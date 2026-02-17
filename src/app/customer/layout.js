@@ -650,7 +650,7 @@ export default function CustomerLayout({ children }) {
           )}
 
           {/* Navigation */}
-          <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto">
+          <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto pb-20">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">CUSTOMER MENU</p>
             <div className="space-y-1">
               {navigation.map((item) => (
@@ -758,19 +758,8 @@ export default function CustomerLayout({ children }) {
                     <Home className="w-5 h-5" />
                   </Link>
 
-                  <Link 
-                    href="/customer/support" 
-                    className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                    style={{ color: '#2A2A2A' }}
-                    title="Support"
-                  >
-                    <HelpCircle className="w-5 h-5" />
-                  </Link>
+                
 
-                  <button className="relative w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-                    <Bell className="w-5 h-5" style={{ color: '#2A2A2A' }} />
-                    <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#E39A65' }}></span>
-                  </button>
 
                   {/* User Dropdown */}
                   {user && (
@@ -832,17 +821,7 @@ export default function CustomerLayout({ children }) {
                               <span>Settings</span>
                             </Link>
                             
-                            <a
-                              href="https://wa.me/1234567890?text=Hello%2C%20I%20need%20assistance%20with%20my%20account"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
-                              style={{ color: '#2A2A2A' }}
-                              onClick={() => setUserMenuOpen(false)}
-                            >
-                              <MessageSquare className="w-4 h-4" style={{ color: '#25D366' }} />
-                              <span>WhatsApp Support</span>
-                            </a>
+                          
                             
                             <button
                               onClick={() => {
@@ -866,18 +845,9 @@ export default function CustomerLayout({ children }) {
           </header>
 
           {/* Page content */}
-          <main className="py-6 px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
-                {pathname.split('/').pop() === 'customer' || pathname.split('/').pop() === 'dashboard' 
-                  ? 'Customer Dashboard' 
-                  : pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + 
-                    pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').slice(1) || 'Dashboard'}
-              </h1>
-            </div>
-
-            {children}
-          </main>
+         <main className="" style={{ margin: 0, padding: 0 }}>
+        {children}
+        </main>
         </div>
       </div>
     </>

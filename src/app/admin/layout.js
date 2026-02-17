@@ -611,7 +611,7 @@ export default function AdminLayout({ children }) {
           )}
 
           {/* Navigation */}
-          <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto">
+       <nav className="px-3 py-4 h-[calc(100vh-11rem)] overflow-y-auto pb-24">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">MAIN MENU</p>
             <div className="space-y-1">
               {navigation.map((item) => (
@@ -685,10 +685,7 @@ export default function AdminLayout({ children }) {
                     <Home className="w-5 h-5" />
                   </Link>
 
-                  <button className="relative w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#E39A65' }}></span>
-                  </button>
+                  
 
                   {/* User Dropdown */}
                   {user && (

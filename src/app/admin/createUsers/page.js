@@ -495,21 +495,7 @@ export default function CreateUsers() {
           </form>
         </motion.div>
 
-        {/* E-commerce Footer Stats */}
-        <div className="mt-6 grid grid-cols-3 gap-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl font-bold" style={{ color: '#E39A65' }}>50+</div>
-            <div className="text-xs text-gray-500">Active Admins</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl font-bold" style={{ color: '#E39A65' }}>120+</div>
-            <div className="text-xs text-gray-500">Moderators</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-2xl font-bold" style={{ color: '#E39A65' }}>24/7</div>
-            <div className="text-xs text-gray-500">Support</div>
-          </div>
-        </div>
+       
       </div>
     </div>
   );
