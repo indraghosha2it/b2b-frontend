@@ -385,6 +385,7 @@
 // }
 
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -407,7 +408,8 @@ import {
   Package,
   MessageSquare,
   Home,
-  ChevronRight
+  ChevronRight,
+  UserCog
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -482,11 +484,17 @@ export default function AdminLayout({ children }) {
       icon: UserPlus,
       current: pathname.startsWith('/admin/createUsers')
     },
+     {
+      name: 'Manage Users',
+      href: '/admin/manageUsers',
+      icon: UserCog,
+      current: pathname.startsWith('/admin/manageUsers')
+    },
     {
-      name: 'Customers',
-      href: '/admin/customers',
+      name: 'All Customers',
+      href: '/admin/allCustomers',
       icon: Users,
-      current: pathname.startsWith('/admin/customers')
+      current: pathname.startsWith('/admin/allCustomers')
     },
     {
       name: 'Payments',
@@ -750,17 +758,8 @@ export default function AdminLayout({ children }) {
             </div>
           </header>
 
-          {/* Page content */}
-          <main className="py-6 px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
-                {pathname.split('/').pop() === 'admin' || pathname.split('/').pop() === 'dashboard' 
-                  ? 'Dashboard' 
-                  : pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + 
-                    pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').slice(1) || 'Dashboard'}
-              </h1>
-            </div>
-
+          {/* Page content - WITHOUT the page title */}
+         <main className="" style={{ margin: 0, padding: 0 }}>
             {children}
           </main>
         </div>
@@ -768,5 +767,3 @@ export default function AdminLayout({ children }) {
     </>
   );
 }
-
-

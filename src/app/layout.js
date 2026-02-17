@@ -97,7 +97,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "B2B Wholesale Clothing Platform",
+  title: " Asian Clothify || B2B Wholesale Clothing Platform",
   description: "B2B Wholesale Clothing Platform",
 };
 
