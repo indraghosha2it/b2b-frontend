@@ -438,7 +438,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { 
   LayoutDashboard, 
   ShoppingBag, 
-  Package,
+  PackagePlus,
   Users, 
   BarChart3, 
   Settings, 
@@ -454,7 +454,8 @@ import {
   Eye,
   FileEdit,
   ClipboardList,
-  HelpCircle
+  HelpCircle,
+  FolderPlus
 } from 'lucide-react';
 
 export default function ModeratorLayout({ children }) {
@@ -505,23 +506,21 @@ export default function ModeratorLayout({ children }) {
       icon: LayoutDashboard,
       current: pathname === '/moderator/dashboard'
     },
+
     {
-      name: 'Products',
-      href: '/moderator/products',
-      icon: Package,
-      current: pathname.startsWith('/moderator/products'),
-      subItems: [
-        { name: 'All Products', href: '/moderator/products' },
-        { name: 'Add New Product', href: '/moderator/products/create' },
-        { name: 'Pending Approval', href: '/moderator/products/pending' }
-      ]
+      name: 'Create Categories',
+      href: '/moderator/createCategories',
+      icon: FolderPlus,
+      current: pathname.startsWith('/moderator/createCategories')
     },
     {
-      name: 'Categories',
-      href: '/moderator/categories',
-      icon: ShoppingBag,
-      current: pathname.startsWith('/moderator/categories')
+      name: 'Create Products',
+      href: '/moderator/createProducts',
+      icon: PackagePlus,
+      current: pathname.startsWith('/moderator/createProducts'),
+     
     },
+  
     {
       name: 'Product Images',
       href: '/moderator/images',
