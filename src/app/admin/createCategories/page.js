@@ -21,12 +21,13 @@
 //   FileText,
 //   Hash,
 //   Clock,
+//   RefreshCw,
 //   Upload
 // } from 'lucide-react';
 // import Link from 'next/link';
 // import { toast } from 'sonner';
 
-// export default function CreateCategories() {
+// export default function AdminCategories() {
 //   const router = useRouter();
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +41,7 @@
 //   const [errors, setErrors] = useState({});
 //   const [imageError, setImageError] = useState('');
 //   const [searchTerm, setSearchTerm] = useState('');
-  
+
 //   // File input refs
 //   const fileInputRef = useRef(null);
 //   const editFileInputRef = useRef(null);
@@ -55,20 +56,21 @@
 //   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 //   const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-//   // Fetch existing categories
-//   useEffect(() => {
-//     fetchCategories();
-//   }, []);
-
-//   // Check user role
+//   // Check admin access
 //   useEffect(() => {
 //     const user = JSON.parse(localStorage.getItem('user') || '{}');
 //     console.log('Current user role:', user.role);
     
-//     if (user.role !== 'moderator' && user.role !== 'admin') {
-//       console.log('Unauthorized - redirecting');
+//     if (user.role !== 'admin') {
+//       console.log('Unauthorized - redirecting to login');
+//       toast.error('Admin access required');
 //       router.push('/login');
 //     }
+//   }, [router]);
+
+//   // Fetch categories
+//   useEffect(() => {
+//     fetchCategories();
 //   }, []);
 
 //   const fetchCategories = async () => {
@@ -424,16 +426,28 @@
 //         <div className="px-6 py-4">
 //           <div className="flex items-center justify-between">
 //             <div className="flex items-center gap-4">
-//               <Link href="/moderator/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+//               <Link href="/admin/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
 //                 <ArrowLeft className="w-5 h-5 text-gray-600" />
 //               </Link>
 //               <div>
 //                 <div className="flex items-center gap-2">
 //                   <h1 className="text-2xl font-bold text-gray-900">Category Management</h1>
-//                   <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full">Moderator</span>
+//                   <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">Admin</span>
 //                 </div>
-//                 <p className="text-sm text-gray-500 mt-1">Create and manage product categories</p>
+//                 <p className="text-sm text-gray-500 mt-1">Manage all product categories with full control</p>
 //               </div>
+//             </div>
+//             <div className="flex items-center gap-3">
+//               <div className="text-sm text-gray-600">
+//                 Total: <span className="font-semibold text-[#E39A65]">{categories.length}</span> categories
+//               </div>
+//               <button
+//                 onClick={fetchCategories}
+//                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+//                 title="Refresh"
+//               >
+//                 <RefreshCw className="w-5 h-5" />
+//               </button>
 //             </div>
 //           </div>
 //         </div>
@@ -583,20 +597,22 @@
 //             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //               {/* Table Header with Search */}
 //               <div className="p-5 border-b border-gray-200">
-//                 <div className="flex items-center justify-between">
+//                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 //                   <h2 className="text-lg font-semibold text-gray-900">
 //                     All Categories ({filteredCategories.length})
 //                   </h2>
+                  
+//                   {/* Search */}
 //                   <div className="relative w-64">
-//                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-//                     <input
-//                       type="text"
-//                       placeholder="Search categories..."
-//                       value={searchTerm}
-//                       onChange={(e) => setSearchTerm(e.target.value)}
-//                       className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition placeholder:text-gray-400"
-//                     />
-//                   </div>
+//   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+//   <input
+//     type="text"
+//     placeholder="Search categories..."
+//     value={searchTerm}
+//     onChange={(e) => setSearchTerm(e.target.value)}
+//     className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition placeholder:text-gray-400"
+//   />
+// </div>
 //                 </div>
 //               </div>
 
@@ -654,6 +670,9 @@
 //                             <div className="text-sm text-gray-600">
 //                               {formatDate(category.createdAt)}
 //                             </div>
+//                             <div className="text-xs text-gray-400 mt-0.5">
+//                               by {category.createdBy?.contactPerson || 'Unknown'}
+//                             </div>
 //                           </td>
 //                           <td className="px-5 py-3">
 //                             <div className="flex items-center justify-end gap-2">
@@ -698,7 +717,7 @@
 //         </div>
 //       </div>
 
-//       {/* Compact View Modal */}
+//       {/* View Modal */}
 //       {viewModal.show && (
 //         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 //           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 overflow-hidden">
@@ -807,7 +826,7 @@
 //         </div>
 //       )}
 
-//       {/* Compact Edit Modal */}
+//       {/* Edit Modal */}
 //       {editModal.show && (
 //         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 //           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
@@ -977,7 +996,7 @@
 //                 Are you sure you want to delete <span className="font-semibold">"{deleteModal.name}"</span>?
 //               </p>
 //               <p className="text-sm text-gray-500 mb-6">
-//                 This action cannot be undone. Products in this category may need to be reassigned.
+//                 This action cannot be undone. The category and its image will be permanently removed.
 //               </p>
 
 //               <div className="flex items-center justify-end gap-3">
@@ -1003,6 +1022,7 @@
 // }
 
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1026,15 +1046,15 @@ import {
   FileText,
   Hash,
   Clock,
+  RefreshCw,
   Upload,
   Package,
-  Info,
-  RefreshCw
+  Info
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function CreateCategories() {
+export default function AdminCategories() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1048,7 +1068,7 @@ export default function CreateCategories() {
   const [errors, setErrors] = useState({});
   const [imageError, setImageError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // File input refs
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
@@ -1063,20 +1083,21 @@ export default function CreateCategories() {
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
   const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-  // Fetch existing categories with product counts
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Check user role
+  // Check admin access
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     console.log('Current user role:', user.role);
     
-    if (user.role !== 'moderator' && user.role !== 'admin') {
-      console.log('Unauthorized - redirecting');
+    if (user.role !== 'admin') {
+      console.log('Unauthorized - redirecting to login');
+      toast.error('Admin access required');
       router.push('/login');
     }
+  }, [router]);
+
+  // Fetch categories with product counts
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
@@ -1299,11 +1320,6 @@ export default function CreateCategories() {
 
   // Delete Modal Handlers
   const handleDeleteClick = (id, name, productCount) => {
-    // Only allow delete if no products
-    if (productCount > 0) {
-      toast.error('Cannot delete category with existing products');
-      return;
-    }
     setDeleteModal({ show: true, id, name, productCount });
   };
 
@@ -1479,15 +1495,15 @@ export default function CreateCategories() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/moderator/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Link href="/admin/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-bold text-gray-900">Category Management</h1>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full">Moderator</span>
+                  <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">Admin</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">Create and manage product categories</p>
+                <p className="text-sm text-gray-500 mt-1">Manage all product categories with full control</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -1645,163 +1661,163 @@ export default function CreateCategories() {
             </div>
           </div>
 
-          {/* Right Column - Categories Table */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              {/* Table Header with Search */}
-              <div className="p-5 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    All Categories ({filteredCategories.length})
-                  </h2>
-                  
-                  {/* Search */}
-                  <div className="relative w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                    <input
-                      type="text"
-                      placeholder="Search categories..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition placeholder:text-gray-400"
+        {/* Right Column - Categories Table */}
+<div className="lg:col-span-2">
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    {/* Table Header with Search */}
+    <div className="p-5 border-b border-gray-200">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-gray-900">
+          All Categories ({filteredCategories.length})
+        </h2>
+        
+        {/* Search */}
+        <div className="relative w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition placeholder:text-gray-400"
+          />
+        </div>
+      </div>
+    </div>
+
+    {/* Table */}
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+            <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div className="flex items-center gap-1">
+                <Package className="w-3.5 h-3.5" />
+                Products
+              </div>
+            </th>
+            <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {isLoading ? (
+            <tr>
+              <td colSpan="5" className="px-5 py-8 text-center">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#E39A65]" />
+              </td>
+            </tr>
+          ) : filteredCategories.length === 0 ? (
+            <tr>
+              <td colSpan="5" className="px-5 py-8 text-center text-gray-500">
+                {searchTerm ? 'No categories found matching your search' : 'No categories created yet'}
+              </td>
+            </tr>
+          ) : (
+            filteredCategories.map((category) => (
+              <tr key={category._id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-5 py-3">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
+                    <img 
+                      src={category.image?.url || '/placeholder-image.jpg'} 
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/48?text=No+Image';
+                      }}
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <div className="flex items-center gap-1">
-                          <Package className="w-3.5 h-3.5" />
-                          Products
-                        </div>
-                      </th>
-                      <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan="5" className="px-5 py-8 text-center">
-                          <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#E39A65]" />
-                        </td>
-                      </tr>
-                    ) : filteredCategories.length === 0 ? (
-                      <tr>
-                        <td colSpan="5" className="px-5 py-8 text-center text-gray-500">
-                          {searchTerm ? 'No categories found matching your search' : 'No categories created yet'}
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredCategories.map((category) => (
-                        <tr key={category._id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-5 py-3">
-                            <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
-                              <img 
-                                src={category.image?.url || '/placeholder-image.jpg'} 
-                                alt={category.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = 'https://via.placeholder.com/48?text=No+Image';
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-5 py-3">
-                            <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                            <div className="text-xs text-gray-500 mt-0.5">ID: {category._id.slice(-6)}</div>
-                          </td>
-                          <td className="px-5 py-3">
-                            <div className="text-sm text-gray-600 max-w-xs">
-                              {truncateDescription(category.description, 8)}
-                            </div>
-                          </td>
-                          <td className="px-5 py-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              category.productCount > 0 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-gray-100 text-gray-600'
-                            }`}>
-                              {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
+                </td>
+                <td className="px-5 py-3">
+                  <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">ID: {category._id.slice(-6)}</div>
+                </td>
+                <td className="px-5 py-3">
+                  <div className="text-sm text-gray-600 max-w-xs">
+                    {truncateDescription(category.description, 8)}
+                  </div>
+                </td>
+                <td className="px-5 py-3">
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    category.productCount > 0 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
+                  </span>
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleViewClick(category)}
+                      className="p-1.5 text-gray-600 hover:text-[#E39A65] hover:bg-orange-50 rounded-lg transition-colors"
+                      title="View Details"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleEditClick(category)}
+                      className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    
+                    {/* Delete Button with Conditional Disable */}
+                    <div className="relative group">
+                      <button
+                        onClick={() => {
+                          if (category.productCount === 0) {
+                            handleDeleteClick(category._id, category.name, category.productCount);
+                          }
+                        }}
+                        disabled={category.productCount > 0}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          category.productCount > 0
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                        }`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      
+                      {/* Custom tooltip for disabled button - positioned to the left */}
+                      {category.productCount > 0 && (
+                        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-48 text-center shadow-lg">
+                          <div className="flex items-start gap-1.5">
+                            <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-orange-300" />
+                            <span className="leading-tight break-words text-left">
+                              Cannot delete - This category has {category.productCount} product{category.productCount !== 1 ? 's' : ''}
                             </span>
-                          </td>
-                          <td className="px-5 py-3">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => handleViewClick(category)}
-                                className="p-1.5 text-gray-600 hover:text-[#E39A65] hover:bg-orange-50 rounded-lg transition-colors"
-                                title="View Details"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleEditClick(category)}
-                                className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                title="Edit"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              
-                              {/* Delete Button with Conditional Disable */}
-                              <div className="relative group">
-                                <button
-                                  onClick={() => {
-                                    if (category.productCount === 0) {
-                                      handleDeleteClick(category._id, category.name, category.productCount);
-                                    }
-                                  }}
-                                  disabled={category.productCount > 0}
-                                  className={`p-1.5 rounded-lg transition-colors ${
-                                    category.productCount > 0
-                                      ? 'text-gray-300 cursor-not-allowed'
-                                      : 'text-gray-600 hover:text-red-600 hover:bg-red-50'
-                                  }`}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                                
-                                {/* Custom tooltip for disabled button - positioned to the left */}
-                                {category.productCount > 0 && (
-                                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-48 text-center shadow-lg">
-                                    <div className="flex items-start gap-1.5">
-                                      <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-orange-300" />
-                                      <span className="leading-tight break-words text-left">
-                                        Cannot delete - This category has {category.productCount} product{category.productCount !== 1 ? 's' : ''}
-                                      </span>
-                                    </div>
-                                    <div className="absolute top-full right-2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                          </div>
+                          <div className="absolute top-full right-2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
 
-              {/* Table Footer */}
-              <div className="px-5 py-3 border-t border-gray-200 bg-gray-50">
-                <p className="text-xs text-gray-500">
-                  Showing {filteredCategories.length} of {categories.length} categories
-                </p>
-              </div>
-            </div>
-          </div>
+    {/* Table Footer */}
+    <div className="px-5 py-3 border-t border-gray-200 bg-gray-50">
+      <p className="text-xs text-gray-500">
+        Showing {filteredCategories.length} of {categories.length} categories
+      </p>
+    </div>
+  </div>
+</div>
         </div>
       </div>
 
-      {/* Compact View Modal */}
+      {/* View Modal */}
       {viewModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 overflow-hidden">
@@ -1927,7 +1943,7 @@ export default function CreateCategories() {
         </div>
       )}
 
-      {/* Compact Edit Modal */}
+      {/* Edit Modal */}
       {editModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">

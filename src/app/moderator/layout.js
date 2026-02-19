@@ -522,10 +522,10 @@ export default function ModeratorLayout({ children }) {
     },
   
     {
-      name: 'Product Images',
-      href: '/moderator/images',
+      name: 'All Products ',
+      href: '/moderator/allProducts',
       icon: Image,
-      current: pathname.startsWith('/moderator/images')
+      current: pathname.startsWith('/moderator/allProducts')
     },
     {
       name: 'Inquiries',

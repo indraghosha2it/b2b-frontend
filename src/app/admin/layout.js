@@ -409,7 +409,8 @@ import {
   MessageSquare,
   Home,
   ChevronRight,
-  UserCog
+  UserCog,
+  FolderPlus
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -477,6 +478,18 @@ export default function AdminLayout({ children }) {
       href: '/admin/createProducts',
       icon: Package,
       current: pathname.startsWith('/admin/createProducts')
+    },
+      {
+      name: 'All Products',
+      href: '/admin/allProducts',
+      icon: Package,
+      current: pathname.startsWith('/admin/allProducts')
+    },
+    {
+      name: 'Create Category',
+      href: '/admin/createCategories',
+      icon: FolderPlus,
+      current: pathname.startsWith('/admin/createCategories')
     },
     {
       name: 'Create Users',
