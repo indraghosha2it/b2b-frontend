@@ -1023,6 +1023,8 @@
 
 
 
+
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1100,69 +1102,48 @@ export default function AdminCategories() {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      
-      // First fetch categories
-      const response = await fetch('http://localhost:5000/api/categories', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+ const fetchCategories = async () => {
+  setIsLoading(true);
+  try {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch('http://localhost:5000/api/categories', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // If categories already have embedded products, count them directly
+      const categoriesWithCounts = data.data.map(category => {
+        // Check if category has products array (from your embedded schema)
+        let productCount = 0;
+        
+        if (category.products && Array.isArray(category.products)) {
+          // Count only active/approved products if needed
+          productCount = category.products.length;
+        } else if (category.productCount) {
+          // If backend already provides productCount
+          productCount = category.productCount;
         }
+        
+        return {
+          ...category,
+          productCount
+        };
       });
       
-      const data = await response.json();
-      
-      if (data.success) {
-        // For each category, fetch its products count
-        const categoriesWithCounts = await Promise.all(
-          data.data.map(async (category) => {
-            try {
-              // Fetch products for this category
-              const productsResponse = await fetch(`http://localhost:5000/api/products/category/${category._id}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-              
-              const productsData = await productsResponse.json();
-              
-              // Get product count (handle both array response and paginated response)
-              let productCount = 0;
-              if (productsData.success) {
-                if (Array.isArray(productsData.data)) {
-                  productCount = productsData.data.length;
-                } else if (productsData.data && Array.isArray(productsData.data.products)) {
-                  productCount = productsData.data.products.length;
-                } else if (productsData.pagination) {
-                  productCount = productsData.pagination.total || 0;
-                }
-              }
-              
-              return {
-                ...category,
-                productCount
-              };
-            } catch (error) {
-              console.error(`Error fetching products for category ${category._id}:`, error);
-              return {
-                ...category,
-                productCount: 0
-              };
-            }
-          })
-        );
-        
-        setCategories(categoriesWithCounts);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to fetch categories');
-    } finally {
-      setIsLoading(false);
+      setCategories(categoriesWithCounts);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    toast.error('Failed to fetch categories');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // View Modal Handlers
   const handleViewClick = (category) => {

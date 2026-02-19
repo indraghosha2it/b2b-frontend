@@ -710,59 +710,11 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Additional Info Badge */}
-          <div className="mt-6 flex justify-center">
-            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
-              <FaCheckCircle className="text-green-500" />
-              <span>Facility open for visits by appointment</span>
-            </div>
-          </div>
+        
         </div>
       </section>
 
-      {/* TEAM SECTION */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="bg-orange-100 text-orange-600 text-sm font-semibold px-4 py-2 rounded-full">
-              👥 OUR TEAM
-            </span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-6 mb-4">
-              The People Behind Our Success
-            </h2>
-            <p className="text-gray-600">
-              Dedicated professionals committed to your satisfaction
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {teamMembers.map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
-                  <p className="text-orange-600 font-medium mb-2">{member.role}</p>
-                  <p className="text-sm text-gray-500">Experience: {member.experience}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+    
 
       {/* CTA SECTION */}
       <section className="py-20 bg-gray-900 text-white">

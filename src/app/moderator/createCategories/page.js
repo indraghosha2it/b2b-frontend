@@ -1079,69 +1079,49 @@ export default function CreateCategories() {
     }
   }, []);
 
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      
-      // First fetch categories
-      const response = await fetch('http://localhost:5000/api/categories', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+ const fetchCategories = async () => {
+  setIsLoading(true);
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Fetch categories
+    const response = await fetch('http://localhost:5000/api/categories', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Method 1: If categories already have embedded products (from your earlier implementation)
+      const categoriesWithCounts = data.data.map(category => {
+        let productCount = 0;
+        
+        // Check if category has embedded products array
+        if (category.products && Array.isArray(category.products)) {
+          productCount = category.products.length;
+        } 
+        // Check if category has productCount field directly
+        else if (category.productCount !== undefined) {
+          productCount = category.productCount;
         }
+        
+        return {
+          ...category,
+          productCount
+        };
       });
       
-      const data = await response.json();
-      
-      if (data.success) {
-        // For each category, fetch its products count
-        const categoriesWithCounts = await Promise.all(
-          data.data.map(async (category) => {
-            try {
-              // Fetch products for this category
-              const productsResponse = await fetch(`http://localhost:5000/api/products/category/${category._id}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-              
-              const productsData = await productsResponse.json();
-              
-              // Get product count (handle both array response and paginated response)
-              let productCount = 0;
-              if (productsData.success) {
-                if (Array.isArray(productsData.data)) {
-                  productCount = productsData.data.length;
-                } else if (productsData.data && Array.isArray(productsData.data.products)) {
-                  productCount = productsData.data.products.length;
-                } else if (productsData.pagination) {
-                  productCount = productsData.pagination.total || 0;
-                }
-              }
-              
-              return {
-                ...category,
-                productCount
-              };
-            } catch (error) {
-              console.error(`Error fetching products for category ${category._id}:`, error);
-              return {
-                ...category,
-                productCount: 0
-              };
-            }
-          })
-        );
-        
-        setCategories(categoriesWithCounts);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('Failed to fetch categories');
-    } finally {
-      setIsLoading(false);
+      setCategories(categoriesWithCounts);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    toast.error('Failed to fetch categories');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // View Modal Handlers
   const handleViewClick = (category) => {
