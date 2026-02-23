@@ -217,9 +217,9 @@ export default function AdminAllProducts() {
     setActiveImageIndex(prev => ({ ...prev, [productId]: 0 }));
   };
 
-  const handleEdit = (productId) => {
-    router.push(`/admin/products/edit/${productId}`);
-  };
+ const handleEdit = (productId) => {
+  router.push(`/admin/editProduct?id=${productId}`);
+};
 
   const handleView = (productId) => {
     router.push(`/admin/products/${productId}`);
@@ -409,7 +409,7 @@ export default function AdminAllProducts() {
         product.isActive ? 'border-gray-200' : 'border-red-200 bg-red-50/30'
       } group`}>
         {/* Image Container */}
-        <div className="relative h-48 overflow-hidden bg-gray-100">
+        <div className="relative h-52 overflow-hidden bg-gray-100">
           <img
             src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
             alt={product.productName}
@@ -438,7 +438,7 @@ export default function AdminAllProducts() {
             {productImages.slice(0, 4).map((image, idx) => (
               <div
                 key={idx}
-                className={`relative w-8 h-8 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                className={`relative w-10 h-10 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
                   activeIndex === idx 
                     ? 'border-[#E39A65] scale-110 shadow-md' 
                     : 'border-transparent opacity-60 hover:opacity-100'

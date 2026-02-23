@@ -1,6 +1,4 @@
 
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -21,7 +19,8 @@
 //   Ruler,
 //   MinusCircle,
 //   PlusCircle,
-//   ChevronDown
+//   ChevronDown,
+//   Users
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -64,11 +63,20 @@
 //   '#1ABC9C', // Turquoise
 // ];
 
+// // Targeted customer options
+// const TARGETED_CUSTOMERS = [
+//   { value: 'ladies', label: 'Ladies', icon: '👩' },
+//   { value: 'gents', label: 'Gents', icon: '👨' },
+//   { value: 'kids', label: 'Kids', icon: '🧒' },
+//   { value: 'unisex', label: 'Unisex', icon: '👤' }
+// ];
+
 // export default function CreateProduct() {
 //   const router = useRouter();
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
+//   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
@@ -76,11 +84,12 @@
 //   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
-//   // Form state
+//   // Form state with targetedCustomer added
 //   const [formData, setFormData] = useState({
 //     productName: '',
 //     description: '',
 //     category: '',
+//     targetedCustomer: 'unisex', // New field with default value
 //     fabric: '',
 //     moq: 100,
 //     pricePerUnit: 0,
@@ -134,7 +143,7 @@
 //     };
 //   }, []);
 
-//   // Initialize TipTap editor only on client side with all necessary extensions
+//   // Initialize TipTap editor only on client side
 //   const editor = useEditor({
 //     extensions: [
 //       StarterKit,
@@ -160,13 +169,22 @@
 //     fetchCategories();
 //   }, []);
 
+//   // Fetch category details when category is selected
+//   useEffect(() => {
+//     if (formData.category) {
+//       fetchCategoryDetails(formData.category);
+//     } else {
+//       setSelectedCategoryDetails(null);
+//     }
+//   }, [formData.category]);
+
 //   // Check user role
 //   useEffect(() => {
 //     const user = JSON.parse(localStorage.getItem('user') || '{}');
 //     if (user.role !== 'moderator' && user.role !== 'admin') {
 //       router.push('/login');
 //     }
-//   }, []);
+//   }, [router]);
 
 //   const fetchCategories = async () => {
 //     setIsLoading(true);
@@ -187,6 +205,24 @@
 //       toast.error('Failed to fetch categories');
 //     } finally {
 //       setIsLoading(false);
+//     }
+//   };
+
+//   const fetchCategoryDetails = async (categoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         setSelectedCategoryDetails(data.data);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching category details:', error);
 //     }
 //   };
 
@@ -261,7 +297,6 @@
 //     const updatedPricing = [...formData.quantityBasedPricing];
     
 //     if (field === 'price') {
-//       // Handle empty price field
 //       if (value === '') {
 //         updatedPricing[index] = { ...updatedPricing[index], [field]: '' };
 //       } else {
@@ -349,7 +384,7 @@
 //     }
 //   };
 
-//   // Validate form
+//   // Validate form - Updated with targetedCustomer validation
 //   const validateForm = () => {
 //     const newErrors = {};
 
@@ -359,6 +394,10 @@
 
 //     if (!formData.category) {
 //       newErrors.category = 'Category is required';
+//     }
+
+//     if (!formData.targetedCustomer) {
+//       newErrors.targetedCustomer = 'Targeted customer is required';
 //     }
 
 //     if (!formData.fabric.trim()) {
@@ -373,19 +412,16 @@
 //       newErrors.pricePerUnit = 'Price must be 0 or greater';
 //     }
 
-//     // Check if at least one image is uploaded
 //     const hasImages = productImages.some(img => img.file !== null);
 //     if (!hasImages) {
 //       newErrors.images = 'At least one product image is required';
 //     }
 
-//     // Validate sizes
 //     const validSizes = formData.sizes.filter(s => s.trim() !== '');
 //     if (validSizes.length === 0) {
 //       newErrors.sizes = 'At least one size is required';
 //     }
 
-//     // Validate colors
 //     if (formData.colors.length === 0) {
 //       newErrors.colors = 'At least one color is required';
 //     }
@@ -394,11 +430,10 @@
 //     return Object.keys(newErrors).length === 0;
 //   };
 
-//   // Handle form submission
+//   // Handle form submission - Updated with targetedCustomer
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
-//     // Check for empty price fields in quantity based pricing
 //     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
 //     if (hasEmptyPrice) {
 //       toast.error('Please fill in all price fields in Quantity Based Pricing');
@@ -416,28 +451,24 @@
 //       const token = localStorage.getItem('token');
 //       const formDataToSend = new FormData();
 
-//       // Convert empty strings back to numbers for submission
 //       const processedPricing = formData.quantityBasedPricing.map(tier => ({
 //         ...tier,
 //         price: tier.price === '' ? 0 : parseFloat(tier.price)
 //       }));
 
-//       // Append basic details
+//       // Append all form data
 //       formDataToSend.append('productName', formData.productName);
 //       formDataToSend.append('description', formData.description);
 //       formDataToSend.append('category', formData.category);
+//       formDataToSend.append('targetedCustomer', formData.targetedCustomer); // New field
 //       formDataToSend.append('fabric', formData.fabric);
 //       formDataToSend.append('moq', formData.moq);
 //       formDataToSend.append('pricePerUnit', formData.pricePerUnit);
-
-//       // Append quantity based pricing
 //       formDataToSend.append('quantityBasedPricing', JSON.stringify(processedPricing));
-
-//       // Append sizes and colors
 //       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
 //       formDataToSend.append('colors', JSON.stringify(formData.colors));
 
-//       // Append images (only non-null ones)
+//       // Append images
 //       productImages.forEach((img, index) => {
 //         if (img.file) {
 //           formDataToSend.append('images', img.file);
@@ -466,6 +497,12 @@
 //     } finally {
 //       setIsSubmitting(false);
 //     }
+//   };
+
+//   // Get icon for selected customer
+//   const getSelectedCustomerIcon = () => {
+//     const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
+//     return customer ? customer.icon : '👤';
 //   };
 
 //   return (
@@ -567,8 +604,9 @@
 //                       )}
 //                     </div>
 
-//                     {/* Category and Fabric */}
-//                     <div className="grid grid-cols-2 gap-4">
+//                     {/* Category, Targeted Customer, and Fabric - 3 Column Layout */}
+//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Category <span className="text-red-500">*</span>
@@ -589,8 +627,50 @@
 //                         {errors.category && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
 //                         )}
+                        
+//                         {/* Show selected category details */}
+//                         {selectedCategoryDetails && (
+//                           <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
+//                             <p className="text-xs text-gray-600">
+//                               <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
+//                             </p>
+//                           </div>
+//                         )}
 //                       </div>
 
+//                       {/* Targeted Customer - New Field */}
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           <div className="flex items-center gap-1">
+//                             <Users className="w-4 h-4" />
+//                             Target Customer <span className="text-red-500">*</span>
+//                           </div>
+//                         </label>
+//                         <div className="relative">
+//                           <select
+//                             name="targetedCustomer"
+//                             value={formData.targetedCustomer}
+//                             onChange={handleChange}
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none ${
+//                               errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
+//                             }`}
+//                           >
+//                             {TARGETED_CUSTOMERS.map(customer => (
+//                               <option key={customer.value} value={customer.value}>
+//                                 {customer.icon} {customer.label}
+//                               </option>
+//                             ))}
+//                           </select>
+//                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+//                             <span className="text-lg">{getSelectedCustomerIcon()}</span>
+//                           </div>
+//                         </div>
+//                         {errors.targetedCustomer && (
+//                           <p className="text-xs text-red-600 mt-1">{errors.targetedCustomer}</p>
+//                         )}
+//                       </div>
+
+//                       {/* Fabric */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Fabric (Material) <span className="text-red-500">*</span>
@@ -610,6 +690,23 @@
 //                         )}
 //                       </div>
 //                     </div>
+
+//                     {/* Quick Stats for Selected Customer */}
+//                     {formData.targetedCustomer && (
+//                       <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+//                         <div className="flex items-center gap-2">
+//                           <span className="text-2xl">{getSelectedCustomerIcon()}</span>
+//                           <div>
+//                             <p className="text-sm font-medium text-gray-900">
+//                               {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label} Collection
+//                             </p>
+//                             <p className="text-xs text-gray-600">
+//                               This product will be shown in the {formData.targetedCustomer} section
+//                             </p>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}
 //                   </div>
 //                 </div>
 //               </div>
@@ -870,70 +967,67 @@
 
 //                   {/* Quantity Based Pricing */}
 //                   <div>
-//               <div className="flex items-center justify-between mb-4">
-//                 <label className="block text-sm font-medium text-gray-700">
-//                   Quantity Based Pricing:
-//                 </label>
-//                 <button
-//                   type="button"
-//                   onClick={addPricingRow}
-//                   className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#E39A65] hover:bg-orange-50 rounded-lg transition-colors border border-[#E39A65]/20"
-//                 >
-//                   <PlusCircle className="w-3.5 h-3.5" />
-//                   Add Tier
-//                 </button>
-//               </div>
-              
-//               <div className="space-y-4">
-//                 {formData.quantityBasedPricing.map((tier, index) => (
-//                   <div key={index} className="flex items-start gap-3">
-//                     {/* Quantity Range Field - 50% width */}
-//                     <div className="w-1/2">
-//                       <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                         Quantity Range
+//                     <div className="flex items-center justify-between mb-4">
+//                       <label className="block text-sm font-medium text-gray-700">
+//                         Quantity Based Pricing:
 //                       </label>
-//                       <input
-//                         type="text"
-//                         value={tier.range}
-//                         onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
-//                         placeholder="e.g., 100-299"
-//                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
-//                       />
+//                       <button
+//                         type="button"
+//                         onClick={addPricingRow}
+//                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#E39A65] hover:bg-orange-50 rounded-lg transition-colors border border-[#E39A65]/20"
+//                       >
+//                         <PlusCircle className="w-3.5 h-3.5" />
+//                         Add Tier
+//                       </button>
 //                     </div>
                     
-//                     {/* Price Field - 50% width */}
-//                     <div className="w-1/2">
-//                       <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                         Price ($)
-//                       </label>
-//                       <input
-//                         type="number"
-//                         value={tier.price}
-//                         onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
-//                         placeholder="0.00"
-//                         min="0"
-//                         step="0.01"
-//                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
-//                       />
+//                     <div className="space-y-4">
+//                       {formData.quantityBasedPricing.map((tier, index) => (
+//                         <div key={index} className="flex items-start gap-3">
+//                           <div className="w-1/2">
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
+//                               Quantity Range
+//                             </label>
+//                             <input
+//                               type="text"
+//                               value={tier.range}
+//                               onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
+//                               placeholder="e.g., 100-299"
+//                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+//                             />
+//                           </div>
+                          
+//                           <div className="w-1/2">
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
+//                               Price ($)
+//                             </label>
+//                             <input
+//                               type="number"
+//                               value={tier.price}
+//                               onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
+//                               placeholder="0.00"
+//                               min="0"
+//                               step="0.01"
+//                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+//                             />
+//                           </div>
+                          
+//                           {formData.quantityBasedPricing.length > 1 && (
+//                             <div className="flex items-end h-[62px]">
+//                               <button
+//                                 type="button"
+//                                 onClick={() => removePricingRow(index)}
+//                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+//                                 title="Remove Tier"
+//                               >
+//                                 <MinusCircle className="w-5 h-5" />
+//                               </button>
+//                             </div>
+//                           )}
+//                         </div>
+//                       ))}
 //                     </div>
-                    
-//                     {/* Delete Button */}
-//                     {formData.quantityBasedPricing.length > 1 && (
-//                       <div className="flex items-end h-[62px]">
-//                         <button
-//                           type="button"
-//                           onClick={() => removePricingRow(index)}
-//                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                           title="Remove Tier"
-//                         >
-//                           <MinusCircle className="w-5 h-5" />
-//                         </button>
-//                       </div>
-//                     )}
 //                   </div>
-//                 ))}
-//               </div>
-//             </div>
 //                 </div>
 //               </div>
 //             </div>
@@ -967,7 +1061,6 @@
 
 
 
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -989,7 +1082,10 @@ import {
   MinusCircle,
   PlusCircle,
   ChevronDown,
-  Users
+  Users,
+  Info,
+  Hash,
+  Type
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1005,31 +1101,10 @@ import '@mantine/core/styles.css';
 
 // Predefined colors for quick selection
 const PREDEFINED_COLORS = [
-  '#FF0000', // Red
-  '#0000FF', // Blue
-  '#00FF00', // Green
-  '#FFFF00', // Yellow
-  '#FF00FF', // Magenta
-  '#00FFFF', // Cyan
-  '#000000', // Black
-  '#FFFFFF', // White
-  '#808080', // Gray
-  '#800000', // Maroon
-  '#808000', // Olive
-  '#008000', // Dark Green
-  '#800080', // Purple
-  '#008080', // Teal
-  '#000080', // Navy
-  '#FFA500', // Orange
-  '#FFC0CB', // Pink
-  '#A52A2A', // Brown
-  '#E39A65', // Your brand color
-  '#4A90E2', // Blue
-  '#50C878', // Emerald
-  '#9B59B6', // Purple
-  '#E74C3C', // Red
-  '#F39C12', // Orange
-  '#1ABC9C', // Turquoise
+  '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
+  '#000000', '#FFFFFF', '#808080', '#800000', '#808000', '#008000',
+  '#800080', '#008080', '#000080', '#FFA500', '#FFC0CB', '#A52A2A',
+  '#E39A65', '#4A90E2', '#50C878', '#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C'
 ];
 
 // Targeted customer options
@@ -1053,12 +1128,12 @@ export default function CreateProduct() {
   // Refs for click outside detection
   const colorPickerRef = useRef(null);
   
-  // Form state with targetedCustomer added
+  // Form state with additionalInfo
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
     category: '',
-    targetedCustomer: 'unisex', // New field with default value
+    targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
     pricePerUnit: 0,
@@ -1070,7 +1145,8 @@ export default function CreateProduct() {
       { code: '#FF0000' },
       { code: '#0000FF' },
       { code: '#000000' }
-    ]
+    ],
+    additionalInfo: [] // New field for additional information
   });
 
   // Image state for 4 images
@@ -1353,7 +1429,58 @@ export default function CreateProduct() {
     }
   };
 
-  // Validate form - Updated with targetedCustomer validation
+  // ========== ADDITIONAL INFO HANDLERS ==========
+  
+  // Handle additional info changes
+  const handleAdditionalInfoChange = (index, field, value) => {
+    const updatedInfo = [...formData.additionalInfo];
+    updatedInfo[index] = { ...updatedInfo[index], [field]: value };
+    setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+    
+    // Clear error for this field if it exists
+    if (errors[`additionalInfo_${index}_${field}`]) {
+      setErrors(prev => ({ ...prev, [`additionalInfo_${index}_${field}`]: null }));
+    }
+  };
+
+  // Add new additional info row
+  const addAdditionalInfo = () => {
+    setFormData(prev => ({
+      ...prev,
+      additionalInfo: [
+        ...prev.additionalInfo,
+        { fieldName: '', fieldValue: '' }
+      ]
+    }));
+  };
+
+  // Remove additional info row
+  const removeAdditionalInfo = (index) => {
+    const updatedInfo = formData.additionalInfo.filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+  };
+
+  // Validate additional info
+  const validateAdditionalInfo = () => {
+    let isValid = true;
+    const newErrors = {};
+
+    formData.additionalInfo.forEach((info, index) => {
+      if (!info.fieldName.trim()) {
+        newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
+        isValid = false;
+      }
+      if (!info.fieldValue.trim()) {
+        newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
+        isValid = false;
+      }
+    });
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return isValid;
+  };
+
+  // Validate form - Updated with additionalInfo validation
   const validateForm = () => {
     const newErrors = {};
 
@@ -1396,10 +1523,14 @@ export default function CreateProduct() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    // Validate additional info separately
+    const isAdditionalInfoValid = validateAdditionalInfo();
+    
+    return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
   };
 
-  // Handle form submission - Updated with targetedCustomer
+  // Handle form submission - Updated with additionalInfo
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -1425,17 +1556,23 @@ export default function CreateProduct() {
         price: tier.price === '' ? 0 : parseFloat(tier.price)
       }));
 
+      // Filter out empty additional info rows
+      const processedAdditionalInfo = formData.additionalInfo.filter(
+        info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
+      );
+
       // Append all form data
       formDataToSend.append('productName', formData.productName);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('category', formData.category);
-      formDataToSend.append('targetedCustomer', formData.targetedCustomer); // New field
+      formDataToSend.append('targetedCustomer', formData.targetedCustomer);
       formDataToSend.append('fabric', formData.fabric);
       formDataToSend.append('moq', formData.moq);
       formDataToSend.append('pricePerUnit', formData.pricePerUnit);
       formDataToSend.append('quantityBasedPricing', JSON.stringify(processedPricing));
       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
       formDataToSend.append('colors', JSON.stringify(formData.colors));
+      formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
 
       // Append images
       productImages.forEach((img, index) => {
@@ -1607,7 +1744,7 @@ export default function CreateProduct() {
                         )}
                       </div>
 
-                      {/* Targeted Customer - New Field */}
+                      {/* Targeted Customer */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <div className="flex items-center gap-1">
@@ -1876,6 +2013,122 @@ export default function CreateProduct() {
                       <Plus className="w-3.5 h-3.5" />
                       Add Color
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* NEW ROW: Additional Information */}
+            <div className="mb-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Info className="w-5 h-5 text-[#E39A65]" />
+                    Additional Information
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Add custom fields for extra product details (e.g., Material Care, Country of Origin, Warranty, etc.)
+                  </p>
+                </div>
+                
+                <div className="p-5">
+                  <div className="space-y-4">
+                    {formData.additionalInfo.map((info, index) => (
+                      <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Field Name */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              <div className="flex items-center gap-1">
+                                <Type className="w-3 h-3" />
+                                Field Name
+                              </div>
+                            </label>
+                            <input
+                              type="text"
+                              value={info.fieldName}
+                              onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
+                              placeholder="e.g., Material Care, Country, Warranty"
+                              className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                                errors[`additionalInfo_${index}_fieldName`] ? 'border-red-500' : 'border-gray-300'
+                              }`}
+                            />
+                            {errors[`additionalInfo_${index}_fieldName`] && (
+                              <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldName`]}</p>
+                            )}
+                          </div>
+                          
+                          {/* Field Value */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              <div className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                Field Value
+                              </div>
+                            </label>
+                            <input
+                              type="text"
+                              value={info.fieldValue}
+                              onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
+                              placeholder="e.g., Machine Wash, Bangladesh, 2 Years"
+                              className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                                errors[`additionalInfo_${index}_fieldValue`] ? 'border-red-500' : 'border-gray-300'
+                              }`}
+                            />
+                            {errors[`additionalInfo_${index}_fieldValue`] && (
+                              <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldValue`]}</p>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Remove Button */}
+                        <button
+                          type="button"
+                          onClick={() => removeAdditionalInfo(index)}
+                          className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                          title="Remove Field"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {/* Add Button */}
+                    <button
+                      type="button"
+                      onClick={addAdditionalInfo}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50 hover:border-[#E39A65] transition-colors"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      Add Additional Information
+                    </button>
+
+                    {/* Example suggestions */}
+                    {formData.additionalInfo.length === 0 && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-xs font-medium text-blue-800 mb-2">Suggested fields:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Care Instructions', 'Country of Origin', 'Warranty', 'Material Composition', 'Season', 'Occasion'].map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  additionalInfo: [
+                                    ...prev.additionalInfo,
+                                    { fieldName: suggestion, fieldValue: '' }
+                                  ]
+                                }));
+                              }}
+                              className="px-2 py-1 text-xs bg-white text-blue-700 rounded-full border border-blue-300 hover:bg-blue-100 transition-colors"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

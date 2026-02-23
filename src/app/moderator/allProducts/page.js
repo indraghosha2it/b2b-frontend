@@ -267,9 +267,9 @@ export default function ModeratorAllProducts() {
     setActiveImageIndex(prev => ({ ...prev, [productId]: 0 }));
   };
 
-  const handleEdit = (productId) => {
-    router.push(`/moderator/products/edit/${productId}`);
-  };
+const handleEdit = (productId) => {
+  router.push(`/moderator/editProduct?id=${productId}`);
+};
 
   const handleView = (productId) => {
     router.push(`/moderator/products/${productId}`);

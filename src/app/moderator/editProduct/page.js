@@ -1,12 +1,7 @@
-
-
-
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
-// import { useRouter } from 'next/navigation';
+// import { useRouter, useSearchParams } from 'next/navigation';
 // import { 
 //   Plus, 
 //   X, 
@@ -24,7 +19,8 @@
 //   MinusCircle,
 //   PlusCircle,
 //   ChevronDown,
-//   Users
+//   Users,
+//   Shield
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -40,59 +36,44 @@
 
 // // Predefined colors for quick selection
 // const PREDEFINED_COLORS = [
-//   '#FF0000', // Red
-//   '#0000FF', // Blue
-//   '#00FF00', // Green
-//   '#FFFF00', // Yellow
-//   '#FF00FF', // Magenta
-//   '#00FFFF', // Cyan
-//   '#000000', // Black
-//   '#FFFFFF', // White
-//   '#808080', // Gray
-//   '#800000', // Maroon
-//   '#808000', // Olive
-//   '#008000', // Dark Green
-//   '#800080', // Purple
-//   '#008080', // Teal
-//   '#000080', // Navy
-//   '#FFA500', // Orange
-//   '#FFC0CB', // Pink
-//   '#A52A2A', // Brown
-//   '#E39A65', // Your brand color
-//   '#4A90E2', // Blue
-//   '#50C878', // Emerald
-//   '#9B59B6', // Purple
-//   '#E74C3C', // Red
-//   '#F39C12', // Orange
-//   '#1ABC9C', // Turquoise
+//   '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
+//   '#000000', '#FFFFFF', '#808080', '#800000', '#808000', '#008000',
+//   '#800080', '#008080', '#000080', '#FFA500', '#FFC0CB', '#A52A2A',
+//   '#E39A65', '#4A90E2', '#50C878', '#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C',
 // ];
 
 // // Targeted customer options
 // const TARGETED_CUSTOMERS = [
-//   { value: 'ladies', label: 'Ladies' },
-//   { value: 'gents', label: 'Gents' },
-//   { value: 'kids', label: 'Kids' },
-//   { value: 'unisex', label: 'Unisex' }
+//   { value: 'ladies', label: 'Ladies', icon: '👩' },
+//   { value: 'gents', label: 'Gents', icon: '👨' },
+//   { value: 'kids', label: 'Kids', icon: '🧒' },
+//   { value: 'unisex', label: 'Unisex', icon: '👤' }
 // ];
 
-// export default function ModeratorCreateProduct() {
+// export default function ModeratorEditProduct() {
 //   const router = useRouter();
-//   const [isLoading, setIsLoading] = useState(false);
+//   const searchParams = useSearchParams();
+//   const productId = searchParams.get('id');
+  
+//   const [isLoading, setIsLoading] = useState(true);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
+//   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
+//   const [originalProduct, setOriginalProduct] = useState(null);
+//   const [userRole, setUserRole] = useState('');
   
 //   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
-//   // Form state with targetedCustomer added
+//   // Form state
 //   const [formData, setFormData] = useState({
 //     productName: '',
 //     description: '',
 //     category: '',
-//     targetedCustomer: 'unisex', // Default value
+//     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
 //     pricePerUnit: 0,
@@ -107,15 +88,12 @@
 //     ]
 //   });
 
-//   // Image state for 4 images
-//   const [productImages, setProductImages] = useState([
-//     { file: null, preview: null, error: '' },
-//     { file: null, preview: null, error: '' },
-//     { file: null, preview: null, error: '' },
-//     { file: null, preview: null, error: '' }
-//   ]);
+//   // Image states
+//   const [existingImages, setExistingImages] = useState([]);
+//   const [newImages, setNewImages] = useState([]);
+//   const [imagesToDelete, setImagesToDelete] = useState([]);
 
-//   // File input refs for images
+//   // File input refs for new images
 //   const fileInputRefs = useRef([]);
 
 //   // Errors state
@@ -129,7 +107,25 @@
 //   // Set mounted state
 //   useEffect(() => {
 //     setIsMounted(true);
-//   }, []);
+    
+//     // Get user role
+//     const user = JSON.parse(localStorage.getItem('user') || '{}');
+//     setUserRole(user.role || '');
+    
+//     // Check if user has access (moderator or admin)
+//     if (user.role !== 'moderator' && user.role !== 'admin') {
+//       toast.error('Unauthorized access');
+//       router.push('/login');
+//     }
+//   }, [router]);
+
+//   // Check if product ID exists
+//   useEffect(() => {
+//     if (!productId) {
+//       toast.error('No product ID provided');
+//       router.push('/moderator/allProducts');
+//     }
+//   }, [productId, router]);
 
 //   // Click outside handler for color picker
 //   useEffect(() => {
@@ -167,21 +163,31 @@
 //     editable: true,
 //   });
 
-//   // Fetch categories on mount
+//   // Fetch categories and product data on mount
 //   useEffect(() => {
-//     fetchCategories();
-//   }, []);
-
-//   // Check user role
-//   useEffect(() => {
-//     const user = JSON.parse(localStorage.getItem('user') || '{}');
-//     if (user.role !== 'moderator' && user.role !== 'admin') {
-//       router.push('/login');
+//     if (productId) {
+//       fetchCategories();
+//       fetchProduct();
 //     }
-//   }, []);
+//   }, [productId]);
+
+//   // Fetch category details when category is selected
+//   useEffect(() => {
+//     if (formData.category) {
+//       fetchCategoryDetails(formData.category);
+//     } else {
+//       setSelectedCategoryDetails(null);
+//     }
+//   }, [formData.category]);
+
+//   // Update editor content when formData.description changes
+//   useEffect(() => {
+//     if (editor && formData.description !== editor.getHTML()) {
+//       editor.commands.setContent(formData.description);
+//     }
+//   }, [formData.description, editor]);
 
 //   const fetchCategories = async () => {
-//     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch('http://localhost:5000/api/categories', {
@@ -197,6 +203,66 @@
 //     } catch (error) {
 //       console.error('Error fetching categories:', error);
 //       toast.error('Failed to fetch categories');
+//     }
+//   };
+
+//   const fetchCategoryDetails = async (categoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         setSelectedCategoryDetails(data.data);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching category details:', error);
+//     }
+//   };
+
+//   const fetchProduct = async () => {
+//     setIsLoading(true);
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         const product = data.data;
+//         setOriginalProduct(product);
+        
+//         // Set form data
+//         setFormData({
+//           productName: product.productName || '',
+//           description: product.description || '',
+//           category: product.category?._id || product.category || '',
+//           targetedCustomer: product.targetedCustomer || 'unisex',
+//           fabric: product.fabric || '',
+//           moq: product.moq || 100,
+//           pricePerUnit: product.pricePerUnit || 0,
+//           quantityBasedPricing: product.quantityBasedPricing || [{ range: '100-299', price: 0 }],
+//           sizes: product.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+//           colors: product.colors || [{ code: '#FF0000' }]
+//         });
+
+//         // Set existing images
+//         setExistingImages(product.images || []);
+//       } else {
+//         toast.error('Failed to fetch product details');
+//         router.push('/moderator/allProducts');
+//       }
+//     } catch (error) {
+//       console.error('Error fetching product:', error);
+//       toast.error('Failed to fetch product details');
+//       router.push('/moderator/allProducts');
 //     } finally {
 //       setIsLoading(false);
 //     }
@@ -223,70 +289,51 @@
 //     return { valid: true };
 //   };
 
-//   // Handle image change for specific index
-//   const handleImageChange = (e, index) => {
+//   // Handle new image selection
+//   const handleNewImageChange = (e, index) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
 
 //     const validation = validateImageFile(file);
 //     if (!validation.valid) {
-//       const updatedImages = [...productImages];
-//       updatedImages[index] = { ...updatedImages[index], error: validation.message };
-//       setProductImages(updatedImages);
+//       toast.error(validation.message);
 //       return;
 //     }
 
 //     const reader = new FileReader();
 //     reader.onloadend = () => {
-//       const updatedImages = [...productImages];
-//       updatedImages[index] = {
+//       const updatedNewImages = [...newImages];
+//       updatedNewImages[index] = {
 //         file,
-//         preview: reader.result,
-//         error: ''
+//         preview: reader.result
 //       };
-//       setProductImages(updatedImages);
+//       setNewImages(updatedNewImages);
 //     };
 //     reader.readAsDataURL(file);
 //   };
 
-//   // Remove image at specific index
-//   const removeImage = (index) => {
-//     const updatedImages = [...productImages];
-//     updatedImages[index] = { file: null, preview: null, error: '' };
-//     setProductImages(updatedImages);
+//   // Remove existing image
+//   const removeExistingImage = (imageId) => {
+//     setImagesToDelete(prev => [...prev, imageId]);
+//     setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
+//   };
+
+//   // Remove new image
+//   const removeNewImage = (index) => {
+//     const updatedNewImages = [...newImages];
+//     updatedNewImages[index] = null;
+//     setNewImages(updatedNewImages);
 //     if (fileInputRefs.current[index]) {
 //       fileInputRefs.current[index].value = '';
 //     }
 //   };
 
-//   // Handle form input changes - Updated with better debugging
+//   // Handle form input changes
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
-//     console.log('Field changed:', name, 'Value:', value); // Debug log
-    
-//     setFormData(prev => ({ 
-//       ...prev, 
-//       [name]: value 
-//     }));
-    
-//     // Clear error for this field if it exists
+//     setFormData(prev => ({ ...prev, [name]: value }));
 //     if (errors[name]) {
 //       setErrors(prev => ({ ...prev, [name]: null }));
-//     }
-//   };
-
-//   // Specific handler for targeted customer (for extra safety)
-//   const handleTargetedCustomerChange = (e) => {
-//     const value = e.target.value;
-//     console.log('Targeted customer changed to:', value); // Debug log
-    
-//     setFormData(prev => ({
-//       ...prev,
-//       targetedCustomer: value
-//     }));
-    
-//     if (errors.targetedCustomer) {
-//       setErrors(prev => ({ ...prev, targetedCustomer: null }));
 //     }
 //   };
 
@@ -382,7 +429,7 @@
 //     }
 //   };
 
-//   // Validate form - Updated with targetedCustomer validation
+//   // Validate form
 //   const validateForm = () => {
 //     const newErrors = {};
 
@@ -410,7 +457,7 @@
 //       newErrors.pricePerUnit = 'Price must be 0 or greater';
 //     }
 
-//     const hasImages = productImages.some(img => img.file !== null);
+//     const hasImages = existingImages.length > 0 || newImages.some(img => img !== null);
 //     if (!hasImages) {
 //       newErrors.images = 'At least one product image is required';
 //     }
@@ -428,13 +475,44 @@
 //     return Object.keys(newErrors).length === 0;
 //   };
 
-//   // Handle form submission - Updated with targetedCustomer
+//   // Check if any changes were made
+//   const hasChanges = () => {
+//     if (!originalProduct) return false;
+
+//     // Check basic fields
+//     if (formData.productName !== originalProduct.productName) return true;
+//     if (formData.description !== originalProduct.description) return true;
+//     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
+//     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
+//     if (formData.fabric !== originalProduct.fabric) return true;
+//     if (formData.moq !== originalProduct.moq) return true;
+//     if (formData.pricePerUnit !== originalProduct.pricePerUnit) return true;
+
+//     // Check quantity based pricing
+//     if (JSON.stringify(formData.quantityBasedPricing) !== JSON.stringify(originalProduct.quantityBasedPricing)) return true;
+
+//     // Check sizes
+//     if (JSON.stringify(formData.sizes) !== JSON.stringify(originalProduct.sizes)) return true;
+
+//     // Check colors
+//     if (JSON.stringify(formData.colors) !== JSON.stringify(originalProduct.colors)) return true;
+
+//     // Check images
+//     if (imagesToDelete.length > 0) return true;
+//     if (newImages.some(img => img !== null)) return true;
+
+//     return false;
+//   };
+
+//   // Handle form submission
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
-//     // Debug log before submission
-//     console.log('Submitting form with data:', formData);
-//     console.log('Targeted customer value:', formData.targetedCustomer);
+//     if (!hasChanges()) {
+//       toast.info('No changes to save');
+//       router.push('/moderator/allProducts');
+//       return;
+//     }
 
 //     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
 //     if (hasEmptyPrice) {
@@ -462,7 +540,7 @@
 //       formDataToSend.append('productName', formData.productName);
 //       formDataToSend.append('description', formData.description);
 //       formDataToSend.append('category', formData.category);
-//       formDataToSend.append('targetedCustomer', formData.targetedCustomer); // Make sure this is included
+//       formDataToSend.append('targetedCustomer', formData.targetedCustomer);
 //       formDataToSend.append('fabric', formData.fabric);
 //       formDataToSend.append('moq', formData.moq);
 //       formDataToSend.append('pricePerUnit', formData.pricePerUnit);
@@ -470,20 +548,20 @@
 //       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
 //       formDataToSend.append('colors', JSON.stringify(formData.colors));
 
-//       // Append images
-//       productImages.forEach((img, index) => {
-//         if (img.file) {
+//       // Append images to delete
+//       if (imagesToDelete.length > 0) {
+//         formDataToSend.append('imagesToDelete', JSON.stringify(imagesToDelete));
+//       }
+
+//       // Append new images
+//       newImages.forEach(img => {
+//         if (img && img.file) {
 //           formDataToSend.append('images', img.file);
 //         }
 //       });
 
-//       // Debug: Check what's in FormData
-//       for (let pair of formDataToSend.entries()) {
-//         console.log('FormData entry:', pair[0], pair[1]);
-//       }
-
-//       const response = await fetch('http://localhost:5000/api/products', {
-//         method: 'POST',
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+//         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         },
@@ -491,21 +569,37 @@
 //       });
 
 //       const data = await response.json();
-//       console.log('Server response:', data);
 
 //       if (data.success) {
-//         toast.success('Product created successfully!');
+//         toast.success('Product updated successfully!');
 //         router.push('/moderator/allProducts');
 //       } else {
-//         toast.error(data.error || 'Failed to create product');
+//         toast.error(data.error || 'Failed to update product');
 //       }
 //     } catch (error) {
-//       console.error('Error creating product:', error);
+//       console.error('Error updating product:', error);
 //       toast.error('Network error. Please try again.');
 //     } finally {
 //       setIsSubmitting(false);
 //     }
 //   };
+
+//   // Get icon for selected customer
+//   const getSelectedCustomerIcon = () => {
+//     const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
+//     return customer ? customer.icon : '👤';
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+//         <div className="text-center">
+//           <Loader2 className="w-12 h-12 animate-spin text-[#E39A65] mx-auto mb-4" />
+//           <p className="text-gray-600">Loading product details...</p>
+//         </div>
+//       </div>
+//     );
+//   }
 
 //   return (
 //     <MantineProvider>
@@ -515,17 +609,20 @@
 //           <div className="px-6 py-4">
 //             <div className="flex items-center justify-between">
 //               <div className="flex items-center gap-4">
-//                 <NextLink href="/moderator/products" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+//                 <NextLink href="/moderator/allProducts" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
 //                   <ArrowLeft className="w-5 h-5 text-gray-600" />
 //                 </NextLink>
 //                 <div>
 //                   <div className="flex items-center gap-2">
-//                     <h1 className="text-2xl font-bold text-gray-900">Create New Product</h1>
-//                     <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+//                     <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+//                     <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full flex items-center gap-1">
+//                       <Shield className="w-3 h-3" />
 //                       Moderator
 //                     </span>
 //                   </div>
-//                   <p className="text-sm text-gray-500 mt-1">Add a new product to your catalog</p>
+//                   <p className="text-sm text-gray-500 mt-1">
+//                     Product ID: {productId?.slice(-8)} • Update product information
+//                   </p>
 //                 </div>
 //               </div>
 //             </div>
@@ -535,9 +632,9 @@
 //         {/* Main Content */}
 //         <div className="p-6">
 //           <form onSubmit={handleSubmit}>
-//             {/* Row 1: Basic Details (Left) and Product Images (Right) */}
+//             {/* Row 1: Basic Details and Product Images */}
 //             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-//               {/* Basic Details Card - Left (2/3 width) */}
+//               {/* Basic Details Card */}
 //               <div className="lg:col-span-2">
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
@@ -571,7 +668,7 @@
 //                       )}
 //                     </div>
 
-//                     {/* Description with Mantine TipTap Rich Text Editor */}
+//                     {/* Description with Rich Text Editor */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Description
@@ -606,7 +703,7 @@
 //                       )}
 //                     </div>
 
-//                     {/* Category, Targeted Customer, and Fabric - 3 Column Layout */}
+//                     {/* Category, Targeted Customer, and Fabric */}
 //                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 //                       {/* Category */}
 //                       <div>
@@ -629,9 +726,18 @@
 //                         {errors.category && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
 //                         )}
+                        
+//                         {/* Show selected category details */}
+//                         {selectedCategoryDetails && (
+//                           <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
+//                             <p className="text-xs text-gray-600">
+//                               <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
+//                             </p>
+//                           </div>
+//                         )}
 //                       </div>
 
-//                       {/* Targeted Customer - Fixed with specific handler */}
+//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -639,20 +745,25 @@
 //                             Target Customer <span className="text-red-500">*</span>
 //                           </div>
 //                         </label>
-//                         <select
-//                           name="targetedCustomer"
-//                           value={formData.targetedCustomer}
-//                           onChange={handleTargetedCustomerChange} // Using specific handler
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                             errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
-//                           }`}
-//                         >
-//                           {TARGETED_CUSTOMERS.map(customer => (
-//                             <option key={customer.value} value={customer.value}>
-//                               {customer.label}
-//                             </option>
-//                           ))}
-//                         </select>
+//                         <div className="relative">
+//                           <select
+//                             name="targetedCustomer"
+//                             value={formData.targetedCustomer}
+//                             onChange={handleChange}
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none ${
+//                               errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
+//                             }`}
+//                           >
+//                             {TARGETED_CUSTOMERS.map(customer => (
+//                               <option key={customer.value} value={customer.value}>
+//                                 {customer.icon} {customer.label}
+//                               </option>
+//                             ))}
+//                           </select>
+//                           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+//                             <span className="text-lg">{getSelectedCustomerIcon()}</span>
+//                           </div>
+//                         </div>
 //                         {errors.targetedCustomer && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.targetedCustomer}</p>
 //                         )}
@@ -678,21 +789,11 @@
 //                         )}
 //                       </div>
 //                     </div>
-
-//                     {/* Info message for selected customer */}
-//                     {formData.targetedCustomer && (
-//                       <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
-//                         <p className="text-xs text-gray-600">
-//                           <span className="font-medium">Selected customer:</span>{' '}
-//                           {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label}
-//                         </p>
-//                       </div>
-//                     )}
 //                   </div>
 //                 </div>
 //               </div>
 
-//               {/* Product Images Card - Right (1/3 width) */}
+//               {/* Product Images Card */}
 //               <div className="lg:col-span-1">
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
@@ -700,7 +801,9 @@
 //                       <ImageIcon className="w-5 h-5 text-[#E39A65]" />
 //                       Product Images <span className="text-red-500">*</span>
 //                     </h2>
-//                     <p className="text-xs text-gray-500 mt-1">Upload up to 4 images (JPG, PNG, WebP, max 5MB each)</p>
+//                     <p className="text-xs text-gray-500 mt-1">
+//                       Existing images: {existingImages.length} • Max 4 images total
+//                     </p>
 //                   </div>
                   
 //                   <div className="p-5">
@@ -711,56 +814,92 @@
 //                       </p>
 //                     )}
                     
-//                     <div className="grid grid-cols-2 gap-4">
-//                       {[0, 1, 2, 3].map((index) => (
-//                         <div key={index}>
-//                           {!productImages[index].preview ? (
-//                             <div 
-//                               className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer h-32 flex flex-col items-center justify-center ${
-//                                 productImages[index].error ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#E39A65] hover:bg-orange-50'
-//                               }`}
-//                               onClick={() => fileInputRefs.current[index]?.click()}
-//                             >
-//                               <input 
-//                                 type="file" 
-//                                 ref={el => fileInputRefs.current[index] = el}
-//                                 className="hidden" 
-//                                 accept="image/jpeg,image/jpg,image/png,image/webp" 
-//                                 onChange={(e) => handleImageChange(e, index)} 
-//                               />
-//                               <Upload className={`w-6 h-6 mx-auto mb-2 ${productImages[index].error ? 'text-red-400' : 'text-gray-400'}`} />
-//                               <p className={`text-xs ${productImages[index].error ? 'text-red-600' : 'text-gray-600'}`}>
-//                                 Image {index + 1}
-//                               </p>
-//                             </div>
-//                           ) : (
-//                             <div className="relative rounded-lg overflow-hidden border border-gray-200 h-32">
+//                     {/* Existing Images */}
+//                     {existingImages.length > 0 && (
+//                       <div className="mb-4">
+//                         <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+//                         <div className="grid grid-cols-2 gap-3">
+//                           {existingImages.map((image, index) => (
+//                             <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
 //                               <img 
-//                                 src={productImages[index].preview} 
+//                                 src={image.url} 
 //                                 alt={`Product ${index + 1}`} 
 //                                 className="w-full h-full object-cover"
 //                               />
 //                               <button
 //                                 type="button"
-//                                 onClick={() => removeImage(index)}
+//                                 onClick={() => removeExistingImage(image.publicId)}
 //                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//                                 title="Remove Image"
 //                               >
 //                                 <X className="w-3 h-3" />
 //                               </button>
+//                               {image.isPrimary && (
+//                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//                                   Primary
+//                                 </span>
+//                               )}
 //                             </div>
-//                           )}
-//                           {productImages[index].error && (
-//                             <p className="text-xs text-red-600 mt-1">{productImages[index].error}</p>
-//                           )}
+//                           ))}
 //                         </div>
-//                       ))}
-//                     </div>
+//                       </div>
+//                     )}
+
+//                     {/* New Images Upload */}
+//                     {existingImages.length + newImages.filter(img => img !== null).length < 4 && (
+//                       <div>
+//                         <h3 className="text-xs font-medium text-gray-500 mb-2">Add New Images</h3>
+//                         <div className="grid grid-cols-2 gap-3">
+//                           {[0, 1, 2, 3].map((index) => {
+//                             if (index >= (4 - (existingImages.length + newImages.filter(img => img !== null).length))) {
+//                               return null;
+//                             }
+                            
+//                             return (
+//                               <div key={`new-${index}`}>
+//                                 {!newImages[index] ? (
+//                                   <div 
+//                                     className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+//                                     onClick={() => fileInputRefs.current[index]?.click()}
+//                                   >
+//                                     <input 
+//                                       type="file" 
+//                                       ref={el => fileInputRefs.current[index] = el}
+//                                       className="hidden" 
+//                                       accept="image/jpeg,image/jpg,image/png,image/webp" 
+//                                       onChange={(e) => handleNewImageChange(e, index)} 
+//                                     />
+//                                     <Upload className="w-5 h-5 text-gray-400 mb-1" />
+//                                     <p className="text-xs text-gray-600">New Image</p>
+//                                   </div>
+//                                 ) : (
+//                                   <div className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+//                                     <img 
+//                                       src={newImages[index].preview} 
+//                                       alt={`New ${index + 1}`} 
+//                                       className="w-full h-full object-cover"
+//                                     />
+//                                     <button
+//                                       type="button"
+//                                       onClick={() => removeNewImage(index)}
+//                                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//                                     >
+//                                       <X className="w-3 h-3" />
+//                                     </button>
+//                                   </div>
+//                                 )}
+//                               </div>
+//                             );
+//                           })}
+//                         </div>
+//                       </div>
+//                     )}
 //                   </div>
 //                 </div>
 //               </div>
 //             </div>
 
-//             {/* Row 2: Sizes (Left) and Colors (Right) */}
+//             {/* Row 2: Sizes and Colors */}
 //             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 //               {/* Sizes Card */}
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -893,7 +1032,7 @@
 //               </div>
 //             </div>
 
-//             {/* Row 3: Bulk Pricing (Full Width) */}
+//             {/* Row 3: Bulk Pricing */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1013,22 +1152,42 @@
 //               </div>
 //             </div>
 
-//             {/* Submit Button */}
-//             <div className="mt-6 flex justify-end">
+//             {/* Info Message - Moderator Permissions */}
+//             <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+//               <div className="flex items-start gap-2">
+//                 <Shield className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+//                 <div>
+//                   <p className="text-sm text-blue-800 font-medium">Moderator Access</p>
+//                   <p className="text-xs text-blue-600">
+//                     You can update product information but cannot delete products. 
+//                     All changes will be reflected immediately in the catalog.
+//                   </p>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* Action Buttons */}
+//             <div className="mt-6 flex justify-end gap-3">
+//               <NextLink
+//                 href="/moderator/allProducts"
+//                 className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors text-sm"
+//               >
+//                 Cancel
+//               </NextLink>
 //               <button
 //                 type="submit"
-//                 disabled={isSubmitting}
+//                 disabled={isSubmitting || !hasChanges()}
 //                 className="flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
 //               >
 //                 {isSubmitting ? (
 //                   <>
 //                     <Loader2 className="w-4 h-4 animate-spin" />
-//                     <span>Creating Product...</span>
+//                     <span>Updating Product...</span>
 //                   </>
 //                 ) : (
 //                   <>
 //                     <Save className="w-4 h-4" />
-//                     <span>Create Product</span>
+//                     <span>Update Product</span>
 //                   </>
 //                 )}
 //               </button>
@@ -1045,7 +1204,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   Plus, 
   X, 
@@ -1064,6 +1223,7 @@ import {
   PlusCircle,
   ChevronDown,
   Users,
+  Shield,
   Info,
   Hash,
   Type
@@ -1082,49 +1242,34 @@ import '@mantine/core/styles.css';
 
 // Predefined colors for quick selection
 const PREDEFINED_COLORS = [
-  '#FF0000', // Red
-  '#0000FF', // Blue
-  '#00FF00', // Green
-  '#FFFF00', // Yellow
-  '#FF00FF', // Magenta
-  '#00FFFF', // Cyan
-  '#000000', // Black
-  '#FFFFFF', // White
-  '#808080', // Gray
-  '#800000', // Maroon
-  '#808000', // Olive
-  '#008000', // Dark Green
-  '#800080', // Purple
-  '#008080', // Teal
-  '#000080', // Navy
-  '#FFA500', // Orange
-  '#FFC0CB', // Pink
-  '#A52A2A', // Brown
-  '#E39A65', // Your brand color
-  '#4A90E2', // Blue
-  '#50C878', // Emerald
-  '#9B59B6', // Purple
-  '#E74C3C', // Red
-  '#F39C12', // Orange
-  '#1ABC9C', // Turquoise
+  '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
+  '#000000', '#FFFFFF', '#808080', '#800000', '#808000', '#008000',
+  '#800080', '#008080', '#000080', '#FFA500', '#FFC0CB', '#A52A2A',
+  '#E39A65', '#4A90E2', '#50C878', '#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C',
 ];
 
 // Targeted customer options
 const TARGETED_CUSTOMERS = [
-  { value: 'ladies', label: 'Ladies' },
-  { value: 'gents', label: 'Gents' },
-  { value: 'kids', label: 'Kids' },
-  { value: 'unisex', label: 'Unisex' }
+  { value: 'ladies', label: 'Ladies', icon: '👩' },
+  { value: 'gents', label: 'Gents', icon: '👨' },
+  { value: 'kids', label: 'Kids', icon: '🧒' },
+  { value: 'unisex', label: 'Unisex', icon: '👤' }
 ];
 
-export default function ModeratorCreateProduct() {
+export default function ModeratorEditProduct() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('id');
+  
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [originalProduct, setOriginalProduct] = useState(null);
+  const [userRole, setUserRole] = useState('');
   
   // Refs for click outside detection
   const colorPickerRef = useRef(null);
@@ -1150,15 +1295,12 @@ export default function ModeratorCreateProduct() {
     additionalInfo: [] // New field for additional information
   });
 
-  // Image state for 4 images
-  const [productImages, setProductImages] = useState([
-    { file: null, preview: null, error: '' },
-    { file: null, preview: null, error: '' },
-    { file: null, preview: null, error: '' },
-    { file: null, preview: null, error: '' }
-  ]);
+  // Image states
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
 
-  // File input refs for images
+  // File input refs for new images
   const fileInputRefs = useRef([]);
 
   // Errors state
@@ -1172,7 +1314,25 @@ export default function ModeratorCreateProduct() {
   // Set mounted state
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    
+    // Get user role
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setUserRole(user.role || '');
+    
+    // Check if user has access (moderator or admin)
+    if (user.role !== 'moderator' && user.role !== 'admin') {
+      toast.error('Unauthorized access');
+      router.push('/login');
+    }
+  }, [router]);
+
+  // Check if product ID exists
+  useEffect(() => {
+    if (!productId) {
+      toast.error('No product ID provided');
+      router.push('/moderator/allProducts');
+    }
+  }, [productId, router]);
 
   // Click outside handler for color picker
   useEffect(() => {
@@ -1210,21 +1370,31 @@ export default function ModeratorCreateProduct() {
     editable: true,
   });
 
-  // Fetch categories on mount
+  // Fetch categories and product data on mount
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Check user role
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.role !== 'moderator' && user.role !== 'admin') {
-      router.push('/login');
+    if (productId) {
+      fetchCategories();
+      fetchProduct();
     }
-  }, []);
+  }, [productId]);
+
+  // Fetch category details when category is selected
+  useEffect(() => {
+    if (formData.category) {
+      fetchCategoryDetails(formData.category);
+    } else {
+      setSelectedCategoryDetails(null);
+    }
+  }, [formData.category]);
+
+  // Update editor content when formData.description changes
+  useEffect(() => {
+    if (editor && formData.description !== editor.getHTML()) {
+      editor.commands.setContent(formData.description);
+    }
+  }, [formData.description, editor]);
 
   const fetchCategories = async () => {
-    setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/categories', {
@@ -1240,6 +1410,67 @@ export default function ModeratorCreateProduct() {
     } catch (error) {
       console.error('Error fetching categories:', error);
       toast.error('Failed to fetch categories');
+    }
+  };
+
+  const fetchCategoryDetails = async (categoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setSelectedCategoryDetails(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching category details:', error);
+    }
+  };
+
+  const fetchProduct = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        const product = data.data;
+        setOriginalProduct(product);
+        
+        // Set form data including additionalInfo
+        setFormData({
+          productName: product.productName || '',
+          description: product.description || '',
+          category: product.category?._id || product.category || '',
+          targetedCustomer: product.targetedCustomer || 'unisex',
+          fabric: product.fabric || '',
+          moq: product.moq || 100,
+          pricePerUnit: product.pricePerUnit || 0,
+          quantityBasedPricing: product.quantityBasedPricing || [{ range: '100-299', price: 0 }],
+          sizes: product.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+          colors: product.colors || [{ code: '#FF0000' }],
+          additionalInfo: product.additionalInfo || [] // Load additional info
+        });
+
+        // Set existing images
+        setExistingImages(product.images || []);
+      } else {
+        toast.error('Failed to fetch product details');
+        router.push('/moderator/allProducts');
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      toast.error('Failed to fetch product details');
+      router.push('/moderator/allProducts');
     } finally {
       setIsLoading(false);
     }
@@ -1266,37 +1497,40 @@ export default function ModeratorCreateProduct() {
     return { valid: true };
   };
 
-  // Handle image change for specific index
-  const handleImageChange = (e, index) => {
+  // Handle new image selection
+  const handleNewImageChange = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const validation = validateImageFile(file);
     if (!validation.valid) {
-      const updatedImages = [...productImages];
-      updatedImages[index] = { ...updatedImages[index], error: validation.message };
-      setProductImages(updatedImages);
+      toast.error(validation.message);
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const updatedImages = [...productImages];
-      updatedImages[index] = {
+      const updatedNewImages = [...newImages];
+      updatedNewImages[index] = {
         file,
-        preview: reader.result,
-        error: ''
+        preview: reader.result
       };
-      setProductImages(updatedImages);
+      setNewImages(updatedNewImages);
     };
     reader.readAsDataURL(file);
   };
 
-  // Remove image at specific index
-  const removeImage = (index) => {
-    const updatedImages = [...productImages];
-    updatedImages[index] = { file: null, preview: null, error: '' };
-    setProductImages(updatedImages);
+  // Remove existing image
+  const removeExistingImage = (imageId) => {
+    setImagesToDelete(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
+  };
+
+  // Remove new image
+  const removeNewImage = (index) => {
+    const updatedNewImages = [...newImages];
+    updatedNewImages[index] = null;
+    setNewImages(updatedNewImages);
     if (fileInputRefs.current[index]) {
       fileInputRefs.current[index].value = '';
     }
@@ -1305,30 +1539,9 @@ export default function ModeratorCreateProduct() {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('Field changed:', name, 'Value:', value);
-    
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value 
-    }));
-    
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  };
-
-  // Specific handler for targeted customer
-  const handleTargetedCustomerChange = (e) => {
-    const value = e.target.value;
-    console.log('Targeted customer changed to:', value);
-    
-    setFormData(prev => ({
-      ...prev,
-      targetedCustomer: value
-    }));
-    
-    if (errors.targetedCustomer) {
-      setErrors(prev => ({ ...prev, targetedCustomer: null }));
     }
   };
 
@@ -1503,7 +1716,7 @@ export default function ModeratorCreateProduct() {
       newErrors.pricePerUnit = 'Price must be 0 or greater';
     }
 
-    const hasImages = productImages.some(img => img.file !== null);
+    const hasImages = existingImages.length > 0 || newImages.some(img => img !== null);
     if (!hasImages) {
       newErrors.images = 'At least one product image is required';
     }
@@ -1525,11 +1738,47 @@ export default function ModeratorCreateProduct() {
     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
   };
 
+  // Check if any changes were made
+  const hasChanges = () => {
+    if (!originalProduct) return false;
+
+    // Check basic fields
+    if (formData.productName !== originalProduct.productName) return true;
+    if (formData.description !== originalProduct.description) return true;
+    if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
+    if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
+    if (formData.fabric !== originalProduct.fabric) return true;
+    if (formData.moq !== originalProduct.moq) return true;
+    if (formData.pricePerUnit !== originalProduct.pricePerUnit) return true;
+
+    // Check quantity based pricing
+    if (JSON.stringify(formData.quantityBasedPricing) !== JSON.stringify(originalProduct.quantityBasedPricing)) return true;
+
+    // Check sizes
+    if (JSON.stringify(formData.sizes) !== JSON.stringify(originalProduct.sizes)) return true;
+
+    // Check colors
+    if (JSON.stringify(formData.colors) !== JSON.stringify(originalProduct.colors)) return true;
+
+    // Check additional info
+    if (JSON.stringify(formData.additionalInfo) !== JSON.stringify(originalProduct.additionalInfo || [])) return true;
+
+    // Check images
+    if (imagesToDelete.length > 0) return true;
+    if (newImages.some(img => img !== null)) return true;
+
+    return false;
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Submitting form with data:', formData);
+    if (!hasChanges()) {
+      toast.info('No changes to save');
+      router.push('/moderator/allProducts');
+      return;
+    }
 
     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
     if (hasEmptyPrice) {
@@ -1571,20 +1820,20 @@ export default function ModeratorCreateProduct() {
       formDataToSend.append('colors', JSON.stringify(formData.colors));
       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
 
-      // Append images
-      productImages.forEach((img, index) => {
-        if (img.file) {
+      // Append images to delete
+      if (imagesToDelete.length > 0) {
+        formDataToSend.append('imagesToDelete', JSON.stringify(imagesToDelete));
+      }
+
+      // Append new images
+      newImages.forEach(img => {
+        if (img && img.file) {
           formDataToSend.append('images', img.file);
         }
       });
 
-      // Debug: Check what's in FormData
-      for (let pair of formDataToSend.entries()) {
-        console.log('FormData entry:', pair[0], pair[1]);
-      }
-
-      const response = await fetch('http://localhost:5000/api/products', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -1592,21 +1841,37 @@ export default function ModeratorCreateProduct() {
       });
 
       const data = await response.json();
-      console.log('Server response:', data);
 
       if (data.success) {
-        toast.success('Product created successfully!');
+        toast.success('Product updated successfully!');
         router.push('/moderator/allProducts');
       } else {
-        toast.error(data.error || 'Failed to create product');
+        toast.error(data.error || 'Failed to update product');
       }
     } catch (error) {
-      console.error('Error creating product:', error);
+      console.error('Error updating product:', error);
       toast.error('Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Get icon for selected customer
+  const getSelectedCustomerIcon = () => {
+    const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
+    return customer ? customer.icon : '👤';
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-[#E39A65] mx-auto mb-4" />
+          <p className="text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <MantineProvider>
@@ -1616,17 +1881,20 @@ export default function ModeratorCreateProduct() {
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <NextLink href="/moderator/products" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <NextLink href="/moderator/allProducts" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </NextLink>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold text-gray-900">Create New Product</h1>
-                    <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+                    <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full flex items-center gap-1">
+                      <Shield className="w-3 h-3" />
                       Moderator
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">Add a new product to your catalog</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Product ID: {productId?.slice(-8)} • Update product information
+                  </p>
                 </div>
               </div>
             </div>
@@ -1636,9 +1904,9 @@ export default function ModeratorCreateProduct() {
         {/* Main Content */}
         <div className="p-6">
           <form onSubmit={handleSubmit}>
-            {/* Row 1: Basic Details (Left) and Product Images (Right) */}
+            {/* Row 1: Basic Details and Product Images */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              {/* Basic Details Card - Left (2/3 width) */}
+              {/* Basic Details Card */}
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
@@ -1672,7 +1940,7 @@ export default function ModeratorCreateProduct() {
                       )}
                     </div>
 
-                    {/* Description with Mantine TipTap Rich Text Editor */}
+                    {/* Description with Rich Text Editor */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
@@ -1707,7 +1975,7 @@ export default function ModeratorCreateProduct() {
                       )}
                     </div>
 
-                    {/* Category, Targeted Customer, and Fabric - 3 Column Layout */}
+                    {/* Category, Targeted Customer, and Fabric */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Category */}
                       <div>
@@ -1730,6 +1998,15 @@ export default function ModeratorCreateProduct() {
                         {errors.category && (
                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
                         )}
+                        
+                        {/* Show selected category details */}
+                        {selectedCategoryDetails && (
+                          <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Targeted Customer */}
@@ -1740,20 +2017,25 @@ export default function ModeratorCreateProduct() {
                             Target Customer <span className="text-red-500">*</span>
                           </div>
                         </label>
-                        <select
-                          name="targetedCustomer"
-                          value={formData.targetedCustomer}
-                          onChange={handleTargetedCustomerChange}
-                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-                            errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                        >
-                          {TARGETED_CUSTOMERS.map(customer => (
-                            <option key={customer.value} value={customer.value}>
-                              {customer.label}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select
+                            name="targetedCustomer"
+                            value={formData.targetedCustomer}
+                            onChange={handleChange}
+                            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none ${
+                              errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            {TARGETED_CUSTOMERS.map(customer => (
+                              <option key={customer.value} value={customer.value}>
+                                {customer.icon} {customer.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <span className="text-lg">{getSelectedCustomerIcon()}</span>
+                          </div>
+                        </div>
                         {errors.targetedCustomer && (
                           <p className="text-xs text-red-600 mt-1">{errors.targetedCustomer}</p>
                         )}
@@ -1779,21 +2061,11 @@ export default function ModeratorCreateProduct() {
                         )}
                       </div>
                     </div>
-
-                    {/* Info message for selected customer */}
-                    {formData.targetedCustomer && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-xs text-gray-600">
-                          <span className="font-medium">Selected customer:</span>{' '}
-                          {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Product Images Card - Right (1/3 width) */}
+              {/* Product Images Card */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
@@ -1801,7 +2073,9 @@ export default function ModeratorCreateProduct() {
                       <ImageIcon className="w-5 h-5 text-[#E39A65]" />
                       Product Images <span className="text-red-500">*</span>
                     </h2>
-                    <p className="text-xs text-gray-500 mt-1">Upload up to 4 images (JPG, PNG, WebP, max 5MB each)</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Existing images: {existingImages.length} • Max 4 images total
+                    </p>
                   </div>
                   
                   <div className="p-5">
@@ -1812,56 +2086,92 @@ export default function ModeratorCreateProduct() {
                       </p>
                     )}
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      {[0, 1, 2, 3].map((index) => (
-                        <div key={index}>
-                          {!productImages[index].preview ? (
-                            <div 
-                              className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer h-32 flex flex-col items-center justify-center ${
-                                productImages[index].error ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-[#E39A65] hover:bg-orange-50'
-                              }`}
-                              onClick={() => fileInputRefs.current[index]?.click()}
-                            >
-                              <input 
-                                type="file" 
-                                ref={el => fileInputRefs.current[index] = el}
-                                className="hidden" 
-                                accept="image/jpeg,image/jpg,image/png,image/webp" 
-                                onChange={(e) => handleImageChange(e, index)} 
-                              />
-                              <Upload className={`w-6 h-6 mx-auto mb-2 ${productImages[index].error ? 'text-red-400' : 'text-gray-400'}`} />
-                              <p className={`text-xs ${productImages[index].error ? 'text-red-600' : 'text-gray-600'}`}>
-                                Image {index + 1}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="relative rounded-lg overflow-hidden border border-gray-200 h-32">
+                    {/* Existing Images */}
+                    {existingImages.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {existingImages.map((image, index) => (
+                            <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
                               <img 
-                                src={productImages[index].preview} 
+                                src={image.url} 
                                 alt={`Product ${index + 1}`} 
                                 className="w-full h-full object-cover"
                               />
                               <button
                                 type="button"
-                                onClick={() => removeImage(index)}
+                                onClick={() => removeExistingImage(image.publicId)}
                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                title="Remove Image"
                               >
                                 <X className="w-3 h-3" />
                               </button>
+                              {image.isPrimary && (
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+                                  Primary
+                                </span>
+                              )}
                             </div>
-                          )}
-                          {productImages[index].error && (
-                            <p className="text-xs text-red-600 mt-1">{productImages[index].error}</p>
-                          )}
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+
+                    {/* New Images Upload */}
+                    {existingImages.length + newImages.filter(img => img !== null).length < 4 && (
+                      <div>
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">Add New Images</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {[0, 1, 2, 3].map((index) => {
+                            if (index >= (4 - (existingImages.length + newImages.filter(img => img !== null).length))) {
+                              return null;
+                            }
+                            
+                            return (
+                              <div key={`new-${index}`}>
+                                {!newImages[index] ? (
+                                  <div 
+                                    className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+                                    onClick={() => fileInputRefs.current[index]?.click()}
+                                  >
+                                    <input 
+                                      type="file" 
+                                      ref={el => fileInputRefs.current[index] = el}
+                                      className="hidden" 
+                                      accept="image/jpeg,image/jpg,image/png,image/webp" 
+                                      onChange={(e) => handleNewImageChange(e, index)} 
+                                    />
+                                    <Upload className="w-5 h-5 text-gray-400 mb-1" />
+                                    <p className="text-xs text-gray-600">New Image</p>
+                                  </div>
+                                ) : (
+                                  <div className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+                                    <img 
+                                      src={newImages[index].preview} 
+                                      alt={`New ${index + 1}`} 
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removeNewImage(index)}
+                                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Row 2: Sizes (Left) and Colors (Right) */}
+            {/* Row 2: Sizes and Colors */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               {/* Sizes Card */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -1994,7 +2304,7 @@ export default function ModeratorCreateProduct() {
               </div>
             </div>
 
-            {/* NEW ROW: Additional Information (without suggested fields) */}
+            {/* NEW ROW: Additional Information */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2003,7 +2313,7 @@ export default function ModeratorCreateProduct() {
                     Additional Information
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
-                    Add custom fields for extra product details (e.g., Care Instructions, Country of Origin, Warranty, etc.)
+                    Add or edit custom fields for extra product details (e.g., Care Instructions, Country of Origin, Warranty, etc.)
                   </p>
                 </div>
                 
@@ -2083,7 +2393,7 @@ export default function ModeratorCreateProduct() {
               </div>
             </div>
 
-            {/* Row 3: Bulk Pricing (Full Width) */}
+            {/* Row 3: Bulk Pricing */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2203,22 +2513,42 @@ export default function ModeratorCreateProduct() {
               </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="mt-6 flex justify-end">
+            {/* Info Message - Moderator Permissions */}
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-start gap-2">
+                <Shield className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm text-blue-800 font-medium">Moderator Access</p>
+                  <p className="text-xs text-blue-600">
+                    You can update product information including additional details. 
+                    All changes will be reflected immediately in the catalog.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex justify-end gap-3">
+              <NextLink
+                href="/moderator/allProducts"
+                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors text-sm"
+              >
+                Cancel
+              </NextLink>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !hasChanges()}
                 className="flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Creating Product...</span>
+                    <span>Updating Product...</span>
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    <span>Create Product</span>
+                    <span>Update Product</span>
                   </>
                 )}
               </button>

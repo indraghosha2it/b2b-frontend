@@ -419,33 +419,184 @@ export default function Products() {
   );
 
   // Product Card Component (Grid View) - EXACT design from FeaturedProducts
-  const ProductGridCard = ({ product }) => {
-    const productImages = product.images || [];
-    const activeIndex = activeImageIndex[product._id] || 0;
-    const hasMultipleImages = productImages.length > 1;
-    const firstTier = getFirstPricingTier(product.quantityBasedPricing);
+// Product Card Component (Grid View)
+const ProductGridCard = ({ product }) => {
+  const productImages = product.images || [];
+  const activeIndex = activeImageIndex[product._id] || 0;
+  const hasMultipleImages = productImages.length > 1;
+  const firstTier = getFirstPricingTier(product.quantityBasedPricing);
 
-    return (
-      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100">
-        <Link href={`/products/${product._id}`}>
-          {/* Image Container */}
-          <div className="relative h-64 overflow-hidden bg-gray-100">
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100">
+      {/* REMOVED the outer Link - now just a div */}
+      <div>
+        {/* Image Container */}
+        <div className="relative h-64 overflow-hidden bg-gray-100">
+          <img
+            src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
+            alt={product.productName || 'Product image'}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
+            }}
+          />
+          
+          {/* Category Badge */}
+          <span className="absolute top-4 left-4 bg-[#E39A65] text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-lg">
+            {product.category?.name || 'Uncategorized'}
+          </span>
+          
+          {/* MOQ Badge */}
+          <span className="absolute top-4 right-4 bg-gray-900/90 text-white text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm shadow-lg">
+            MOQ: {product.moq || 0}pcs
+          </span>
+
+          {/* Targeted Customer Badge */}
+          {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
+            <span className="absolute bottom-4 left-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+              {capitalizeFirst(product.targetedCustomer)}
+            </span>
+          )}
+        </div>
+
+        {/* Thumbnail Gallery */}
+        {hasMultipleImages && (
+          <div 
+            className="flex justify-center gap-1 py-3 px-2 bg-gray-50 border-t border-gray-100"
+            onMouseLeave={() => handleImageLeave(product._id)}
+          >
+            {productImages.slice(0, 5).map((image, index) => (
+              <div
+                key={`${product._id}-thumb-${index}`}
+                className={`relative w-10 h-10 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                  activeIndex === index 
+                    ? 'border-[#E39A65] scale-110 shadow-md' 
+                    : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
+                }`}
+                onMouseEnter={() => handleImageHover(product._id, index)}
+              >
+                <img
+                  src={image.url}
+                  alt={`${product.productName} - view ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100';
+                  }}
+                />
+              </div>
+            ))}
+            {productImages.length > 5 && (
+              <div className="w-10 h-10 rounded-md bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
+                +{productImages.length - 5}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="p-5 pt-3">
+          {/* Product Name */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[56px]" title={product.productName}>
+            {truncateText(product.productName, 40)}
+          </h3>
+
+          {/* Price */}
+          <div className="mb-3">
+            <span className="text-2xl font-bold text-[#E39A65]">
+              ${formatPrice(product.pricePerUnit)}
+            </span>
+            <span className="text-gray-500 text-sm ml-2">
+              per piece
+            </span>
+          </div>
+
+          {/* Color Options */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-sm text-gray-600">Colors:</span>
+              <div className="flex gap-1.5">
+                {product.colors.slice(0, 5).map((color, i) => (
+                  <div
+                    key={`${product._id}-color-${i}-${color.code || i}`}
+                    className="w-5 h-5 rounded-full border-2 border-white shadow-md"
+                    style={{ backgroundColor: color.code || '#CCCCCC' }}
+                    title={`Color ${i + 1}`}
+                  />
+                ))}
+                {product.colors.length > 5 && (
+                  <span className="text-xs text-gray-500 ml-1">
+                    +{product.colors.length - 5}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Bulk Pricing Preview */}
+          {firstTier && (
+            <div className="bg-orange-50 rounded-lg p-3 mb-4 border border-orange-100">
+              <p className="text-xs text-[#E39A65] font-medium mb-1">Bulk pricing:</p>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-700">{firstTier.range || 'Bulk'} pcs</span>
+                <span className="font-semibold text-[#E39A65]">
+                  ${formatPrice(firstTier.price)}/pc
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Fabric/Material */}
+          {product.fabric && (
+            <p className="text-xs text-gray-500 mb-3">
+              Material: {product.fabric}
+            </p>
+          )}
+
+          {/* View Details Button - This is now the only Link */}
+          <div className="mt-3">
+            <Link 
+              href={`/productDetails?id=${product._id}`}
+              className="block w-full text-center bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-[#E39A65] transition-colors duration-300"
+            >
+              View Details →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+  // Product Card Component (List View) - Adapted from FeaturedProducts design
+// Product Card Component (List View)
+const ProductListCard = ({ product }) => {
+  const productImages = product.images || [];
+  const activeIndex = activeImageIndex[product._id] || 0;
+  const hasMultipleImages = productImages.length > 1;
+  const firstTier = getFirstPricingTier(product.quantityBasedPricing);
+
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
+      {/* REMOVED the outer Link */}
+      <div className="flex flex-col md:flex-row">
+        {/* Left Column - Images */}
+        <div className="md:w-80">
+          {/* Main Image */}
+          <div className="relative h-64 md:h-80 overflow-hidden bg-gray-100">
             <img
               src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
-              alt={product.productName || 'Product image'}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
-              }}
+              alt={product.productName}
+              className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
             />
             
-            {/* Category Badge - Left Top */}
+            {/* Category Badge */}
             <span className="absolute top-4 left-4 bg-[#E39A65] text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-lg">
               {product.category?.name || 'Uncategorized'}
             </span>
-            
-            {/* MOQ Badge - Right Top */}
+
+            {/* MOQ Badge */}
             <span className="absolute top-4 right-4 bg-gray-900/90 text-white text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm shadow-lg">
               MOQ: {product.moq || 0}pcs
             </span>
@@ -458,281 +609,123 @@ export default function Products() {
             )}
           </div>
 
-          {/* Thumbnail Gallery - Centered */}
+          {/* Thumbnail Gallery */}
           {hasMultipleImages && (
             <div 
-              className="flex justify-center gap-1 py-3 px-2 bg-gray-50 border-t border-gray-100"
+              className="flex justify-center gap-2 py-3 px-2 bg-gray-50 border-t border-gray-100"
               onMouseLeave={() => handleImageLeave(product._id)}
             >
-              {productImages.slice(0, 5).map((image, index) => (
+              {productImages.slice(0, 4).map((image, idx) => (
                 <div
-                  key={`${product._id}-thumb-${index}`}
-                  className={`relative w-10 h-10 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                    activeIndex === index 
+                  key={idx}
+                  className={`relative w-12 h-12 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                    activeIndex === idx 
                       ? 'border-[#E39A65] scale-110 shadow-md' 
                       : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
                   }`}
-                  onMouseEnter={() => handleImageHover(product._id, index)}
+                  onMouseEnter={() => handleImageHover(product._id, idx)}
                 >
                   <img
                     src={image.url}
-                    alt={`${product.productName} - view ${index + 1}`}
+                    alt={`${product.productName} - view ${idx + 1}`}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100';
-                    }}
                   />
                 </div>
               ))}
-              {productImages.length > 5 && (
-                <div className="w-10 h-10 rounded-md bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
-                  +{productImages.length - 5}
+              {productImages.length > 4 && (
+                <div className="w-12 h-12 rounded-md bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
+                  +{productImages.length - 4}
                 </div>
               )}
             </div>
           )}
+        </div>
 
-          {/* Content */}
-          <div className="p-5 pt-3">
-            {/* Product Name */}
-            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[56px]" title={product.productName}>
-              {truncateText(product.productName, 40)}
-            </h3>
-
-            {/* Price */}
-            <div className="mb-3">
-              <span className="text-2xl font-bold text-[#E39A65]">
-                ${formatPrice(product.pricePerUnit)}
-              </span>
-              <span className="text-gray-500 text-sm ml-2">
-                per piece
-              </span>
-            </div>
-
-            {/* Color Options */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-sm text-gray-600">Colors:</span>
-                <div className="flex gap-1.5">
-                  {product.colors.slice(0, 5).map((color, i) => (
-                    <div
-                      key={`${product._id}-color-${i}-${color.code || i}`}
-                      className="w-5 h-5 rounded-full border-2 border-white shadow-md"
-                      style={{ backgroundColor: color.code || '#CCCCCC' }}
-                      title={`Color ${i + 1}`}
-                    />
-                  ))}
-                  {product.colors.length > 5 && (
-                    <span className="text-xs text-gray-500 ml-1">
-                      +{product.colors.length - 5}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Bulk Pricing Preview - Shows first tier */}
-            {firstTier && (
-              <div className="bg-orange-50 rounded-lg p-3 mb-4 border border-orange-100">
-                <p className="text-xs text-[#E39A65] font-medium mb-1">Bulk pricing:</p>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">{firstTier.range || 'Bulk'} pcs</span>
-                  <span className="font-semibold text-[#E39A65]">
-                    ${formatPrice(firstTier.price)}/pc
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Fabric/Material (Optional) */}
-            {product.fabric && (
-              <p className="text-xs text-gray-500 mb-3">
-                Material: {product.fabric}
+        {/* Right Column - Content */}
+        <div className="flex-1 p-6">
+          <div className="flex flex-col h-full">
+            <div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                {product.productName}
+              </h3>
+              
+              <p className="text-gray-600 mb-4 line-clamp-3">
+                {product.description?.replace(/<[^>]*>/g, '') || 'No description available'}
               </p>
-            )}
 
-            {/* View Details Button */}
-            <div className="mt-3">
-              <span className="block w-full text-center bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-[#E39A65] transition-colors duration-300">
-                View Details →
-              </span>
-            </div>
-          </div>
-        </Link>
-      </div>
-    );
-  };
-
-  // Product Card Component (List View) - Adapted from FeaturedProducts design
-  const ProductListCard = ({ product }) => {
-    const productImages = product.images || [];
-    const activeIndex = activeImageIndex[product._id] || 0;
-    const hasMultipleImages = productImages.length > 1;
-    const firstTier = getFirstPricingTier(product.quantityBasedPricing);
-
-    return (
-      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100">
-        <Link href={`/products/${product._id}`}>
-          <div className="flex flex-col md:flex-row">
-            {/* Left Column - Images */}
-            <div className="md:w-80">
-              {/* Main Image */}
-              <div className="relative h-64 md:h-80 overflow-hidden bg-gray-100">
-                <img
-                  src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
-                  alt={product.productName}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                />
-                
-                {/* Category Badge */}
-                <span className="absolute top-4 left-4 bg-[#E39A65] text-white text-xs px-3 py-1.5 rounded-full font-medium shadow-lg">
-                  {product.category?.name || 'Uncategorized'}
-                </span>
-
-                {/* MOQ Badge */}
-                <span className="absolute top-4 right-4 bg-gray-900/90 text-white text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm shadow-lg">
-                  MOQ: {product.moq || 0}pcs
-                </span>
-
-                {/* Targeted Customer Badge */}
-                {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-                  <span className="absolute bottom-4 left-4 bg-black/50 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                    {capitalizeFirst(product.targetedCustomer)}
-                  </span>
-                )}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <p className="text-xs text-gray-500">Price</p>
+                  <p className="text-2xl font-bold text-[#E39A65]">${formatPrice(product.pricePerUnit)}<span className="text-sm text-gray-500 ml-1">/pc</span></p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">MOQ</p>
+                  <p className="font-semibold text-gray-900">{product.moq} pcs</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Target</p>
+                  <p className="font-semibold text-gray-900 capitalize">{product.targetedCustomer || 'Unisex'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Fabric</p>
+                  <p className="font-semibold text-gray-900">{product.fabric || 'N/A'}</p>
+                </div>
               </div>
 
-              {/* Thumbnail Gallery */}
-              {hasMultipleImages && (
-                <div 
-                  className="flex justify-center gap-2 py-3 px-2 bg-gray-50 border-t border-gray-100"
-                  onMouseLeave={() => handleImageLeave(product._id)}
-                >
-                  {productImages.slice(0, 4).map((image, idx) => (
-                    <div
-                      key={idx}
-                      className={`relative w-12 h-12 rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                        activeIndex === idx 
-                          ? 'border-[#E39A65] scale-110 shadow-md' 
-                          : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'
-                      }`}
-                      onMouseEnter={() => handleImageHover(product._id, idx)}
-                    >
-                      <img
-                        src={image.url}
-                        alt={`${product.productName} - view ${idx + 1}`}
-                        className="w-full h-full object-cover"
+              {/* Colors */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-sm text-gray-600">Available Colors:</span>
+                  <div className="flex gap-1.5">
+                    {product.colors.slice(0, 8).map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="w-6 h-6 rounded-full border-2 border-white shadow-md"
+                        style={{ backgroundColor: color.code }}
+                        title={color.name || `Color ${idx + 1}`}
                       />
-                    </div>
-                  ))}
-                  {productImages.length > 4 && (
-                    <div className="w-12 h-12 rounded-md bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium">
-                      +{productImages.length - 4}
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Right Column - Content */}
-            <div className="flex-1 p-6">
-              <div className="flex flex-col h-full">
-                <div>
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                    {product.productName}
-                  </h3>
-                  
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {product.description?.replace(/<[^>]*>/g, '') || 'No description available'}
-                  </p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-500">Price</p>
-                      <p className="text-2xl font-bold text-[#E39A65]">${formatPrice(product.pricePerUnit)}<span className="text-sm text-gray-500 ml-1">/pc</span></p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">MOQ</p>
-                      <p className="font-semibold text-gray-900">{product.moq} pcs</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Target</p>
-                      <p className="font-semibold text-gray-900 capitalize">{product.targetedCustomer || 'Unisex'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Fabric</p>
-                      <p className="font-semibold text-gray-900">{product.fabric || 'N/A'}</p>
+            {/* Action Buttons */}
+            <div className="flex w-full gap-4">
+              {/* Bulk Pricing */}
+              <div className="flex-1">
+                {firstTier && (
+                  <div className="bg-orange-50 rounded-lg p-3 border border-orange-100 h-full flex flex-col justify-center">
+                    <p className="text-xs text-[#E39A65] font-medium mb-1">Bulk pricing:</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-700">{firstTier.range || 'Bulk'} pcs</span>
+                      <span className="font-semibold text-[#E39A65]">
+                        ${formatPrice(firstTier.price)}/pc
+                      </span>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  {/* Colors */}
-                  {product.colors && product.colors.length > 0 && (
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-sm text-gray-600">Available Colors:</span>
-                      <div className="flex gap-1.5">
-                        {product.colors.slice(0, 8).map((color, idx) => (
-                          <div
-                            key={idx}
-                            className="w-6 h-6 rounded-full border-2 border-white shadow-md"
-                            style={{ backgroundColor: color.code }}
-                            title={color.name || `Color ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                
-
-                  {/* Bulk Pricing Preview */}
-                  {/* {firstTier && (
-                    <div className="bg-orange-50 rounded-lg p-3 mb-4 border border-orange-100 max-w-xs">
-                      <p className="text-xs text-[#E39A65] font-medium mb-1">Bulk pricing:</p>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-700">{firstTier.range || 'Bulk'} pcs</span>
-                        <span className="font-semibold text-[#E39A65]">
-                          ${formatPrice(firstTier.price)}/pc
-                        </span>
-                      </div>
-                    </div>
-                  )} */}
-                </div>
-
-                {/* View Details Button */}
-               <div className="flex w-full gap-4">
-  {/* Bulk Pricing - Takes half width */}
-  <div className="flex-1">
-    {firstTier && (
-      <div className="bg-orange-50 rounded-lg p-3 border border-orange-100 h-full flex flex-col justify-center">
-        <p className="text-xs text-[#E39A65] font-medium mb-1">Bulk pricing:</p>
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-700">{firstTier.range || 'Bulk'} pcs</span>
-          <span className="font-semibold text-[#E39A65]">
-            ${formatPrice(firstTier.price)}/pc
-          </span>
-        </div>
-      </div>
-    )}
-  </div>
-
-  {/* View Details Button - Takes half width */}
-  <div className="flex-1">
-    <span className="w-full inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-[#E39A65] transition-colors duration-300 h-full">
-      View Full Details
-      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-      </svg>
-    </span>
-  </div>
-</div>
+              {/* View Details Button - Now the only Link */}
+              <div className="flex-1">
+                <Link 
+                  href={`/productDetails?id=${product._id}`}
+                  className="w-full inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-semibold hover:bg-[#E39A65] transition-colors duration-300 h-full"
+                >
+                  View Full Details
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
               </div>
             </div>
           </div>
-        </Link>
+        </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   return (
     <>
