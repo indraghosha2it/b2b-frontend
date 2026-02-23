@@ -1234,6 +1234,8 @@
 // }
 
 
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -1399,7 +1401,7 @@ const ImageGallery = ({ images = [], productName }) => {
       </div>
 
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center mt-16">
           <button
             onClick={() => setIsFullscreen(false)}
             className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
@@ -1409,7 +1411,7 @@ const ImageGallery = ({ images = [], productName }) => {
           <img
             src={images[mainImage]?.url || images[0]?.url}
             alt={productName}
-            className="max-w-[90vw] max-h-[90vh] object-contain"
+            className="max-w-[90vw] max-h-[84vh] object-contain"
           />
         </div>
       )}
@@ -2071,52 +2073,114 @@ export default function ProductDetails() {
   };
 
   // UPDATED: Check authentication before WhatsApp inquiry
-  const handleWhatsAppInquiry = () => {
-    if (!isAuthenticated) {
-      setAuthModalTab('login');
-      setShowAuthModal(true);
-      toast.info('Please login to send WhatsApp inquiry');
-      return;
-    }
+// UPDATED: Check authentication before WhatsApp inquiry with env number
+const handleWhatsAppInquiry = () => {
+  if (!isAuthenticated) {
+    setAuthModalTab('login');
+    setShowAuthModal(true);
+    toast.info('Please login to send WhatsApp inquiry');
+    return;
+  }
 
-    if (inquiryItems.length === 0) {
-      toast.error('Please add items to inquiry');
-      return;
-    }
+  if (inquiryItems.length === 0) {
+    toast.error('Please add items to inquiry');
+    return;
+  }
 
-    let message = `*Inquiry for ${product.productName}*\n\n`;
-    message += `*Company:* ${user?.companyName}\n`;
-    message += `*Contact Person:* ${user?.contactPerson}\n`;
-    message += `*Email:* ${user?.email}\n`;
-    message += `*Phone:* ${user?.phone}\n\n`;
+  // Format the message with all product and inquiry details
+  let message = `*Inquiry for ${product.productName}*\n\n`;
+  
+  // Customer/Buyer Information
+  message += `*👤 BUYER INFORMATION*\n`;
+  message += `• Company: ${user?.companyName || 'N/A'}\n`;
+  message += `• Contact Person: ${user?.contactPerson || 'N/A'}\n`;
+  message += `• Email: ${user?.email || 'N/A'}\n`;
+  message += `• Phone: ${user?.phone || 'N/A'}\n`;
+  if (user?.whatsapp) message += `• WhatsApp: ${user.whatsapp}\n`;
+  message += `• Country: ${user?.country || 'N/A'}\n\n`;
+  
+  // Product Information
+  message += `*📦 PRODUCT DETAILS*\n`;
+  message += `• Product: ${product.productName}\n`;
+  message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
+  message += `• Fabric: ${product.fabric || 'Standard'}\n`;
+  message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
+  message += `• MOQ: ${product.moq} pieces\n\n`;
+  
+  // Inquiry Items with Size Breakdown
+  message += `*🛒 INQUIRY ITEMS*\n`;
+  
+  inquiryItems.forEach((item, index) => {
+    message += `\n*Item ${index + 1} - Color: ${item.color?.code || 'N/A'}*\n`;
     
-    message += `*Items:*\n`;
-    
-    inquiryItems.forEach((item, index) => {
-      message += `\n📦 *Item ${index + 1} - ${item.color?.code}*\n`;
-      
-      // Add size quantities
-      Object.entries(item.sizeQuantities || {}).forEach(([size, qty]) => {
-        if (qty > 0) {
-          message += `   ${size}: ${qty} pcs\n`;
-        }
-      });
-      
-      const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-      message += `   *Item Total:* ${itemTotal} pcs\n`;
+    // Add size quantities (only non-zero quantities)
+    let hasSizes = false;
+    Object.entries(item.sizeQuantities || {}).forEach(([size, qty]) => {
+      if (qty && qty > 0) {
+        message += `  • Size ${size}: ${qty} pcs\n`;
+        hasSizes = true;
+      }
     });
     
-    message += `\n*Total Quantity:* ${totalQuantity} pieces\n`;
-    message += `*Unit Price:* ${formatPrice(applicableUnitPrice)}\n`;
-    message += `*Estimated Total:* ${formatPrice(totalPrice)}\n`;
-    
-    if (specialInstructions) {
-      message += `\n*Special Instructions:* ${specialInstructions}\n`;
+    if (!hasSizes) {
+      message += `  • No sizes specified\n`;
     }
     
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
+    const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+    message += `  *Item Total:* ${itemTotal} pcs\n`;
+  });
+  
+  // Order Summary
+  message += `\n*📊 ORDER SUMMARY*\n`;
+  message += `• Total Quantity: ${totalQuantity} pieces\n`;
+  message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
+  message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
+  
+  // Applied Bulk Tier (if applicable)
+  // if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
+  //   const appliedTier = product.quantityBasedPricing.find(tier => {
+  //     if (tier.range.includes('-')) {
+  //       const [min, max] = tier.range.split('-').map(Number);
+  //       return totalQuantity >= min && totalQuantity <= max;
+  //     } else if (tier.range.includes('+')) {
+  //       const minQty = parseInt(tier.range.replace('+', ''));
+  //       return totalQuantity >= minQty;
+  //     }
+  //     return false;
+  //   });
+    
+  //   if (appliedTier) {
+  //     message += `• Bulk Tier Applied: ${appliedTier.range}\n`;
+  //   }
+  // }
+  
+  // Special Instructions
+  if (specialInstructions) {
+    message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
+    message += `${specialInstructions}\n`;
+  }
+  
+  // Timestamp
+  message += `\n*🕐 Inquiry sent:* ${new Date().toLocaleString()}\n`;
+ 
+
+  // Get WhatsApp number from environment variable
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685'; // Fallback to your number
+  
+  // Clean the number (remove any non-digit characters except +)
+  const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, '');
+  
+  // Create WhatsApp URL
+  const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+  
+  // Open WhatsApp in new tab
+  window.open(whatsappUrl, '_blank');
+  
+  // Optional: Show success toast
+  toast.success('WhatsApp chat opened!', {
+    description: 'Your inquiry has been prepared and ready to send.',
+  });
+};
 
   if (loading) {
     return <ProductDetailsSkeleton />;
@@ -2373,7 +2437,7 @@ export default function ProductDetails() {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ShoppingCart className="w-4 h-4" />
-                    Submit Inquiry
+                  Add to Inquiry Cart
                   </button>
                   <button
                     onClick={handleWhatsAppInquiry}
@@ -2381,7 +2445,7 @@ export default function ProductDetails() {
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <MessageCircle className="w-4 h-4" />
-                    WhatsApp
+                    Chat on WhatsApp
                   </button>
                 </div>
 

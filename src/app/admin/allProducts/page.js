@@ -221,9 +221,9 @@ export default function AdminAllProducts() {
   router.push(`/admin/editProduct?id=${productId}`);
 };
 
-  const handleView = (productId) => {
-    router.push(`/admin/products/${productId}`);
-  };
+ const handleView = (productId) => {
+  router.push(`/admin/productDetails?id=${productId}`);
+};
 
   const handleDeleteClick = (id, name) => {
     setDeleteModal({ show: true, id, name });

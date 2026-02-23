@@ -272,8 +272,8 @@ const handleEdit = (productId) => {
 };
 
   const handleView = (productId) => {
-    router.push(`/moderator/products/${productId}`);
-  };
+  router.push(`/moderator/productDetails?id=${productId}`);
+};
 
   const getActiveFilterCount = () => {
     let count = 0;
