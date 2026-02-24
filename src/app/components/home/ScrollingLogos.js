@@ -159,7 +159,7 @@ export default function ScrollingLogos() {
     { 
       id: 9, 
       name: 'HUGO-BOSS', 
-      logo: 'https://i.ibb.co.com/8D1N4LCz/Hugo-Boss-Logo-Download-Free-PNG.png',
+      logo: 'https://i.ibb.co/8D1N4LCz/Hugo-Boss-Logo-Download-Free-PNG.png',
       width: 110,
       height: 40
     },
@@ -205,7 +205,7 @@ export default function ScrollingLogos() {
                   <div className="h-16 flex items-center justify-center">
                     {/* Logo Image */}
                     <div className="relative grayscale-0 hover:grayscale-0 transition-all duration-300 opacity-100 hover:opacity-100">
-                      <Image
+                      {/* <Image
                         src={company.logo}
                         alt={company.name}
                         width={company.width}
@@ -216,7 +216,21 @@ export default function ScrollingLogos() {
                           height: 'auto',
                           maxHeight: '48px'
                         }}
-                      />
+                      /> */}
+                                  <img
+              src={company.logo}
+              alt={company.name}
+              width={company.width}
+              height={company.height}
+              className="object-contain max-h-12 w-auto"
+              style={{ 
+                width: 'auto',
+                height: 'auto',
+                maxHeight: '48px'
+              }}
+              loading="lazy" // Optional: adds lazy loading
+            />
+
                     </div>
                   </div>
                 </div>

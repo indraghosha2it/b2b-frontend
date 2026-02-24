@@ -13,18 +13,54 @@
 //   const pathname = usePathname();
 //   const router = useRouter();
 
-//   useEffect(() => {
-//     // Check if user is logged in
-//     const userData = localStorage.getItem('user');
-//     if (userData) {
-//       try {
-//         const parsedUser = JSON.parse(userData);
-//         setUser(parsedUser);
-//       } catch (error) {
-//         console.error('Error parsing user data:', error);
+//   // Function to check and update user state
+//   const checkUserState = () => {
+//     if (typeof window !== 'undefined') {
+//       const userData = localStorage.getItem('user');
+//       if (userData) {
+//         try {
+//           const parsedUser = JSON.parse(userData);
+//           setUser(parsedUser);
+//         } catch (error) {
+//           console.error('Error parsing user data:', error);
+//           setUser(null);
+//         }
+//       } else {
+//         setUser(null);
 //       }
 //     }
+//   };
+
+//   // Initial check
+//   useEffect(() => {
+//     checkUserState();
+
+//     // Add event listener for storage changes (in case user logs in from another tab)
+//     const handleStorageChange = (e) => {
+//       if (e.key === 'user' || e.key === 'token') {
+//         checkUserState();
+//       }
+//     };
+
+//     window.addEventListener('storage', handleStorageChange);
+
+//     // Custom event listener for auth changes within the same tab
+//     const handleAuthChange = () => {
+//       checkUserState();
+//     };
+
+//     window.addEventListener('auth-change', handleAuthChange);
+
+//     return () => {
+//       window.removeEventListener('storage', handleStorageChange);
+//       window.removeEventListener('auth-change', handleAuthChange);
+//     };
 //   }, []);
+
+//   // Listen for route changes to check auth state
+//   useEffect(() => {
+//     checkUserState();
+//   }, [pathname]);
 
 //   const navItems = [
 //     { name: 'Home', href: '/' },
@@ -38,8 +74,13 @@
 //   const logout = () => {
 //     localStorage.removeItem('token');
 //     localStorage.removeItem('user');
+//     localStorage.removeItem('rememberedEmail');
 //     setUser(null);
 //     setUserMenuOpen(false);
+    
+//     // Dispatch custom event to notify other components
+//     window.dispatchEvent(new Event('auth-change'));
+    
 //     router.push('/');
 //   };
 
@@ -128,65 +169,68 @@
 //             ))}
             
 //             {/* Mobile menu user section */}
-//         {/* Mobile menu user section */}
-// {/* Mobile menu user section */}
-// {user ? (
-//   <>
-//     <li className="border-t border-[#E39A65] mt-2 pt-2 w-full ">
-//       <div className="flex flex-col px-2 py-1 text-sm text-[#FBFFFF] w-full items-start">
-//         <div className="font-semibold truncate text-left w-full">{getDisplayName()}</div>
-//         <div className="text-xs opacity-80 truncate text-left w-full">{user.email}</div>
-//         <div className="text-xs mt-1.5 text-left w-full">
-//           <span className="inline-block bg-[#E39A65] text-gray-900 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
-//             {getRoleDisplay()}
-//           </span>
-//         </div>
-//       </div>
-//     </li>
-//     <li className="w-full">
-//       <Link 
-//         href={getDashboardLink()} 
-//         className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start"
-//       >
-//         <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
-//         <span>Dashboard</span>
-//       </Link>
-//     </li>
-//     <li className="w-full">
-//       <Link 
-//         href={getSettingsLink()} 
-//         className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start"
-//       >
-//         <Settings className="h-4 w-4 flex-shrink-0" />
-//         <span>Settings</span>
-//       </Link>
-//     </li>
-//     <li className="w-full">
-//       <button
-//         onClick={logout}
-//         className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full text-left px-2 py-2 justify-start"
-//       >
-//         <LogOut className="h-4 w-4 flex-shrink-0" />
-//         <span>Logout</span>
-//       </button>
-//     </li>
-//   </>
-// ) : (
-//   <>
-//     <li className="border-t border-[#E39A65] mt-2 pt-2 w-full">
-//       <Link href="/login" className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start">
-//         <User className="h-4 w-4 flex-shrink-0" />
-//         <span>Sign In</span>
-//       </Link>
-//     </li>
-//     <li className="w-full">
-//       <Link href="/register" className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start">
-//         <Users className="h-4 w-4 flex-shrink-0" />
-//         <span>Register (B2B)</span>
-//       </Link>
-//     </li>
-//   </>
-// )}
+//             {user ? (
+//               <>
+//                 <li className="border-t border-[#E39A65] mt-2 pt-2 w-full">
+//                   <div className="flex flex-col px-2 py-1 text-sm text-[#FBFFFF] w-full items-start">
+//                     <div className="font-semibold truncate text-left w-full">{getDisplayName()}</div>
+//                     <div className="text-xs opacity-80 truncate text-left w-full">{user.email}</div>
+//                     <div className="text-xs mt-1.5 text-left w-full">
+//                       <span className="inline-block bg-[#E39A65] text-gray-900 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
+//                         {getRoleDisplay()}
+//                       </span>
+//                     </div>
+//                   </div>
+//                 </li>
+//                 <li className="w-full">
+//                   <Link 
+//                     href={getDashboardLink()} 
+//                     className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start"
+//                     onClick={() => setIsMenuOpen(false)}
+//                   >
+//                     <LayoutDashboard className="h-4 w-4 flex-shrink-0" />
+//                     <span>Dashboard</span>
+//                   </Link>
+//                 </li>
+//                 <li className="w-full">
+//                   <Link 
+//                     href={getSettingsLink()} 
+//                     className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start"
+//                     onClick={() => setIsMenuOpen(false)}
+//                   >
+//                     <Settings className="h-4 w-4 flex-shrink-0" />
+//                     <span>Settings</span>
+//                   </Link>
+//                 </li>
+//                 <li className="w-full">
+//                   <button
+//                     onClick={() => {
+//                       setIsMenuOpen(false);
+//                       logout();
+//                     }}
+//                     className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full text-left px-2 py-2 justify-start"
+//                   >
+//                     <LogOut className="h-4 w-4 flex-shrink-0" />
+//                     <span>Logout</span>
+//                   </button>
+//                 </li>
+//               </>
+//             ) : (
+//               <>
+//                 <li className="border-t border-[#E39A65] mt-2 pt-2 w-full">
+//                   <Link href="/login" className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start">
+//                     <User className="h-4 w-4 flex-shrink-0" />
+//                     <span>Sign In</span>
+//                   </Link>
+//                 </li>
+//                 <li className="w-full">
+//                   <Link href="/register" className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full px-2 py-2 justify-start">
+//                     <Users className="h-4 w-4 flex-shrink-0" />
+//                     <span>Register (B2B)</span>
+//                   </Link>
+//                 </li>
+//               </>
+//             )}
             
 //             <li className="border-t border-[#E39A65] mt-2 pt-2 w-full">
 //               <Link href="/inquiry-cart" className="flex items-center gap-2 text-[#FBFFFF] hover:bg-[#E39A65] hover:text-gray-900 w-full">
@@ -200,7 +244,7 @@
 //           </ul>
 //         </div>
         
-//         {/* Logo/Brand - NO hover effect whatsoever */}
+//         {/* Logo/Brand */}
 //         <Link 
 //           href="/" 
 //           className="btn btn-ghost normal-case text-xl font-bold flex items-center gap-2"
@@ -271,23 +315,19 @@
 
 //         {/* User Menu or Auth Buttons */}
 //         {user ? (
-//           <div className="relative hover:bg-neutral-700">
+//           <div className="relative">
 //             <button
 //               onClick={() => setUserMenuOpen(!userMenuOpen)}
-//               className="flex items-center gap-2 px-3 py-2 rounded-lg"
-//               style={{ 
-//                 color: '#FBFFFF',
-//                 backgroundColor: 'transparent'
-//               }}
-//               // REMOVED ALL HOVER EFFECTS - No hover on user button
+//               className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-neutral-700 transition-colors"
+//               style={{ color: '#FBFFFF' }}
 //             >
 //               <div className="w-8 h-8 rounded-full bg-[#E39A65] flex items-center justify-center text-gray-900 font-semibold">
 //                 {getInitials()}
 //               </div>
-//               <span className="hidden lg:inline max-w-[100px] truncate" style={{ color: '#FBFFFF' }}>
+//               <span className="hidden lg:inline max-w-[100px] truncate">
 //                 {getDisplayName()}
 //               </span>
-//               <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} style={{ color: '#FBFFFF' }} />
+//               <ChevronDown className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
 //             </button>
 
 //             {/* Dropdown Menu */}
@@ -297,17 +337,19 @@
 //                   className="fixed inset-0 z-40"
 //                   onClick={() => setUserMenuOpen(false)}
 //                 />
-//                 <div className="absolute hover:  right-0 mt-2 w-64 bg-[#2A2A2A] rounded-xl shadow-xl border border-[#242323] py-2 z-50">
+//                 <div className="absolute right-0 mt-2 w-64 bg-[#2A2A2A] rounded-xl shadow-xl border border-gray-700 py-2 z-50">
 //                   {/* User Info */}
-//                   <div className=" bg-neutral-700 px-4 py-3 border-b border-gray-200">
-//                     <p className="text-sm font-semibold text-white ">{getDisplayName()}</p>
-//                     <p className="text-xs text-gray-300 truncate mt-0.5">{user.email}</p>
+//                   <div className="px-4 py-3 border-b border-gray-700">
+//                     <p className="text-sm font-semibold text-white">{getDisplayName()}</p>
+//                     <p className="text-xs text-gray-400 truncate mt-0.5">{user.email}</p>
 //                     <div className="mt-2">
-//                       <span className="px-2 py-0.5 text-xs   font-medium rounded-full" 
+//                       <span 
+//                         className="px-2 py-0.5 text-xs font-medium rounded-full" 
 //                         style={{ 
 //                           backgroundColor: '#faf1e9',
 //                           color: '#E39A65'
-//                         }}>
+//                         }}
+//                       >
 //                         {getRoleDisplay()}
 //                       </span>
 //                     </div>
@@ -338,7 +380,7 @@
 //                       setUserMenuOpen(false);
 //                       logout();
 //                     }}
-//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-neutral-700 transition-colors w-full text-left border-t border-gray-100 mt-1 pt-2"
+//                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-neutral-700 transition-colors w-full text-left border-t border-gray-700 mt-1 pt-2"
 //                   >
 //                     <LogOut className="w-4 h-4" />
 //                     <span>Logout</span>
@@ -405,7 +447,6 @@
 
 
 
-
 'use client';
 
 import Link from 'next/link';
@@ -417,6 +458,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -438,35 +480,69 @@ export default function Navbar() {
     }
   };
 
+  // Fetch cart count
+  const fetchCartCount = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if (data.success) {
+          setCartCount(data.data.totalItems || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching cart count:', error);
+      }
+    } else {
+      setCartCount(0);
+    }
+  };
+
   // Initial check
   useEffect(() => {
     checkUserState();
+    fetchCartCount();
 
-    // Add event listener for storage changes (in case user logs in from another tab)
+    // Add event listener for storage changes
     const handleStorageChange = (e) => {
       if (e.key === 'user' || e.key === 'token') {
         checkUserState();
+        fetchCartCount();
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
 
-    // Custom event listener for auth changes within the same tab
+    // Custom event listener for auth changes
     const handleAuthChange = () => {
       checkUserState();
+      fetchCartCount();
     };
 
     window.addEventListener('auth-change', handleAuthChange);
 
+    // Custom event listener for cart updates
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener('cart-update', handleCartUpdate);
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('cart-update', handleCartUpdate);
     };
   }, []);
 
-  // Listen for route changes to check auth state
+  // Listen for route changes
   useEffect(() => {
     checkUserState();
+    fetchCartCount();
   }, [pathname]);
 
   const navItems = [
@@ -483,6 +559,7 @@ export default function Navbar() {
     localStorage.removeItem('user');
     localStorage.removeItem('rememberedEmail');
     setUser(null);
+    setCartCount(0);
     setUserMenuOpen(false);
     
     // Dispatch custom event to notify other components
@@ -645,7 +722,9 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 Inquiry Cart
-                <span className="badge badge-sm" style={{ backgroundColor: '#E39A65', color: '#1f1f1f' }}>0</span>
+                {cartCount > 0 && (
+                  <span className="badge badge-sm" style={{ backgroundColor: '#E39A65', color: '#1f1f1f' }}>{cartCount}</span>
+                )}
               </Link>
             </li>
           </ul>
@@ -716,7 +795,11 @@ export default function Navbar() {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span className="badge badge-sm indicator-item" style={{ backgroundColor: '#E39A65', color: '#1f1f1f' }}>0</span>
+            {cartCount > 0 && (
+              <span className="badge badge-sm indicator-item" style={{ backgroundColor: '#E39A65', color: '#1f1f1f' }}>
+                {cartCount}
+              </span>
+            )}
           </div>
         </Link>
 
