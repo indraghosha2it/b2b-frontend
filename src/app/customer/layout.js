@@ -511,12 +511,7 @@ export default function CustomerLayout({ children }) {
       name: 'My Inquiries',
       href: '/customer/inquiries',
       icon: MessageSquare,
-      current: pathname.startsWith('/customer/inquiries'),
-      subItems: [
-        { name: 'All Inquiries', href: '/customer/inquiries' },
-        { name: 'New Inquiry', href: '/customer/inquiries/new' },
-        { name: 'Drafts', href: '/customer/inquiries/drafts' }
-      ]
+     current: pathname === '/customer/inquiries'
     },
     {
       name: 'My Invoices',
@@ -529,24 +524,14 @@ export default function CustomerLayout({ children }) {
         { name: 'Paid', href: '/customer/invoices/paid' }
       ]
     },
-    {
-      name: 'Payments',
-      href: '/customer/payments',
-      icon: CreditCard,
-      current: pathname.startsWith('/customer/payments')
-    },
+  
     {
       name: 'Browse Products',
       href: '/products',
       icon: ShoppingBag,
       current: pathname === '/products' || pathname.startsWith('/products/')
     },
-    {
-      name: 'Support',
-      href: '/customer/support',
-      icon: HelpCircle,
-      current: pathname.startsWith('/customer/support')
-    },
+ 
     {
       name: 'Settings',
       href: '/customer/settings',
