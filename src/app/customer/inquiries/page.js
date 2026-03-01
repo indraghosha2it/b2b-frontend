@@ -519,6 +519,8 @@
 //   );
 // }
 
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -817,7 +819,7 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
         return (
           <button
             onClick={handleViewInvoice}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
           >
             <Eye className="w-3.5 h-3.5" />
             View Invoice
