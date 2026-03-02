@@ -1332,18 +1332,18 @@ export default function UpdateInvoicePage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Invoice Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
-                Invoice Number
-              </label>
-              <input
-                type="text"
-                value={invoiceData.invoiceNumber}
-                onChange={(e) => handleInputChange('invoiceNumber', e.target.value)}
-                readOnly={isPaid}
-                className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-              />
-            </div>
+           <div>
+  <label className="block text-xs font-medium text-gray-500 mb-1">
+    Invoice Number
+  </label>
+  <input
+    type="text"
+    value={invoiceData.invoiceNumber || 'N/A'}
+    readOnly
+    disabled
+    className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 cursor-not-allowed"
+  />
+</div>
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">
                 Invoice Date

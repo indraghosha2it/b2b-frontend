@@ -777,9 +777,39 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
     }
   };
 
-  const handleViewInvoice = () => {
-    router.push(`/customer/invoices/${inquiry._id}`);
-  };
+const handleViewInvoice = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Fetch customer's invoices
+    const response = await fetch(`http://localhost:5000/api/invoices/my-invoices`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      // Find the invoice that matches this inquiry ID
+      const matchingInvoice = data.data.find(inv => 
+        inv.inquiryId === inquiry._id || inv.inquiryId?.toString() === inquiry._id
+      );
+      
+      if (matchingInvoice) {
+        // Navigate to the customer view invoice page with the correct invoice ID
+        router.push(`/customer/viewInvoice?invoiceId=${matchingInvoice._id}`);
+      } else {
+        toast.error('No invoice found for this inquiry');
+      }
+    } else {
+      toast.error('Failed to fetch invoices');
+    }
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
+    toast.error('Failed to find invoice');
+  }
+};
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);

@@ -1604,9 +1604,30 @@ const handleCreateInvoice = () => {
     toast.error('Failed to prepare invoice data');
   }
 };
-const handleViewInvoice = () => {
-    router.push(`/admin/invoices/${inquiry._id}`);
-  };
+const handleViewInvoice = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Fetch invoices associated with this inquiry
+    const response = await fetch(`http://localhost:5000/api/invoices?inquiryId=${inquiry._id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.data.invoices && data.data.invoices.length > 0) {
+      const invoice = data.data.invoices[0]; // Get the first invoice
+      router.push(`/admin/viewInvoice?invoiceId=${invoice._id}`);
+    } else {
+      toast.error('No invoice found for this inquiry');
+    }
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
+    toast.error('Failed to find invoice');
+  }
+};
 
   const handleWhatsApp = () => {
     // Only proceed if WhatsApp number exists

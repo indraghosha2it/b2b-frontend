@@ -813,6 +813,7 @@ import {
   Printer
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateInvoicePDF } from '@/utils/invoicePDF';
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -1315,10 +1316,18 @@ export default function CustomerInvoicesPage() {
   const handleViewInvoice = (invoiceId) => {
     router.push(`/customer/viewInvoice?invoiceId=${invoiceId}`);
   };
-
-  const handleDownloadPDF = (invoiceId) => {
-    window.open(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, '_blank');
-  };
+const handleDownloadPDF = async (invoice) => {
+  if (!invoice) return;
+  
+  try {
+    toast.info('🖨️ Generating PDF invoice...');
+    await generateInvoicePDF(invoice);
+    toast.success('✅ PDF generated successfully!');
+  } catch (error) {
+    console.error('PDF Generation Error:', error);
+    toast.error('❌ Failed to generate PDF');
+  }
+};
 
   // Get current page invoices
   const indexOfLastInvoice = currentPage * itemsPerPage;
@@ -1547,13 +1556,13 @@ export default function CustomerInvoicesPage() {
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
-                              <button
-                                onClick={() => handleDownloadPDF(invoice._id)}
-                                className="p-1.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                title="Download PDF"
-                              >
-                                <Download className="w-4 h-4" />
-                              </button>
+                                <button
+        onClick={() => handleDownloadPDF(invoice)}
+        className="p-1.5 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+        title="Download PDF"
+      >
+        <Download className="w-4 h-4" />
+      </button>
                             </div>
                           </td>
                         </tr>

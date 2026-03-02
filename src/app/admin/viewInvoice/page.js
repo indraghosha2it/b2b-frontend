@@ -2085,6 +2085,8 @@
 //   );
 // }
 
+
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -2123,6 +2125,7 @@ import {
   MoreVertical
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateInvoicePDF } from '@/utils/invoicePDF'; 
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -2422,6 +2425,8 @@ export default function AdminInvoiceViewPage() {
   const [deleting, setDeleting] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+   const [generatingPDF, setGeneratingPDF] = useState(false);
+  
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -2542,13 +2547,23 @@ export default function AdminInvoiceViewPage() {
     router.push(`/admin/updateInvoice?invoiceId=${invoiceId}`);
   };
 
-  const handleDownloadPDF = () => {
-    window.open(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, '_blank');
+  const handleDownloadPDF = async () => {
+    if (!invoice) return;
+    
+    setGeneratingPDF(true);
+    try {
+      toast.info('🖨️ Generating PDF invoice...');
+      await generateInvoicePDF(invoice);
+      toast.success('✅ PDF generated successfully!');
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      toast.error('❌ Failed to generate PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
-  const handlePrint = () => {
-    window.open(`/admin/invoices/print?invoiceId=${invoiceId}`, '_blank');
-  };
+  
 
   const handleGoBack = () => {
     router.push('/admin/invoices');
@@ -2671,20 +2686,19 @@ export default function AdminInvoiceViewPage() {
             </button>
             
             <button
-              onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Download PDF
-            </button>
+  onClick={handleDownloadPDF}
+  disabled={generatingPDF}
+  className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+>
+  {generatingPDF ? (
+    <Loader2 className="w-4 h-4 animate-spin" />
+  ) : (
+    <Download className="w-4 h-4" />
+  )}
+  {generatingPDF ? 'Generating...' : 'Download PDF'}
+</button>
             
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Printer className="w-4 h-4" />
-              Print
-            </button>
+           
 
             {/* Delete Button */}
             <button

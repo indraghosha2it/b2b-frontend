@@ -32,6 +32,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateInvoicePDF } from '@/utils/invoicePDF'; 
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -307,6 +308,7 @@ export default function CustomerInvoiceViewPage() {
   const [error, setError] = useState(null);
   const [isExpired, setIsExpired] = useState(false);
   const [overdueDays, setOverdueDays] = useState(0);
+    const [generatingPDF, setGeneratingPDF] = useState(false);
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -368,14 +370,23 @@ export default function CustomerInvoiceViewPage() {
       setLoading(false);
     }
   };
-
-  const handleDownloadPDF = () => {
-    window.open(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, '_blank');
+  const handleDownloadPDF = async () => {
+    if (!invoice) return;
+    
+    setGeneratingPDF(true);
+    try {
+      toast.info('🖨️ Generating PDF invoice...');
+      await generateInvoicePDF(invoice);
+      toast.success('✅ PDF generated successfully!');
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      toast.error('❌ Failed to generate PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
-  const handlePrint = () => {
-    window.open(`/customer/invoices/print?invoiceId=${invoiceId}`, '_blank');
-  };
+ 
 
   const handleGoBack = () => {
     router.push('/customer/invoices');
@@ -429,20 +440,19 @@ export default function CustomerInvoiceViewPage() {
           </button>
           
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+                    <button
+            onClick={handleDownloadPDF}
+            disabled={generatingPDF}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-white bg-[#E39A65] border border-gray-200 rounded-lg hover:bg-[#eb8841] transition-colors disabled:opacity-50"
+          >
+            {generatingPDF ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
               <Download className="w-4 h-4" />
-              Download PDF
-            </button>
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Printer className="w-4 h-4" />
-              Print
-            </button>
+            )}
+            {generatingPDF ? 'Generating...' : 'Download PDF'}
+          </button>
+          
           </div>
         </div>
 
