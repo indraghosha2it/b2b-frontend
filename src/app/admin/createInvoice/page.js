@@ -2680,6 +2680,7 @@ useEffect(() => {
     }
   };
 
+
 // const handleSaveInvoice = async (invoiceStatus = 'draft') => {
 //   setSaving(true);
 //   try {
@@ -2723,27 +2724,38 @@ useEffect(() => {
 //     // Get the payment status from your existing status object
 //     const paymentStatusText = status.text;
 
-//     // Format the items to match backend schema
-//     const formattedItems = invoiceData.items.map(item => ({
-//       productId: item.productId,
-//       productName: item.productName,
-//       colors: item.colors.map(color => ({
-//         color: {
-//           code: color.color.code,
-//           name: color.color.name || color.color.code
-//         },
-//         sizeQuantities: color.sizeQuantities.map(sq => ({
-//           size: sq.size,
-//           quantity: sq.quantity
+//     // Format the items to match backend schema - ENSURE productImage IS INCLUDED
+//     const formattedItems = invoiceData.items.map(item => {
+//       console.log(`📦 Formatting item ${item.productName} with image:`, item.productImage);
+      
+//       return {
+//         productId: item.productId,
+//         productName: item.productName,
+//         colors: item.colors.map(color => ({
+//           color: {
+//             code: color.color.code,
+//             name: color.color.name || color.color.code
+//           },
+//           sizeQuantities: color.sizeQuantities.map(sq => ({
+//             size: sq.size,
+//             quantity: sq.quantity
+//           })),
+//           totalForColor: color.totalForColor
 //         })),
-//         totalForColor: color.totalForColor
-//       })),
-//       totalQuantity: item.totalQuantity,
-//       unitPrice: item.unitPrice,
-//       moq: item.moq,
-//       productImage: item.productImage || '',
-//       total: item.total
-//     }));
+//         totalQuantity: item.totalQuantity,
+//         unitPrice: item.unitPrice,
+//         moq: item.moq,
+//         productImage: item.productImage || '', // CRITICAL: Ensure productImage is included
+//         total: item.total
+//       };
+//     });
+
+//     // Log formatted items to verify images
+//     console.log('📦 Formatted items with images:', formattedItems.map(item => ({
+//       product: item.productName,
+//       hasImage: !!item.productImage,
+//       imageUrl: item.productImage
+//     })));
 
 //     // Create payload matching backend schema
 //     const invoicePayload = {
@@ -2793,7 +2805,7 @@ useEffect(() => {
 //         bankAddress: invoiceData.bankDetails?.bankAddress || ''
 //       },
       
-//       // Items
+//       // Items - with images included
 //       items: formattedItems,
       
 //       // Calculations
@@ -2825,7 +2837,13 @@ useEffect(() => {
 //       createdAt: new Date().toISOString()
 //     };
 
-//     console.log('📤 Final invoice payload userId:', invoicePayload.userId);
+//     console.log('📤 Final invoice payload - items with images:', 
+//       invoicePayload.items.map(item => ({
+//         product: item.productName,
+//         hasImage: !!item.productImage,
+//         imageUrl: item.productImage
+//       }))
+//     );
 
 //     const response = await fetch('http://localhost:5000/api/invoices', {
 //       method: 'POST',
@@ -2861,6 +2879,7 @@ useEffect(() => {
 //     setSaving(false);
 //   }
 // };
+
 const handleSaveInvoice = async (invoiceStatus = 'draft') => {
   setSaving(true);
   try {
@@ -2883,12 +2902,9 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
       }
     }
 
-    // Get userId directly from URL params as the most reliable source
+    // Get userId directly from URL params
     let userIdFromUrl = searchParams.get('userId');
     
-    console.log('🔍 UserId from URL params:', userIdFromUrl, 'Type:', typeof userIdFromUrl);
-    
-    // Validate the userId from URL
     if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
       console.error('❌ Invalid userId in URL params:', userIdFromUrl);
       toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
@@ -2896,18 +2912,15 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
       return;
     }
 
-    // Use the URL userId directly - it should be a clean string
     const processedUserId = userIdFromUrl;
-
-    console.log('✅ Using userId:', processedUserId);
-
-    // Get the payment status from your existing status object
     const paymentStatusText = status.text;
+    
+    // Calculate percentages
+    const paidPercentage = finalTotal > 0 ? (paidAmount / finalTotal) * 100 : 0;
+    const unpaidPercentage = finalTotal > 0 ? (dueAmount / finalTotal) * 100 : 0;
 
-    // Format the items to match backend schema - ENSURE productImage IS INCLUDED
+    // Format the items
     const formattedItems = invoiceData.items.map(item => {
-      console.log(`📦 Formatting item ${item.productName} with image:`, item.productImage);
-      
       return {
         productId: item.productId,
         productName: item.productName,
@@ -2925,19 +2938,12 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
         totalQuantity: item.totalQuantity,
         unitPrice: item.unitPrice,
         moq: item.moq,
-        productImage: item.productImage || '', // CRITICAL: Ensure productImage is included
+        productImage: item.productImage || '',
         total: item.total
       };
     });
 
-    // Log formatted items to verify images
-    console.log('📦 Formatted items with images:', formattedItems.map(item => ({
-      product: item.productName,
-      hasImage: !!item.productImage,
-      imageUrl: item.productImage
-    })));
-
-    // Create payload matching backend schema
+    // Create payload
     const invoicePayload = {
       invoiceNumber: invoiceData.invoiceNumber,
       invoiceDate: invoiceData.invoiceDate,
@@ -2985,7 +2991,7 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
         bankAddress: invoiceData.bankDetails?.bankAddress || ''
       },
       
-      // Items - with images included
+      // Items
       items: formattedItems,
       
       // Calculations
@@ -3001,6 +3007,10 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
       amountPaid: paidAmount,
       dueAmount: dueAmount,
       
+      // NEW: Percentage fields
+      paidPercentage: Math.round(paidPercentage * 100) / 100, // Round to 2 decimals
+      unpaidPercentage: Math.round(unpaidPercentage * 100) / 100,
+      
       // Status fields
       paymentStatus: paymentStatusText.toLowerCase(),
       status: invoiceStatus === 'draft' ? 'draft' : 'sent',
@@ -3010,20 +3020,19 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
       terms: invoiceData.terms || '',
       customFields: validDynamicFields,
       
-      // Tracking - USE URL USERID DIRECTLY
+      // Tracking
       userId: processedUserId,
       createdBy: adminId,
       
       createdAt: new Date().toISOString()
     };
 
-    console.log('📤 Final invoice payload - items with images:', 
-      invoicePayload.items.map(item => ({
-        product: item.productName,
-        hasImage: !!item.productImage,
-        imageUrl: item.productImage
-      }))
-    );
+    console.log('📤 Final invoice payload with percentages:', {
+      amountPaid: invoicePayload.amountPaid,
+      dueAmount: invoicePayload.dueAmount,
+      paidPercentage: invoicePayload.paidPercentage,
+      unpaidPercentage: invoicePayload.unpaidPercentage
+    });
 
     const response = await fetch('http://localhost:5000/api/invoices', {
       method: 'POST',
@@ -3034,10 +3043,7 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
       body: JSON.stringify(invoicePayload)
     });
 
-    // Get the response as text first for debugging
     const responseText = await response.text();
-    console.log('📥 Response:', responseText);
-
     let data;
     try {
       data = JSON.parse(responseText);
@@ -3059,8 +3065,6 @@ const handleSaveInvoice = async (invoiceStatus = 'draft') => {
     setSaving(false);
   }
 };
-
-
 const handleSendInvoice = () => {
   handleSaveInvoice('sent'); // This passes 'sent' as the invoiceStatus parameter
 };
@@ -3545,7 +3549,7 @@ const handleSendInvoice = () => {
 {/* Summary and Additional Information */}
 <div className="space-y-6">
   {/* Top Row - Summary and Bank Details side by side */}
-  <div className="grid grid-cols-2 gap-6">
+  <div className="grid grid-cols-2 gap-6 items-start">
      {/* Bank Details Form */}
     <div className="w-full">
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
@@ -3740,55 +3744,118 @@ const handleSendInvoice = () => {
           </div>
 
           {/* Payment Details */}
-          <div className="space-y-4 pt-3 border-t border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[#E39A65]" />
-              Payment Details
-            </h3>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Amount Paid</span>
-                <input
-                  type="number"
-                  value={invoiceData.amountPaid}
-                  onChange={(e) => handleInputChange('amountPaid', e.target.value)}
-                  onBlur={() => handleNumericBlur('amountPaid')}
-                  min="0"
-                  max={finalTotal}
-                  step="0.01"
-                  className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-                />
-              </div>
+{/* Payment Details */}
+<div className="space-y-4 pt-3 border-t border-gray-200">
+  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+    <CreditCard className="w-4 h-4 text-[#E39A65]" />
+    Payment Details
+  </h3>
+  
+  <div className="space-y-3">
+    <div className="flex justify-between items-center">
+      <span className="text-sm text-gray-600">Amount Paid</span>
+      <input
+        type="number"
+        value={invoiceData.amountPaid}
+        onChange={(e) => handleInputChange('amountPaid', e.target.value)}
+        onBlur={() => handleNumericBlur('amountPaid')}
+        min="0"
+        max={finalTotal}
+        step="0.01"
+        className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+      />
+    </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Due Amount</span>
-                <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
-              </div>
+    <div className="flex justify-between items-center">
+      <span className="text-sm text-gray-600">Due Amount</span>
+      <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
+    </div>
 
-              <div className="flex justify-center mt-2">
-                <StatusBadge status={status.text} />
-              </div>
+    {/* Paid Section with Amount and Percentage */}
+    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-green-600" />
+          <span className="text-sm font-medium text-green-700">Paid</span>
+        </div>
+        <span className="text-sm font-bold text-green-700">
+          {formatPrice(paidAmount)}
+        </span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs">
+          <span className="text-green-600">Percentage</span>
+          <span className="font-medium text-green-700">
+            {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
+          </span>
+        </div>
+        <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-green-500 rounded-full transition-all duration-300"
+            style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
+          />
+        </div>
+      </div>
+    </div>
 
-              <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-                <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">Final Total:</span>
-                    <span className="font-medium">{formatPrice(finalTotal)}</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-600">Paid:</span>
-                    <span className="font-medium text-green-600">{formatPrice(paidAmount)}</span>
-                  </div>
-                  <div className="flex justify-between text-xs font-semibold pt-1 border-t border-gray-200">
-                    <span className={status.color}>Balance:</span>
-                    <span className={status.color}>{formatPrice(dueAmount)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    {/* Unpaid Section with Amount and Percentage */}
+    <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-2">
+          <TrendingDown className="w-4 h-4 text-red-600" />
+          <span className="text-sm font-medium text-red-700">Unpaid</span>
+        </div>
+        <span className="text-sm font-bold text-red-700">
+          {formatPrice(dueAmount)}
+        </span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs">
+          <span className="text-red-600">Percentage</span>
+          <span className="font-medium text-red-700">
+            {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
+          </span>
+        </div>
+        <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-red-500 rounded-full transition-all duration-300"
+            style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
+          />
+        </div>
+      </div>
+    </div>
+
+    <div className="flex justify-center mt-2">
+      <StatusBadge status={status.text} />
+    </div>
+
+    <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+      <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs">
+          <span className="text-gray-600">Final Total:</span>
+          <span className="font-medium">{formatPrice(finalTotal)}</span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className="text-gray-600">Paid:</span>
+          <span className="font-medium text-green-600">
+            {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+          </span>
+        </div>
+        <div className="flex justify-between text-xs">
+          <span className="text-gray-600">Unpaid:</span>
+          <span className="font-medium text-red-500">
+            {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+          </span>
+        </div>
+        <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
+          <span className={status.color}>Status:</span>
+          <span className={status.color}>{status.text}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
       </div>
     </div>

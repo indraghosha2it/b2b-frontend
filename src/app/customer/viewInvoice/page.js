@@ -538,13 +538,14 @@ export default function CustomerInvoiceViewPage() {
                     <p className="text-xs font-medium text-gray-500 mb-2">Billing Address</p>
                     <p className="text-sm text-gray-600 flex items-start gap-2">
                       <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
-                      <span>
-                        {invoice.customer.billingAddress}
-                        {invoice.customer.billingCity && <>, {invoice.customer.billingCity}</>}
-                        {invoice.customer.billingZipCode && <br />}
-                        {invoice.customer.billingZipCode}
-                        {invoice.customer.billingCountry && <>, {invoice.customer.billingCountry}</>}
-                      </span>
+                     <span className="truncate">
+  {[
+    invoice.customer.billingAddress,
+    invoice.customer.billingCity,
+    invoice.customer.billingZipCode,
+    invoice.customer.billingCountry
+  ].filter(Boolean).join(', ')}
+</span>
                     </p>
                   </div>
                 )}
@@ -555,13 +556,14 @@ export default function CustomerInvoiceViewPage() {
                     <p className="text-xs font-medium text-gray-500 mb-2">Shipping Address</p>
                     <p className="text-sm text-gray-600 flex items-start gap-2">
                       <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
-                      <span>
-                        {invoice.customer.shippingAddress}
-                        {invoice.customer.shippingCity && <>, {invoice.customer.shippingCity}</>}
-                        {invoice.customer.shippingZipCode && <br />}
-                        {invoice.customer.shippingZipCode}
-                        {invoice.customer.shippingCountry && <>, {invoice.customer.shippingCountry}</>}
-                      </span>
+                     <span className="truncate">
+                    {[
+                        invoice.customer.shippingAddress,
+                        invoice.customer.shippingCity,
+                        invoice.customer.shippingZipCode,
+                        invoice.customer.shippingCountry
+                    ].filter(Boolean).join(', ')}
+                    </span>
                     </p>
                   </div>
                 )}
@@ -613,7 +615,7 @@ export default function CustomerInvoiceViewPage() {
 </div>
 
         {/* Invoice Summary and Payment Details */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-6 items-start">
           {/* Bank Details */}
           {invoice.bankDetails && Object.values(invoice.bankDetails).some(v => v) && (
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -677,89 +679,165 @@ export default function CustomerInvoiceViewPage() {
           )}
 
           {/* Invoice Summary */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Invoice Summary
-              </h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subtotal:</span>
-                  <span className="font-medium text-gray-900">{formatPrice(invoice.subtotal)}</span>
-                </div>
-                
-                {invoice.vatPercentage > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">VAT ({invoice.vatPercentage}%):</span>
-                    <span className="font-medium text-gray-900">{formatPrice(invoice.vatAmount)}</span>
-                  </div>
-                )}
-                
-                {invoice.discountPercentage > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Discount ({invoice.discountPercentage}%):</span>
-                    <span className="font-medium text-red-600">-{formatPrice(invoice.discountAmount)}</span>
-                  </div>
-                )}
-                
-                {invoice.shippingCost > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Shipping:</span>
-                    <span className="font-medium text-gray-900">{formatPrice(invoice.shippingCost)}</span>
-                  </div>
-                )}
-                
-                <div className="border-t border-gray-200 my-3 pt-3">
-                  <div className="flex justify-between font-semibold">
-                    <span className="text-gray-900">Total:</span>
-                    <span className="text-[#E39A65] text-lg">{formatPrice(invoice.finalTotal)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Details */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" />
-                  Payment Details
-                </h3>
-                
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Amount Paid:</span>
-                  <span className="font-medium text-green-600">{formatPrice(invoice.amountPaid || 0)}</span>
-                </div>
-                
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Due Amount:</span>
-                  <span className={`font-medium ${dueAmount > 0 ? 'text-red-600' : 'text-gray-600'}`}>
-                    {formatPrice(dueAmount)}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                  <span className="text-gray-500">Payment Status:</span>
-                  <PaymentStatusBadge status={invoice.paymentStatus} isExpired={isExpired} />
-                </div>
-              </div>
-
-              {/* Dates */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <p className="text-gray-500">Invoice Date</p>
-                  <p className="font-medium text-gray-900">{formatDate(invoice.invoiceDate)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Due Date</p>
-                  <p className={`font-medium ${isExpired ? 'text-red-600' : 'text-gray-900'}`}>
-                    {formatDate(invoice.dueDate)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                   <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                     <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                       <DollarSign className="w-4 h-4" />
+                       Invoice Summary
+                     </h2>
+                   </div>
+                   <div className="p-6 space-y-4">
+                     <div className="space-y-2">
+                       <div className="flex justify-between text-sm">
+                         <span className="text-gray-500">Subtotal:</span>
+                         <span className="font-medium text-gray-900">{formatPrice(invoice.subtotal)}</span>
+                       </div>
+                       
+                       {invoice.vatPercentage > 0 && (
+                         <div className="flex justify-between text-sm">
+                           <span className="text-gray-500">VAT ({invoice.vatPercentage}%):</span>
+                           <span className="font-medium text-gray-900">{formatPrice(invoice.vatAmount)}</span>
+                         </div>
+                       )}
+                       
+                       {invoice.discountPercentage > 0 && (
+                         <div className="flex justify-between text-sm">
+                           <span className="text-gray-500">Discount ({invoice.discountPercentage}%):</span>
+                           <span className="font-medium text-red-600">-{formatPrice(invoice.discountAmount)}</span>
+                         </div>
+                       )}
+                       
+                       {invoice.shippingCost > 0 && (
+                         <div className="flex justify-between text-sm">
+                           <span className="text-gray-500">Shipping:</span>
+                           <span className="font-medium text-gray-900">{formatPrice(invoice.shippingCost)}</span>
+                         </div>
+                       )}
+                       
+                       <div className="border-t border-gray-200 my-3 pt-3">
+                         <div className="flex justify-between font-semibold">
+                           <span className="text-gray-900">Total:</span>
+                           <span className="text-[#E39A65] text-lg">{formatPrice(invoice.finalTotal)}</span>
+                         </div>
+                       </div>
+                     </div>
+       
+                     {/* Payment Details with Percentages */}
+                     <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                       <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                         <CreditCard className="w-4 h-4" />
+                         Payment Details
+                       </h3>
+                       
+                       {/* Paid Section with Amount and Percentage */}
+                       <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                         <div className="flex justify-between items-center mb-2">
+                           <div className="flex items-center gap-2">
+                             <TrendingUp className="w-4 h-4 text-green-600" />
+                             <span className="text-sm font-medium text-green-700">Paid</span>
+                           </div>
+                           <span className="text-sm font-bold text-green-700">
+                             {formatPrice(invoice.amountPaid || 0)}
+                           </span>
+                         </div>
+                         <div className="space-y-2">
+                           <div className="flex justify-between text-xs">
+                             <span className="text-green-600">Percentage</span>
+                             <span className="font-medium text-green-700">
+                               {invoice.finalTotal > 0 
+                                 ? ((invoice.amountPaid / invoice.finalTotal) * 100).toFixed(1) 
+                                 : '0'}%
+                             </span>
+                           </div>
+                           <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+                             <div 
+                               className="h-full bg-green-500 rounded-full transition-all duration-300"
+                               style={{ 
+                                 width: `${invoice.finalTotal > 0 
+                                   ? Math.min((invoice.amountPaid / invoice.finalTotal) * 100, 100) 
+                                   : 0}%` 
+                               }}
+                             />
+                           </div>
+                         </div>
+                       </div>
+       
+                       {/* Unpaid Section with Amount and Percentage */}
+                       <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                         <div className="flex justify-between items-center mb-2">
+                           <div className="flex items-center gap-2">
+                             <TrendingDown className="w-4 h-4 text-red-600" />
+                             <span className="text-sm font-medium text-red-700">Unpaid</span>
+                           </div>
+                           <span className="text-sm font-bold text-red-700">
+                             {formatPrice(dueAmount)}
+                           </span>
+                         </div>
+                         <div className="space-y-2">
+                           <div className="flex justify-between text-xs">
+                             <span className="text-red-600">Percentage</span>
+                             <span className="font-medium text-red-700">
+                               {invoice.finalTotal > 0 
+                                 ? ((dueAmount / invoice.finalTotal) * 100).toFixed(1) 
+                                 : '0'}%
+                             </span>
+                           </div>
+                           <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+                             <div 
+                               className="h-full bg-red-500 rounded-full transition-all duration-300"
+                               style={{ 
+                                 width: `${invoice.finalTotal > 0 
+                                   ? Math.max(Math.min((dueAmount / invoice.finalTotal) * 100, 100), 0) 
+                                   : 0}%` 
+                               }}
+                             />
+                           </div>
+                         </div>
+                       </div>
+       
+                       {/* Compact Summary */}
+                       <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
+                         <span className="text-gray-500">Payment Status:</span>
+                         <PaymentStatusBadge status={invoice.paymentStatus} />
+                       </div>
+                       
+                       <div className="grid grid-cols-2 gap-2 text-xs mt-2">
+                         <div className="bg-white p-2 rounded border border-gray-200">
+                           <p className="text-gray-500">Paid Amount</p>
+                           <p className="font-semibold text-green-600">{formatPrice(invoice.amountPaid || 0)}</p>
+                           <p className="text-[10px] text-gray-400 mt-1">
+                             {invoice.finalTotal > 0 
+                               ? ((invoice.amountPaid / invoice.finalTotal) * 100).toFixed(1) 
+                               : '0'}% of total
+                           </p>
+                         </div>
+                         <div className="bg-white p-2 rounded border border-gray-200">
+                           <p className="text-gray-500">Unpaid Amount</p>
+                           <p className="font-semibold text-red-500">{formatPrice(dueAmount)}</p>
+                           <p className="text-[10px] text-gray-400 mt-1">
+                             {invoice.finalTotal > 0 
+                               ? ((dueAmount / invoice.finalTotal) * 100).toFixed(1) 
+                               : '0'}% of total
+                           </p>
+                         </div>
+                       </div>
+                     </div>
+       
+                     {/* Dates */}
+                     <div className="grid grid-cols-2 gap-3 text-xs">
+                       <div>
+                         <p className="text-gray-500">Invoice Date</p>
+                         <p className="font-medium text-gray-900">{formatDate(invoice.invoiceDate)}</p>
+                       </div>
+                       <div>
+                         <p className="text-gray-500">Due Date</p>
+                         <p className={`font-medium ${isExpired ? 'text-red-600' : 'text-gray-900'}`}>
+                           {formatDate(invoice.dueDate)}
+                         </p>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
         </div>
 
         {/* Notes and Terms */}
