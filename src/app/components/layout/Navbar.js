@@ -550,6 +550,7 @@ export default function Navbar() {
     { name: 'Products', href: '/products' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' },
+    { name: 'Blog', href: '/blog' },
   ];
 
   const isActive = (path) => pathname === path;

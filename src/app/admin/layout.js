@@ -410,7 +410,8 @@ import {
   Home,
   ChevronRight,
   UserCog,
-  FolderPlus
+  FolderPlus,
+  Newspaper
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -516,10 +517,16 @@ export default function AdminLayout({ children }) {
       current: pathname.startsWith('/admin/payments')
     },
     {
-      name: 'Reports',
-      href: '/admin/reports',
-      icon: BarChart3,
-      current: pathname.startsWith('/admin/reports')
+      name: 'Create Blog',
+      href: '/admin/createBlog',
+      icon: Newspaper,
+      current: pathname.startsWith('/admin/createBlog')
+    },
+    {
+      name: 'Manage Blogs',
+      href: '/admin/allBlogs',
+      icon: Newspaper,
+      current: pathname.startsWith('/admin/allBlogs')
     },
     {
       name: 'Settings',

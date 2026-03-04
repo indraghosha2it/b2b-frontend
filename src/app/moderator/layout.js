@@ -455,7 +455,9 @@ import {
   FileEdit,
   ClipboardList,
   HelpCircle,
-  FolderPlus
+  FolderPlus,
+  Newspaper,
+  Edit
 } from 'lucide-react';
 
 export default function ModeratorLayout({ children }) {
@@ -526,6 +528,18 @@ export default function ModeratorLayout({ children }) {
       href: '/moderator/allProducts',
       icon: Image,
       current: pathname.startsWith('/moderator/allProducts')
+    },
+      {
+      name: 'Create Blog',
+      href: '/moderator/createBlog',
+      icon: Newspaper,
+      current: pathname.startsWith('/moderator/createBlog')
+    },
+      {
+      name: 'Manage Blogs',
+      href: '/moderator/manageBlogs',
+      icon: Edit,
+      current: pathname.startsWith('/moderator/manageBlogs')
     },
     {
       name: 'Inquiries',
