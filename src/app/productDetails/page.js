@@ -1512,7 +1512,7 @@ import { toast } from 'sonner';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
 import AuthModal from '../components/AuthModal';
-
+import ProductReviews from '../components/product/ProductReviews';
 // Helper function to format currency
 const formatPrice = (price) => {
   return new Intl.NumberFormat('en-US', {
@@ -2789,66 +2789,83 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* Product Details Tabs */}
-          <div className="mt-8">
-            <div className="border-b border-gray-200">
-              <nav className="flex gap-8">
-                <button
-                  onClick={() => setActiveTab('attributes')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'attributes'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Key Attributes
-                </button>
-                <button
-                  onClick={() => setActiveTab('description')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'description'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Description
-                </button>
-                <button
-                  onClick={() => setActiveTab('pricing')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'pricing'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Bulk Pricing
-                </button>
-                <button
-                  onClick={() => setActiveTab('shipping')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'shipping'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Shipping Info
-                </button>
-              </nav>
-            </div>
+          
+{/* Product Details Tabs */}
+<div className="mt-8">
+  <div className="border-b border-gray-200">
+    <nav className="flex gap-8">
+      {/* Your existing tab buttons */}
+      <button
+        onClick={() => setActiveTab('attributes')}
+        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+          activeTab === 'attributes'
+            ? 'border-[#E39A65] text-[#E39A65]'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        Key Attributes
+      </button>
+      <button
+        onClick={() => setActiveTab('description')}
+        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+          activeTab === 'description'
+            ? 'border-[#E39A65] text-[#E39A65]'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        Description
+      </button>
+      <button
+        onClick={() => setActiveTab('pricing')}
+        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+          activeTab === 'pricing'
+            ? 'border-[#E39A65] text-[#E39A65]'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        Bulk Pricing
+      </button>
+      <button
+        onClick={() => setActiveTab('shipping')}
+        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+          activeTab === 'shipping'
+            ? 'border-[#E39A65] text-[#E39A65]'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        Shipping Info
+      </button>
+      {/* Add a Reviews tab */}
+      <button
+        onClick={() => setActiveTab('reviews')}
+        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+          activeTab === 'reviews'
+            ? 'border-[#E39A65] text-[#E39A65]'
+            : 'border-transparent text-gray-500 hover:text-gray-700'
+        }`}
+      >
+        Reviews
+      </button>
+    </nav>
+  </div>
 
-            <div className="mt-6">
-              {activeTab === 'attributes' && <KeyAttributes product={product} />}
-              {activeTab === 'description' && <Description product={product} />}
-              {activeTab === 'pricing' && (
-                <BulkPricingTable 
-                  pricing={product.quantityBasedPricing} 
-                  unitPrice={product.pricePerUnit}
-                  moq={product.moq}
-                />
-              )}
-              {activeTab === 'shipping' && <ShippingInfo />}
-            </div>
-          </div>
+  <div className="mt-6">
+    {activeTab === 'attributes' && <KeyAttributes product={product} />}
+    {activeTab === 'description' && <Description product={product} />}
+    {activeTab === 'pricing' && (
+      <BulkPricingTable 
+        pricing={product.quantityBasedPricing} 
+        unitPrice={product.pricePerUnit}
+        moq={product.moq}
+      />
+    )}
+    {activeTab === 'shipping' && <ShippingInfo />}
+    {/* Add the reviews tab content */}
+    {activeTab === 'reviews' && (
+      <ProductReviews productId={product._id} />
+    )}
+  </div>
+</div>
 
           {/* Related Products Section */}
           {relatedProducts.length > 0 && (
@@ -2874,6 +2891,8 @@ export default function ProductDetails() {
               </div>
             </div>
           )}
+
+
         </div>
 
         {/* WhatsApp Floating Button */}
