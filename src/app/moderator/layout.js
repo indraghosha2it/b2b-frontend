@@ -457,7 +457,8 @@ import {
   HelpCircle,
   FolderPlus,
   Newspaper,
-  Edit
+  Edit,
+  Star
 } from 'lucide-react';
 
 export default function ModeratorLayout({ children }) {
@@ -540,6 +541,12 @@ export default function ModeratorLayout({ children }) {
       href: '/moderator/manageBlogs',
       icon: Edit,
       current: pathname.startsWith('/moderator/manageBlogs')
+    },
+      {
+      name: 'Manage Reviews',
+      href: '/moderator/manageReviews',
+      icon: Star,
+      current: pathname.startsWith('/moderator/manageReviews')
     },
     {
       name: 'Inquiries',

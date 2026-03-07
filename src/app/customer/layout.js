@@ -456,7 +456,8 @@ import {
   ChevronDown,
   Home,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Star
 } from 'lucide-react';
 
 export default function CustomerLayout({ children }) {
@@ -517,12 +518,7 @@ export default function CustomerLayout({ children }) {
       name: 'My Invoices',
       href: '/customer/invoices',
       icon: FileText,
-      current: pathname.startsWith('/customer/invoices'),
-      subItems: [
-        { name: 'All Invoices', href: '/customer/invoices' },
-        { name: 'Pending', href: '/customer/invoices/pending' },
-        { name: 'Paid', href: '/customer/invoices/paid' }
-      ]
+      current: pathname === '/customer/invoices',
     },
   
     {
@@ -531,7 +527,12 @@ export default function CustomerLayout({ children }) {
       icon: ShoppingBag,
       current: pathname === '/products' || pathname.startsWith('/products/')
     },
- 
+      {
+      name: 'My Reviews',
+      href: '/customer/myReviews',
+      icon: Star,
+      current: pathname === '/customer/myReviews',
+    },
     {
       name: 'Settings',
       href: '/customer/settings',

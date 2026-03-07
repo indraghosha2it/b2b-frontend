@@ -411,7 +411,8 @@ import {
   ChevronRight,
   UserCog,
   FolderPlus,
-  Newspaper
+  Newspaper,
+  Star
 } from 'lucide-react';
 
 export default function AdminLayout({ children }) {
@@ -527,6 +528,12 @@ export default function AdminLayout({ children }) {
       href: '/admin/allBlogs',
       icon: Newspaper,
       current: pathname.startsWith('/admin/allBlogs')
+    },
+    {
+      name: 'Manage Reviews',
+      href: '/admin/manageReviews',
+      icon: Star,
+      current: pathname.startsWith('/admin/manageReviews')
     },
     {
       name: 'Settings',

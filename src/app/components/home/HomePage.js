@@ -8,6 +8,7 @@ import Categories from './Categories.js'
 import AlibabaTrustSection from './AlibabaTrustSection.js'
 import Navbar from '../layout/Navbar.js'
 import Footer from '../layout/Footer.js'
+import ReviewsSection from './ReviewsSection.js'
 
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
       <WhyChooseUs />
       <Categories />
       <FeaturedProducts />
+      <ReviewsSection />
            <AlibabaTrustSection /> 
            <Footer />
   
