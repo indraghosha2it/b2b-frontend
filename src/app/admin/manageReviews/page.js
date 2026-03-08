@@ -130,7 +130,7 @@
 
 //     console.log('Fetching with params:', params.toString());
 
-//     const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
+//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
 //       headers: {
 //         'Authorization': `Bearer ${token}`
 //       }
@@ -163,11 +163,11 @@
 //       const token = localStorage.getItem('token');
       
 //       const [allRes, pendingRes, approvedRes, rejectedRes, featuredRes] = await Promise.all([
-//         fetch('http://localhost:5000/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('http://localhost:5000/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('http://localhost:5000/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('http://localhost:5000/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('http://localhost:5000/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
+//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
 //       ]);
 
 //       const allData = await allRes.json();
@@ -214,7 +214,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${deleteModal.review._id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${deleteModal.review._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -273,7 +273,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -309,7 +309,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${responseModal.review._id}/respond`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${responseModal.review._id}/respond`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1078,7 +1078,7 @@ export default function ManageReviews() {
 
       console.log('Fetching with params:', params.toString());
 
-      const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1111,11 +1111,11 @@ export default function ManageReviews() {
       const token = localStorage.getItem('token');
       
       const [allRes, pendingRes, approvedRes, rejectedRes, featuredRes] = await Promise.all([
-        fetch('http://localhost:5000/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:5000/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:5000/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:5000/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:5000/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       const allData = await allRes.json();
@@ -1162,7 +1162,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${deleteModal.review._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${deleteModal.review._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1192,7 +1192,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1221,7 +1221,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1324,7 +1324,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

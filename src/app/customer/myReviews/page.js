@@ -92,7 +92,7 @@ export default function MyReviews() {
         params.append('search', searchTerm);
       }
 
-      const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/user/me?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -212,7 +212,7 @@ export default function MyReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

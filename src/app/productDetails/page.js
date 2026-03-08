@@ -1,3 +1,5 @@
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -28,13 +30,14 @@
 //   Trash2,
 //   ChevronRight,
 //   Star,
-//   Eye
+//   Eye,
+//   AlertCircle
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 // import Footer from '../components/layout/Footer';
 // import Navbar from '../components/layout/Navbar';
 // import AuthModal from '../components/AuthModal';
-
+// import ProductReviews from '../components/product/ProductReviews';
 // // Helper function to format currency
 // const formatPrice = (price) => {
 //   return new Intl.NumberFormat('en-US', {
@@ -340,7 +343,7 @@
 //   );
 // };
 
-// // UPDATED: Inquiry Item Component - Shows multiple sizes for a selected color with quantity inputs
+// // Inquiry Item Component - Shows multiple sizes for a selected color with quantity inputs
 // const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) => {
 //   const [sizeQuantities, setSizeQuantities] = useState(item.sizeQuantities || {});
 
@@ -416,19 +419,14 @@
 //   );
 // };
 
-// // ADDED: Related Product Card Component matching grid view design
+// // Related Product Card Component
 // const RelatedProductCard = ({ product }) => {
 //   const [isHovered, setIsHovered] = useState(false);
 //   const productImages = product.images || [];
 //   const firstTier = product.quantityBasedPricing?.[0];
-  
-//   // Calculate discount if available
-//   const discount = product.pricePerUnit && firstTier?.price 
-//     ? ((product.pricePerUnit - firstTier.price) / product.pricePerUnit * 100).toFixed(0)
-//     : null;
 
 //   const handleInquireClick = (e) => {
-//     e.preventDefault(); // Prevent the Link from triggering
+//     e.preventDefault();
 //     window.location.href = `/productDetails?id=${product._id}`;
 //   };
 
@@ -439,20 +437,15 @@
 //         onMouseEnter={() => setIsHovered(true)}
 //         onMouseLeave={() => setIsHovered(false)}
 //       >
-//         {/* Image Container */}
 //         <div className="relative h-48 overflow-hidden bg-gray-100">
 //           <img
 //             src={productImages[0]?.url || 'https://via.placeholder.com/300x300?text=No+Image'}
 //             alt={product.productName}
 //             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
 //           />
-          
-//           {/* Category Badge */}
 //           <span className="absolute top-3 left-3 bg-[#E39A65] text-white text-xs px-2 py-1 rounded-full shadow-md">
 //             {product.category?.name || 'Uncategorized'}
 //           </span>
-
-//           {/* View Overlay */}
 //           <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
 //             <span className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
 //               <Eye className="w-4 h-4" />
@@ -460,15 +453,10 @@
 //             </span>
 //           </div>
 //         </div>
-
-//         {/* Content */}
 //         <div className="p-4">
-//           {/* Product Title */}
 //           <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 h-12" title={product.productName}>
 //             {product.productName}
 //           </h3>
-
-//           {/* Price and MOQ */}
 //           <div className="flex items-center justify-between mb-3">
 //             <div>
 //               <span className="text-lg font-bold text-[#E39A65]">
@@ -480,8 +468,6 @@
 //               MOQ: {product.moq}
 //             </span>
 //           </div>
-
-//           {/* Bulk Pricing Preview */}
 //           {firstTier && (
 //             <div className="text-xs bg-orange-50 p-2 rounded-lg">
 //               <span className="font-medium text-orange-700">Bulk: </span>
@@ -490,8 +476,6 @@
 //               </span>
 //             </div>
 //           )}
-
-//           {/* Quick Stats */}
 //           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
 //             <div className="flex items-center gap-1">
 //               <Package className="w-3 h-3" />
@@ -502,8 +486,6 @@
 //               <span>{product.colors?.length || 0} colors</span>
 //             </div>
 //           </div>
-
-//           {/* Inquiry Button - Updated to navigate to product details */}
 //           <button 
 //             className="w-full mt-3 bg-[#E39A65] text-white py-2 rounded-lg text-sm font-medium hover:bg-[#d48b54] transition-colors flex items-center justify-center gap-2"
 //             onClick={handleInquireClick}
@@ -536,7 +518,11 @@
 //   const [isAuthenticated, setIsAuthenticated] = useState(false);
 //   const [user, setUser] = useState(null);
 //   const [showAuthModal, setShowAuthModal] = useState(false);
-//   const [authModalTab, setAuthModalTab] = useState('login'); // 'login' or 'register'
+//   const [authModalTab, setAuthModalTab] = useState('login');
+  
+//   // Cart check state
+//   const [isInCart, setIsInCart] = useState(false);
+//   const [cartItemDetails, setCartItemDetails] = useState(null);
 
 //   // Check authentication status on mount
 //   useEffect(() => {
@@ -577,10 +563,32 @@
 //     }
 //   }, [productId]);
 
+//   // Check if product is in cart when product loads or auth changes
+//   useEffect(() => {
+//     if (product && isAuthenticated) {
+//       checkIfInCart();
+//     } else {
+//       setIsInCart(false);
+//       setCartItemDetails(null);
+//     }
+//   }, [product, isAuthenticated]);
+
+//   // Listen for cart updates
+//   useEffect(() => {
+//     const handleCartUpdate = () => {
+//       if (product && isAuthenticated) {
+//         checkIfInCart();
+//       }
+//     };
+    
+//     window.addEventListener('cart-update', handleCartUpdate);
+//     return () => window.removeEventListener('cart-update', handleCartUpdate);
+//   }, [product, isAuthenticated]);
+
 //   const fetchProduct = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -590,10 +598,10 @@
 //           setSelectedColor(data.data.colors[0]);
 //         }
         
-//         // Initialize with empty inquiry items (no default item)
+//         // Initialize with empty inquiry items
 //         setInquiryItems([]);
         
-//         // Fetch related products based on category and targeted customer
+//         // Fetch related products
 //         fetchRelatedProducts(data.data.category?._id || data.data.category, data.data.targetedCustomer);
 //       } else {
 //         toast.error('Product not found');
@@ -609,22 +617,51 @@
 //   const fetchRelatedProducts = async (categoryId, targetedCustomer) => {
 //     try {
 //       const queryParams = new URLSearchParams();
-//       queryParams.append('limit', 8); // Fetch more to filter
+//       queryParams.append('limit', 8);
 //       if (categoryId) queryParams.append('category', categoryId);
 //       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
-//         // Filter out current product and get random 4
 //         const filtered = (data.data || []).filter(p => p._id !== productId);
-//         // Shuffle array to get random products
 //         const shuffled = filtered.sort(() => 0.5 - Math.random());
 //         setRelatedProducts(shuffled.slice(0, 4));
 //       }
 //     } catch (error) {
 //       console.error('Error fetching related products:', error);
+//     }
+//   };
+
+//   // Check if product is already in cart
+//   const checkIfInCart = async () => {
+//     if (!isAuthenticated || !product) return;
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success && data.data.items) {
+//         const existingItem = data.data.items.find(item => 
+//           item.productId === product._id || item.productId === product.id
+//         );
+        
+//         if (existingItem) {
+//           setIsInCart(true);
+//           setCartItemDetails(existingItem);
+//         } else {
+//           setIsInCart(false);
+//           setCartItemDetails(null);
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Error checking cart:', error);
 //     }
 //   };
 
@@ -754,7 +791,7 @@
 //       id: Date.now(),
 //       color: selectedColor,
 //       sizeQuantities: initialSizeQuantities,
-//       quantity: 0 // Will be calculated from size quantities
+//       quantity: 0
 //     }]);
 
 //     toast.success('Color added. Enter quantities for each size.');
@@ -776,313 +813,188 @@
 //     }
 //   };
 
-//   // UPDATED: Check authentication before submitting inquiry
-//   // const handleSubmitInquiry = () => {
-//   //   // First check if user is authenticated
-//   //   if (!isAuthenticated) {
-//   //     setAuthModalTab('login');
-//   //     setShowAuthModal(true);
-//   //     toast.info('Please login to submit an inquiry');
-//   //     return;
-//   //   }
+//   // Handle submit inquiry - group all colors under ONE product
+//   const handleSubmitInquiry = async () => {
+//     // First check if user is authenticated
+//     if (!isAuthenticated) {
+//       setAuthModalTab('login');
+//       setShowAuthModal(true);
+//       toast.info('Please login to submit an inquiry');
+//       return;
+//     }
 
-//   //   // Then validate inquiry
-//   //   if (inquiryItems.length === 0) {
-//   //     toast.error('Please add at least one color');
-//   //     return;
-//   //   }
+//     // Then validate inquiry
+//     if (inquiryItems.length === 0) {
+//       toast.error('Please add at least one color');
+//       return;
+//     }
 
-//   //   // Check if any quantities are entered
-//   //   const hasQuantities = inquiryItems.some(item => {
-//   //     const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-//   //     return total > 0;
-//   //   });
+//     // Check if any quantities are entered
+//     const hasQuantities = inquiryItems.some(item => {
+//       const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+//       return total > 0;
+//     });
 
-//   //   if (!hasQuantities) {
-//   //     toast.error('Please enter quantities for at least one size');
-//   //     return;
-//   //   }
+//     if (!hasQuantities) {
+//       toast.error('Please enter quantities for at least one size');
+//       return;
+//     }
 
-//   //   if (totalQuantity < product.moq) {
-//   //     toast.error(`Total quantity must be at least ${product.moq} pieces`);
-//   //     return;
-//   //   }
+//     // Calculate total quantity across ALL colors
+//     const calculatedTotalQuantity = inquiryItems.reduce((total, item) => {
+//       const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+//       return total + itemTotal;
+//     }, 0);
 
-//   //   const inquiryData = {
-//   //     productId: product._id,
-//   //     productName: product.productName,
-//   //     userId: user?._id,
-//   //     userEmail: user?.email,
-//   //     companyName: user?.companyName,
-//   //     items: inquiryItems.map(item => ({
-//   //       color: item.color,
-//   //       sizeQuantities: item.sizeQuantities,
-//   //       totalQuantity: Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0)
-//   //     })),
-//   //     totalQuantity,
-//   //     totalPrice,
-//   //     specialInstructions,
-//   //     submittedAt: new Date().toISOString()
-//   //   };
+//     // Check MOQ against total quantity
+//     if (calculatedTotalQuantity < product.moq) {
+//       toast.error(`Total quantity must be at least ${product.moq} pieces (currently ${calculatedTotalQuantity})`);
+//       return;
+//     }
 
-//   //   const existingInquiries = JSON.parse(localStorage.getItem('inquiries') || '[]');
-//   //   existingInquiries.push(inquiryData);
-//   //   localStorage.setItem('inquiries', JSON.stringify(existingInquiries));
-
-//   //   toast.success('Inquiry submitted successfully!');
-//   //   setInquiryItems([]);
-//   //   setSpecialInstructions('');
-//   // };
-//   // Updated handleSubmitInquiry function
-// // Updated handleSubmitInquiry function to send ALL items to API
-// // Updated handleSubmitInquiry function to group all colors under ONE product
-// const handleSubmitInquiry = async () => {
-//   // First check if user is authenticated
-//   if (!isAuthenticated) {
-//     setAuthModalTab('login');
-//     setShowAuthModal(true);
-//     toast.info('Please login to submit an inquiry');
-//     return;
-//   }
-
-//   // Then validate inquiry
-//   if (inquiryItems.length === 0) {
-//     toast.error('Please add at least one color');
-//     return;
-//   }
-
-//   // Check if any quantities are entered
-//   const hasQuantities = inquiryItems.some(item => {
-//     const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-//     return total > 0;
-//   });
-
-//   if (!hasQuantities) {
-//     toast.error('Please enter quantities for at least one size');
-//     return;
-//   }
-
-//   // Calculate total quantity across ALL colors
-//   const calculatedTotalQuantity = inquiryItems.reduce((total, item) => {
-//     const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-//     return total + itemTotal;
-//   }, 0);
-
-//   // Check MOQ against total quantity
-//   if (calculatedTotalQuantity < product.moq) {
-//     toast.error(`Total quantity must be at least ${product.moq} pieces (currently ${calculatedTotalQuantity})`);
-//     return;
-//   }
-
-//   try {
-//     const token = localStorage.getItem('token');
-    
-//     // Prepare colors data with their size quantities
-//     const colorsData = inquiryItems.map(item => {
-//       // Calculate total for this color
-//       const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+//     try {
+//       const token = localStorage.getItem('token');
       
-//       return {
-//         color: item.color,
-//         sizeQuantities: item.sizeQuantities, // Keep as object for now, backend will convert
-//         totalQuantity: colorTotal
+//       // Prepare colors data with their size quantities
+//       const colorsData = inquiryItems.map(item => {
+//         const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+        
+//         return {
+//           color: item.color,
+//           sizeQuantities: item.sizeQuantities,
+//           totalQuantity: colorTotal
+//         };
+//       }).filter(item => item.totalQuantity > 0);
+
+//       // Create ONE cart item for this product with all colors
+//       const cartItem = {
+//         productId: product._id,
+//         productName: product.productName,
+//         colors: colorsData,
+//         totalQuantity: calculatedTotalQuantity,
+//         unitPrice: applicableUnitPrice,
+//         moq: product.moq,
+//         productImage: product.images?.[0]?.url,
+//         specialInstructions: specialInstructions // ADD THIS LINE
 //       };
-//     }).filter(item => item.totalQuantity > 0); // Only include colors with quantity > 0
-
-//     // Create ONE cart item for this product with all colors
-//     const cartItem = {
-//       productId: product._id,
-//       productName: product.productName,
-//       colors: colorsData,
-//       totalQuantity: calculatedTotalQuantity,
-//       unitPrice: applicableUnitPrice,
-//       moq: product.moq,
-//       productImage: product.images?.[0]?.url
-//     };
-
-//     console.log('Sending ONE cart item with multiple colors:', cartItem);
-
-//     const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
-//       method: 'POST',
-//       headers: {
-//         'Authorization': `Bearer ${token}`,
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify(cartItem)
-//     });
-
-//     const data = await response.json();
-    
-//     if (data.success) {
-//       toast.success(`${colorsData.length} color(s) added for ${product.productName}! Total: ${calculatedTotalQuantity} pcs`);
       
-//       // Clear the form
-//       setInquiryItems([]);
-//       setSpecialInstructions('');
+//     console.log('📤 Sending cart item with special instructions:', specialInstructions); // Debug log
+
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//         method: 'POST',
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(cartItem)
+//       });
+
+//       const data = await response.json();
       
-//       // Dispatch cart update event for navbar
-//       window.dispatchEvent(new Event('cart-update'));
-//     } else {
-//       toast.error(data.error || 'Failed to add to cart');
-//     }
-    
-//   } catch (error) {
-//     console.error('Error adding to cart:', error);
-//     toast.error('Failed to add items to cart');
-//   }
-// };
-
-//   // UPDATED: Check authentication before WhatsApp inquiry
-// // UPDATED: Check authentication before WhatsApp inquiry with env number
-// const handleWhatsAppInquiry = () => {
-//   if (!isAuthenticated) {
-//     setAuthModalTab('login');
-//     setShowAuthModal(true);
-//     toast.info('Please login to send WhatsApp inquiry');
-//     return;
-//   }
-
-//   if (inquiryItems.length === 0) {
-//     toast.error('Please add items to inquiry');
-//     return;
-//   }
-
-//   // Format the message with all product and inquiry details
-//   let message = `*Inquiry for ${product.productName}*\n\n`;
-  
-//   // Customer/Buyer Information
-//   message += `*👤 BUYER INFORMATION*\n`;
-//   message += `• Company: ${user?.companyName || 'N/A'}\n`;
-//   message += `• Contact Person: ${user?.contactPerson || 'N/A'}\n`;
-//   message += `• Email: ${user?.email || 'N/A'}\n`;
-//   message += `• Phone: ${user?.phone || 'N/A'}\n`;
-//   if (user?.whatsapp) message += `• WhatsApp: ${user.whatsapp}\n`;
-//   message += `• Country: ${user?.country || 'N/A'}\n\n`;
-  
-//   // Product Information
-//   message += `*📦 PRODUCT DETAILS*\n`;
-//   message += `• Product: ${product.productName}\n`;
-//   message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
-//   message += `• Fabric: ${product.fabric || 'Standard'}\n`;
-//   message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
-//   message += `• MOQ: ${product.moq} pieces\n\n`;
-  
-//   // Inquiry Items with Size Breakdown
-//   message += `*🛒 INQUIRY ITEMS*\n`;
-  
-//   inquiryItems.forEach((item, index) => {
-//     message += `\n*Item ${index + 1} - Color: ${item.color?.code || 'N/A'}*\n`;
-    
-//     // Add size quantities (only non-zero quantities)
-//     let hasSizes = false;
-//     Object.entries(item.sizeQuantities || {}).forEach(([size, qty]) => {
-//       if (qty && qty > 0) {
-//         message += `  • Size ${size}: ${qty} pcs\n`;
-//         hasSizes = true;
+//       if (data.success) {
+//         toast.success(`${colorsData.length} color(s) added for ${product.productName}! Total: ${calculatedTotalQuantity} pcs`);
+        
+//         // Clear the form
+//         setInquiryItems([]);
+//         setSpecialInstructions('');
+        
+//         // Update cart status
+//         setIsInCart(true);
+//         checkIfInCart();
+        
+//         // Dispatch cart update event for navbar
+//         window.dispatchEvent(new Event('cart-update'));
+//       } else {
+//         toast.error(data.error || 'Failed to add to cart');
 //       }
+      
+//     } catch (error) {
+//       console.error('Error adding to cart:', error);
+//       toast.error('Failed to add items to cart');
+//     }
+//   };
+
+//   // Handle WhatsApp inquiry
+//   const handleWhatsAppInquiry = () => {
+//     if (!isAuthenticated) {
+//       setAuthModalTab('login');
+//       setShowAuthModal(true);
+//       toast.info('Please login to send WhatsApp inquiry');
+//       return;
+//     }
+
+//     if (inquiryItems.length === 0) {
+//       toast.error('Please add items to inquiry');
+//       return;
+//     }
+
+//     // Format the message with all product and inquiry details
+//     let message = `*Inquiry for ${product.productName}*\n\n`;
+    
+//     // Customer/Buyer Information
+//     message += `*👤 BUYER INFORMATION*\n`;
+//     message += `• Company: ${user?.companyName || 'N/A'}\n`;
+//     message += `• Contact Person: ${user?.contactPerson || 'N/A'}\n`;
+//     message += `• Email: ${user?.email || 'N/A'}\n`;
+//     message += `• Phone: ${user?.phone || 'N/A'}\n`;
+//     if (user?.whatsapp) message += `• WhatsApp: ${user.whatsapp}\n`;
+//     message += `• Country: ${user?.country || 'N/A'}\n\n`;
+    
+//     // Product Information
+//     message += `*📦 PRODUCT DETAILS*\n`;
+//     message += `• Product: ${product.productName}\n`;
+//     message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
+//     message += `• Fabric: ${product.fabric || 'Standard'}\n`;
+//     message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
+//     message += `• MOQ: ${product.moq} pieces\n\n`;
+    
+//     // Inquiry Items with Size Breakdown
+//     message += `*🛒 INQUIRY ITEMS*\n`;
+    
+//     inquiryItems.forEach((item, index) => {
+//       message += `\n*Item ${index + 1} - Color: ${item.color?.code || 'N/A'}*\n`;
+      
+//       let hasSizes = false;
+//       Object.entries(item.sizeQuantities || {}).forEach(([size, qty]) => {
+//         if (qty && qty > 0) {
+//           message += `  • Size ${size}: ${qty} pcs\n`;
+//           hasSizes = true;
+//         }
+//       });
+      
+//       if (!hasSizes) {
+//         message += `  • No sizes specified\n`;
+//       }
+      
+//       const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+//       message += `  *Item Total:* ${itemTotal} pcs\n`;
 //     });
     
-//     if (!hasSizes) {
-//       message += `  • No sizes specified\n`;
+//     // Order Summary
+//     message += `\n*📊 ORDER SUMMARY*\n`;
+//     message += `• Total Quantity: ${totalQuantity} pieces\n`;
+//     message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
+//     message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
+    
+//     // Special Instructions
+//     if (specialInstructions) {
+//       message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
+//       message += `${specialInstructions}\n`;
 //     }
     
-//     const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-//     message += `  *Item Total:* ${itemTotal} pcs\n`;
-//   });
-  
-//   // Order Summary
-//   message += `\n*📊 ORDER SUMMARY*\n`;
-//   message += `• Total Quantity: ${totalQuantity} pieces\n`;
-//   message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
-//   message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
-  
-//   // Applied Bulk Tier (if applicable)
-//   // if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-//   //   const appliedTier = product.quantityBasedPricing.find(tier => {
-//   //     if (tier.range.includes('-')) {
-//   //       const [min, max] = tier.range.split('-').map(Number);
-//   //       return totalQuantity >= min && totalQuantity <= max;
-//   //     } else if (tier.range.includes('+')) {
-//   //       const minQty = parseInt(tier.range.replace('+', ''));
-//   //       return totalQuantity >= minQty;
-//   //     }
-//   //     return false;
-//   //   });
+//     message += `\n*🕐 Inquiry sent:* ${new Date().toLocaleString()}\n`;
+
+//     // Get WhatsApp number from environment variable
+//     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685';
+//     const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, '');
+//     const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
     
-//   //   if (appliedTier) {
-//   //     message += `• Bulk Tier Applied: ${appliedTier.range}\n`;
-//   //   }
-//   // }
-  
-//   // Special Instructions
-//   if (specialInstructions) {
-//     message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
-//     message += `${specialInstructions}\n`;
-//   }
-  
-//   // Timestamp
-//   message += `\n*🕐 Inquiry sent:* ${new Date().toLocaleString()}\n`;
- 
-
-//   // Get WhatsApp number from environment variable
-//   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685'; // Fallback to your number
-  
-//   // Clean the number (remove any non-digit characters except +)
-//   const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, '');
-  
-//   // Create WhatsApp URL
-//   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
-  
-//   // Open WhatsApp in new tab
-//   window.open(whatsappUrl, '_blank');
-  
-//   // Optional: Show success toast
-//   toast.success('WhatsApp chat opened!', {
-//     description: 'Your inquiry has been prepared and ready to send.',
-//   });
-// };
-
-// // const handleWhatsAppInquiry = async () => {
-// //   if (!isAuthenticated) {
-// //     setAuthModalTab('login');
-// //     setShowAuthModal(true);
-// //     toast.info('Please login to send WhatsApp inquiry');
-// //     return;
-// //   }
-
-// //   if (inquiryItems.length === 0) {
-// //     toast.error('Please add items to inquiry');
-// //     return;
-// //   }
-
-// //   // First add to cart
-// //   const cartItem = {
-// //     productId: product._id,
-// //     color: selectedColor,
-// //     sizeQuantities: inquiryItems[0].sizeQuantities,
-// //     totalQuantity: totalQuantity
-// //   };
-
-// //   try {
-// //     const token = localStorage.getItem('token');
-// //     await fetch('http://localhost:5000/api/inquiry-cart/add', {
-// //       method: 'POST',
-// //       headers: {
-// //         'Authorization': `Bearer ${token}`,
-// //         'Content-Type': 'application/json'
-// //       },
-// //       body: JSON.stringify(cartItem)
-// //     });
+//     window.open(whatsappUrl, '_blank');
     
-// //     // Dispatch cart update event
-// //     window.dispatchEvent(new Event('cart-update'));
-// //   } catch (error) {
-// //     console.error('Error adding to cart:', error);
-// //   }
-
-// //   // Then proceed with WhatsApp message (rest of your existing code)
-// //   // ... (keep your existing WhatsApp message formatting code)
-// // };
+//     toast.success('WhatsApp chat opened!', {
+//       description: 'Your inquiry has been prepared and ready to send.',
+//     });
+//   };
 
 //   if (loading) {
 //     return <ProductDetailsSkeleton />;
@@ -1126,14 +1038,14 @@
 //         <div className="container mx-auto px-4 max-w-7xl py-8">
 //           {/* Two Column Layout */}
 //           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-//             {/* Left Column - Image Gallery (5 columns) - Sticky */}
+//             {/* Left Column - Image Gallery */}
 //             <div className="lg:col-span-5">
 //               <div className="sticky top-24">
 //                 <ImageGallery images={product.images} productName={product.productName} />
 //               </div>
 //             </div>
 
-//             {/* Right Column - Product Info & Inquiry Form (7 columns) */}
+//             {/* Right Column - Product Info & Inquiry Form */}
 //             <div className="lg:col-span-7 space-y-6">
 //               {/* Product Info Card */}
 //               <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -1222,7 +1134,7 @@
 //                 </div>
 //               </div>
 
-//               {/* UPDATED: Inquiry Form Card with Multi-Size Selection */}
+//               {/* Inquiry Form Card */}
 //               <div className="bg-white rounded-xl border border-gray-200 p-6">
 //                 <div className="flex items-center justify-between mb-4">
 //                   <h2 className="text-lg font-semibold text-gray-900">Create Your Inquiry</h2>
@@ -1253,15 +1165,32 @@
 //                 {/* Add Button */}
 //                 <button
 //                   onClick={handleAddItem}
-//                   disabled={!selectedColor}
+//                   disabled={!selectedColor || isInCart}
 //                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
 //                 >
 //                   <Plus className="w-5 h-5" />
 //                   Add Selected Color
 //                 </button>
 
+//                 {/* Already in cart notice */}
+//                 {isInCart && (
+//                   <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+//                     <div className="flex items-start gap-2">
+//                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+//                       <div>
+//                         <p className="text-sm font-medium text-green-800">
+//                           ✓ This product is already in your inquiry cart
+//                         </p>
+//                         <p className="text-xs text-green-600 mt-1">
+//                           You can view or modify it in your cart
+//                         </p>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 )}
+
 //                 {/* Quick size guide */}
-//                 {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && (
+//                 {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && !isInCart && (
 //                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
 //                     <p className="text-xs text-blue-700">
 //                       <span className="font-medium">Available Sizes:</span> {product.sizes.filter(s => s.trim()).join(', ')}
@@ -1272,8 +1201,8 @@
 //                   </div>
 //                 )}
 
-//                 {/* Inquiry Items List */}
-//                 {inquiryItems.length > 0 && (
+//                 {/* Inquiry Items List - Only show if not in cart */}
+//                 {!isInCart && inquiryItems.length > 0 && (
 //                   <>
 //                     <h3 className="text-md font-semibold text-gray-900 mb-3">Your Items</h3>
 //                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 mb-4">
@@ -1331,28 +1260,50 @@
 //                   </>
 //                 )}
 
-//                 {/* Action Buttons - Always Visible */}
+//                 {/* Action Buttons */}
 //                 <div className="flex gap-3 mt-4">
-//                   <button
-//                     onClick={handleSubmitInquiry}
-//                     disabled={totalQuantity < product.moq || inquiryItems.length === 0}
-//                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-//                   >
-//                     <ShoppingCart className="w-4 h-4" />
-//                   Add to Inquiry Cart
-//                   </button>
-//                   <button
-//                     onClick={handleWhatsAppInquiry}
-//                     disabled={inquiryItems.length === 0}
-//                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-//                   >
-//                     <MessageCircle className="w-4 h-4" />
-//                     Chat on WhatsApp
-//                   </button>
+//                   {isInCart ? (
+//                     <>
+//                       <Link 
+//                         href="/inquiry-cart" 
+//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+//                       >
+//                         <ShoppingCart className="w-4 h-4" />
+//                         View in Cart
+//                       </Link>
+//                       <button
+//                         onClick={handleWhatsAppInquiry}
+//                         disabled={inquiryItems.length === 0}
+//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                       >
+//                         <MessageCircle className="w-4 h-4" />
+//                         Chat on WhatsApp
+//                       </button>
+//                     </>
+//                   ) : (
+//                     <>
+//                       <button
+//                         onClick={handleSubmitInquiry}
+//                         disabled={totalQuantity < product.moq || inquiryItems.length === 0}
+//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                       >
+//                         <ShoppingCart className="w-4 h-4" />
+//                         Add to Inquiry Cart
+//                       </button>
+//                       <button
+//                         onClick={handleWhatsAppInquiry}
+//                         disabled={inquiryItems.length === 0}
+//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                       >
+//                         <MessageCircle className="w-4 h-4" />
+//                         Chat on WhatsApp
+//                       </button>
+//                     </>
+//                   )}
 //                 </div>
 
 //                 {/* Empty State Message */}
-//                 {inquiryItems.length === 0 && (
+//                 {!isInCart && inquiryItems.length === 0 && (
 //                   <div className="text-center py-4 mt-2">
 //                     <p className="text-sm text-gray-500">
 //                       Select a color and click "Add Selected Color" to start building your inquiry
@@ -1363,68 +1314,85 @@
 //             </div>
 //           </div>
 
-//           {/* Product Details Tabs */}
-//           <div className="mt-8">
-//             <div className="border-b border-gray-200">
-//               <nav className="flex gap-8">
-//                 <button
-//                   onClick={() => setActiveTab('attributes')}
-//                   className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//                     activeTab === 'attributes'
-//                       ? 'border-[#E39A65] text-[#E39A65]'
-//                       : 'border-transparent text-gray-500 hover:text-gray-700'
-//                   }`}
-//                 >
-//                   Key Attributes
-//                 </button>
-//                 <button
-//                   onClick={() => setActiveTab('description')}
-//                   className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//                     activeTab === 'description'
-//                       ? 'border-[#E39A65] text-[#E39A65]'
-//                       : 'border-transparent text-gray-500 hover:text-gray-700'
-//                   }`}
-//                 >
-//                   Description
-//                 </button>
-//                 <button
-//                   onClick={() => setActiveTab('pricing')}
-//                   className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//                     activeTab === 'pricing'
-//                       ? 'border-[#E39A65] text-[#E39A65]'
-//                       : 'border-transparent text-gray-500 hover:text-gray-700'
-//                   }`}
-//                 >
-//                   Bulk Pricing
-//                 </button>
-//                 <button
-//                   onClick={() => setActiveTab('shipping')}
-//                   className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//                     activeTab === 'shipping'
-//                       ? 'border-[#E39A65] text-[#E39A65]'
-//                       : 'border-transparent text-gray-500 hover:text-gray-700'
-//                   }`}
-//                 >
-//                   Shipping Info
-//                 </button>
-//               </nav>
-//             </div>
+          
+// {/* Product Details Tabs */}
+// <div className="mt-8">
+//   <div className="border-b border-gray-200">
+//     <nav className="flex gap-8">
+//       {/* Your existing tab buttons */}
+//       <button
+//         onClick={() => setActiveTab('attributes')}
+//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+//           activeTab === 'attributes'
+//             ? 'border-[#E39A65] text-[#E39A65]'
+//             : 'border-transparent text-gray-500 hover:text-gray-700'
+//         }`}
+//       >
+//         Key Attributes
+//       </button>
+//       <button
+//         onClick={() => setActiveTab('description')}
+//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+//           activeTab === 'description'
+//             ? 'border-[#E39A65] text-[#E39A65]'
+//             : 'border-transparent text-gray-500 hover:text-gray-700'
+//         }`}
+//       >
+//         Description
+//       </button>
+//       <button
+//         onClick={() => setActiveTab('pricing')}
+//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+//           activeTab === 'pricing'
+//             ? 'border-[#E39A65] text-[#E39A65]'
+//             : 'border-transparent text-gray-500 hover:text-gray-700'
+//         }`}
+//       >
+//         Bulk Pricing
+//       </button>
+//       <button
+//         onClick={() => setActiveTab('shipping')}
+//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+//           activeTab === 'shipping'
+//             ? 'border-[#E39A65] text-[#E39A65]'
+//             : 'border-transparent text-gray-500 hover:text-gray-700'
+//         }`}
+//       >
+//         Shipping Info
+//       </button>
+//       {/* Add a Reviews tab */}
+//       <button
+//         onClick={() => setActiveTab('reviews')}
+//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+//           activeTab === 'reviews'
+//             ? 'border-[#E39A65] text-[#E39A65]'
+//             : 'border-transparent text-gray-500 hover:text-gray-700'
+//         }`}
+//       >
+//         Reviews
+//       </button>
+//     </nav>
+//   </div>
 
-//             <div className="mt-6">
-//               {activeTab === 'attributes' && <KeyAttributes product={product} />}
-//               {activeTab === 'description' && <Description product={product} />}
-//               {activeTab === 'pricing' && (
-//                 <BulkPricingTable 
-//                   pricing={product.quantityBasedPricing} 
-//                   unitPrice={product.pricePerUnit}
-//                   moq={product.moq}
-//                 />
-//               )}
-//               {activeTab === 'shipping' && <ShippingInfo />}
-//             </div>
-//           </div>
+//   <div className="mt-6">
+//     {activeTab === 'attributes' && <KeyAttributes product={product} />}
+//     {activeTab === 'description' && <Description product={product} />}
+//     {activeTab === 'pricing' && (
+//       <BulkPricingTable 
+//         pricing={product.quantityBasedPricing} 
+//         unitPrice={product.pricePerUnit}
+//         moq={product.moq}
+//       />
+//     )}
+//     {activeTab === 'shipping' && <ShippingInfo />}
+//     {/* Add the reviews tab content */}
+//     {activeTab === 'reviews' && (
+//       <ProductReviews productId={product._id} />
+//     )}
+//   </div>
+// </div>
 
-//           {/* ADDED: Related Products Section */}
+//           {/* Related Products Section */}
 //           {relatedProducts.length > 0 && (
 //             <div className="mt-12">
 //               <div className="flex items-center justify-between mb-6">
@@ -1448,6 +1416,8 @@
 //               </div>
 //             </div>
 //           )}
+
+
 //         </div>
 
 //         {/* WhatsApp Floating Button */}
@@ -1474,9 +1444,10 @@
 //   );
 // }
 
-
+// app/productDetails/page.jsx
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -1513,6 +1484,7 @@ import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
 import AuthModal from '../components/AuthModal';
 import ProductReviews from '../components/product/ProductReviews';
+
 // Helper function to format currency
 const formatPrice = (price) => {
   return new Intl.NumberFormat('en-US', {
@@ -1541,10 +1513,11 @@ const formatPriceNumber = (price) => {
   return price?.toFixed(2) || '0.00';
 };
 
-// Loading Skeleton Component
+// Loading Skeleton Component - Moved OUTSIDE ProductContent
 const ProductDetailsSkeleton = () => (
   <div className="min-h-screen bg-gray-50">
-    <div className="container mx-auto px-4 max-w-7xl py-8">
+    <Navbar />
+    <div className="container mx-auto px-4 max-w-7xl py-8 mt-20">
       <div className="h-4 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1567,6 +1540,7 @@ const ProductDetailsSkeleton = () => (
         </div>
       </div>
     </div>
+    <Footer />
   </div>
 );
 
@@ -1974,8 +1948,8 @@ const RelatedProductCard = ({ product }) => {
   );
 };
 
-// Main Product Details Component
-export default function ProductDetails() {
+// Main Product Content Component that uses useSearchParams
+function ProductContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
   
@@ -2063,7 +2037,7 @@ export default function ProductDetails() {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -2096,7 +2070,7 @@ export default function ProductDetails() {
       if (categoryId) queryParams.append('category', categoryId);
       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {
@@ -2115,7 +2089,7 @@ export default function ProductDetails() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2350,12 +2324,12 @@ export default function ProductDetails() {
         unitPrice: applicableUnitPrice,
         moq: product.moq,
         productImage: product.images?.[0]?.url,
-        specialInstructions: specialInstructions // ADD THIS LINE
+        specialInstructions: specialInstructions
       };
       
-    console.log('📤 Sending cart item with special instructions:', specialInstructions); // Debug log
+      console.log('📤 Sending cart item with special instructions:', specialInstructions);
 
-      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2789,83 +2763,79 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          
-{/* Product Details Tabs */}
-<div className="mt-8">
-  <div className="border-b border-gray-200">
-    <nav className="flex gap-8">
-      {/* Your existing tab buttons */}
-      <button
-        onClick={() => setActiveTab('attributes')}
-        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === 'attributes'
-            ? 'border-[#E39A65] text-[#E39A65]'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        Key Attributes
-      </button>
-      <button
-        onClick={() => setActiveTab('description')}
-        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === 'description'
-            ? 'border-[#E39A65] text-[#E39A65]'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        Description
-      </button>
-      <button
-        onClick={() => setActiveTab('pricing')}
-        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === 'pricing'
-            ? 'border-[#E39A65] text-[#E39A65]'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        Bulk Pricing
-      </button>
-      <button
-        onClick={() => setActiveTab('shipping')}
-        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === 'shipping'
-            ? 'border-[#E39A65] text-[#E39A65]'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        Shipping Info
-      </button>
-      {/* Add a Reviews tab */}
-      <button
-        onClick={() => setActiveTab('reviews')}
-        className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === 'reviews'
-            ? 'border-[#E39A65] text-[#E39A65]'
-            : 'border-transparent text-gray-500 hover:text-gray-700'
-        }`}
-      >
-        Reviews
-      </button>
-    </nav>
-  </div>
+          {/* Product Details Tabs */}
+          <div className="mt-8">
+            <div className="border-b border-gray-200">
+              <nav className="flex gap-8">
+                <button
+                  onClick={() => setActiveTab('attributes')}
+                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'attributes'
+                      ? 'border-[#E39A65] text-[#E39A65]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Key Attributes
+                </button>
+                <button
+                  onClick={() => setActiveTab('description')}
+                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'description'
+                      ? 'border-[#E39A65] text-[#E39A65]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Description
+                </button>
+                <button
+                  onClick={() => setActiveTab('pricing')}
+                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'pricing'
+                      ? 'border-[#E39A65] text-[#E39A65]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Bulk Pricing
+                </button>
+                <button
+                  onClick={() => setActiveTab('shipping')}
+                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'shipping'
+                      ? 'border-[#E39A65] text-[#E39A65]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Shipping Info
+                </button>
+                <button
+                  onClick={() => setActiveTab('reviews')}
+                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'reviews'
+                      ? 'border-[#E39A65] text-[#E39A65]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Reviews
+                </button>
+              </nav>
+            </div>
 
-  <div className="mt-6">
-    {activeTab === 'attributes' && <KeyAttributes product={product} />}
-    {activeTab === 'description' && <Description product={product} />}
-    {activeTab === 'pricing' && (
-      <BulkPricingTable 
-        pricing={product.quantityBasedPricing} 
-        unitPrice={product.pricePerUnit}
-        moq={product.moq}
-      />
-    )}
-    {activeTab === 'shipping' && <ShippingInfo />}
-    {/* Add the reviews tab content */}
-    {activeTab === 'reviews' && (
-      <ProductReviews productId={product._id} />
-    )}
-  </div>
-</div>
+            <div className="mt-6">
+              {activeTab === 'attributes' && <KeyAttributes product={product} />}
+              {activeTab === 'description' && <Description product={product} />}
+              {activeTab === 'pricing' && (
+                <BulkPricingTable 
+                  pricing={product.quantityBasedPricing} 
+                  unitPrice={product.pricePerUnit}
+                  moq={product.moq}
+                />
+              )}
+              {activeTab === 'shipping' && <ShippingInfo />}
+              {activeTab === 'reviews' && (
+                <ProductReviews productId={product._id} />
+              )}
+            </div>
+          </div>
 
           {/* Related Products Section */}
           {relatedProducts.length > 0 && (
@@ -2891,8 +2861,6 @@ export default function ProductDetails() {
               </div>
             </div>
           )}
-
-
         </div>
 
         {/* WhatsApp Floating Button */}
@@ -2916,5 +2884,14 @@ export default function ProductDetails() {
       </div>
       <Footer />
     </>
+  );
+}
+
+// Main page component with Suspense
+export default function ProductDetailsPage() {
+  return (
+    <Suspense fallback={<ProductDetailsSkeleton />}>
+      <ProductContent />
+    </Suspense>
   );
 }

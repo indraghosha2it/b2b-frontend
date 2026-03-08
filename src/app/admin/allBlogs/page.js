@@ -105,7 +105,7 @@ export default function AdminBlogs() {
         params.append('search', searchTerm);
       }
 
-      const response = await fetch(`http://localhost:5000/api/blogs/admin/all?${params}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/all?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -155,7 +155,7 @@ export default function AdminBlogs() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/blogs/admin/${deleteModal.blog._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/${deleteModal.blog._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -181,7 +181,7 @@ export default function AdminBlogs() {
   const handleToggleStatus = async (blog) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/blogs/admin/${blog._id}/toggle`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/${blog._id}/toggle`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

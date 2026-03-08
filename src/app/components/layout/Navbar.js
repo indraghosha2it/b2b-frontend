@@ -33,26 +33,69 @@ export default function Navbar() {
   };
 
   // Fetch cart count
-  const fetchCartCount = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await fetch('http://localhost:5000/api/inquiry-cart', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await response.json();
-        if (data.success) {
-          setCartCount(data.data.totalItems || 0);
-        }
-      } catch (error) {
-        console.error('Error fetching cart count:', error);
+  // const fetchCartCount = async () => {
+  //   const token = localStorage.getItem('token');
+  //   if (token) {
+  //     try {
+  //       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+  //         headers: {
+  //           'Authorization': `Bearer ${token}`
+  //         }
+  //       });
+  //       const data = await response.json();
+  //       if (data.success) {
+  //         setCartCount(data.data.totalItems || 0);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching cart count:', error);
+  //     }
+  //   } else {
+  //     setCartCount(0);
+  //   }
+  // };
+  // Fetch cart count
+const fetchCartCount = async () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal
+      }).finally(() => clearTimeout(timeoutId));
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } else {
+      
+      const data = await response.json();
+      if (data.success) {
+        setCartCount(data.data?.totalItems || 0);
+      } else {
+        console.error('API returned error:', data.error);
+        setCartCount(0);
+      }
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
       setCartCount(0);
+      
+      // Show user-friendly message
+      if (error.name === 'AbortError') {
+        toast?.error('Request timeout. Please check your connection.');
+      } else {
+        toast?.error('Failed to connect to server. Please try again.');
+      }
     }
-  };
+  } else {
+    setCartCount(0);
+  }
+};
 
   // Initial check
   useEffect(() => {

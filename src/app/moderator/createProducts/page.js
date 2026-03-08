@@ -187,7 +187,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -543,7 +543,7 @@
 //         console.log('FormData entry:', pair[0], pair[1]);
 //       }
 
-//       const response = await fetch('http://localhost:5000/api/products', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1448,7 +1448,7 @@ const removeKeyword = (indexToRemove) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1842,7 +1842,7 @@ const removeKeyword = (indexToRemove) => {
         console.log('FormData entry:', pair[0], pair[1]);
       }
 
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

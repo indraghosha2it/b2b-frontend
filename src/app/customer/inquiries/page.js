@@ -129,7 +129,7 @@
 //     setCancelling(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/inquiries/${inquiry._id}/cancel`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiry._id}/cancel`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -358,7 +358,7 @@
 //         return;
 //       }
 
-//       const response = await fetch('http://localhost:5000/api/inquiries/my-inquiries', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiries/my-inquiries', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -733,7 +733,7 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
     setCancelling(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/inquiries/${inquiry._id}/cancel`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiry._id}/cancel`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -757,7 +757,7 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
   const handleAcceptQuote = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/inquiries/${inquiry._id}/accept`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiry._id}/accept`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -782,7 +782,7 @@ const handleViewInvoice = async () => {
     const token = localStorage.getItem('token');
     
     // Fetch customer's invoices
-    const response = await fetch(`http://localhost:5000/api/invoices/my-invoices`, {
+    const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/my-invoices`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -1263,7 +1263,7 @@ export default function InquiriesPage() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/inquiries/my-inquiries', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiries/my-inquiries', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

@@ -493,7 +493,7 @@
 //       }
 
 //       // Build query params
-//       let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       if (activeFilter !== 'All') {
 //         const filterMap = {
@@ -642,7 +642,7 @@
 //     setDeletingInvoice(invoiceToDelete._id);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -684,7 +684,7 @@
 //         updateData.dueAmount = 0;
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -1636,7 +1636,7 @@ export default function AdminInvoicesPage() {
       }
 
       // Build query params
-      let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (activeFilter !== 'All' && !showExpiredOnly) {
         const filterMap = {
@@ -1807,7 +1807,7 @@ export default function AdminInvoicesPage() {
     setDeletingInvoice(invoiceToDelete._id);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1849,7 +1849,7 @@ export default function AdminInvoicesPage() {
         updateData.dueAmount = 0;
       }
 
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

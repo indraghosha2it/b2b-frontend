@@ -58,7 +58,7 @@
 //     }
 
 //     try {
-//       const response = await fetch('http://localhost:5000/api/auth/register', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/register', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -582,7 +582,7 @@ export default function RegisterPage() {
     const loadingToast = toast.loading('Creating your account...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
