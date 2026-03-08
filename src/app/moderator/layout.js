@@ -554,24 +554,7 @@ export default function ModeratorLayout({ children }) {
       icon: MessageSquare,
       current: pathname.startsWith('/moderator/inquiries')
     },
-    {
-      name: 'Reviews',
-      href: '/moderator/reviews',
-      icon: Eye,
-      current: pathname.startsWith('/moderator/reviews')
-    },
-    {
-      name: 'Inventory',
-      href: '/moderator/inventory',
-      icon: ClipboardList,
-      current: pathname.startsWith('/moderator/inventory')
-    },
-    {
-      name: 'Reports',
-      href: '/moderator/reports',
-      icon: BarChart3,
-      current: pathname.startsWith('/moderator/reports')
-    },
+   
     {
       name: 'Settings',
       href: '/moderator/settings',

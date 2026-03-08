@@ -1,12 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 
 export default function AlibabaTrustSection() {
-  const [yearsInBusiness] = useState(8);
-  const [responseRate] = useState(98);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -39,7 +36,7 @@ export default function AlibabaTrustSection() {
   const featuredItems = [
     {
       id: 1,
-      name: "High Quality Spring Famous Brand Designer Luxury Sweatshirts ",
+      name: "High Quality Spring Famous Brand Designer Luxury Sweatshirts",
       price: "$17.89",
       moq: "10 pcs",
       image: "https://i.ibb.co.com/PZZ9vvCr/H4d5f244f6765473f8a752284f942313fs.jpg",
@@ -76,43 +73,43 @@ export default function AlibabaTrustSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-20 bg-white">
+    <section ref={sectionRef} className="py-16 bg-white overflow-x-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {/* Partner Badge */}
           <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 mb-6">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-sm font-medium text-gray-700">Verified Alibaba Partner</span>
           </div>
 
           {/* Title */}
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
             Trusted Seller on{' '}
             <span className="text-orange-500">Alibaba.com</span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
             8+ years of excellence in wholesale apparel manufacturing
           </p>
         </div>
 
         {/* Stats Grid */}
-        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 group"
+              className="bg-gray-50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 group"
             >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300">
                 {stat.icon}
               </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">
+              <div className="text-xl font-bold text-gray-900 mb-1">
                 {stat.value}
               </div>
-              <div className="text-sm font-medium text-gray-700 mb-1">
+              <div className="text-xs font-medium text-gray-700 mb-1">
                 {stat.label}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-[10px] text-gray-500">
                 {stat.subtext}
               </div>
             </div>
@@ -120,35 +117,35 @@ export default function AlibabaTrustSection() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Left Column - Store Preview */}
-          <div className={`space-y-6 transition-all duration-700 delay-400 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
+          <div className={`space-y-5 transition-all duration-700 delay-400 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
             {/* Alibaba Store Card */}
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
               {/* Store Header */}
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100/50 p-6 border-b border-gray-200">
+              <div className="bg-gradient-to-r from-orange-50 to-orange-100/50 p-5 border-b border-gray-200">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="bg-orange-500 rounded-lg p-2">
-                        <span className="text-white font-bold text-sm">Alibaba</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="bg-orange-500 rounded-lg px-2 py-1 flex-shrink-0">
+                        <span className="text-white font-bold text-xs">Alibaba</span>
                       </div>
-                      <span className="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-medium">
+                      <span className="bg-yellow-100 text-yellow-800 text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap">
                         Gold Supplier
                       </span>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1">Asian Cloth Ltd.</h3>
-                    <p className="text-gray-600 text-sm">Wholesale Apparel Manufacturer</p>
+                    <h3 className="text-lg font-bold text-gray-900 mb-0.5 truncate">Asian Cloth Ltd.</h3>
+                    <p className="text-xs text-gray-600 truncate">Wholesale Apparel Manufacturer</p>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 mb-1">
+                  <div className="text-right flex-shrink-0 ml-2">
+                    <div className="flex items-center gap-0.5 mb-1">
                       {[1,2,3,4,5].map(star => (
-                        <svg key={star} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                        <svg key={star} className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 20 20">
                           <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                         </svg>
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600">4.9 (1,234 reviews)</span>
+                    <span className="text-[10px] text-gray-600 whitespace-nowrap">4.9 (1.2k reviews)</span>
                   </div>
                 </div>
               </div>
@@ -160,26 +157,26 @@ export default function AlibabaTrustSection() {
                   { label: 'Response Rate', value: '98%' },
                   { label: 'Response Time', value: '&lt;2h' }
                 ].map((stat, index) => (
-                  <div key={index} className="text-center py-4">
-                    <div className="font-bold text-gray-900">{stat.value}</div>
-                    <div className="text-xs text-gray-500">{stat.label}</div>
+                  <div key={index} className="text-center py-3">
+                    <div className="font-bold text-gray-900 text-sm">{stat.value}</div>
+                    <div className="text-[10px] text-gray-500">{stat.label}</div>
                   </div>
                 ))}
               </div>
 
               {/* Action Buttons */}
-              <div className="p-6 border-t border-gray-200">
+              <div className="p-4 border-t border-gray-200 space-y-2">
                 <Link
                   href="https://asianclothltd.m.trustpass.alibaba.com/index.html"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition-all duration-300 mb-3"
+                  className="block w-full text-center bg-orange-500 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-all duration-300"
                 >
                   Visit Our Alibaba Store →
                 </Link>
                 <Link
                   href="/contact"
-                  className="block w-full text-center bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all duration-300"
+                  className="block w-full text-center bg-gray-100 text-gray-700 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all duration-300"
                 >
                   Request Sample Order
                 </Link>
@@ -187,46 +184,47 @@ export default function AlibabaTrustSection() {
             </div>
 
             {/* Trust Badges Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {badges.map((badge, index) => (
-                <div key={index} className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl mb-2">{badge.icon}</div>
-                  <div className="font-semibold text-gray-900 text-sm mb-1">{badge.name}</div>
-                  <div className="text-xs text-gray-500">{badge.desc}</div>
+                <div key={index} className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="text-xl mb-1">{badge.icon}</div>
+                  <div className="font-semibold text-gray-900 text-xs mb-0.5">{badge.name}</div>
+                  <div className="text-[9px] text-gray-500">{badge.desc}</div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right Column - Featured Products */}
-          <div className={`space-y-6 transition-all duration-700 delay-600 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-            <div className="bg-gray-50 rounded-2xl p-6">
-             <div className="flex items-center justify-between mb-6">
-  <h3 className="text-lg font-semibold text-gray-900">🔥 Featured on Alibaba</h3>
-  <Link 
-    href="https://asianclothltd.m.trustpass.alibaba.com/index.html" 
-    className="text-sm text-orange-500 font-medium hover:text-orange-600 transition-colors duration-300 flex items-center gap-1 group"
-  >
-    View All 
-    <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-  </Link>
-</div>
+          <div className={`space-y-5 transition-all duration-700 delay-600 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
+            <div className="bg-gray-50 rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-semibold text-gray-900">🔥 Featured on Alibaba</h3>
+                <Link 
+                  href="https://asianclothltd.m.trustpass.alibaba.com/index.html" 
+                  className="text-xs text-orange-500 font-medium hover:text-orange-600 transition-colors duration-300 flex items-center gap-1 group flex-shrink-0"
+                >
+                  View All 
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                </Link>
+              </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {featuredItems.map((item) => (
-                  <div key={item.id} className="bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                    <div className="relative h-32 bg-gray-100">
+                  <div key={item.id} className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="relative h-24 bg-gray-100">
                       <img
                         src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     </div>
-                    <div className="p-3">
-                      <h4 className="font-medium text-gray-900 text-sm mb-1 truncate">{item.name}</h4>
+                    <div className="p-2">
+                      <h4 className="font-medium text-gray-900 text-xs mb-1 truncate">{item.name}</h4>
                       <div className="flex justify-between items-center">
-                        <span className="text-orange-500 font-bold">{item.price}</span>
-                        <span className="text-xs text-gray-500">MOQ: {item.moq}</span>
+                        <span className="text-orange-500 font-bold text-xs">{item.price}</span>
+                        <span className="text-[8px] text-gray-500">MOQ: {item.moq}</span>
                       </div>
                     </div>
                   </div>
@@ -235,39 +233,40 @@ export default function AlibabaTrustSection() {
             </div>
 
             {/* Testimonial Card */}
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gray-300 rounded-full overflow-hidden">
+            <div className="bg-gray-50 rounded-xl p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
                   <img
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
                     alt="Client"
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Michael Chen</h4>
-                  <p className="text-sm text-gray-600">Fashion Retailer, Singapore</p>
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-gray-900 text-sm truncate">Michael Chen</h4>
+                  <p className="text-xs text-gray-600 truncate">Fashion Retailer, Singapore</p>
                 </div>
               </div>
-              <p className="text-gray-700 text-sm italic">
-                "Been ordering from them for 3 years. Quality is always consistent and shipping is fast. Great Alibaba partner."
+              <p className="text-gray-700 text-xs italic">
+                "Been ordering from them for 3 years. Quality is always consistent and shipping is fast."
               </p>
             </div>
           </div>
         </div>
 
         {/* Bottom CTA */}
-        <div className={`mt-16 text-center p-8 bg-gray-50 rounded-2xl border border-gray-200 transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <div className={`mt-12 text-center p-6 bg-gray-50 rounded-xl border border-gray-200 transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
             Ready to start your wholesale order?
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-4">
             Contact us directly or browse our complete catalog on Alibaba
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap gap-3 justify-center">
             <Link
               href="/products"
-              className="px-8 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300"
+              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-all duration-300"
             >
               Browse All Products
             </Link>
@@ -275,7 +274,7 @@ export default function AlibabaTrustSection() {
               href="https://asianclothltd.m.trustpass.alibaba.com/index.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-3 bg-white text-gray-900 rounded-xl font-semibold border-2 border-gray-200 hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
+              className="px-5 py-2.5 bg-white text-gray-900 rounded-lg text-sm font-semibold border border-gray-200 hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
             >
               View on Alibaba
             </Link>

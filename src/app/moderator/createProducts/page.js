@@ -2,7 +2,6 @@
 
 
 
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -24,7 +23,10 @@
 //   MinusCircle,
 //   PlusCircle,
 //   ChevronDown,
-//   Users
+//   Users,
+//   Info,
+//   Hash,
+//   Type
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -87,12 +89,12 @@
 //   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
-//   // Form state with targetedCustomer added
+//   // Form state with additionalInfo
 //   const [formData, setFormData] = useState({
 //     productName: '',
 //     description: '',
 //     category: '',
-//     targetedCustomer: 'unisex', // Default value
+//     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
 //     pricePerUnit: 0,
@@ -104,7 +106,8 @@
 //       { code: '#FF0000' },
 //       { code: '#0000FF' },
 //       { code: '#000000' }
-//     ]
+//     ],
+//     additionalInfo: [] // New field for additional information
 //   });
 
 //   // Image state for 4 images
@@ -259,26 +262,25 @@
 //     }
 //   };
 
-//   // Handle form input changes - Updated with better debugging
+//   // Handle form input changes
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
-//     console.log('Field changed:', name, 'Value:', value); // Debug log
+//     console.log('Field changed:', name, 'Value:', value);
     
 //     setFormData(prev => ({ 
 //       ...prev, 
 //       [name]: value 
 //     }));
     
-//     // Clear error for this field if it exists
 //     if (errors[name]) {
 //       setErrors(prev => ({ ...prev, [name]: null }));
 //     }
 //   };
 
-//   // Specific handler for targeted customer (for extra safety)
+//   // Specific handler for targeted customer
 //   const handleTargetedCustomerChange = (e) => {
 //     const value = e.target.value;
-//     console.log('Targeted customer changed to:', value); // Debug log
+//     console.log('Targeted customer changed to:', value);
     
 //     setFormData(prev => ({
 //       ...prev,
@@ -382,7 +384,58 @@
 //     }
 //   };
 
-//   // Validate form - Updated with targetedCustomer validation
+//   // ========== ADDITIONAL INFO HANDLERS ==========
+  
+//   // Handle additional info changes
+//   const handleAdditionalInfoChange = (index, field, value) => {
+//     const updatedInfo = [...formData.additionalInfo];
+//     updatedInfo[index] = { ...updatedInfo[index], [field]: value };
+//     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+    
+//     // Clear error for this field if it exists
+//     if (errors[`additionalInfo_${index}_${field}`]) {
+//       setErrors(prev => ({ ...prev, [`additionalInfo_${index}_${field}`]: null }));
+//     }
+//   };
+
+//   // Add new additional info row
+//   const addAdditionalInfo = () => {
+//     setFormData(prev => ({
+//       ...prev,
+//       additionalInfo: [
+//         ...prev.additionalInfo,
+//         { fieldName: '', fieldValue: '' }
+//       ]
+//     }));
+//   };
+
+//   // Remove additional info row
+//   const removeAdditionalInfo = (index) => {
+//     const updatedInfo = formData.additionalInfo.filter((_, i) => i !== index);
+//     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
+//   };
+
+//   // Validate additional info
+//   const validateAdditionalInfo = () => {
+//     let isValid = true;
+//     const newErrors = {};
+
+//     formData.additionalInfo.forEach((info, index) => {
+//       if (!info.fieldName.trim()) {
+//         newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
+//         isValid = false;
+//       }
+//       if (!info.fieldValue.trim()) {
+//         newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
+//         isValid = false;
+//       }
+//     });
+
+//     setErrors(prev => ({ ...prev, ...newErrors }));
+//     return isValid;
+//   };
+
+//   // Validate form
 //   const validateForm = () => {
 //     const newErrors = {};
 
@@ -425,16 +478,18 @@
 //     }
 
 //     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
+    
+//     // Validate additional info separately
+//     const isAdditionalInfoValid = validateAdditionalInfo();
+    
+//     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
 //   };
 
-//   // Handle form submission - Updated with targetedCustomer
+//   // Handle form submission
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
-//     // Debug log before submission
 //     console.log('Submitting form with data:', formData);
-//     console.log('Targeted customer value:', formData.targetedCustomer);
 
 //     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
 //     if (hasEmptyPrice) {
@@ -458,17 +513,23 @@
 //         price: tier.price === '' ? 0 : parseFloat(tier.price)
 //       }));
 
+//       // Filter out empty additional info rows
+//       const processedAdditionalInfo = formData.additionalInfo.filter(
+//         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
+//       );
+
 //       // Append all form data
 //       formDataToSend.append('productName', formData.productName);
 //       formDataToSend.append('description', formData.description);
 //       formDataToSend.append('category', formData.category);
-//       formDataToSend.append('targetedCustomer', formData.targetedCustomer); // Make sure this is included
+//       formDataToSend.append('targetedCustomer', formData.targetedCustomer);
 //       formDataToSend.append('fabric', formData.fabric);
 //       formDataToSend.append('moq', formData.moq);
 //       formDataToSend.append('pricePerUnit', formData.pricePerUnit);
 //       formDataToSend.append('quantityBasedPricing', JSON.stringify(processedPricing));
 //       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
 //       formDataToSend.append('colors', JSON.stringify(formData.colors));
+//       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
 
 //       // Append images
 //       productImages.forEach((img, index) => {
@@ -631,7 +692,7 @@
 //                         )}
 //                       </div>
 
-//                       {/* Targeted Customer - Fixed with specific handler */}
+//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -642,7 +703,7 @@
 //                         <select
 //                           name="targetedCustomer"
 //                           value={formData.targetedCustomer}
-//                           onChange={handleTargetedCustomerChange} // Using specific handler
+//                           onChange={handleTargetedCustomerChange}
 //                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
 //                             errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
 //                           }`}
@@ -893,6 +954,95 @@
 //               </div>
 //             </div>
 
+//             {/* NEW ROW: Additional Information (without suggested fields) */}
+//             <div className="mb-6">
+//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                 <div className="p-5 border-b border-gray-200">
+//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                     <Info className="w-5 h-5 text-[#E39A65]" />
+//                     Additional Information
+//                   </h2>
+//                   <p className="text-xs text-gray-500 mt-1">
+//                     Add custom fields for extra product details (e.g., Care Instructions, Country of Origin, Warranty, etc.)
+//                   </p>
+//                 </div>
+                
+//                 <div className="p-5">
+//                   <div className="space-y-4">
+//                     {formData.additionalInfo.map((info, index) => (
+//                       <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+//                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+//                           {/* Field Name */}
+//                           <div>
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
+//                               <div className="flex items-center gap-1">
+//                                 <Type className="w-3 h-3" />
+//                                 Field Name
+//                               </div>
+//                             </label>
+//                             <input
+//                               type="text"
+//                               value={info.fieldName}
+//                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
+//                               placeholder="e.g., Care Instructions, Country, Warranty"
+//                               className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+//                                 errors[`additionalInfo_${index}_fieldName`] ? 'border-red-500' : 'border-gray-300'
+//                               }`}
+//                             />
+//                             {errors[`additionalInfo_${index}_fieldName`] && (
+//                               <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldName`]}</p>
+//                             )}
+//                           </div>
+                          
+//                           {/* Field Value */}
+//                           <div>
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
+//                               <div className="flex items-center gap-1">
+//                                 <Hash className="w-3 h-3" />
+//                                 Field Value
+//                               </div>
+//                             </label>
+//                             <input
+//                               type="text"
+//                               value={info.fieldValue}
+//                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
+//                               placeholder="e.g., Machine Wash, Bangladesh, 2 Years"
+//                               className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+//                                 errors[`additionalInfo_${index}_fieldValue`] ? 'border-red-500' : 'border-gray-300'
+//                               }`}
+//                             />
+//                             {errors[`additionalInfo_${index}_fieldValue`] && (
+//                               <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldValue`]}</p>
+//                             )}
+//                           </div>
+//                         </div>
+                        
+//                         {/* Remove Button */}
+//                         <button
+//                           type="button"
+//                           onClick={() => removeAdditionalInfo(index)}
+//                           className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+//                           title="Remove Field"
+//                         >
+//                           <Trash2 className="w-4 h-4" />
+//                         </button>
+//                       </div>
+//                     ))}
+                    
+//                     {/* Add Button */}
+//                     <button
+//                       type="button"
+//                       onClick={addAdditionalInfo}
+//                       className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50 hover:border-[#E39A65] transition-colors"
+//                     >
+//                       <PlusCircle className="w-4 h-4" />
+//                       Add Additional Information
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
 //             {/* Row 3: Bulk Pricing (Full Width) */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -1066,7 +1216,10 @@ import {
   Users,
   Info,
   Hash,
-  Type
+  Type,
+  Star,
+  Search,
+  Tag
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1117,6 +1270,18 @@ const TARGETED_CUSTOMERS = [
   { value: 'unisex', label: 'Unisex' }
 ];
 
+// Available tags (matching your schema)
+const AVAILABLE_TAGS = [
+  'Top Ranking',
+  'New Arrival',
+  'Top Deal',
+  'Best Seller',
+  'Summer Collection',
+  'Winter Collection',
+  'Limited Edition',
+  'Trending'
+];
+
 export default function ModeratorCreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -1125,11 +1290,17 @@ export default function ModeratorCreateProduct() {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [keywordInput, setKeywordInput] = useState('');
+
+  
+  // New state for collapsible sections
+  const [showTags, setShowTags] = useState(false);
+  const [showMeta, setShowMeta] = useState(false);
   
   // Refs for click outside detection
   const colorPickerRef = useRef(null);
   
-  // Form state with additionalInfo
+  // Form state with all fields including new ones
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
@@ -1147,8 +1318,58 @@ export default function ModeratorCreateProduct() {
       { code: '#0000FF' },
       { code: '#000000' }
     ],
-    additionalInfo: [] // New field for additional information
+    additionalInfo: [],
+    // NEW FIELDS
+    isFeatured: false,
+    tags: [],
+    metaSettings: {
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: []
+    }
   });
+  // Add these handlers
+const addKeyword = () => {
+  if (!keywordInput.trim()) return;
+  
+  // Split by comma if multiple keywords are pasted at once
+  const keywordsToAdd = keywordInput
+    .split(',')
+    .map(k => k.trim())
+    .filter(k => k !== '');
+  
+  setFormData(prev => ({
+    ...prev,
+    metaSettings: {
+      ...prev.metaSettings,
+      metaKeywords: [...(prev.metaSettings.metaKeywords || []), ...keywordsToAdd]
+    }
+  }));
+  setKeywordInput('');
+};
+
+const handleKeywordKeyDown = (e) => {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    addKeyword();
+  }
+};
+
+const handleKeywordBlur = () => {
+  if (keywordInput.trim()) {
+    addKeyword();
+  }
+};
+
+const removeKeyword = (indexToRemove) => {
+  setFormData(prev => ({
+    ...prev,
+    metaSettings: {
+      ...prev.metaSettings,
+      metaKeywords: prev.metaSettings.metaKeywords.filter((_, index) => index !== indexToRemove)
+    }
+  }));
+};
 
   // Image state for 4 images
   const [productImages, setProductImages] = useState([
@@ -1432,7 +1653,6 @@ export default function ModeratorCreateProduct() {
     updatedInfo[index] = { ...updatedInfo[index], [field]: value };
     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
     
-    // Clear error for this field if it exists
     if (errors[`additionalInfo_${index}_${field}`]) {
       setErrors(prev => ({ ...prev, [`additionalInfo_${index}_${field}`]: null }));
     }
@@ -1455,6 +1675,31 @@ export default function ModeratorCreateProduct() {
     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
   };
 
+  // ========== NEW HANDLERS FOR TAGS AND META ==========
+  
+  // Handle tag toggle
+  const handleTagToggle = (tag) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.includes(tag)
+        ? prev.tags.filter(t => t !== tag)
+        : [...prev.tags, tag]
+    }));
+  };
+
+  // Handle meta settings change
+  const handleMetaChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      metaSettings: {
+        ...prev.metaSettings,
+        [field]: value
+      }
+    }));
+  };
+
+
+
   // Validate additional info
   const validateAdditionalInfo = () => {
     let isValid = true;
@@ -1475,7 +1720,7 @@ export default function ModeratorCreateProduct() {
     return isValid;
   };
 
-  // Validate form
+  // Validate form - Updated with new fields validation
   const validateForm = () => {
     const newErrors = {};
 
@@ -1517,15 +1762,24 @@ export default function ModeratorCreateProduct() {
       newErrors.colors = 'At least one color is required';
     }
 
+    // Validate meta title length
+    if (formData.metaSettings.metaTitle && formData.metaSettings.metaTitle.length > 70) {
+      newErrors.metaTitle = 'Meta title should not exceed 70 characters';
+    }
+
+    // Validate meta description length
+    if (formData.metaSettings.metaDescription && formData.metaSettings.metaDescription.length > 160) {
+      newErrors.metaDescription = 'Meta description should not exceed 160 characters';
+    }
+
     setErrors(newErrors);
     
-    // Validate additional info separately
     const isAdditionalInfoValid = validateAdditionalInfo();
     
     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
   };
 
-  // Handle form submission
+  // Handle form submission - Updated with new fields
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -1570,6 +1824,11 @@ export default function ModeratorCreateProduct() {
       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
       formDataToSend.append('colors', JSON.stringify(formData.colors));
       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
+      
+      // Append new fields
+      formDataToSend.append('isFeatured', formData.isFeatured);
+      formDataToSend.append('tags', JSON.stringify(formData.tags));
+      formDataToSend.append('metaSettings', JSON.stringify(formData.metaSettings));
 
       // Append images
       productImages.forEach((img, index) => {
@@ -1994,7 +2253,7 @@ export default function ModeratorCreateProduct() {
               </div>
             </div>
 
-            {/* NEW ROW: Additional Information (without suggested fields) */}
+            {/* Additional Information Section */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2083,7 +2342,250 @@ export default function ModeratorCreateProduct() {
               </div>
             </div>
 
-            {/* Row 3: Bulk Pricing (Full Width) */}
+            {/* NEW: Featured & Tags Section */}
+            <div className="mb-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-5 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-[#E39A65]" />
+                    Product Promotion
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Mark as featured and add tags to highlight your product
+                  </p>
+                </div>
+                
+                <div className="p-5">
+                  {/* Featured Checkbox */}
+                  <div className="mb-4">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.isFeatured}
+                        onChange={(e) => {
+                          setFormData({ ...formData, isFeatured: e.target.checked });
+                          setShowTags(e.target.checked);
+                        }}
+                        className="w-5 h-5 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
+                        <p className="text-xs text-gray-500">Featured products will appear in special sections</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Tags Section */}
+                  <div className="mt-4">
+                    <div 
+                      className="flex items-center justify-between cursor-pointer py-2"
+                      onClick={() => setShowTags(!showTags)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-[#E39A65]" />
+                        <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
+                    </div>
+
+                    {showTags && (
+                      <div className="mt-3">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {AVAILABLE_TAGS.map(tag => (
+                            <label key={tag} className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.tags.includes(tag)}
+                                onChange={() => handleTagToggle(tag)}
+                                className="w-4 h-4 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
+                              />
+                              <span className="text-sm text-gray-600">{tag}</span>
+                            </label>
+                          ))}
+                        </div>
+                        
+                        {/* Selected Tags Display */}
+                        {formData.tags.length > 0 && (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {formData.tags.map(tag => (
+                              <span
+                                key={tag}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                              >
+                                {tag}
+                                <button
+                                  type="button"
+                                  onClick={() => handleTagToggle(tag)}
+                                  className="ml-1.5 text-orange-600 hover:text-orange-800"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* NEW: Meta Settings (SEO) Section */}
+            <div className="mb-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-5 border-b border-gray-200">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setShowMeta(!showMeta)}
+                  >
+                    <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <Search className="w-5 h-5 text-[#E39A65]" />
+                      Meta Settings (SEO)
+                    </h2>
+                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Optimize your product for search engines
+                  </p>
+                </div>
+                
+                {showMeta && (
+                  <div className="p-5">
+                    <div className="space-y-4">
+                      {/* Meta Title */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Title
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.metaSettings.metaTitle}
+                          onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
+                          maxLength="70"
+                          placeholder="Enter meta title (max 70 characters)"
+                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                            errors.metaTitle ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        <div className="flex justify-between mt-1">
+                          <p className="text-xs text-gray-500">Appears in search engine results</p>
+                          <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 60 ? 'text-orange-600' : 'text-gray-500'}`}>
+                            {formData.metaSettings.metaTitle?.length || 0}/70
+                          </span>
+                        </div>
+                        {errors.metaTitle && (
+                          <p className="text-xs text-red-600 mt-1">{errors.metaTitle}</p>
+                        )}
+                      </div>
+
+                      {/* Meta Description */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Description
+                        </label>
+                        <textarea
+                          value={formData.metaSettings.metaDescription}
+                          onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
+                          maxLength="160"
+                          placeholder="Enter meta description (max 160 characters)"
+                          rows="3"
+                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none ${
+                            errors.metaDescription ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        <div className="flex justify-between mt-1">
+                          <p className="text-xs text-gray-500">Brief description for search results</p>
+                          <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 150 ? 'text-orange-600' : 'text-gray-500'}`}>
+                            {formData.metaSettings.metaDescription?.length || 0}/160
+                          </span>
+                        </div>
+                        {errors.metaDescription && (
+                          <p className="text-xs text-red-600 mt-1">{errors.metaDescription}</p>
+                        )}
+                      </div>
+{/* Meta Keywords - Chip Input Style */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Meta Keywords
+  </label>
+  
+  {/* Display existing keywords as chips */}
+  {formData.metaSettings.metaKeywords?.length > 0 && (
+    <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+      {formData.metaSettings.metaKeywords.map((keyword, index) => (
+        <span
+          key={index}
+          className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+        >
+          {keyword}
+          <button
+            type="button"
+            onClick={() => removeKeyword(index)}
+            className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </span>
+      ))}
+    </div>
+  )}
+  
+  {/* Input for new keywords */}
+  <div className="relative">
+    <input
+      type="text"
+      value={keywordInput}
+      onChange={(e) => setKeywordInput(e.target.value)}
+      onKeyDown={handleKeywordKeyDown}
+      onBlur={handleKeywordBlur}
+      placeholder="Type a keyword and press Enter or comma to add"
+      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition pr-20"
+    />
+    {keywordInput.trim() && (
+      <button
+        type="button"
+        onClick={addKeyword}
+        className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#E39A65] text-white text-xs font-medium rounded hover:bg-[#d48b54] transition-colors"
+      >
+        Add
+      </button>
+    )}
+  </div>
+  <p className="text-xs text-gray-500 mt-1">
+    Type a keyword and press Enter or comma to add. Keywords appear as chips above.
+  </p>
+  
+  {/* Debug display - remove after testing */}
+  {/* <div className="mt-2 text-xs text-gray-400">
+    Current keywords array: {JSON.stringify(formData.metaSettings.metaKeywords)}
+  </div> */}
+</div>
+
+                      {/* SEO Preview */}
+                      {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <h4 className="text-xs font-medium text-gray-700 mb-2">Search Engine Preview:</h4>
+                          <div className="space-y-1">
+                            <div className="text-blue-600 text-sm font-medium truncate">
+                              {formData.metaSettings.metaTitle || formData.productName || 'Product Title'}
+                            </div>
+                            <div className="text-green-600 text-xs">
+                              {typeof window !== 'undefined' ? window.location.origin : ''}/product/{formData.productName?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}
+                            </div>
+                            <div className="text-gray-600 text-xs line-clamp-2">
+                              {formData.metaSettings.metaDescription || formData.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Product description will appear here...'}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bulk Pricing Section */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">

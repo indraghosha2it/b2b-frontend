@@ -1071,21 +1071,6 @@ export default function CreateBlog() {
                     />
                   </div>
 
-                  {/* SEO Preview */}
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-xs font-medium text-gray-500 mb-2">Search Result Preview</p>
-                    <div className="bg-white p-3 rounded-lg border border-gray-200">
-                      <p className="text-lg text-blue-700 font-medium truncate">
-                        {formData.metaTitle || formData.title || 'Blog Post Title'}
-                      </p>
-                      <p className="text-sm text-green-700 truncate">
-                        {typeof window !== 'undefined' ? window.location.origin : ''}/blog/{formData.title?.toLowerCase().replace(/\s+/g, '-') || 'post-title'}
-                      </p>
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {formData.metaDescription || formData.excerpt || 'Blog post description will appear here...'}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
