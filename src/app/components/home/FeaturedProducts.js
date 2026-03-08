@@ -68,7 +68,7 @@ export default function FeaturedProducts() {
   const [loading, setLoading] = useState(true);
   const [activeTag, setActiveTag] = useState('all');
   const [activeImageIndex, setActiveImageIndex] = useState({});
-  const [visibleCount, setVisibleCount] = useState(4); // Show 4 products initially
+  const [visibleCount, setVisibleCount] = useState(5); // Show 5 products initially
   const [isExpanding, setIsExpanding] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
 
@@ -87,7 +87,7 @@ export default function FeaturedProducts() {
       );
       setFilteredProducts(filtered);
     }
-    setVisibleCount(4); // Reset to 4 when changing tabs
+    setVisibleCount(5); // Reset to 5 when changing tabs
   }, [activeTag, products]);
 
   const fetchProducts = async () => {
@@ -146,20 +146,20 @@ export default function FeaturedProducts() {
   // Show more products
   const handleShowMore = () => {
     setIsExpanding(true);
-    setVisibleCount(prev => Math.min(prev + 4, filteredProducts.length));
+    setVisibleCount(prev => Math.min(prev + 5, filteredProducts.length));
     setTimeout(() => setIsExpanding(false), 500);
   };
 
   // Show less products
   const handleShowLess = () => {
     setIsCollapsing(true);
-    setVisibleCount(prev => Math.max(4, prev - 4));
+    setVisibleCount(prev => Math.max(5, prev - 5));
     setTimeout(() => setIsCollapsing(false), 500);
   };
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
   const hasMore = visibleCount < filteredProducts.length;
-  const hasLess = visibleCount > 4;
+  const hasLess = visibleCount > 5;
 
   // Animation variants
   const containerVariants = {
@@ -387,7 +387,7 @@ export default function FeaturedProducts() {
           </motion.div>
         </div>
 
-        {/* Products Grid - 4 per row with Animations */}
+        {/* Products Grid - 5 per row with Animations */}
         {filteredProducts.length === 0 ? (
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
@@ -418,7 +418,7 @@ export default function FeaturedProducts() {
         ) : (
           <>
             <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -452,7 +452,7 @@ export default function FeaturedProducts() {
                       className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100/80 hover:border-[#E39A65]/20"
                     >
                       {/* Image Container */}
-                      <div className="relative h-52 overflow-hidden bg-gray-100">
+                      <div className="relative h-40 overflow-hidden bg-gray-100">
                         <motion.div 
                           className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
                           whileHover={{ opacity: 1 }}
@@ -555,69 +555,69 @@ export default function FeaturedProducts() {
                       )}
 
                       {/* Content */}
-                                <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="p-3"
-          >
-            {/* Title and Price in same row */}
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
-                {truncateText(product.productName, 30)}
-              </h3>
-              <div className="flex-shrink-0 text-right">
-                <span className="text-base font-bold text-[#E39A65]">
-                  ${formatPrice(product.pricePerUnit)}
-                </span>
-                <span className="text-gray-500 text-[8px] ml-1">/pc</span>
-              </div>
-            </div>
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                        className="p-3"
+                      >
+                        {/* Title and Price in same row */}
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
+                            {truncateText(product.productName, 30)}
+                          </h3>
+                          <div className="flex-shrink-0 text-right">
+                            <span className="text-base font-bold text-[#E39A65]">
+                              ${formatPrice(product.pricePerUnit)}
+                            </span>
+                            <span className="text-gray-500 text-[8px] ml-1">/pc</span>
+                          </div>
+                        </div>
 
-            {/* Color Dots */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="flex items-center gap-1 mb-1.5">
-                {product.colors.slice(0, 3).map((color, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ scale: 1.2 }}
-                    className="w-3 h-3 rounded-full border border-white shadow-sm"
-                    style={{ backgroundColor: color.code }}
-                    title={color.name || color.code}
-                  />
-                ))}
-                {product.colors.length > 3 && (
-                  <span className="text-[6px] text-gray-400">+{product.colors.length - 3}</span>
-                )}
-              </div>
-            )}
+                        {/* Color Dots */}
+                        {product.colors && product.colors.length > 0 && (
+                          <div className="flex items-center gap-1 mb-1.5">
+                            {product.colors.slice(0, 3).map((color, i) => (
+                              <motion.div
+                                key={i}
+                                whileHover={{ scale: 1.2 }}
+                                className="w-3 h-3 rounded-full border border-white shadow-sm"
+                                style={{ backgroundColor: color.code }}
+                                title={color.name || color.code}
+                              />
+                            ))}
+                            {product.colors.length > 3 && (
+                              <span className="text-[6px] text-gray-400">+{product.colors.length - 3}</span>
+                            )}
+                          </div>
+                        )}
 
-            {/* Bulk Price */}
-            {firstTier && (
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-1.5 mb-1.5 border border-orange-100/80"
-              >
-                <div className="flex justify-between items-center text-[8px]">
-                  <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
-                  <span className="font-bold text-[#E39A65]">${formatPrice(firstTier.price)}</span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* View Details Button */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link
-                href={`/productDetails?id=${product._id}`}
-                className="block w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-1.5 rounded-lg text-[10px] font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden"
-              >
-                View Details
-              </Link>
-            </motion.div>
+                        {/* Bulk Price */}
+                        {firstTier && (
+                          <motion.div 
+                            whileHover={{ scale: 1.02 }}
+                            className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-1.5 mb-1.5 border border-orange-100/80"
+                          >
+                            <div className="flex justify-between items-center text-[8px]">
+                              <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
+                              <span className="font-bold text-[#E39A65]">${formatPrice(firstTier.price)}</span>
+                            </div>
                           </motion.div>
+                        )}
+
+                        {/* View Details Button */}
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Link
+                            href={`/productDetails?id=${product._id}`}
+                            className="block w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-1.5 rounded-lg text-[10px] font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden"
+                          >
+                            View Details
+                          </Link>
+                        </motion.div>
+                      </motion.div>
                     </motion.div>
                   );
                 })}
@@ -674,7 +674,7 @@ export default function FeaturedProducts() {
             </div>
 
             {/* Results Counter with Animation */}
-            {/* <motion.div 
+            <motion.div 
               className="text-center mt-4 text-xs text-gray-500"
               key={visibleCount}
               initial={{ opacity: 0, y: 10 }}
@@ -682,7 +682,7 @@ export default function FeaturedProducts() {
               transition={{ duration: 0.3 }}
             >
               Showing {visibleCount} of {filteredProducts.length} products
-            </motion.div> */}
+            </motion.div>
           </>
         )}
       </div>

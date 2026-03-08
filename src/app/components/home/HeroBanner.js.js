@@ -116,7 +116,7 @@ export default function HeroBanner() {
                 {/* CTA Button */}
                 <Link
                   href={slide.ctaLink}
-                  className="inline-flex items-center px-8 py-4 bg-[#d9884e] text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg animate-fade-in-up animation-delay-600"
+                  className="inline-flex items-center px-8 py-4 bg-[#d9884e] text-white font-semibold rounded-lg hover:bg-[#e67d32] transition-all duration-300 transform hover:scale-105 shadow-lg animate-fade-in-up animation-delay-600"
                 >
                   {slide.cta}
                   <svg
