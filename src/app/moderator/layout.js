@@ -530,6 +530,12 @@ export default function ModeratorLayout({ children }) {
       icon: Image,
       current: pathname.startsWith('/moderator/allProducts')
     },
+    {
+      name: 'Inquiries',
+      href: '/moderator/inquiries',
+      icon: MessageSquare,
+      current: pathname.startsWith('/moderator/inquiries')
+    },
       {
       name: 'Create Blog',
       href: '/moderator/createBlog',
@@ -548,12 +554,7 @@ export default function ModeratorLayout({ children }) {
       icon: Star,
       current: pathname.startsWith('/moderator/manageReviews')
     },
-    {
-      name: 'Inquiries',
-      href: '/moderator/inquiries',
-      icon: MessageSquare,
-      current: pathname.startsWith('/moderator/inquiries')
-    },
+    
    
     {
       name: 'Settings',
@@ -609,12 +610,13 @@ export default function ModeratorLayout({ children }) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
           {/* Sidebar header with logo */}
-          <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: '#E39A65' }}>
-            <div className="flex items-center justify-center w-full">
+                  <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
+          <div className="flex items-center justify-center w-full">
+            <Link href="/">
               <img 
                 src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
                 alt="Asian Clothify Logo" 
-                className="h-20 w-auto object-contain drop-shadow-md"
+                className="h-20 w-auto object-contain drop-shadow-md cursor-pointer hover:opacity-90 transition-opacity"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.style.display = 'none';
@@ -622,15 +624,9 @@ export default function ModeratorLayout({ children }) {
                   parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
                 }}
               />
-            </div>
-            
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="absolute right-4 lg:hidden text-white/80 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            </Link>
           </div>
+        </div>
 
           {/* User info */}
           {user && (

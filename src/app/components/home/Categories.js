@@ -20,7 +20,7 @@ export default function Categories() {
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
+      const response = await fetch('http://localhost:5000/api/categories');
       const data = await response.json();
       
       if (data.success) {
@@ -196,7 +196,8 @@ export default function Categories() {
                 whileHover={{ scale: 1.02 }}
                 className="flex-shrink-0 w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px]"
               >
-                <Link href={`/products?category=${category.slug || category.name.toLowerCase()}`}>
+               
+                <Link href={`/products?category=${category._id}`}>
                   <div className="relative h-32 sm:h-36 md:h-40 lg:h-44 rounded-xl md:rounded-2xl overflow-hidden cursor-pointer">
                     <img
                       src={category.image}

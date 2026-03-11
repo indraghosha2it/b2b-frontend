@@ -100,7 +100,7 @@ export default function ModeratorBlogs() {
         params.append('search', searchTerm);
       }
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/all?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/blogs/admin/all?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -208,9 +208,8 @@ export default function ModeratorBlogs() {
       <div className="p-6">
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative mb-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
@@ -220,6 +219,8 @@ export default function ModeratorBlogs() {
                 className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
               />
             </div>
+          <div className="flex flex-col md:flex-row gap-4">
+          
 
             {/* Category Filter */}
             <div className="w-full md:w-48 relative">

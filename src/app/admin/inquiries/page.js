@@ -1,4 +1,6 @@
 
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -43,7 +45,10 @@
 //   Ban,
 //   ChevronLeft,
 //   ChevronsLeft,
-//   ChevronsRight
+//   ChevronsRight,
+//   BarChart3,
+//   PieChart,
+//   Activity
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -119,32 +124,83 @@
 //   );
 // };
 
-// // Stat Card - Updated to remove Paid stat
-// const StatCard = ({ title, value, icon: Icon, color }) => {
+// // Modern Stat Card Component
+// const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => {
 //   const colorClasses = {
-//     amber: 'bg-amber-50 text-amber-600',
-//     blue: 'bg-blue-50 text-blue-600',
-//     emerald: 'bg-emerald-50 text-emerald-600',
-//     purple: 'bg-purple-50 text-purple-600',
-//     green: 'bg-green-50 text-green-600',
-//     rose: 'bg-rose-50 text-rose-600',
-//     gray: 'bg-gray-50 text-gray-600'
+//     amber: {
+//       bg: 'bg-gradient-to-br from-amber-50 to-amber-100/50',
+//       iconBg: 'bg-amber-500',
+//       text: 'text-amber-700',
+//       border: 'border-amber-200',
+//       icon: 'text-white'
+//     },
+//     blue: {
+//       bg: 'bg-gradient-to-br from-blue-50 to-blue-100/50',
+//       iconBg: 'bg-blue-500',
+//       text: 'text-blue-700',
+//       border: 'border-blue-200',
+//       icon: 'text-white'
+//     },
+//     emerald: {
+//       bg: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50',
+//       iconBg: 'bg-emerald-500',
+//       text: 'text-emerald-700',
+//       border: 'border-emerald-200',
+//       icon: 'text-white'
+//     },
+//     purple: {
+//       bg: 'bg-gradient-to-br from-purple-50 to-purple-100/50',
+//       iconBg: 'bg-purple-500',
+//       text: 'text-purple-700',
+//       border: 'border-purple-200',
+//       icon: 'text-white'
+//     },
+//     rose: {
+//       bg: 'bg-gradient-to-br from-rose-50 to-rose-100/50',
+//       iconBg: 'bg-rose-500',
+//       text: 'text-rose-700',
+//       border: 'border-rose-200',
+//       icon: 'text-white'
+//     },
+//     gray: {
+//       bg: 'bg-gradient-to-br from-gray-50 to-gray-100/50',
+//       iconBg: 'bg-gray-600',
+//       text: 'text-gray-700',
+//       border: 'border-gray-200',
+//       icon: 'text-white'
+//     }
 //   };
 
+//   const theme = colorClasses[color] || colorClasses.gray;
+
 //   return (
-//     <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
-//       <div className="flex items-center justify-between mb-2">
-//         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
-//           <Icon className="w-4 h-4" />
+//     <div className={`relative overflow-hidden rounded-2xl border ${theme.border} ${theme.bg} p-5 hover:shadow-lg transition-all duration-300 group`}>
+//       {/* Decorative Elements */}
+//       <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
+//       <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
+      
+//       <div className="relative z-10">
+//         <div className="flex items-start justify-between mb-3">
+//           <div className={`p-2.5 rounded-xl ${theme.iconBg} shadow-lg shadow-${color}-500/20`}>
+//             <Icon className={`w-4 h-4 ${theme.icon}`} />
+//           </div>
+//           {trend && (
+//             <div className={`flex items-center gap-1 px-2 py-1 rounded-lg bg-white/60 backdrop-blur-sm ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+//               <TrendingUp className={`w-3 h-3 ${trend < 0 ? 'rotate-180' : ''}`} />
+//               <span className="text-xs font-medium">{trend > 0 ? '+' : ''}{trend}%</span>
+//             </div>
+//           )}
 //         </div>
+        
+//         <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+//         <p className={`text-xs font-medium ${theme.text} uppercase tracking-wider`}>{title}</p>
+//         {subtitle && <p className="text-[10px] text-gray-400 mt-2">{subtitle}</p>}
 //       </div>
-//       <p className="text-2xl font-bold text-gray-900">{value}</p>
-//       <p className="text-xs text-gray-500 mt-1">{title}</p>
 //     </div>
 //   );
 // };
 
-// // Pagination Component - Fixed arrow spacing
+// // Pagination Component
 // const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 //   const getPageNumbers = () => {
 //     const pages = [];
@@ -200,7 +256,7 @@
 //             onClick={() => onPageChange(page)}
 //             className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
 //               currentPage === page
-//                 ? 'bg-[#E39A65] text-white'
+//                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
 //                 : 'text-gray-700 hover:bg-gray-100'
 //             }`}
 //           >
@@ -241,7 +297,7 @@
 //     setUpdating(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -268,7 +324,7 @@
 //     setDeleting(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -290,13 +346,168 @@
 //     }
 //   };
 
-//   const handleCreateInvoice = () => {
-//     router.push(`/admin/invoices/create?inquiryId=${inquiry._id}`);
-//   };
 
-//   const handleViewInvoice = () => {
-//     router.push(`/admin/invoices/${inquiry._id}`);
-//   };
+// const handleCreateInvoice = () => {
+//   try {
+//     // Validate required data
+//     if (!inquiry._id) {
+//       toast.error('Inquiry ID is missing');
+//       return;
+//     }
+
+//     // SAFELY extract userId
+//     let userId = '';
+    
+//     console.log('🔍 Raw inquiry.userId:', inquiry.userId);
+//     console.log('🔍 Type:', typeof inquiry.userId);
+    
+//     // Case 1: inquiry.userId is a string
+//     if (typeof inquiry.userId === 'string') {
+//       userId = inquiry.userId;
+//       console.log('✅ Using string userId:', userId);
+//     }
+//     // Case 2: inquiry.userId is an object with _id (populated)
+//     else if (inquiry.userId && typeof inquiry.userId === 'object') {
+//       if (inquiry.userId._id) {
+//         userId = inquiry.userId._id.toString();
+//         console.log('✅ Using userId._id:', userId);
+//       } 
+//       else if (inquiry.userId.id) {
+//         userId = inquiry.userId.id.toString();
+//         console.log('✅ Using userId.id:', userId);
+//       }
+//       else {
+//         // Try to convert the whole object to string as last resort
+//         try {
+//           userId = JSON.stringify(inquiry.userId);
+//           console.log('⚠️ Using JSON.stringify fallback:', userId);
+//         } catch (e) {
+//           userId = '';
+//         }
+//       }
+//     }
+    
+//     // If userId is still empty or invalid, try to get it from the inquiry object directly
+//     if (!userId || userId === '[object Object]' || userId.includes('[object')) {
+//       console.error('❌ Invalid userId, checking other sources');
+      
+//       // Sometimes the userId might be in userDetails or elsewhere
+//       if (inquiry.userDetails?.userId) {
+//         userId = inquiry.userDetails.userId.toString();
+//       } else if (inquiry.customerId) {
+//         userId = inquiry.customerId.toString();
+//       } else {
+//         toast.error('Unable to extract valid user ID. Please contact support.');
+//         return;
+//       }
+//     }
+
+//     // Final validation - ensure it's not [object Object]
+//     if (userId === '[object Object]' || userId.includes('[object')) {
+//       console.error('❌ Still invalid userId after all attempts:', userId);
+//       toast.error('User ID format error. Cannot create invoice.');
+//       return;
+//     }
+
+//     console.log('✅ FINAL userId to use:', userId);
+
+//     // Prepare items data with proper structure - MAKE SURE productImage IS INCLUDED
+//     const itemsData = inquiry.items.map(item => ({
+//       productId: item.productId,
+//       productName: item.productName,
+//       totalQuantity: item.totalQuantity || 0,
+//       unitPrice: item.unitPrice || 0,
+//       productImage: item.productImage || '', // THIS IS CRITICAL - ensure productImage is included
+//       colors: (item.colors || []).map(c => ({
+//         color: {
+//           code: c.color?.code || '#CCCCCC',
+//           name: c.color?.name || c.color?.code || 'Color'
+//         },
+//         sizeQuantities: (c.sizeQuantities || []).map(sq => ({
+//           size: sq.size || '',
+//           quantity: sq.quantity || 0
+//         })),
+//         totalForColor: c.totalForColor || 0
+//       }))
+//     }));
+
+//     // Prepare ALL customer data with proper field names
+//     const customerData = {
+//       companyName: inquiry.userDetails?.companyName || '',
+//       contactPerson: inquiry.userDetails?.contactPerson || '',
+//       email: inquiry.userDetails?.email || '',
+//       phone: inquiry.userDetails?.phone || '',
+//       whatsapp: inquiry.userDetails?.whatsapp || '',
+//       address: inquiry.userDetails?.address || '',
+//       city: inquiry.userDetails?.city || '',
+//       country: inquiry.userDetails?.country || '',
+//       zipCode: inquiry.userDetails?.zipCode || ''
+//     };
+
+//     // Create URL params with consistent naming
+//     const params = new URLSearchParams();
+    
+//     // Basic inquiry info
+//     params.append('inquiryId', inquiry._id);
+//     params.append('inquiryNumber', inquiry.inquiryNumber || '');
+//     params.append('userId', userId);
+//     params.append('totalAmount', (inquiry.subtotal || 0).toString());
+//     params.append('items', JSON.stringify(itemsData)); // This now includes productImage
+//     params.append('specialInstructions', inquiry.specialInstructions || '');
+//     params.append('createdAt', inquiry.createdAt || new Date().toISOString());
+    
+//     // Customer details - append each field individually
+//     params.append('companyName', customerData.companyName);
+//     params.append('contactPerson', customerData.contactPerson);
+//     params.append('email', customerData.email);
+//     params.append('phone', customerData.phone);
+//     params.append('whatsapp', customerData.whatsapp);
+//     params.append('address', customerData.address);
+//     params.append('city', customerData.city);
+//     params.append('country', customerData.country);
+//     params.append('zipCode', customerData.zipCode);
+
+//     // Log all params for debugging
+//     const paramsObj = Object.fromEntries(params.entries());
+//     console.log('📤 FINAL params being sent:', paramsObj);
+//     console.log('📤 Items with images:', itemsData.map(item => ({
+//       product: item.productName,
+//       hasImage: !!item.productImage,
+//       imageUrl: item.productImage
+//     })));
+
+//     // Navigate to create invoice page with params
+//     router.push(`/admin/createInvoice?${params.toString()}`);
+    
+//   } catch (error) {
+//     console.error('Error preparing invoice data:', error);
+//     toast.error('Failed to prepare invoice data');
+//   }
+// };
+// const handleViewInvoice = async () => {
+//   try {
+//     const token = localStorage.getItem('token');
+    
+//     // Fetch invoices associated with this inquiry
+//     const response = await fetch(`http://localhost:5000/api/invoices?inquiryId=${inquiry._id}`, {
+//       headers: {
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+    
+//     const data = await response.json();
+    
+//     if (data.success && data.data.invoices && data.data.invoices.length > 0) {
+//       const invoice = data.data.invoices[0]; // Get the first invoice
+//       router.push(`/admin/viewInvoice?invoiceId=${invoice._id}`);
+//     } else {
+//       toast.error('No invoice found for this inquiry');
+//     }
+//   } catch (error) {
+//     console.error('Error fetching invoice:', error);
+//     toast.error('Failed to find invoice');
+//   }
+// };
 
 //   const handleWhatsApp = () => {
 //     // Only proceed if WhatsApp number exists
@@ -336,7 +547,7 @@
 //       // Create download link
 //       const link = document.createElement('a');
 //       link.href = blobUrl;
-//       link.download = file.fileName; // This forces download with the correct filename
+//       link.download = file.fileName;
       
 //       // Trigger download
 //       document.body.appendChild(link);
@@ -358,75 +569,133 @@
 //   };
 
 //   // Render action buttons based on status with text labels
-//   const renderActionButtons = () => {
-//     switch(inquiry.status) {
-//       case 'submitted':
-//         return (
-//           <div className="flex items-center gap-2">
-//             <button
-//               onClick={() => handleStatusUpdate('quoted')}
-//               disabled={updating}
-//               className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
-//             >
-//               <FileText className="w-3.5 h-3.5" />
-//               Mark as Quoted
-//             </button>
-//             <button
-//               onClick={() => handleStatusUpdate('cancelled')}
-//               disabled={updating}
-//               className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors font-medium"
-//             >
-//               <XCircle className="w-3.5 h-3.5" />
-//               Cancel
-//             </button>
-//           </div>
-//         );
+//   // const renderActionButtons = () => {
+//   //   switch(inquiry.status) {
+//   //     case 'submitted':
+//   //       return (
+//   //         <div className="flex items-center gap-2">
+//   //           <button
+//   //             onClick={() => handleStatusUpdate('quoted')}
+//   //             disabled={updating}
+//   //             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+//   //           >
+//   //             <FileText className="w-3.5 h-3.5" />
+//   //             Mark as Quoted
+//   //           </button>
+//   //           <button
+//   //             onClick={() => handleStatusUpdate('cancelled')}
+//   //             disabled={updating}
+//   //             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors font-medium"
+//   //           >
+//   //             <XCircle className="w-3.5 h-3.5" />
+//   //             Cancel
+//   //           </button>
+//   //         </div>
+//   //       );
       
-//       case 'accepted':
-//         return (
-//           <button
-//             onClick={handleCreateInvoice}
-//             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
-//           >
-//             <FileOutput className="w-3.5 h-3.5" />
-//             Create Invoice
-//           </button>
-//         );
+//   //     case 'accepted':
+//   //       return (
+//   //         <button
+//   //           onClick={handleCreateInvoice}
+//   //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+//   //         >
+//   //           <FileOutput className="w-3.5 h-3.5" />
+//   //           Create Invoice
+//   //         </button>
+//   //       );
       
-//       case 'invoiced':
-//         return (
+//   //     case 'invoiced':
+//   //       return (
+//   //         <button
+//   //           onClick={() => handleStatusUpdate('paid')}
+//   //           disabled={updating}
+//   //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors font-medium"
+//   //         >
+//   //           <CheckCircle className="w-3.5 h-3.5" />
+//   //           Mark as Paid
+//   //         </button>
+//   //       );
+      
+//   //     case 'paid':
+//   //       return (
+//   //         <button
+//   //           onClick={handleViewInvoice}
+//   //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+//   //         >
+//   //           <Eye className="w-3.5 h-3.5" />
+//   //           View Invoice
+//   //         </button>
+//   //       );
+      
+//   //     case 'quoted':
+//   //       return (
+//   //         <span className="text-xs text-[#E39A65] bg-gray-100 px-3 py-1.5 rounded-lg">
+//   //           Awaiting customer acceptance
+//   //         </span>
+//   //       );
+      
+//   //     default:
+//   //       return null;
+//   //   }
+//   // };
+//   // Render action buttons based on status with text labels
+// const renderActionButtons = () => {
+//   switch(inquiry.status) {
+//     case 'submitted':
+//       return (
+//         <div className="flex items-center gap-2">
 //           <button
-//             onClick={() => handleStatusUpdate('paid')}
+//             onClick={() => handleStatusUpdate('quoted')}
 //             disabled={updating}
-//             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors font-medium"
-//           >
-//             <CheckCircle className="w-3.5 h-3.5" />
-//             Mark as Paid
-//           </button>
-//         );
-      
-//       case 'paid':
-//         return (
-//           <button
-//             onClick={handleViewInvoice}
 //             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
 //           >
-//             <Eye className="w-3.5 h-3.5" />
-//             View Invoice
+//             <FileText className="w-3.5 h-3.5" />
+//             Mark as Quoted
 //           </button>
-//         );
-      
-//       case 'quoted':
-//         return (
-//           <span className="text-xs text-[#E39A65] bg-gray-100 px-3 py-1.5 rounded-lg">
-//             Awaiting customer acceptance
-//           </span>
-//         );
-      
-//       default:
-//         return null;
-//     }
-//   };
+//           <button
+//             onClick={() => handleStatusUpdate('cancelled')}
+//             disabled={updating}
+//             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors font-medium"
+//           >
+//             <XCircle className="w-3.5 h-3.5" />
+//             Cancel
+//           </button>
+//         </div>
+//       );
+    
+//     case 'accepted':
+//       return (
+//         <button
+//           onClick={handleCreateInvoice}
+//           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+//         >
+//           <FileOutput className="w-3.5 h-3.5" />
+//           Create Invoice
+//         </button>
+//       );
+    
+//     case 'invoiced':
+//       return (
+//         <button
+//           onClick={handleViewInvoice}
+//           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-100 text-purple-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
+//         >
+//           <Eye className="w-3.5 h-3.5" />
+//           View Invoice
+//         </button>
+//       );
+    
+//     case 'quoted':
+//       return (
+//         <span className="text-xs text-[#E39A65] bg-gray-100 px-3 py-1.5 rounded-lg">
+//           Awaiting customer acceptance
+//         </span>
+//       );
+    
+//     default:
+//       return null;
+//   }
+// };
 
 //   return (
 //     <>
@@ -435,7 +704,7 @@
 //         <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
 //           <div className="flex items-center justify-between">
 //             <div className="flex items-center gap-3">
-//               <div className="w-8 h-8 bg-gradient-to-br from-[#E39A65] to-[#d48b54] rounded-lg flex items-center justify-center">
+//               <div className="w-8 h-8 bg-gradient-to-br from-[#E39A65] to-[#d48b54] rounded-lg flex items-center justify-center shadow-md">
 //                 <FileText className="w-4 h-4 text-white" />
 //               </div>
 //               <div>
@@ -689,7 +958,7 @@
 //   );
 // };
 
-// // Filter Bar - Removed 'Paid' from filters
+// // Filter Bar
 // const FilterBar = ({ onFilter, activeFilter, setActiveFilter, onDateFilter }) => {
 //   const filters = ['All', 'Submitted', 'Quoted', 'Accepted', 'Invoiced', 'Cancelled'];
 
@@ -705,7 +974,7 @@
 //             }}
 //             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
 //               activeFilter === filter
-//                 ? 'bg-[#E39A65] text-white'
+//                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
 //                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 //             }`}
 //           >
@@ -716,7 +985,7 @@
       
 //       <select
 //         onChange={(e) => onDateFilter(e.target.value)}
-//         className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//         className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
 //       >
 //         <option value="all">All Time</option>
 //         <option value="today">Today</option>
@@ -728,7 +997,6 @@
 //   );
 // };
 
-// // Main Admin Page Component
 // // Main Admin Page Component
 // export default function AdminInquiriesPage() {
 //   const [inquiries, setInquiries] = useState([]);
@@ -761,7 +1029,7 @@
 //       }
 
 //       // Build query params
-//       let url = `https://b2b-backend-rosy.vercel.app/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `http://localhost:5000/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       if (activeFilter !== 'All') {
 //         url += `&status=${activeFilter.toLowerCase()}`;
@@ -829,7 +1097,7 @@
 
 //   useEffect(() => {
 //     fetchInquiries();
-//   }, [currentPage, activeFilter, dateRange]); // Add dateRange to dependencies
+//   }, [currentPage, activeFilter, dateRange]);
 
 //   const handleRefresh = () => {
 //     setRefreshing(true);
@@ -873,7 +1141,10 @@
 //   if (loading) {
 //     return (
 //       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-//         <Loader2 className="w-8 h-8 animate-spin text-[#E39A65]" />
+//         <div className="text-center">
+//           <Loader2 className="w-10 h-10 animate-spin text-[#E39A65] mx-auto mb-4" />
+//           <p className="text-sm text-gray-500">Loading inquiries...</p>
+//         </div>
 //       </div>
 //     );
 //   }
@@ -885,29 +1156,65 @@
 //         <div className="container mx-auto px-4 max-w-7xl py-4">
 //           <div className="flex items-center justify-between mb-4">
 //             <div>
-//               <h1 className="text-xl font-bold text-gray-900">Inquiry Management</h1>
+//               <h1 className="text-2xl font-bold text-gray-900">Inquiry Management</h1>
 //               <p className="text-xs text-gray-500 mt-0.5">
-//                 Total {totalInquiries} inquiries in database
+//                 Total {totalInquiries} inquiries • {formatPrice(stats.totalValue)} total value
 //               </p>
 //             </div>
 //             <button
 //               onClick={handleRefresh}
 //               disabled={refreshing}
-//               className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+//               className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
 //             >
 //               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
 //               Refresh
 //             </button>
 //           </div>
 
-//           {/* Stats */}
+//           {/* Stats - Now with 7 columns including cancelled */}
 //           <div className="grid grid-cols-6 gap-3">
-//             <StatCard title="Total" value={totalInquiries} icon={ShoppingBag} color="gray" />
-//             <StatCard title="Submitted" value={stats.submitted} icon={Clock} color="amber" />
-//             <StatCard title="Quoted" value={stats.quoted} icon={FileText} color="blue" />
-//             <StatCard title="Accepted" value={stats.accepted} icon={CheckSquare} color="emerald" />
-//             <StatCard title="Invoiced" value={stats.invoiced} icon={FileOutput} color="purple" />
-//             <StatCard title="Value" value={formatPrice(stats.totalValue)} icon={DollarSign} color="blue" />
+//             <StatCard 
+//               title="Total" 
+//               value={totalInquiries} 
+//               icon={ShoppingBag} 
+//               color="gray" 
+//             />
+//             <StatCard 
+//               title="Submitted" 
+//               value={stats.submitted} 
+//               icon={Clock} 
+//               color="amber" 
+//             />
+//             <StatCard 
+//               title="Quoted" 
+//               value={stats.quoted} 
+//               icon={FileText} 
+//               color="blue" 
+//             />
+//             <StatCard 
+//               title="Accepted" 
+//               value={stats.accepted} 
+//               icon={CheckSquare} 
+//               color="emerald" 
+//             />
+//             <StatCard 
+//               title="Invoiced" 
+//               value={stats.invoiced} 
+//               icon={FileOutput} 
+//               color="purple" 
+//             />
+//             <StatCard 
+//               title="Cancelled" 
+//               value={stats.cancelled} 
+//               icon={XCircle} 
+//               color="rose" 
+//             />
+//             {/* <StatCard 
+//               title="Value" 
+//               value={formatPrice(stats.totalValue)} 
+//               icon={DollarSign} 
+//               color="blue" 
+//             /> */}
 //           </div>
 //         </div>
 //       </div>
@@ -946,12 +1253,12 @@
 //         {/* Inquiries List */}
 //         <div id="inquiries-list">
 //           {filteredInquiries.length === 0 ? (
-//             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-//               <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-//                 <FileSearch className="w-5 h-5 text-gray-400" />
+//             <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+//               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+//                 <FileSearch className="w-8 h-8 text-gray-400" />
 //               </div>
-//               <h2 className="text-sm font-semibold text-gray-900 mb-1">No inquiries found</h2>
-//               <p className="text-xs text-gray-500 mb-3">
+//               <h2 className="text-lg font-semibold text-gray-900 mb-2">No inquiries found</h2>
+//               <p className="text-sm text-gray-500 mb-4">
 //                 {totalInquiries === 0 ? "No inquiries have been submitted yet" : "Try adjusting your filters"}
 //               </p>
 //             </div>
@@ -1031,7 +1338,13 @@ import {
   ChevronsRight,
   BarChart3,
   PieChart,
-  Activity
+  Activity,
+  CalendarRange,
+  Inbox,
+  AlertOctagon,
+  ArrowRight,
+  Zap,
+  Receipt
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -1054,6 +1367,12 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   });
+};
+
+// Get month name
+const getMonthName = (monthIndex) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[monthIndex];
 };
 
 // Status Badge
@@ -1280,7 +1599,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
     setUpdating(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+      const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1307,7 +1626,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
     setDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}`, {
+      const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1472,7 +1791,7 @@ const handleViewInvoice = async () => {
     const token = localStorage.getItem('token');
     
     // Fetch invoices associated with this inquiry
-    const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices?inquiryId=${inquiry._id}`, {
+    const response = await fetch(`http://localhost:5000/api/invoices?inquiryId=${inquiry._id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -1551,76 +1870,6 @@ const handleViewInvoice = async () => {
     }
   };
 
-  // Render action buttons based on status with text labels
-  // const renderActionButtons = () => {
-  //   switch(inquiry.status) {
-  //     case 'submitted':
-  //       return (
-  //         <div className="flex items-center gap-2">
-  //           <button
-  //             onClick={() => handleStatusUpdate('quoted')}
-  //             disabled={updating}
-  //             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
-  //           >
-  //             <FileText className="w-3.5 h-3.5" />
-  //             Mark as Quoted
-  //           </button>
-  //           <button
-  //             onClick={() => handleStatusUpdate('cancelled')}
-  //             disabled={updating}
-  //             className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors font-medium"
-  //           >
-  //             <XCircle className="w-3.5 h-3.5" />
-  //             Cancel
-  //           </button>
-  //         </div>
-  //       );
-      
-  //     case 'accepted':
-  //       return (
-  //         <button
-  //           onClick={handleCreateInvoice}
-  //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors font-medium"
-  //         >
-  //           <FileOutput className="w-3.5 h-3.5" />
-  //           Create Invoice
-  //         </button>
-  //       );
-      
-  //     case 'invoiced':
-  //       return (
-  //         <button
-  //           onClick={() => handleStatusUpdate('paid')}
-  //           disabled={updating}
-  //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors font-medium"
-  //         >
-  //           <CheckCircle className="w-3.5 h-3.5" />
-  //           Mark as Paid
-  //         </button>
-  //       );
-      
-  //     case 'paid':
-  //       return (
-  //         <button
-  //           onClick={handleViewInvoice}
-  //           className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
-  //         >
-  //           <Eye className="w-3.5 h-3.5" />
-  //           View Invoice
-  //         </button>
-  //       );
-      
-  //     case 'quoted':
-  //       return (
-  //         <span className="text-xs text-[#E39A65] bg-gray-100 px-3 py-1.5 rounded-lg">
-  //           Awaiting customer acceptance
-  //         </span>
-  //       );
-      
-  //     default:
-  //       return null;
-  //   }
-  // };
   // Render action buttons based on status with text labels
 const renderActionButtons = () => {
   switch(inquiry.status) {
@@ -1941,12 +2190,25 @@ const SearchBar = ({ onSearch }) => {
   );
 };
 
-// Filter Bar
-const FilterBar = ({ onFilter, activeFilter, setActiveFilter, onDateFilter }) => {
+// Filter Bar - Status filters on left, Month/Year filter on right
+const FilterBar = ({ 
+  onFilter, 
+  activeFilter, 
+  setActiveFilter,
+  filterType,
+  setFilterType,
+  selectedMonth,
+  setSelectedMonth,
+  selectedYear,
+  setSelectedYear,
+  onMonthChange,
+  onYearChange
+}) => {
   const filters = ['All', 'Submitted', 'Quoted', 'Accepted', 'Invoiced', 'Cancelled'];
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Status Filters on Left */}
       <div className="flex flex-wrap gap-2">
         {filters.map((filter) => (
           <button
@@ -1965,17 +2227,88 @@ const FilterBar = ({ onFilter, activeFilter, setActiveFilter, onDateFilter }) =>
           </button>
         ))}
       </div>
-      
-      <select
-        onChange={(e) => onDateFilter(e.target.value)}
-        className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-      >
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
-        <option value="year">This Year</option>
-      </select>
+
+      {/* Month/Year Filter on Right */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setFilterType('all')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'all' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilterType('year')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'year' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Year
+          </button>
+          <button
+            onClick={() => setFilterType('month')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'month' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Month
+          </button>
+        </div>
+
+        {/* Month Navigation */}
+        {filterType === 'month' && (
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => onMonthChange(-1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous month"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {getMonthName(selectedMonth)} {selectedYear}
+            </span>
+            <button
+              onClick={() => onMonthChange(1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next month"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Year Navigation */}
+        {filterType === 'year' && (
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => onYearChange(-1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous year"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {selectedYear}
+            </span>
+            <button
+              onClick={() => onYearChange(1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next year"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -1987,12 +2320,19 @@ export default function AdminInquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
-  const [dateRange, setDateRange] = useState('all');
+  
+  // Date filter state
+  const [filterType, setFilterType] = useState('all'); // 'all', 'year', 'month'
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalInquiries, setTotalInquiries] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [stats, setStats] = useState({
+  
+  // Stats for ALL inquiries (not filtered by page)
+  const [allStats, setAllStats] = useState({
     total: 0,
     submitted: 0,
     quoted: 0,
@@ -2001,47 +2341,108 @@ export default function AdminInquiriesPage() {
     cancelled: 0,
     totalValue: 0
   });
+
   const router = useRouter();
+
+  // Filter inquiries by date
+  const filterByDate = (inquiriesList) => {
+    if (filterType === 'all') return inquiriesList;
+    
+    return inquiriesList.filter(inquiry => {
+      const inquiryDate = new Date(inquiry.createdAt);
+      const inquiryYear = inquiryDate.getFullYear();
+      const inquiryMonth = inquiryDate.getMonth();
+      
+      if (filterType === 'year') {
+        return inquiryYear === selectedYear;
+      } else if (filterType === 'month') {
+        return inquiryYear === selectedYear && inquiryMonth === selectedMonth;
+      }
+      return true;
+    });
+  };
+
+  // Calculate stats from all inquiries (after date filter but before status filter)
+  const calculateAllStats = (allInquiries) => {
+    const totalValue = allInquiries.reduce((sum, i) => sum + (i.subtotal || 0), 0);
+    
+    setAllStats({
+      total: allInquiries.length,
+      submitted: allInquiries.filter(i => i.status === 'submitted').length,
+      quoted: allInquiries.filter(i => i.status === 'quoted').length,
+      accepted: allInquiries.filter(i => i.status === 'accepted').length,
+      invoiced: allInquiries.filter(i => i.status === 'invoiced').length,
+      cancelled: allInquiries.filter(i => i.status === 'cancelled').length,
+      totalValue
+    });
+  };
+
+  // Apply all filters for display
+  const applyFilters = (inquiriesList, statusFilter, dateFilterType, searchTerm = '') => {
+    let filtered = [...inquiriesList];
+
+    // Apply date filter
+    filtered = filterByDate(filtered);
+
+    // Apply status filter
+    if (statusFilter !== 'All') {
+      filtered = filtered.filter(inquiry => 
+        inquiry.status === statusFilter.toLowerCase()
+      );
+    }
+
+    // Apply search filter
+    if (searchTerm && searchTerm.trim()) {
+      filtered = filtered.filter(inquiry => 
+        inquiry.inquiryNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inquiry.userDetails?.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inquiry.userDetails?.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inquiry.userDetails?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inquiry.items.some(item => 
+          item.productName.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+
+    return filtered;
+  };
 
   const fetchInquiries = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem('token');
       if (!token) {
         router.push('/login');
         return;
       }
 
-      // Build query params
-      let url = `https://b2b-backend-rosy.vercel.app/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+      // First, fetch ALL inquiries for stats (no pagination)
+      const allInquiriesResponse = await fetch(`http://localhost:5000/api/admin/inquiries/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const allInquiriesData = await allInquiriesResponse.json();
+      
+      if (allInquiriesData.success) {
+        // Apply date filter to all inquiries for stats
+        const dateFilteredAll = filterByDate(allInquiriesData.data);
+        calculateAllStats(dateFilteredAll);
+      }
+
+      // Then fetch paginated inquiries for display
+      let url = `http://localhost:5000/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (activeFilter !== 'All') {
         url += `&status=${activeFilter.toLowerCase()}`;
       }
       
-      if (dateRange !== 'all') {
-        const now = new Date();
-        let startDate;
-        
-        switch(dateRange) {
-          case 'today':
-            startDate = new Date(now.setHours(0, 0, 0, 0));
-            break;
-          case 'week':
-            startDate = new Date(now.setDate(now.getDate() - 7));
-            break;
-          case 'month':
-            startDate = new Date(now.setMonth(now.getMonth() - 1));
-            break;
-          case 'year':
-            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-            break;
-          default:
-            startDate = null;
-        }
-        
-        if (startDate) {
-          url += `&startDate=${startDate.toISOString()}`;
-        }
+      // Add date filter parameters
+      if (filterType === 'year') {
+        url += `&year=${selectedYear}`;
+      } else if (filterType === 'month') {
+        url += `&month=${selectedMonth + 1}&year=${selectedYear}`; // month+1 because JS months are 0-indexed
       }
 
       const response = await fetch(url, {
@@ -2056,21 +2457,9 @@ export default function AdminInquiriesPage() {
         setFilteredInquiries(data.data.inquiries);
         setTotalInquiries(data.data.pagination.total);
         setTotalPages(data.data.pagination.pages);
-        
-        // Calculate stats from current page
-        const totalValue = data.data.inquiries.reduce((sum, i) => sum + (i.subtotal || 0), 0);
-        
-        setStats({
-          total: data.data.pagination.total,
-          submitted: data.data.inquiries.filter(i => i.status === 'submitted').length,
-          quoted: data.data.inquiries.filter(i => i.status === 'quoted').length,
-          accepted: data.data.inquiries.filter(i => i.status === 'accepted').length,
-          invoiced: data.data.inquiries.filter(i => i.status === 'invoiced').length,
-          cancelled: data.data.inquiries.filter(i => i.status === 'cancelled').length,
-          totalValue
-        });
       }
     } catch (error) {
+      console.error('Error fetching inquiries:', error);
       toast.error('Failed to load inquiries');
     } finally {
       setLoading(false);
@@ -2080,7 +2469,7 @@ export default function AdminInquiriesPage() {
 
   useEffect(() => {
     fetchInquiries();
-  }, [currentPage, activeFilter, dateRange]);
+  }, [currentPage, activeFilter, filterType, selectedMonth, selectedYear]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -2111,14 +2500,41 @@ export default function AdminInquiriesPage() {
     setCurrentPage(1);
   };
 
-  const handleDateFilter = (range) => {
-    setDateRange(range);
-    setCurrentPage(1);
+  const handleMonthChange = (increment) => {
+    let newMonth = selectedMonth + increment;
+    let newYear = selectedYear;
+    
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear = selectedYear - 1;
+    } else if (newMonth > 11) {
+      newMonth = 0;
+      newYear = selectedYear + 1;
+    }
+    
+    setSelectedMonth(newMonth);
+    setSelectedYear(newYear);
+    setFilterType('month');
+  };
+
+  const handleYearChange = (increment) => {
+    setSelectedYear(selectedYear + increment);
+    setFilterType('year');
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
     document.getElementById('inquiries-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const getFilterDisplayText = () => {
+    if (filterType === 'all') {
+      return 'All Time';
+    } else if (filterType === 'year') {
+      return `Year: ${selectedYear}`;
+    } else {
+      return `${getMonthName(selectedMonth)} ${selectedYear}`;
+    }
   };
 
   if (loading) {
@@ -2140,8 +2556,13 @@ export default function AdminInquiriesPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Inquiry Management</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Total {totalInquiries} inquiries • {formatPrice(stats.totalValue)} total value
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                Total {allStats.total} inquiries • {formatPrice(allStats.totalValue)} total value
+                {filterType !== 'all' && (
+                  <span className="ml-2 text-[#E39A65] font-medium">
+                    • Showing: {getFilterDisplayText()}
+                  </span>
+                )}
               </p>
             </div>
             <button
@@ -2154,50 +2575,44 @@ export default function AdminInquiriesPage() {
             </button>
           </div>
 
-          {/* Stats - Now with 7 columns including cancelled */}
+          {/* Stats - Now showing counts from ALL inquiries (filtered by date only) */}
           <div className="grid grid-cols-6 gap-3">
             <StatCard 
               title="Total" 
-              value={totalInquiries} 
+              value={allStats.total} 
               icon={ShoppingBag} 
               color="gray" 
             />
             <StatCard 
               title="Submitted" 
-              value={stats.submitted} 
+              value={allStats.submitted} 
               icon={Clock} 
               color="amber" 
             />
             <StatCard 
               title="Quoted" 
-              value={stats.quoted} 
+              value={allStats.quoted} 
               icon={FileText} 
               color="blue" 
             />
             <StatCard 
               title="Accepted" 
-              value={stats.accepted} 
+              value={allStats.accepted} 
               icon={CheckSquare} 
               color="emerald" 
             />
             <StatCard 
               title="Invoiced" 
-              value={stats.invoiced} 
+              value={allStats.invoiced} 
               icon={FileOutput} 
               color="purple" 
             />
             <StatCard 
               title="Cancelled" 
-              value={stats.cancelled} 
+              value={allStats.cancelled} 
               icon={XCircle} 
               color="rose" 
             />
-            {/* <StatCard 
-              title="Value" 
-              value={formatPrice(stats.totalValue)} 
-              icon={DollarSign} 
-              color="blue" 
-            /> */}
           </div>
         </div>
       </div>
@@ -2211,7 +2626,14 @@ export default function AdminInquiriesPage() {
             onFilter={handleFilter} 
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
-            onDateFilter={handleDateFilter}
+            filterType={filterType}
+            setFilterType={setFilterType}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            onMonthChange={handleMonthChange}
+            onYearChange={handleYearChange}
           />
         </div>
 
@@ -2222,14 +2644,14 @@ export default function AdminInquiriesPage() {
             {totalInquiries > itemsPerPage && (
               <> (Page {currentPage} of {totalPages})</>
             )}
-            {dateRange !== 'all' && (
+            {filterType !== 'all' && (
               <span className="ml-1 text-[#E39A65]">
-                • Filtered by: {dateRange}
+                • {getFilterDisplayText()}
               </span>
             )}
           </p>
           <p className="text-xs text-gray-500">
-            Total Inquiries: <span className="font-semibold text-[#E39A65]">{totalInquiries}</span>
+            Filtered Total: <span className="font-semibold text-[#E39A65]">{totalInquiries}</span>
           </p>
         </div>
 
@@ -2242,8 +2664,21 @@ export default function AdminInquiriesPage() {
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-2">No inquiries found</h2>
               <p className="text-sm text-gray-500 mb-4">
-                {totalInquiries === 0 ? "No inquiries have been submitted yet" : "Try adjusting your filters"}
+                {allStats.total === 0 
+                  ? "No inquiries have been submitted yet" 
+                  : filterType !== 'all'
+                    ? `No inquiries found for ${getFilterDisplayText().toLowerCase()}`
+                    : "Try adjusting your filters"}
               </p>
+              {filterType !== 'all' && allStats.total > 0 && (
+                <button
+                  onClick={() => setFilterType('all')}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white text-sm rounded-lg hover:bg-[#d48b54] transition-colors"
+                >
+                  <CalendarRange className="w-4 h-4" />
+                  View All Time
+                </button>
+              )}
             </div>
           ) : (
             <>

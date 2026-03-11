@@ -176,7 +176,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
+//       const response = await fetch('http://localhost:5000/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -197,7 +197,7 @@
 //   const fetchCategoryDetails = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -522,7 +522,7 @@
 //         }
 //       });
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
+//       const response = await fetch('http://localhost:5000/api/products', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1428,7 +1428,7 @@ const [keywordInput, setKeywordInput] = useState('');
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
+      const response = await fetch('http://localhost:5000/api/categories', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1449,7 +1449,7 @@ const [keywordInput, setKeywordInput] = useState('');
   const fetchCategoryDetails = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1855,7 +1855,7 @@ const removeKeyword = (indexToRemove) => {
         }
       });
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
+      const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

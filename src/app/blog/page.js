@@ -55,7 +55,7 @@ export default function BlogPage() {
           ...(searchTerm && { search: searchTerm })
         });
 
-        const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs?${params}`);
+        const response = await fetch(`http://localhost:5000/api/blogs?${params}`);
         const data = await response.json();
 
         if (data.success) {
@@ -90,7 +90,7 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const response = await fetch('https://b2b-backend-rosy.vercel.app/api/blogs?featured=true&limit=3');
+        const response = await fetch('http://localhost:5000/api/blogs?featured=true&limit=3');
         const data = await response.json();
         if (data.success) {
           setFeaturedBlogs(data.data);

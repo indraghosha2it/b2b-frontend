@@ -62,7 +62,7 @@
 
 // //       setLoading(true);
 // //       try {
-// //         const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/${blogId}`);
+// //         const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
 // //         const data = await response.json();
 
 // //         if (data.success) {
@@ -71,7 +71,7 @@
 // //           // Fetch related blogs (same category)
 // //           if (data.data.category) {
 // //             const relatedResponse = await fetch(
-// //               `https://b2b-backend-rosy.vercel.app/api/blogs?category=${data.data.category}&limit=3`
+// //               `http://localhost:5000/api/blogs?category=${data.data.category}&limit=3`
 // //             );
 // //             const relatedData = await relatedResponse.json();
 // //             if (relatedData.success) {
@@ -532,7 +532,7 @@
 
 //   //     setLoading(true);
 //   //     try {
-//   //       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/${blogId}`);
+//   //       const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
 //   //       const data = await response.json();
 
 //   //       if (data.success) {
@@ -541,7 +541,7 @@
 //   //         // Fetch related blogs (same category)
 //   //         if (data.data.category) {
 //   //           const relatedResponse = await fetch(
-//   //             `https://b2b-backend-rosy.vercel.app/api/blogs?category=${data.data.category}&limit=3`
+//   //             `http://localhost:5000/api/blogs?category=${data.data.category}&limit=3`
 //   //           );
 //   //           const relatedData = await relatedResponse.json();
 //   //           if (relatedData.success) {
@@ -576,7 +576,7 @@
 //       setLoading(true);
 //       try {
 //         console.log('🔍 Fetching blog with ID:', blogId);
-//         const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/${blogId}`);
+//         const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
 //         const data = await response.json();
 //         console.log('📥 Blog data received:', data);
 
@@ -586,7 +586,7 @@
 //           // Fetch related blogs (same category)
 //           if (data.data.category) {
 //             const relatedResponse = await fetch(
-//               `https://b2b-backend-rosy.vercel.app/api/blogs?category=${data.data.category}&limit=3`
+//               `http://localhost:5000/api/blogs?category=${data.data.category}&limit=3`
 //             );
 //             const relatedData = await relatedResponse.json();
 //             if (relatedData.success) {
@@ -1143,7 +1143,7 @@ function BlogContent() {
       setLoading(true);
       try {
         console.log('🔍 Fetching blog with ID:', blogId);
-        const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/${blogId}`);
+        const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
         const data = await response.json();
         console.log('📥 Blog data received:', data);
 
@@ -1153,7 +1153,7 @@ function BlogContent() {
           // Fetch related blogs (same category)
           if (data.data.category) {
             const relatedResponse = await fetch(
-              `https://b2b-backend-rosy.vercel.app/api/blogs?category=${data.data.category}&limit=3`
+              `http://localhost:5000/api/blogs?category=${data.data.category}&limit=3`
             );
             const relatedData = await relatedResponse.json();
             if (relatedData.success) {

@@ -264,7 +264,7 @@ export default function ModeratorEditBlog() {
       setIsLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/${blogId}`, {
+        const response = await fetch(`http://localhost:5000/api/blogs/admin/${blogId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -685,7 +685,7 @@ export default function ModeratorEditBlog() {
       });
 
       // Send to API
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/${blogId}`, {
+      const response = await fetch(`http://localhost:5000/api/blogs/admin/${blogId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

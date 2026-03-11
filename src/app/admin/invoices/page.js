@@ -1,3 +1,8 @@
+
+
+
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -61,218 +66,114 @@
 //   });
 // };
 
-// // Check if invoice is expired (due date passed)
-// // const isInvoiceExpired = (invoice) => {
-// //   const today = new Date();
-// //   today.setHours(0, 0, 0, 0);
-// //   const dueDate = new Date(invoice.dueDate);
-// //   dueDate.setHours(0, 0, 0, 0);
-  
-// //   return dueDate < today && 
-// //          invoice.paymentStatus !== 'paid' && 
-// //          invoice.paymentStatus !== 'cancelled' &&
-// //          invoice.paymentStatus !== 'overpaid';
-// // };
-// // Check if invoice is expired (due date passed) - FIXED VERSION
+// // Check if invoice is expired (due date passed) - Only for unpaid/partial invoices
 // const isInvoiceExpired = (invoice) => {
+//   if (invoice.paymentStatus === 'paid' || 
+//       invoice.paymentStatus === 'cancelled' || 
+//       invoice.paymentStatus === 'overpaid') {
+//     return false;
+//   }
+  
 //   const today = new Date();
 //   const dueDate = new Date(invoice.dueDate);
-  
-//   // Reset time part to compare dates only
 //   today.setHours(0, 0, 0, 0);
 //   dueDate.setHours(0, 0, 0, 0);
   
-//   return dueDate < today && 
-//          invoice.paymentStatus !== 'paid' && 
-//          invoice.paymentStatus !== 'cancelled' &&
-//          invoice.paymentStatus !== 'overpaid';
+//   return dueDate < today;
 // };
 
 // // Calculate overdue days
-// // const getOverdueDays = (dueDate) => {
-// //   const today = new Date();
-// //   const due = new Date(dueDate);
-// //   const diffTime = today - due;
-// //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-// //   return diffDays > 0 ? diffDays : 0;
-// // };
-
-// // Calculate overdue days - FIXED VERSION
 // const getOverdueDays = (dueDate) => {
 //   const today = new Date();
 //   const due = new Date(dueDate);
-  
-//   // Reset time part to compare dates only
 //   today.setHours(0, 0, 0, 0);
 //   due.setHours(0, 0, 0, 0);
   
-//   // Calculate difference in milliseconds
 //   const diffTime = today - due;
-  
-//   // Convert to days (1000 ms * 60 seconds * 60 minutes * 24 hours)
 //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-//   // Only return positive numbers (if due date is in the past)
 //   return diffDays > 0 ? diffDays : 0;
 // };
 
 // // Payment Status Badge Component
-// const PaymentStatusBadge = ({ status, isExpired = false }) => {
-//   // If expired and status is not paid/cancelled/overpaid, show as expired
-//   const displayStatus = isExpired ? 'expired' : status;
-  
+// const PaymentStatusBadge = ({ status }) => {
 //   const statusConfig = {
 //     paid: { 
-//       bg: 'bg-emerald-50', 
-//       text: 'text-emerald-700', 
-//       border: 'border-emerald-200',
+//       bg: 'bg-emerald-100', 
+//       text: 'text-emerald-800', 
+//       border: 'border-emerald-300',
 //       label: 'Paid', 
-//       icon: CheckCircle 
+//       icon: CheckCircle,
+//       iconColor: 'text-emerald-600'
 //     },
 //     partial: { 
-//       bg: 'bg-amber-50', 
-//       text: 'text-amber-700', 
-//       border: 'border-amber-200',
+//       bg: 'bg-blue-100', 
+//       text: 'text-blue-800', 
+//       border: 'border-blue-300',
 //       label: 'Partial', 
-//       icon: TrendingUp 
+//       icon: TrendingUp,
+//       iconColor: 'text-blue-600'
 //     },
 //     unpaid: { 
-//       bg: 'bg-rose-50', 
-//       text: 'text-rose-700', 
-//       border: 'border-rose-200',
+//       bg: 'bg-amber-100', 
+//       text: 'text-amber-800', 
+//       border: 'border-amber-300',
 //       label: 'Unpaid', 
-//       icon: AlertCircle 
-//     },
-//     expired: { 
-//       bg: 'bg-orange-50', 
-//       text: 'text-orange-700', 
-//       border: 'border-orange-200',
-//       label: 'Expired', 
-//       icon: Clock 
+//       icon: AlertCircle,
+//       iconColor: 'text-amber-600'
 //     },
 //     overpaid: { 
-//       bg: 'bg-purple-50', 
-//       text: 'text-purple-700', 
-//       border: 'border-purple-200',
+//       bg: 'bg-purple-100', 
+//       text: 'text-purple-800', 
+//       border: 'border-purple-300',
 //       label: 'Overpaid', 
-//       icon: TrendingDown 
+//       icon: TrendingDown,
+//       iconColor: 'text-purple-600'
 //     },
 //     cancelled: { 
-//       bg: 'bg-gray-100', 
-//       text: 'text-gray-700', 
-//       border: 'border-gray-300',
+//       bg: 'bg-rose-100', 
+//       text: 'text-rose-800', 
+//       border: 'border-rose-300',
 //       label: 'Cancelled', 
-//       icon: XCircle 
+//       icon: XCircle,
+//       iconColor: 'text-rose-600'
 //     }
 //   };
 
-//   const normalizedStatus = displayStatus?.toLowerCase() || 'unpaid';
+//   const normalizedStatus = status?.toLowerCase() || 'unpaid';
 //   const config = statusConfig[normalizedStatus] || statusConfig.unpaid;
 //   const Icon = config.icon;
 
 //   return (
 //     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${config.bg} border ${config.border}`}>
-//       <Icon className={`w-3.5 h-3.5 ${config.text}`} />
+//       <Icon className={`w-3.5 h-3.5 ${config.iconColor}`} />
 //       <span className={`text-xs font-medium ${config.text}`}>{config.label}</span>
 //     </div>
 //   );
 // };
 
-// // Modern, Compact Stat Card Component
-// const StatCard = ({ title, value, icon: Icon, trend, trendValue, color = 'blue' }) => {
+// // Stat Card Component
+// const StatCard = ({ title, value, icon: Icon, color = 'blue' }) => {
 //   const colorClasses = {
-//     blue: {
-//       bg: 'bg-blue-50',
-//       iconBg: 'bg-blue-500',
-//       iconColor: 'text-white',
-//       text: 'text-blue-700',
-//       border: 'border-blue-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     emerald: {
-//       bg: 'bg-emerald-50',
-//       iconBg: 'bg-emerald-500',
-//       iconColor: 'text-white',
-//       text: 'text-emerald-700',
-//       border: 'border-emerald-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     amber: {
-//       bg: 'bg-amber-50',
-//       iconBg: 'bg-amber-500',
-//       iconColor: 'text-white',
-//       text: 'text-amber-700',
-//       border: 'border-amber-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     rose: {
-//       bg: 'bg-rose-50',
-//       iconBg: 'bg-rose-500',
-//       iconColor: 'text-white',
-//       text: 'text-rose-700',
-//       border: 'border-rose-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     purple: {
-//       bg: 'bg-purple-50',
-//       iconBg: 'bg-purple-500',
-//       iconColor: 'text-white',
-//       text: 'text-purple-700',
-//       border: 'border-purple-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     orange: {
-//       bg: 'bg-orange-50',
-//       iconBg: 'bg-orange-500',
-//       iconColor: 'text-white',
-//       text: 'text-orange-700',
-//       border: 'border-orange-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     },
-//     gray: {
-//       bg: 'bg-gray-50',
-//       iconBg: 'bg-gray-600',
-//       iconColor: 'text-white',
-//       text: 'text-gray-700',
-//       border: 'border-gray-200',
-//       trendUp: 'text-emerald-600',
-//       trendDown: 'text-rose-600'
-//     }
+//     blue: { bg: 'bg-blue-50', iconBg: 'bg-blue-500', iconColor: 'text-white', text: 'text-blue-700', border: 'border-blue-200' },
+//     emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-500', iconColor: 'text-white', text: 'text-emerald-700', border: 'border-emerald-200' },
+//     amber: { bg: 'bg-amber-50', iconBg: 'bg-amber-500', iconColor: 'text-white', text: 'text-amber-700', border: 'border-amber-200' },
+//     rose: { bg: 'bg-rose-50', iconBg: 'bg-rose-500', iconColor: 'text-white', text: 'text-rose-700', border: 'border-rose-200' },
+//     purple: { bg: 'bg-purple-50', iconBg: 'bg-purple-500', iconColor: 'text-white', text: 'text-purple-700', border: 'border-purple-200' },
+//     orange: { bg: 'bg-orange-50', iconBg: 'bg-orange-500', iconColor: 'text-white', text: 'text-orange-700', border: 'border-orange-200' },
+//     gray: { bg: 'bg-gray-50', iconBg: 'bg-gray-600', iconColor: 'text-white', text: 'text-gray-700', border: 'border-gray-200' }
 //   };
 
 //   const theme = colorClasses[color] || colorClasses.blue;
 
 //   return (
 //     <div className={`relative overflow-hidden rounded-xl border ${theme.border} ${theme.bg} p-4 hover:shadow-md transition-all duration-300 group`}>
-//       {/* Decorative gradient line */}
 //       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${theme.iconBg.replace('bg-', 'from-')} to-transparent opacity-50`}></div>
-      
 //       <div className="relative z-10">
 //         <div className="flex items-start justify-between">
 //           <div>
 //             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{title}</p>
 //             <p className="text-2xl font-bold text-gray-900">{value}</p>
-            
-//             {trend && (
-//               <div className="flex items-center gap-1 mt-2">
-//                 {trend === 'up' ? (
-//                   <TrendUpIcon className={`w-3 h-3 ${theme.trendUp}`} />
-//                 ) : trend === 'down' ? (
-//                   <TrendDownIcon className={`w-3 h-3 ${theme.trendDown}`} />
-//                 ) : null}
-//                 <span className={`text-xs font-medium ${trend === 'up' ? theme.trendUp : trend === 'down' ? theme.trendDown : 'text-gray-500'}`}>
-//                   {trendValue}
-//                 </span>
-//               </div>
-//             )}
 //           </div>
-          
 //           <div className={`p-2.5 rounded-lg ${theme.iconBg} bg-opacity-90 shadow-sm`}>
 //             <Icon className={`w-4 h-4 ${theme.iconColor}`} />
 //           </div>
@@ -308,9 +209,11 @@
 //   activeFilter, 
 //   setActiveFilter, 
 //   onFilter,
-//   onDateFilter 
+//   onDateFilter,
+//   onExpiredFilter,
+//   showExpiredOnly
 // }) => {
-//   const paymentFilters = ['All', 'Paid', 'Partial', 'Unpaid', 'Expired', 'Overpaid', 'Cancelled'];
+//   const paymentFilters = ['All', 'Paid', 'Partial', 'Unpaid', 'Overpaid', 'Cancelled'];
 
 //   return (
 //     <div className="flex flex-wrap items-center gap-3">
@@ -327,7 +230,7 @@
 //               onFilter(filter);
 //             }}
 //             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-//               activeFilter === filter
+//               activeFilter === filter && !showExpiredOnly
 //                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
 //                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 //             }`}
@@ -335,6 +238,18 @@
 //             {filter}
 //           </button>
 //         ))}
+        
+//         <button
+//           onClick={onExpiredFilter}
+//           className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1 ${
+//             showExpiredOnly
+//               ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+//               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+//           }`}
+//         >
+//           <Clock className="w-3.5 h-3.5" />
+//           Expired
+//         </button>
 //       </div>
       
 //       <select
@@ -351,7 +266,7 @@
 //   );
 // };
 
-// // Pagination Component
+// // Pagination Component - Same as inquiries page
 // const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 //   const getPageNumbers = () => {
 //     const pages = [];
@@ -382,61 +297,56 @@
 //   if (totalPages <= 1) return null;
 
 //   return (
-//     <div className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl mt-4">
-//       <div className="text-xs text-gray-500">
-//         Page {currentPage} of {totalPages}
-//       </div>
-//       <div className="flex items-center gap-2">
-//         <button
-//           onClick={() => onPageChange(1)}
-//           disabled={currentPage === 1}
-//           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//           title="First page"
-//         >
-//           <ChevronsLeft className="w-4 h-4" />
-//         </button>
-//         <button
-//           onClick={() => onPageChange(currentPage - 1)}
-//           disabled={currentPage === 1}
-//           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//           title="Previous page"
-//         >
-//           <ChevronLeft className="w-4 h-4" />
-//         </button>
+//     <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl mt-4">
+//       <button
+//         onClick={() => onPageChange(1)}
+//         disabled={currentPage === 1}
+//         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+//         title="First page"
+//       >
+//         <ChevronsLeft className="w-4 h-4" />
+//       </button>
+//       <button
+//         onClick={() => onPageChange(currentPage - 1)}
+//         disabled={currentPage === 1}
+//         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+//         title="Previous page"
+//       >
+//         <ChevronLeft className="w-4 h-4" />
+//       </button>
 
-//         <div className="flex items-center gap-1">
-//           {getPageNumbers().map((page) => (
-//             <button
-//               key={page}
-//               onClick={() => onPageChange(page)}
-//               className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
-//                 currentPage === page
-//                   ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
-//                   : 'text-gray-700 hover:bg-gray-100'
-//               }`}
-//             >
-//               {page}
-//             </button>
-//           ))}
-//         </div>
-
-//         <button
-//           onClick={() => onPageChange(currentPage + 1)}
-//           disabled={currentPage === totalPages}
-//           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//           title="Next page"
-//         >
-//           <ChevronRight className="w-4 h-4" />
-//         </button>
-//         <button
-//           onClick={() => onPageChange(totalPages)}
-//           disabled={currentPage === totalPages}
-//           className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-//           title="Last page"
-//         >
-//           <ChevronsRight className="w-4 h-4" />
-//         </button>
+//       <div className="flex items-center gap-1">
+//         {getPageNumbers().map((page) => (
+//           <button
+//             key={page}
+//             onClick={() => onPageChange(page)}
+//             className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
+//               currentPage === page
+//                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
+//                 : 'text-gray-700 hover:bg-gray-100'
+//             }`}
+//           >
+//             {page}
+//           </button>
+//         ))}
 //       </div>
+
+//       <button
+//         onClick={() => onPageChange(currentPage + 1)}
+//         disabled={currentPage === totalPages}
+//         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+//         title="Next page"
+//       >
+//         <ChevronRight className="w-4 h-4" />
+//       </button>
+//       <button
+//         onClick={() => onPageChange(totalPages)}
+//         disabled={currentPage === totalPages}
+//         className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+//         title="Last page"
+//       >
+//         <ChevronsRight className="w-4 h-4" />
+//       </button>
 //     </div>
 //   );
 // };
@@ -444,10 +354,10 @@
 // // Main Admin Invoices Page Component
 // export default function AdminInvoicesPage() {
 //   const [invoices, setInvoices] = useState([]);
-//   const [filteredInvoices, setFilteredInvoices] = useState([]);
 //   const [loading, setLoading] = useState(true);
 //   const [refreshing, setRefreshing] = useState(false);
 //   const [activeFilter, setActiveFilter] = useState('All');
+//   const [showExpiredOnly, setShowExpiredOnly] = useState(false);
 //   const [dateRange, setDateRange] = useState('all');
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [itemsPerPage] = useState(10);
@@ -456,12 +366,6 @@
 //   const [userRole, setUserRole] = useState('admin');
 //   const [statusDropdownOpen, setStatusDropdownOpen] = useState(null);
 //   const [updatingStatus, setUpdatingStatus] = useState(null);
-  
-//   // Delete modal states
-//   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-//   const [deletingInvoice, setDeletingInvoice] = useState(null);
-//   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
-
 //   const [stats, setStats] = useState({
 //     total: 0,
 //     paid: 0,
@@ -471,10 +375,17 @@
 //     overpaid: 0,
 //     cancelled: 0
 //   });
+  
+//   // Delete modal states
+//   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+//   const [deletingInvoice, setDeletingInvoice] = useState(null);
+//   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
+  
 //   const router = useRouter();
 
 //   const fetchInvoices = async () => {
 //     try {
+//       setLoading(true);
 //       const token = localStorage.getItem('token');
 //       if (!token) {
 //         router.push('/login');
@@ -492,15 +403,15 @@
 //         }
 //       }
 
-//       // Build query params
-//       let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+//       // Build query params - SERVER SIDE PAGINATION like inquiries page
+//       let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
       
-//       if (activeFilter !== 'All') {
+//       // Add status filter if not "All" and not showing expired only
+//       if (activeFilter !== 'All' && !showExpiredOnly) {
 //         const filterMap = {
 //           'Paid': 'paid',
 //           'Partial': 'partial',
 //           'Unpaid': 'unpaid',
-//           'Expired': 'overdue',
 //           'Overpaid': 'overpaid',
 //           'Cancelled': 'cancelled'
 //         };
@@ -510,6 +421,7 @@
 //         }
 //       }
       
+//       // Add date range filter
 //       if (dateRange !== 'all') {
 //         const now = new Date();
 //         let startDate;
@@ -536,6 +448,8 @@
 //         }
 //       }
 
+//       console.log('Fetching invoices from:', url);
+
 //       const response = await fetch(url, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -543,6 +457,8 @@
 //       });
 
 //       const data = await response.json();
+//       console.log('API Response:', data);
+      
 //       if (data.success) {
 //         // Add expired flag to invoices
 //         const invoicesWithExpiry = data.data.invoices.map(inv => ({
@@ -551,29 +467,33 @@
 //         }));
         
 //         setInvoices(invoicesWithExpiry);
-//         setFilteredInvoices(invoicesWithExpiry);
 //         setTotalInvoices(data.data.pagination.total);
 //         setTotalPages(data.data.pagination.pages);
         
-//         // Calculate stats
-//         const paid = data.data.invoices.filter(i => i.paymentStatus === 'paid').length;
-//         const partial = data.data.invoices.filter(i => i.paymentStatus === 'partial').length;
-//         const unpaid = data.data.invoices.filter(i => i.paymentStatus === 'unpaid').length;
-//         const overpaid = data.data.invoices.filter(i => i.paymentStatus === 'overpaid').length;
-//         const cancelled = data.data.invoices.filter(i => i.paymentStatus === 'cancelled').length;
-//         const expired = data.data.invoices.filter(i => isInvoiceExpired(i)).length;
-        
-//         setStats({
-//           total: data.data.pagination.total,
-//           paid,
-//           partial,
-//           unpaid,
-//           expired,
-//           overpaid,
-//           cancelled
-//         });
+//         // Calculate stats from all invoices (if available in response)
+//         if (data.data.stats) {
+//           const paid = data.data.stats.find(s => s._id === 'paid')?.count || 0;
+//           const partial = data.data.stats.find(s => s._id === 'partial')?.count || 0;
+//           const unpaid = data.data.stats.find(s => s._id === 'unpaid')?.count || 0;
+//           const overpaid = data.data.stats.find(s => s._id === 'overpaid')?.count || 0;
+//           const cancelled = data.data.stats.find(s => s._id === 'cancelled')?.count || 0;
+          
+//           // Calculate expired count from all invoices
+//           const expired = data.data.invoices.filter(i => isInvoiceExpired(i)).length;
+          
+//           setStats({
+//             total: data.data.pagination.total,
+//             paid,
+//             partial,
+//             unpaid,
+//             expired,
+//             overpaid,
+//             cancelled
+//           });
+//         }
 //       }
 //     } catch (error) {
+//       console.error('Error fetching invoices:', error);
 //       toast.error('Failed to load invoices');
 //     } finally {
 //       setLoading(false);
@@ -583,7 +503,7 @@
 
 //   useEffect(() => {
 //     fetchInvoices();
-//   }, [currentPage, activeFilter, dateRange]);
+//   }, [currentPage, activeFilter, dateRange, showExpiredOnly]);
 
 //   const handleRefresh = () => {
 //     setRefreshing(true);
@@ -591,24 +511,33 @@
 //   };
 
 //   const handleSearch = (term) => {
-//     if (!term.trim()) {
-//       fetchInvoices();
-//     } else {
+//     // For search, we'll let the API handle it with server-side filtering
+//     // This is a simplified version - you might want to add search to your API
+//     if (term.trim()) {
+//       // You can implement client-side search temporarily or add search param to API
 //       const filtered = invoices.filter(invoice => 
-//         invoice.invoiceNumber.toLowerCase().includes(term.toLowerCase()) ||
+//         invoice.invoiceNumber?.toLowerCase().includes(term.toLowerCase()) ||
 //         invoice.customer?.companyName?.toLowerCase().includes(term.toLowerCase()) ||
 //         invoice.customer?.contactPerson?.toLowerCase().includes(term.toLowerCase()) ||
-//         invoice.customer?.email?.toLowerCase().includes(term.toLowerCase()) ||
-//         invoice.inquiryNumber?.toLowerCase().includes(term.toLowerCase())
+//         invoice.customer?.email?.toLowerCase().includes(term.toLowerCase())
 //       );
-//       setFilteredInvoices(filtered);
-//       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+//       setInvoices(filtered);
+//       setTotalPages(1);
+//     } else {
+//       fetchInvoices();
 //     }
 //     setCurrentPage(1);
 //   };
 
 //   const handleFilter = (status) => {
 //     setActiveFilter(status);
+//     setShowExpiredOnly(false);
+//     setCurrentPage(1);
+//   };
+
+//   const handleExpiredFilter = () => {
+//     setShowExpiredOnly(!showExpiredOnly);
+//     setActiveFilter('All');
 //     setCurrentPage(1);
 //   };
 
@@ -624,7 +553,6 @@
 
 //   const handleView = (invoiceId) => {
 //     router.push(`/admin/viewInvoice?invoiceId=${invoiceId}`);
-    
 //   };
 
 //   const handleEdit = (invoiceId) => {
@@ -642,7 +570,7 @@
 //     setDeletingInvoice(invoiceToDelete._id);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -670,21 +598,17 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       // Prepare update data
 //       const updateData = { paymentStatus: newStatus };
       
-//       // If marking as paid, set amountPaid to finalTotal
 //       const invoice = invoices.find(i => i._id === invoiceId);
 //       if (newStatus === 'paid' && invoice) {
 //         updateData.amountPaid = invoice.finalTotal;
 //         updateData.dueAmount = 0;
-//       }
-//       // If cancelling, set dueAmount to 0
-//       else if (newStatus === 'cancelled') {
+//       } else if (newStatus === 'cancelled') {
 //         updateData.dueAmount = 0;
 //       }
 
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
+//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -708,24 +632,11 @@
 //     }
 //   };
 
-//   // Get available status options based on current status
 //   const getStatusOptions = (invoice) => {
-//     const isExpired = invoice.isExpired;
-    
-//     // If paid or cancelled, no options
 //     if (invoice.paymentStatus === 'paid' || invoice.paymentStatus === 'cancelled') {
 //       return [];
 //     }
 
-//     // If expired
-//     if (isExpired) {
-//       return [
-//         { value: 'paid', label: 'Mark as Paid', icon: CheckCircle },
-//         { value: 'cancelled', label: 'Cancel Invoice', icon: XCircle }
-//       ];
-//     }
-
-//     // Based on current status
 //     switch (invoice.paymentStatus) {
 //       case 'partial':
 //         return [
@@ -745,11 +656,6 @@
 //         return [];
 //     }
 //   };
-
-//   // Get current page invoices
-//   const indexOfLastInvoice = currentPage * itemsPerPage;
-//   const indexOfFirstInvoice = indexOfLastInvoice - itemsPerPage;
-//   const currentInvoices = filteredInvoices.slice(indexOfFirstInvoice, indexOfLastInvoice);
 
 //   if (loading) {
 //     return (
@@ -772,6 +678,11 @@
 //               <h1 className="text-2xl font-bold text-gray-900">Invoice Management</h1>
 //               <p className="text-xs text-gray-500 mt-0.5">
 //                 Total {totalInvoices} invoices
+//                 {showExpiredOnly && (
+//                   <span className="ml-2 text-orange-600 font-medium">
+//                     • Showing expired invoices only
+//                   </span>
+//                 )}
 //               </p>
 //             </div>
 //             <div className="flex items-center gap-2">
@@ -783,60 +694,24 @@
 //                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
 //                 Refresh
 //               </button>
-//         <Link
-//   href="/admin/inquiries?filter=accepted"
-//   className="flex items-center gap-1.5 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-// >
-//   <PlusCircle className="w-3.5 h-3.5" />
-//   Create Invoice from Inquiry
-// </Link>
+//               <Link
+//                 href="/admin/inquiries?filter=accepted"
+//                 className="flex items-center gap-1.5 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//               >
+//                 <PlusCircle className="w-3.5 h-3.5" />
+//                 Create Invoice from Inquiry
+//               </Link>
 //             </div>
 //           </div>
 
-//           {/* Stats Cards - Compact Grid - Removed Revenue and Overpaid */}
+//           {/* Stats Cards */}
 //           <div className="grid grid-cols-6 gap-2">
-//             <StatCard 
-//               title="Total" 
-//               value={stats.total} 
-//               icon={FileText} 
-//               color="blue" 
-//             />
-//             <StatCard 
-//               title="Paid" 
-//               value={stats.paid} 
-//               icon={CheckCircle} 
-//               color="emerald" 
-//             />
-//             <StatCard 
-//               title="Partial" 
-//               value={stats.partial} 
-//               icon={TrendingUp} 
-//               color="amber" 
-//             />
-//             <StatCard 
-//               title="Unpaid" 
-//               value={stats.unpaid} 
-//               icon={AlertCircle} 
-//               color="rose" 
-//             />
-//             <StatCard 
-//               title="Expired" 
-//               value={stats.expired} 
-//               icon={Clock} 
-//               color="orange" 
-//             />
-//             {/* <StatCard 
-//               title="Overpaid" 
-//               value={stats.overpaid} 
-//               icon={TrendingDown} 
-//               color="purple" 
-//             /> */}
-//             <StatCard 
-//               title="Cancelled" 
-//               value={stats.cancelled} 
-//               icon={XCircle} 
-//               color="gray" 
-//             />
+//             <StatCard title="Total" value={stats.total} icon={FileText} color="blue" />
+//             <StatCard title="Paid" value={stats.paid} icon={CheckCircle} color="emerald" />
+//             <StatCard title="Partial" value={stats.partial} icon={TrendingUp} color="amber" />
+//             <StatCard title="Unpaid" value={stats.unpaid} icon={AlertCircle} color="rose" />
+//             <StatCard title="Expired" value={stats.expired} icon={Clock} color="orange" />
+//             <StatCard title="Cancelled" value={stats.cancelled} icon={XCircle} color="gray" />
 //           </div>
 //         </div>
 //       </div>
@@ -851,28 +726,42 @@
 //             setActiveFilter={setActiveFilter}
 //             onFilter={handleFilter}
 //             onDateFilter={handleDateFilter}
+//             onExpiredFilter={handleExpiredFilter}
+//             showExpiredOnly={showExpiredOnly}
 //           />
 //         </div>
 
 //         {/* Results Summary */}
 //         <div className="flex items-center justify-between mb-2">
 //           <p className="text-xs text-gray-500">
-//             Showing <span className="font-medium">{filteredInvoices.length > 0 ? indexOfFirstInvoice + 1 : 0}</span> to{' '}
-//             <span className="font-medium">{Math.min(indexOfLastInvoice, filteredInvoices.length)}</span> of{' '}
-//             <span className="font-medium">{filteredInvoices.length}</span> invoices
+//             Showing <span className="font-medium">{invoices.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to{' '}
+//             <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalInvoices)}</span> of{' '}
+//             <span className="font-medium">{totalInvoices}</span> invoices
+//             {showExpiredOnly && (
+//               <span className="ml-1 text-orange-600">(Expired only)</span>
+//             )}
+//             {totalPages > 1 && (
+//               <span className="ml-2 text-gray-400">• Page {currentPage} of {totalPages}</span>
+//             )}
 //           </p>
 //         </div>
 
 //         {/* Invoices Table */}
 //         <div id="invoices-table" className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-//           {filteredInvoices.length === 0 ? (
+//           {invoices.length === 0 ? (
 //             <div className="p-12 text-center">
 //               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
 //                 <FileText className="w-8 h-8 text-gray-400" />
 //               </div>
-//               <h2 className="text-lg font-semibold text-gray-900 mb-2">No Invoices Found</h2>
+//               <h2 className="text-lg font-semibold text-gray-900 mb-2">
+//                 {showExpiredOnly ? 'No Expired Invoices' : 'No Invoices Found'}
+//               </h2>
 //               <p className="text-sm text-gray-500 mb-4">
-//                 {totalInvoices === 0 ? 'No invoices have been created yet' : 'Try adjusting your filters'}
+//                 {showExpiredOnly 
+//                   ? 'No invoices have expired yet.' 
+//                   : totalInvoices === 0 
+//                     ? 'No invoices have been created yet' 
+//                     : 'Try adjusting your filters'}
 //               </p>
 //               <Link
 //                 href="/admin/createInvoice?new=true"
@@ -930,7 +819,7 @@
 //                     </tr>
 //                   </thead>
 //                   <tbody className="divide-y divide-gray-100">
-//                     {currentInvoices.map((invoice) => {
+//                     {invoices.map((invoice) => {
 //                       const dueAmount = invoice.finalTotal - (invoice.amountPaid || 0);
 //                       const isExpired = invoice.isExpired;
 //                       const overdueDays = isExpired ? getOverdueDays(invoice.dueDate) : 0;
@@ -940,7 +829,13 @@
 //                         <tr key={invoice._id} className="hover:bg-gray-50 transition-colors">
 //                           <td className="px-4 py-3">
 //                             <div className="font-medium text-gray-900">{invoice.invoiceNumber}</div>
-//                             {invoice.inquiryNumber && (
+//                             {isExpired && (
+//                               <div className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full text-xs">
+//                                 <Clock className="w-3 h-3" />
+//                                 {overdueDays} day{overdueDays !== 1 ? 's' : ''} overdue
+//                               </div>
+//                             )}
+//                             {invoice.inquiryNumber && !isExpired && (
 //                               <div className="text-xs text-gray-500 mt-0.5">
 //                                 Ref: {invoice.inquiryNumber}
 //                               </div>
@@ -970,12 +865,6 @@
 //                                 {formatDate(invoice.dueDate)}
 //                               </span>
 //                             </div>
-//                             {isExpired && (
-//                               <div className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-700 rounded-full text-xs">
-//                                 <AlertTriangle className="w-3 h-3" />
-//                                 {overdueDays} days overdue
-//                               </div>
-//                             )}
 //                           </td>
                           
 //                           <td className="px-4 py-3">
@@ -1006,8 +895,7 @@
 //                                 disabled={statusOptions.length === 0 || updatingStatus === invoice._id}
 //                                 className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg border transition-all ${
 //                                   PaymentStatusBadge({ 
-//                                     status: invoice.paymentStatus, 
-//                                     isExpired 
+//                                     status: invoice.paymentStatus
 //                                   }).props.className
 //                                 } ${statusOptions.length === 0 ? 'cursor-default' : 'cursor-pointer hover:shadow-sm'}`}
 //                               >
@@ -1017,9 +905,8 @@
 //                                   {invoice.paymentStatus === 'unpaid' && <AlertCircle className="w-3.5 h-3.5" />}
 //                                   {invoice.paymentStatus === 'overpaid' && <TrendingDown className="w-3.5 h-3.5" />}
 //                                   {invoice.paymentStatus === 'cancelled' && <XCircle className="w-3.5 h-3.5" />}
-//                                   {isExpired && <Clock className="w-3.5 h-3.5" />}
 //                                   <span className="text-xs font-medium capitalize">
-//                                     {isExpired ? 'Expired' : invoice.paymentStatus}
+//                                     {invoice.paymentStatus}
 //                                   </span>
 //                                 </div>
 //                                 {statusOptions.length > 0 && (
@@ -1082,7 +969,7 @@
 //                 </table>
 //               </div>
               
-//               {/* Pagination */}
+//               {/* Pagination - Same as inquiries page */}
 //               {totalPages > 1 && (
 //                 <Pagination
 //                   currentPage={currentPage}
@@ -1095,7 +982,7 @@
 //         </div>
 //       </div>
 
-//       {/* Delete Confirmation Modal - Same style as inquiries page */}
+//       {/* Delete Confirmation Modal */}
 //       {showDeleteConfirm && invoiceToDelete && (
 //         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 //           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
@@ -1144,8 +1031,6 @@
 // }
 
 
-
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -1182,11 +1067,7 @@ import {
   Package,
   CreditCard,
   Filter,
-  TrendingUp as TrendUpIcon,
-  TrendingDown as TrendDownIcon,
-  Activity,
-  BarChart3,
-  PieChart
+  CalendarRange
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -1209,9 +1090,14 @@ const formatDate = (dateString) => {
   });
 };
 
+// Get month name
+const getMonthName = (monthIndex) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[monthIndex];
+};
+
 // Check if invoice is expired (due date passed) - Only for unpaid/partial invoices
 const isInvoiceExpired = (invoice) => {
-  // Don't mark as expired if paid or cancelled or overpaid
   if (invoice.paymentStatus === 'paid' || 
       invoice.paymentStatus === 'cancelled' || 
       invoice.paymentStatus === 'overpaid') {
@@ -1220,8 +1106,6 @@ const isInvoiceExpired = (invoice) => {
   
   const today = new Date();
   const dueDate = new Date(invoice.dueDate);
-  
-  // Reset time part to compare dates only
   today.setHours(0, 0, 0, 0);
   dueDate.setHours(0, 0, 0, 0);
   
@@ -1232,24 +1116,25 @@ const isInvoiceExpired = (invoice) => {
 const getOverdueDays = (dueDate) => {
   const today = new Date();
   const due = new Date(dueDate);
-  
-  // Reset time part to compare dates only
   today.setHours(0, 0, 0, 0);
   due.setHours(0, 0, 0, 0);
   
-  // Calculate difference in milliseconds
   const diffTime = today - due;
-  
-  // Convert to days (1000 ms * 60 seconds * 60 minutes * 24 hours)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  // Only return positive numbers (if due date is in the past)
   return diffDays > 0 ? diffDays : 0;
 };
 
-// Payment Status Badge Component - Only shows actual payment status
-// Payment Status Badge Component - Shows actual payment status with colors
-const PaymentStatusBadge = ({ status }) => {
+// Payment Status Badge Component
+const PaymentStatusBadge = ({ status, isExpired = false }) => {
+  if (isExpired) {
+    return (
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-100 border border-orange-300">
+        <Clock className="w-3.5 h-3.5 text-orange-600" />
+        <span className="text-xs font-medium text-orange-800">Expired</span>
+      </div>
+    );
+  }
+
   const statusConfig = {
     paid: { 
       bg: 'bg-emerald-100', 
@@ -1305,101 +1190,29 @@ const PaymentStatusBadge = ({ status }) => {
   );
 };
 
-// Modern, Compact Stat Card Component
-const StatCard = ({ title, value, icon: Icon, trend, trendValue, color = 'blue' }) => {
+// Stat Card Component
+const StatCard = ({ title, value, icon: Icon, color = 'blue' }) => {
   const colorClasses = {
-    blue: {
-      bg: 'bg-blue-50',
-      iconBg: 'bg-blue-500',
-      iconColor: 'text-white',
-      text: 'text-blue-700',
-      border: 'border-blue-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    emerald: {
-      bg: 'bg-emerald-50',
-      iconBg: 'bg-emerald-500',
-      iconColor: 'text-white',
-      text: 'text-emerald-700',
-      border: 'border-emerald-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    amber: {
-      bg: 'bg-amber-50',
-      iconBg: 'bg-amber-500',
-      iconColor: 'text-white',
-      text: 'text-amber-700',
-      border: 'border-amber-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    rose: {
-      bg: 'bg-rose-50',
-      iconBg: 'bg-rose-500',
-      iconColor: 'text-white',
-      text: 'text-rose-700',
-      border: 'border-rose-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    purple: {
-      bg: 'bg-purple-50',
-      iconBg: 'bg-purple-500',
-      iconColor: 'text-white',
-      text: 'text-purple-700',
-      border: 'border-purple-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    orange: {
-      bg: 'bg-orange-50',
-      iconBg: 'bg-orange-500',
-      iconColor: 'text-white',
-      text: 'text-orange-700',
-      border: 'border-orange-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    },
-    gray: {
-      bg: 'bg-gray-50',
-      iconBg: 'bg-gray-600',
-      iconColor: 'text-white',
-      text: 'text-gray-700',
-      border: 'border-gray-200',
-      trendUp: 'text-emerald-600',
-      trendDown: 'text-rose-600'
-    }
+    blue: { bg: 'bg-blue-50', iconBg: 'bg-blue-500', iconColor: 'text-white', text: 'text-blue-700', border: 'border-blue-200' },
+    emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-500', iconColor: 'text-white', text: 'text-emerald-700', border: 'border-emerald-200' },
+    amber: { bg: 'bg-amber-50', iconBg: 'bg-amber-500', iconColor: 'text-white', text: 'text-amber-700', border: 'border-amber-200' },
+    rose: { bg: 'bg-rose-50', iconBg: 'bg-rose-500', iconColor: 'text-white', text: 'text-rose-700', border: 'border-rose-200' },
+    purple: { bg: 'bg-purple-50', iconBg: 'bg-purple-500', iconColor: 'text-white', text: 'text-purple-700', border: 'border-purple-200' },
+    orange: { bg: 'bg-orange-50', iconBg: 'bg-orange-500', iconColor: 'text-white', text: 'text-orange-700', border: 'border-orange-200' },
+    gray: { bg: 'bg-gray-50', iconBg: 'bg-gray-600', iconColor: 'text-white', text: 'text-gray-700', border: 'border-gray-200' }
   };
 
   const theme = colorClasses[color] || colorClasses.blue;
 
   return (
     <div className={`relative overflow-hidden rounded-xl border ${theme.border} ${theme.bg} p-4 hover:shadow-md transition-all duration-300 group`}>
-      {/* Decorative gradient line */}
       <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${theme.iconBg.replace('bg-', 'from-')} to-transparent opacity-50`}></div>
-      
       <div className="relative z-10">
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">{title}</p>
             <p className="text-2xl font-bold text-gray-900">{value}</p>
-            
-            {trend && (
-              <div className="flex items-center gap-1 mt-2">
-                {trend === 'up' ? (
-                  <TrendUpIcon className={`w-3 h-3 ${theme.trendUp}`} />
-                ) : trend === 'down' ? (
-                  <TrendDownIcon className={`w-3 h-3 ${theme.trendDown}`} />
-                ) : null}
-                <span className={`text-xs font-medium ${trend === 'up' ? theme.trendUp : trend === 'down' ? theme.trendDown : 'text-gray-500'}`}>
-                  {trendValue}
-                </span>
-              </div>
-            )}
           </div>
-          
           <div className={`p-2.5 rounded-lg ${theme.iconBg} bg-opacity-90 shadow-sm`}>
             <Icon className={`w-4 h-4 ${theme.iconColor}`} />
           </div>
@@ -1430,65 +1243,145 @@ const SearchBar = ({ onSearch }) => {
   );
 };
 
-// Filter Bar - Updated to remove Expired from status filters
+// Filter Bar - Status filters on left, Month/Year filter on right
 const FilterBar = ({ 
   activeFilter, 
   setActiveFilter, 
   onFilter,
-  onDateFilter,
+  filterType,
+  setFilterType,
+  selectedMonth,
+  setSelectedMonth,
+  selectedYear,
+  setSelectedYear,
+  onMonthChange,
+  onYearChange,
   onExpiredFilter,
   showExpiredOnly
 }) => {
   const paymentFilters = ['All', 'Paid', 'Partial', 'Unpaid', 'Overpaid', 'Cancelled'];
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-gray-400" />
-        <span className="text-xs font-medium text-gray-500">Filter by:</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {paymentFilters.map((filter) => (
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Status Filters on Left */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-400" />
+          <span className="text-xs font-medium text-gray-500">Filter by:</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {paymentFilters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => {
+                setActiveFilter(filter);
+                onFilter(filter);
+              }}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                activeFilter === filter && !showExpiredOnly
+                  ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+          
           <button
-            key={filter}
-            onClick={() => {
-              setActiveFilter(filter);
-              onFilter(filter);
-            }}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-              activeFilter === filter && !showExpiredOnly
-                ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
+            onClick={onExpiredFilter}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1 ${
+              showExpiredOnly
+                ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            {filter}
+            <Clock className="w-3.5 h-3.5" />
+            Expired
           </button>
-        ))}
-        
-        {/* Expired Filter Button - Separate from status filters */}
-        <button
-          onClick={onExpiredFilter}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1 ${
-            showExpiredOnly
-              ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          <Clock className="w-3.5 h-3.5" />
-          Expired
-        </button>
+        </div>
       </div>
-      
-      <select
-        onChange={(e) => onDateFilter(e.target.value)}
-        className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent ml-auto"
-      >
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
-        <option value="year">This Year</option>
-      </select>
+
+      {/* Month/Year Filter on Right */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setFilterType('all')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'all' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilterType('year')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'year' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Year
+          </button>
+          <button
+            onClick={() => setFilterType('month')}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              filterType === 'month' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Month
+          </button>
+        </div>
+
+        {/* Month Navigation */}
+        {filterType === 'month' && (
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => onMonthChange(-1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous month"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {getMonthName(selectedMonth)} {selectedYear}
+            </span>
+            <button
+              onClick={() => onMonthChange(1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next month"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Year Navigation */}
+        {filterType === 'year' && (
+          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => onYearChange(-1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous year"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {selectedYear}
+            </span>
+            <button
+              onClick={() => onYearChange(1)}
+              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next year"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -1524,61 +1417,56 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl mt-4">
-      <div className="text-xs text-gray-500">
-        Page {currentPage} of {totalPages}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="First page"
-        >
-          <ChevronsLeft className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Previous page"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+    <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl mt-4">
+      <button
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="First page"
+      >
+        <ChevronsLeft className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Previous page"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
 
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map((page) => (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
-                currentPage === page
-                  ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Next page"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
-          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Last page"
-        >
-          <ChevronsRight className="w-4 h-4" />
-        </button>
+      <div className="flex items-center gap-1">
+        {getPageNumbers().map((page) => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
+              currentPage === page
+                ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
       </div>
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Next page"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+      <button
+        onClick={() => onPageChange(totalPages)}
+        disabled={currentPage === totalPages}
+        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        title="Last page"
+      >
+        <ChevronsRight className="w-4 h-4" />
+      </button>
     </div>
   );
 };
@@ -1586,12 +1474,16 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 // Main Admin Invoices Page Component
 export default function AdminInvoicesPage() {
   const [invoices, setInvoices] = useState([]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [showExpiredOnly, setShowExpiredOnly] = useState(false);
-  const [dateRange, setDateRange] = useState('all');
+  
+  // Date filter state
+  const [filterType, setFilterType] = useState('all'); // 'all', 'year', 'month'
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalInvoices, setTotalInvoices] = useState(0);
@@ -1599,12 +1491,6 @@ export default function AdminInvoicesPage() {
   const [userRole, setUserRole] = useState('admin');
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
-  
-  // Delete modal states
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deletingInvoice, setDeletingInvoice] = useState(null);
-  const [invoiceToDelete, setInvoiceToDelete] = useState(null);
-
   const [stats, setStats] = useState({
     total: 0,
     paid: 0,
@@ -1614,107 +1500,116 @@ export default function AdminInvoicesPage() {
     overpaid: 0,
     cancelled: 0
   });
+  
+  // Delete modal states
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingInvoice, setDeletingInvoice] = useState(null);
+  const [invoiceToDelete, setInvoiceToDelete] = useState(null);
+  
   const router = useRouter();
 
-  const fetchInvoices = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
+const fetchInvoices = async () => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
 
-      // Get user role from localStorage
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          setUserRole(user.role || 'admin');
-        } catch (e) {
-          console.error('Error parsing user data:', e);
-        }
+    // Get user role from localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setUserRole(user.role || 'admin');
+      } catch (e) {
+        console.error('Error parsing user data:', e);
       }
+    }
 
-      // Build query params
-      let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+    // Build query params for paginated invoices
+    let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+    
+    // Add status filter if not "All" and not showing expired only
+    // IMPORTANT: When showExpiredOnly is true, we DON'T send any paymentStatus filter
+    // because we need to get ALL invoices and then filter for expired ones client-side
+    if (activeFilter !== 'All' && !showExpiredOnly) {
+      const filterMap = {
+        'Paid': 'paid',
+        'Partial': 'partial',
+        'Unpaid': 'unpaid',
+        'Overpaid': 'overpaid',
+        'Cancelled': 'cancelled'
+      };
+      const apiFilter = filterMap[activeFilter];
+      if (apiFilter) {
+        url += `&paymentStatus=${apiFilter}`;
+      }
+    }
+    
+    // Add date filter for paginated results
+    if (filterType === 'year') {
+      url += `&year=${selectedYear}`;
+    } else if (filterType === 'month') {
+      url += `&month=${selectedMonth + 1}&year=${selectedYear}`; // month+1 because JS months are 0-indexed
+    }
+
+    console.log('Fetching paginated invoices from:', url);
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+    console.log('API Response:', data);
+    
+    if (data.success) {
+      // Add expired flag to invoices
+      let invoicesWithExpiry = data.data.invoices.map(inv => ({
+        ...inv,
+        isExpired: isInvoiceExpired(inv)
+      }));
       
-      if (activeFilter !== 'All' && !showExpiredOnly) {
-        const filterMap = {
-          'Paid': 'paid',
-          'Partial': 'partial',
-          'Unpaid': 'unpaid',
-          'Overpaid': 'overpaid',
-          'Cancelled': 'cancelled'
-        };
-        const apiFilter = filterMap[activeFilter];
-        if (apiFilter) {
-          url += `&paymentStatus=${apiFilter}`;
-        }
+      // Apply client-side filtering for expired/overdue invoices
+      if (showExpiredOnly) {
+        invoicesWithExpiry = invoicesWithExpiry.filter(inv => inv.isExpired === true);
       }
       
-      if (dateRange !== 'all') {
-        const now = new Date();
-        let startDate;
+      setInvoices(invoicesWithExpiry);
+      setTotalInvoices(data.data.pagination.total);
+      setTotalPages(data.data.pagination.pages);
+      
+      // Calculate stats from the stats array in the response
+      if (data.data.stats && Array.isArray(data.data.stats)) {
+        const paid = data.data.stats.find(s => s._id === 'paid')?.count || 0;
+        const partial = data.data.stats.find(s => s._id === 'partial')?.count || 0;
+        const unpaid = data.data.stats.find(s => s._id === 'unpaid')?.count || 0;
+        const overpaid = data.data.stats.find(s => s._id === 'overpaid')?.count || 0;
+        const cancelled = data.data.stats.find(s => s._id === 'cancelled')?.count || 0;
         
-        switch(dateRange) {
-          case 'today':
-            startDate = new Date(now.setHours(0, 0, 0, 0));
-            break;
-          case 'week':
-            startDate = new Date(now.setDate(now.getDate() - 7));
-            break;
-          case 'month':
-            startDate = new Date(now.setMonth(now.getMonth() - 1));
-            break;
-          case 'year':
-            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-            break;
-          default:
-            startDate = null;
-        }
+        // Calculate expired count from all invoices
+        const expired = invoicesWithExpiry.filter(i => i.isExpired).length;
         
-        if (startDate) {
-          url += `&startDate=${startDate.toISOString()}`;
-        }
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        // Add expired flag to invoices (only for display, not as status)
-        const invoicesWithExpiry = data.data.invoices.map(inv => ({
-          ...inv,
-          isExpired: isInvoiceExpired(inv)
-        }));
-        
-        setInvoices(invoicesWithExpiry);
-        
-        // Apply expired filter if needed
-        let filtered = invoicesWithExpiry;
-        if (showExpiredOnly) {
-          filtered = invoicesWithExpiry.filter(inv => inv.isExpired);
-        } else if (activeFilter !== 'All') {
-          filtered = invoicesWithExpiry.filter(inv => 
-            inv.paymentStatus?.toLowerCase() === activeFilter.toLowerCase()
-          );
-        }
-        
-        setFilteredInvoices(filtered);
-        setTotalInvoices(data.data.pagination.total);
-        setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-        
-        // Calculate stats
-        const paid = data.data.invoices.filter(i => i.paymentStatus === 'paid').length;
-        const partial = data.data.invoices.filter(i => i.paymentStatus === 'partial').length;
-        const unpaid = data.data.invoices.filter(i => i.paymentStatus === 'unpaid').length;
-        const overpaid = data.data.invoices.filter(i => i.paymentStatus === 'overpaid').length;
-        const cancelled = data.data.invoices.filter(i => i.paymentStatus === 'cancelled').length;
-        const expired = data.data.invoices.filter(i => isInvoiceExpired(i)).length;
+        setStats({
+          total: data.data.pagination.total,
+          paid,
+          partial,
+          unpaid,
+          expired,
+          overpaid,
+          cancelled
+        });
+      } else {
+        // Fallback: calculate stats from current page only
+        const paid = invoicesWithExpiry.filter(i => i.paymentStatus === 'paid').length;
+        const partial = invoicesWithExpiry.filter(i => i.paymentStatus === 'partial').length;
+        const unpaid = invoicesWithExpiry.filter(i => i.paymentStatus === 'unpaid').length;
+        const overpaid = invoicesWithExpiry.filter(i => i.paymentStatus === 'overpaid').length;
+        const cancelled = invoicesWithExpiry.filter(i => i.paymentStatus === 'cancelled').length;
+        const expired = invoicesWithExpiry.filter(i => i.isExpired).length;
         
         setStats({
           total: data.data.pagination.total,
@@ -1726,17 +1621,19 @@ export default function AdminInvoicesPage() {
           cancelled
         });
       }
-    } catch (error) {
-      toast.error('Failed to load invoices');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    toast.error('Failed to load invoices');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   useEffect(() => {
     fetchInvoices();
-  }, [currentPage, activeFilter, dateRange, showExpiredOnly]);
+  }, [currentPage, activeFilter, filterType, selectedMonth, selectedYear, showExpiredOnly]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -1744,24 +1641,17 @@ export default function AdminInvoicesPage() {
   };
 
   const handleSearch = (term) => {
-    if (!term.trim()) {
-      fetchInvoices();
-    } else {
+    if (term.trim()) {
       const filtered = invoices.filter(invoice => 
-        invoice.invoiceNumber.toLowerCase().includes(term.toLowerCase()) ||
+        invoice.invoiceNumber?.toLowerCase().includes(term.toLowerCase()) ||
         invoice.customer?.companyName?.toLowerCase().includes(term.toLowerCase()) ||
         invoice.customer?.contactPerson?.toLowerCase().includes(term.toLowerCase()) ||
-        invoice.customer?.email?.toLowerCase().includes(term.toLowerCase()) ||
-        invoice.inquiryNumber?.toLowerCase().includes(term.toLowerCase())
+        invoice.customer?.email?.toLowerCase().includes(term.toLowerCase())
       );
-      
-      // Apply expired filter if active
-      const finalFiltered = showExpiredOnly 
-        ? filtered.filter(inv => inv.isExpired)
-        : filtered;
-      
-      setFilteredInvoices(finalFiltered);
-      setTotalPages(Math.ceil(finalFiltered.length / itemsPerPage));
+      setInvoices(filtered);
+      setTotalPages(1);
+    } else {
+      fetchInvoices();
     }
     setCurrentPage(1);
   };
@@ -1778,9 +1668,26 @@ export default function AdminInvoicesPage() {
     setCurrentPage(1);
   };
 
-  const handleDateFilter = (range) => {
-    setDateRange(range);
-    setCurrentPage(1);
+  const handleMonthChange = (increment) => {
+    let newMonth = selectedMonth + increment;
+    let newYear = selectedYear;
+    
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear = selectedYear - 1;
+    } else if (newMonth > 11) {
+      newMonth = 0;
+      newYear = selectedYear + 1;
+    }
+    
+    setSelectedMonth(newMonth);
+    setSelectedYear(newYear);
+    setFilterType('month');
+  };
+
+  const handleYearChange = (increment) => {
+    setSelectedYear(selectedYear + increment);
+    setFilterType('year');
   };
 
   const handlePageChange = (page) => {
@@ -1807,7 +1714,7 @@ export default function AdminInvoicesPage() {
     setDeletingInvoice(invoiceToDelete._id);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
+      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1835,21 +1742,17 @@ export default function AdminInvoicesPage() {
     try {
       const token = localStorage.getItem('token');
       
-      // Prepare update data
       const updateData = { paymentStatus: newStatus };
       
-      // If marking as paid, set amountPaid to finalTotal
       const invoice = invoices.find(i => i._id === invoiceId);
       if (newStatus === 'paid' && invoice) {
         updateData.amountPaid = invoice.finalTotal;
         updateData.dueAmount = 0;
-      }
-      // If cancelling, set dueAmount to 0
-      else if (newStatus === 'cancelled') {
+      } else if (newStatus === 'cancelled') {
         updateData.dueAmount = 0;
       }
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
+      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1873,14 +1776,11 @@ export default function AdminInvoicesPage() {
     }
   };
 
-  // Get available status options based on current status
   const getStatusOptions = (invoice) => {
-    // If paid or cancelled, no options
     if (invoice.paymentStatus === 'paid' || invoice.paymentStatus === 'cancelled') {
       return [];
     }
 
-    // Based on current status
     switch (invoice.paymentStatus) {
       case 'partial':
         return [
@@ -1901,10 +1801,15 @@ export default function AdminInvoicesPage() {
     }
   };
 
-  // Get current page invoices
-  const indexOfLastInvoice = currentPage * itemsPerPage;
-  const indexOfFirstInvoice = indexOfLastInvoice - itemsPerPage;
-  const currentInvoices = filteredInvoices.slice(indexOfFirstInvoice, indexOfLastInvoice);
+  const getFilterDisplayText = () => {
+    if (filterType === 'all') {
+      return 'All Time';
+    } else if (filterType === 'year') {
+      return `Year: ${selectedYear}`;
+    } else {
+      return `${getMonthName(selectedMonth)} ${selectedYear}`;
+    }
+  };
 
   if (loading) {
     return (
@@ -1925,11 +1830,16 @@ export default function AdminInvoicesPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Invoice Management</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Total {totalInvoices} invoices
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                Total {stats.total} invoices
+                {filterType !== 'all' && (
+                  <span className="ml-2 text-[#E39A65] font-medium">
+                    • Showing: {getFilterDisplayText()}
+                  </span>
+                )}
                 {showExpiredOnly && (
                   <span className="ml-2 text-orange-600 font-medium">
-                    • Showing expired invoices only
+                    • Overdue only
                   </span>
                 )}
               </p>
@@ -1943,54 +1853,24 @@ export default function AdminInvoicesPage() {
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
-        <Link
-  href="/admin/inquiries?filter=accepted"
-  className="flex items-center gap-1.5 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
->
-  <PlusCircle className="w-3.5 h-3.5" />
-  Create Invoice from Inquiry
-</Link>
+              <Link
+                href="/admin/inquiries?filter=accepted"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                Create Invoice from Inquiry
+              </Link>
             </div>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-6 gap-2">
-            <StatCard 
-              title="Total" 
-              value={stats.total} 
-              icon={FileText} 
-              color="blue" 
-            />
-            <StatCard 
-              title="Paid" 
-              value={stats.paid} 
-              icon={CheckCircle} 
-              color="emerald" 
-            />
-            <StatCard 
-              title="Partial" 
-              value={stats.partial} 
-              icon={TrendingUp} 
-              color="amber" 
-            />
-            <StatCard 
-              title="Unpaid" 
-              value={stats.unpaid} 
-              icon={AlertCircle} 
-              color="rose" 
-            />
-            <StatCard 
-              title="Expired" 
-              value={stats.expired} 
-              icon={Clock} 
-              color="orange" 
-            />
-            <StatCard 
-              title="Cancelled" 
-              value={stats.cancelled} 
-              icon={XCircle} 
-              color="gray" 
-            />
+            <StatCard title="Total" value={stats.total} icon={FileText} color="blue" />
+            <StatCard title="Paid" value={stats.paid} icon={CheckCircle} color="emerald" />
+            <StatCard title="Partial" value={stats.partial} icon={TrendingUp} color="amber" />
+            <StatCard title="Unpaid" value={stats.unpaid} icon={AlertCircle} color="rose" />
+            <StatCard title="Overdue" value={stats.expired} icon={Clock} color="orange" />
+            <StatCard title="Cancelled" value={stats.cancelled} icon={XCircle} color="gray" />
           </div>
         </div>
       </div>
@@ -2004,7 +1884,14 @@ export default function AdminInvoicesPage() {
             activeFilter={activeFilter}
             setActiveFilter={setActiveFilter}
             onFilter={handleFilter}
-            onDateFilter={handleDateFilter}
+            filterType={filterType}
+            setFilterType={setFilterType}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            onMonthChange={handleMonthChange}
+            onYearChange={handleYearChange}
             onExpiredFilter={handleExpiredFilter}
             showExpiredOnly={showExpiredOnly}
           />
@@ -2013,39 +1900,59 @@ export default function AdminInvoicesPage() {
         {/* Results Summary */}
         <div className="flex items-center justify-between mb-2">
           <p className="text-xs text-gray-500">
-            Showing <span className="font-medium">{filteredInvoices.length > 0 ? indexOfFirstInvoice + 1 : 0}</span> to{' '}
-            <span className="font-medium">{Math.min(indexOfLastInvoice, filteredInvoices.length)}</span> of{' '}
-            <span className="font-medium">{filteredInvoices.length}</span> invoices
+            Showing <span className="font-medium">{invoices.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}</span> to{' '}
+            <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalInvoices)}</span> of{' '}
+            <span className="font-medium">{totalInvoices}</span> invoices
             {showExpiredOnly && (
-              <span className="ml-1 text-orange-600">(Expired only)</span>
+              <span className="ml-1 text-orange-600">(Overdue only)</span>
+            )}
+            {filterType !== 'all' && (
+              <span className="ml-1 text-[#E39A65]">
+                • {getFilterDisplayText()}
+              </span>
+            )}
+            {totalPages > 1 && (
+              <span className="ml-2 text-gray-400">• Page {currentPage} of {totalPages}</span>
             )}
           </p>
         </div>
 
         {/* Invoices Table */}
         <div id="invoices-table" className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-          {filteredInvoices.length === 0 ? (
+          {invoices.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-8 h-8 text-gray-400" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                {showExpiredOnly ? 'No Expired Invoices' : 'No Invoices Found'}
+                {showExpiredOnly ? 'No Overdue Invoices' : 'No Invoices Found'}
               </h2>
               <p className="text-sm text-gray-500 mb-4">
                 {showExpiredOnly 
-                  ? 'No invoices have expired yet.' 
-                  : totalInvoices === 0 
+                  ? 'No invoices are past their due date.' 
+                  : stats.total === 0 
                     ? 'No invoices have been created yet' 
-                    : 'Try adjusting your filters'}
+                    : filterType !== 'all'
+                      ? `No invoices found for ${getFilterDisplayText().toLowerCase()}`
+                      : 'Try adjusting your filters'}
               </p>
-              <Link
-                href="/admin/createInvoice?new=true"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-              >
-                <PlusCircle className="w-4 h-4" />
-                Create First Invoice
-              </Link>
+              {filterType !== 'all' && stats.total > 0 ? (
+                <button
+                  onClick={() => setFilterType('all')}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                >
+                  <CalendarRange className="w-4 h-4" />
+                  View All Time
+                </button>
+              ) : (
+                <Link
+                  href="/admin/createInvoice?new=true"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Create First Invoice
+                </Link>
+              )}
             </div>
           ) : (
             <>
@@ -2095,7 +2002,7 @@ export default function AdminInvoicesPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {currentInvoices.map((invoice) => {
+                    {invoices.map((invoice) => {
                       const dueAmount = invoice.finalTotal - (invoice.amountPaid || 0);
                       const isExpired = invoice.isExpired;
                       const overdueDays = isExpired ? getOverdueDays(invoice.dueDate) : 0;
@@ -2163,52 +2070,10 @@ export default function AdminInvoicesPage() {
                           </td>
                           
                           <td className="px-4 py-3">
-                            <div className="relative">
-                              <button
-                                onClick={() => statusOptions.length > 0 && setStatusDropdownOpen(
-                                  statusDropdownOpen === invoice._id ? null : invoice._id
-                                )}
-                                disabled={statusOptions.length === 0 || updatingStatus === invoice._id}
-                                className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg border transition-all ${
-                                  PaymentStatusBadge({ 
-                                    status: invoice.paymentStatus
-                                  }).props.className
-                                } ${statusOptions.length === 0 ? 'cursor-default' : 'cursor-pointer hover:shadow-sm'}`}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {invoice.paymentStatus === 'paid' && <CheckCircle className="w-3.5 h-3.5" />}
-                                  {invoice.paymentStatus === 'partial' && <TrendingUp className="w-3.5 h-3.5" />}
-                                  {invoice.paymentStatus === 'unpaid' && <AlertCircle className="w-3.5 h-3.5" />}
-                                  {invoice.paymentStatus === 'overpaid' && <TrendingDown className="w-3.5 h-3.5" />}
-                                  {invoice.paymentStatus === 'cancelled' && <XCircle className="w-3.5 h-3.5" />}
-                                  <span className="text-xs font-medium capitalize">
-                                    {invoice.paymentStatus}
-                                  </span>
-                                </div>
-                                {statusOptions.length > 0 && (
-                                  <ChevronDown className="w-3 h-3" />
-                                )}
-                                {updatingStatus === invoice._id && (
-                                  <Loader2 className="w-3 h-3 animate-spin" />
-                                )}
-                              </button>
-                              
-                              {/* Status Dropdown */}
-                              {statusDropdownOpen === invoice._id && statusOptions.length > 0 && (
-                                <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                                  {statusOptions.map((option) => (
-                                    <button
-                                      key={option.value}
-                                      onClick={() => handleStatusUpdate(invoice._id, option.value)}
-                                      className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 flex items-center gap-2"
-                                    >
-                                      <option.icon className="w-4 h-4" />
-                                      {option.label}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
+                            <PaymentStatusBadge 
+                              status={invoice.paymentStatus} 
+                              isExpired={isExpired} 
+                            />
                           </td>
                           
                           <td className="px-4 py-3">

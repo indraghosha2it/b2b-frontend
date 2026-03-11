@@ -130,7 +130,7 @@
 
 //     console.log('Fetching with params:', params.toString());
 
-//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
+//     const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
 //       headers: {
 //         'Authorization': `Bearer ${token}`
 //       }
@@ -163,11 +163,11 @@
 //       const token = localStorage.getItem('token');
       
 //       const [allRes, pendingRes, approvedRes, rejectedRes, featuredRes] = await Promise.all([
-//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-//         fetch('https://b2b-backend-rosy.vercel.app/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
+//         fetch('http://localhost:5000/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('http://localhost:5000/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('http://localhost:5000/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('http://localhost:5000/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+//         fetch('http://localhost:5000/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
 //       ]);
 
 //       const allData = await allRes.json();
@@ -214,7 +214,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${deleteModal.review._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${deleteModal.review._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -273,7 +273,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -309,7 +309,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${responseModal.review._id}/respond`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${responseModal.review._id}/respond`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -982,6 +982,7 @@ export default function ManageReviews() {
   const [editModal, setEditModal] = useState({ show: false, review: null, formData: null });
   const [viewModal, setViewModal] = useState({ show: false, review: null });
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(''); 
   const [statusFilter, setStatusFilter] = useState('all');
   const [ratingFilter, setRatingFilter] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('');
@@ -1072,13 +1073,13 @@ export default function ManageReviews() {
         params.append('isFeatured', featuredFilter);
       }
       
-      if (searchTerm) {
-        params.append('search', searchTerm);
-      }
+     if (debouncedSearchTerm) {
+  params.append('search', debouncedSearchTerm);
+}
 
       console.log('Fetching with params:', params.toString());
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1111,11 +1112,11 @@ export default function ManageReviews() {
       const token = localStorage.getItem('token');
       
       const [allRes, pendingRes, approvedRes, rejectedRes, featuredRes] = await Promise.all([
-        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('https://b2b-backend-rosy.vercel.app/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('http://localhost:5000/api/reviews?limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:5000/api/reviews?status=pending&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:5000/api/reviews?status=approved&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:5000/api/reviews?status=rejected&limit=1', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:5000/api/reviews?isFeatured=true&limit=1', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       const allData = await allRes.json();
@@ -1137,23 +1138,23 @@ export default function ManageReviews() {
   };
 
   // Initial fetch and on filter change
-  useEffect(() => {
-    fetchReviews();
-    fetchStats();
-  }, [pagination.page, statusFilter, ratingFilter, featuredFilter]);
+useEffect(() => {
+  fetchReviews();
+  fetchStats();
+}, [pagination.page, statusFilter, ratingFilter, featuredFilter, debouncedSearchTerm]);
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (pagination.page === 1) {
-        fetchReviews();
-      } else {
-        setPagination(prev => ({ ...prev, page: 1 }));
-      }
-    }, 500);
+ 
+// Debounce search - FIXED VERSION
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearchTerm(searchTerm);
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, 500);
 
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  return () => clearTimeout(timer);
+}, [searchTerm]);
+
+
 
   // Handle delete
   const handleDelete = async () => {
@@ -1162,7 +1163,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${deleteModal.review._id}`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${deleteModal.review._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1192,7 +1193,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1221,7 +1222,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1324,7 +1325,7 @@ export default function ManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1479,9 +1480,8 @@ export default function ManageReviews() {
       <div className="p-6">
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative mb-2">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
@@ -1491,6 +1491,8 @@ export default function ManageReviews() {
                 className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
               />
             </div>
+          <div className="flex flex-col md:flex-row gap-4">
+          
 
             {/* Status Filter */}
             <div className="w-full md:w-40 relative">

@@ -41,7 +41,7 @@ export default function ReviewsSection() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/reviews/featured?limit=6');
+      const response = await fetch('http://localhost:5000/api/reviews/featured?limit=6');
       const data = await response.json();
       
       if (data.success) {

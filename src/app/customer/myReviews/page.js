@@ -46,7 +46,7 @@ export default function MyReviews() {
 
   // Status options
   const statusOptions = [
-    { value: 'all', label: 'All Reviews' },
+    { value: 'all', label: 'All Reviews', icon: '📋' },
     { value: 'pending', label: 'Pending', icon: '⏳' },
     { value: 'approved', label: 'Approved', icon: '✅' },
     { value: 'rejected', label: 'Rejected', icon: '❌' }
@@ -80,19 +80,21 @@ export default function MyReviews() {
       
       // Build query params
       const params = new URLSearchParams({
-        page: pagination.page,
-        limit: pagination.limit
+        page: pagination.page.toString(),
+        limit: pagination.limit.toString()
       });
       
-      if (statusFilter !== 'all') {
+      // Add status filter if not 'all'
+      if (statusFilter && statusFilter !== 'all') {
         params.append('status', statusFilter);
       }
       
-      if (searchTerm) {
-        params.append('search', searchTerm);
+      // Add search term if present
+      if (searchTerm && searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
       }
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/user/me?${params}`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -101,40 +103,29 @@ export default function MyReviews() {
       const data = await response.json();
 
       if (data.success) {
-        setReviews(data.data);
+        setReviews(data.data || []);
         setPagination(prev => ({
           ...prev,
-          total: data.pagination.total,
-          pages: data.pagination.pages
+          total: data.pagination?.total || 0,
+          pages: data.pagination?.pages || 0
         }));
       } else {
         toast.error(data.error || 'Failed to fetch reviews');
+        setReviews([]);
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
       toast.error('Network error. Please try again.');
+      setReviews([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Initial fetch and on filter change
+  // Fetch when page, status filter, or search changes
   useEffect(() => {
     fetchMyReviews();
-  }, [pagination.page, statusFilter]);
-
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (pagination.page === 1) {
-        fetchMyReviews();
-      } else {
-        setPagination(prev => ({ ...prev, page: 1 }));
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [pagination.page, statusFilter, searchTerm]);
 
   // Handle edit - open modal with review data
   const handleEditClick = (review) => {
@@ -212,7 +203,7 @@ export default function MyReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -277,7 +268,12 @@ export default function MyReviews() {
           </span>
         );
       default:
-        return null;
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+            <AlertCircle className="w-3 h-3" />
+            Unknown
+          </span>
+        );
     }
   };
 
@@ -313,6 +309,24 @@ export default function MyReviews() {
     );
   };
 
+  // Handle filter change
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+  };
+
+  // Handle search with debounce
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+  };
+
+  // Clear status filter
+  const clearStatusFilter = () => {
+    setStatusFilter('all');
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -323,38 +337,34 @@ export default function MyReviews() {
               <h1 className="text-2xl font-bold text-gray-900">My Reviews</h1>
               <p className="text-sm text-gray-500 mt-1">View and manage your product reviews</p>
             </div>
-           
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Filters */}
+        {/* Filters - Increased width for search */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
+            {/* Search - Increased width with flex-[2] */}
+            <div className="flex-[2] relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search your reviews by title or comment..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
               />
             </div>
 
             {/* Status Filter */}
-            <div className="w-full md:w-48 relative">
+            <div className="flex-1 relative">
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <select
                 value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setPagination(prev => ({ ...prev, page: 1 }));
-                }}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none bg-white"
+                onChange={handleStatusFilterChange}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none bg-white"
               >
                 {statusOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -362,6 +372,34 @@ export default function MyReviews() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Active Filters Display */}
+            <div className="flex items-center gap-2">
+              {statusFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 text-orange-700 text-sm rounded-lg">
+                  <Filter className="w-3 h-3" />
+                  {statusOptions.find(opt => opt.value === statusFilter)?.label}
+                  <button
+                    onClick={clearStatusFilter}
+                    className="ml-1 hover:text-orange-900"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {searchTerm && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm rounded-lg">
+                  <Search className="w-3 h-3" />
+                  "{searchTerm}"
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="ml-1 hover:text-blue-900"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -377,8 +415,14 @@ export default function MyReviews() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                 <MessageCircle className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
-              <p className="text-sm text-gray-500 mb-6">You haven't written any reviews yet.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {statusFilter !== 'all' 
+                  ? `You don't have any ${statusOptions.find(opt => opt.value === statusFilter)?.label.toLowerCase()} reviews.` 
+                  : searchTerm
+                  ? `No reviews matching "${searchTerm}"`
+                  : "You haven't written any reviews yet."}
+              </p>
               <Link
                 href="/products"
                 className="inline-flex items-center px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-sm font-medium"
