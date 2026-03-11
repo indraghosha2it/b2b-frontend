@@ -2885,7 +2885,7 @@ export default function Products() {
                             <span className="text-gray-500 text-[10px] ml-1">/pc</span>
                           </div>
                         </div>
-            {/* Product Name */}
+        
           
 
             {/* Color Options */}
