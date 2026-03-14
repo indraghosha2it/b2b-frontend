@@ -232,26 +232,7 @@ export default function AlibabaTrustSection() {
               </div>
             </div>
 
-            {/* Testimonial Card */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
-                  <img
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                    alt="Client"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-gray-900 text-sm truncate">Michael Chen</h4>
-                  <p className="text-xs text-gray-600 truncate">Fashion Retailer, Singapore</p>
-                </div>
-              </div>
-              <p className="text-gray-700 text-xs italic">
-                "Been ordering from them for 3 years. Quality is always consistent and shipping is fast."
-              </p>
-            </div>
+          
           </div>
         </div>
 

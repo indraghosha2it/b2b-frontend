@@ -142,7 +142,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -203,7 +203,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -271,7 +271,7 @@
 //   const handleDeleteConfirm = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${deleteModal.id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${deleteModal.id}`, {
 //         method: 'DELETE',
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
@@ -295,7 +295,7 @@
 //   const handleToggleStatus = async (productId, currentStatus) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}/toggle`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}/toggle`, {
 //         method: 'PUT',
 //         headers: { 
 //           'Authorization': `Bearer ${token}`,
@@ -1392,7 +1392,7 @@ export default function AdminAllProducts() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -1452,7 +1452,7 @@ export default function AdminAllProducts() {
       }
       queryParams.append('sort', sortParam);
 
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -1540,7 +1540,7 @@ export default function AdminAllProducts() {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${deleteModal.id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${deleteModal.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -1564,7 +1564,7 @@ export default function AdminAllProducts() {
   const handleToggleStatus = async (productId, currentStatus) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${productId}/toggle`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}/toggle`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,

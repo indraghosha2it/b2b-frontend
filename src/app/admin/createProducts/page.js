@@ -176,7 +176,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -197,7 +197,7 @@
 //   const fetchCategoryDetails = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -522,7 +522,7 @@
 //         }
 //       });
 
-//       const response = await fetch('http://localhost:5000/api/products', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1260,7 +1260,9 @@ import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
-import TipTapLink from '@tiptap/extension-link';
+import Link from '@tiptap/extension-link';
+// import TipTapLink from '@tiptap/extension-link';
+
 import '@mantine/tiptap/styles.css';
 import '@mantine/core/styles.css';
 
@@ -1317,6 +1319,7 @@ const [keywordInput, setKeywordInput] = useState('');
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
+     instruction: '', 
     category: '',
     targetedCustomer: 'unisex',
     fabric: '',
@@ -1381,27 +1384,122 @@ const [keywordInput, setKeywordInput] = useState('');
     };
   }, []);
 
-  // Initialize TipTap editor only on client side
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TipTapLink.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          rel: 'noopener noreferrer',
-          target: '_blank',
-        },
-      }),
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    ],
-    content: formData.description,
-    onUpdate: ({ editor }) => {
-      setFormData(prev => ({ ...prev, description: editor.getHTML() }));
-    },
-    immediatelyRender: false,
-    editable: true,
-  });
 
+
+  // Then update your editor initialization
+// const editor = useEditor({
+//   extensions: [
+//     StarterKit.configure({
+//       // Configure StarterKit to include list features
+//       bulletList: {
+//         keepMarks: true,
+//         keepAttributes: false,
+//       },
+//       orderedList: {
+//         keepMarks: true,
+//         keepAttributes: false,
+//       },
+//     }),
+//     // Or you can add them separately if not using StarterKit's list features
+//     ListItem,
+//     BulletList,
+//     OrderedList,
+//     TipTapLink.configure({
+//       openOnClick: false,
+//       HTMLAttributes: {
+//         rel: 'noopener noreferrer',
+//         target: '_blank',
+//       },
+//     }),
+//     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+//   ],
+//   content: formData.description,
+//   onUpdate: ({ editor }) => {
+//     setFormData(prev => ({ ...prev, description: editor.getHTML() }));
+//   },
+//   immediatelyRender: false,
+//   editable: true,
+// });
+
+
+//   const instructionEditor = useEditor({
+//   extensions: [
+//     StarterKit,
+//     TipTapLink.configure({
+//       openOnClick: false,
+//       HTMLAttributes: {
+//         rel: 'noopener noreferrer',
+//         target: '_blank',
+//       },
+//     }),
+//     TextAlign.configure({ types: ['heading', 'paragraph'] }),
+//   ],
+//   content: formData.instruction,
+//   onUpdate: ({ editor }) => {
+//     setFormData(prev => ({ ...prev, instruction: editor.getHTML() }));
+//   },
+//   immediatelyRender: false,
+//   editable: true,
+// });
+
+// Initialize TipTap editor for description
+const editor = useEditor({
+  extensions: [
+    StarterKit.configure({
+      bulletList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      orderedList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+    }),
+    Link.configure({  // Changed from TipTapLink to Link
+      openOnClick: false,
+      HTMLAttributes: {
+        rel: 'noopener noreferrer',
+        target: '_blank',
+      },
+    }),
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  ],
+  content: formData.description,
+  onUpdate: ({ editor }) => {
+    setFormData(prev => ({ ...prev, description: editor.getHTML() }));
+  },
+  immediatelyRender: false,
+  editable: true,
+});
+
+const instructionEditor = useEditor({
+  extensions: [
+    StarterKit.configure({
+      bulletList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+      orderedList: {
+        keepMarks: true,
+        keepAttributes: false,
+      },
+    }),
+    Link.configure({  // Changed from TipTapLink to Link
+      openOnClick: false,
+      HTMLAttributes: {
+        rel: 'noopener noreferrer',
+        target: '_blank',
+      },
+    }),
+    TextAlign.configure({ types: ['heading', 'paragraph'] }),
+  ],
+  content: formData.instruction,
+  onUpdate: ({ editor }) => {
+    setFormData(prev => ({ ...prev, instruction: editor.getHTML() }));
+  },
+  immediatelyRender: false,
+  editable: true,
+});
   // Fetch categories on mount
   useEffect(() => {
     fetchCategories();
@@ -1428,7 +1526,7 @@ const [keywordInput, setKeywordInput] = useState('');
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1449,7 +1547,7 @@ const [keywordInput, setKeywordInput] = useState('');
   const fetchCategoryDetails = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1659,9 +1757,7 @@ const [keywordInput, setKeywordInput] = useState('');
   const handleTagToggle = (tag) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.includes(tag)
-        ? prev.tags.filter(t => t !== tag)
-        : [...prev.tags, tag]
+     tags: prev.tags.includes(tag) ? [] : [tag]
     }));
   };
 
@@ -1833,6 +1929,7 @@ const removeKeyword = (indexToRemove) => {
       // Append all form data
       formDataToSend.append('productName', formData.productName);
       formDataToSend.append('description', formData.description);
+      formDataToSend.append('instruction', formData.instruction || '');
       formDataToSend.append('category', formData.category);
       formDataToSend.append('targetedCustomer', formData.targetedCustomer);
       formDataToSend.append('fabric', formData.fabric);
@@ -1855,7 +1952,7 @@ const removeKeyword = (indexToRemove) => {
         }
       });
 
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1950,7 +2047,7 @@ const removeKeyword = (indexToRemove) => {
                     </div>
 
                     {/* Description with Mantine TipTap Rich Text Editor */}
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
                       </label>
@@ -1972,6 +2069,11 @@ const removeKeyword = (indexToRemove) => {
                               <RichTextEditor.H4 />
                             </RichTextEditor.ControlsGroup>
 
+                             <RichTextEditor.ControlsGroup>
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+          </RichTextEditor.ControlsGroup>
+
                             <RichTextEditor.ControlsGroup>
                               <RichTextEditor.AlignLeft />
                               <RichTextEditor.AlignCenter />
@@ -1982,6 +2084,103 @@ const removeKeyword = (indexToRemove) => {
                           <RichTextEditor.Content />
                         </RichTextEditor>
                       )}
+                    </div> */}
+                    {/* Description with Mantine TipTap Rich Text Editor */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Description
+  </label>
+  {isMounted && editor && (
+    <div className="border border-gray-300 rounded-lg overflow-hidden">
+      <RichTextEditor editor={editor}>
+        {/* Remove sticky prop and use cleaner toolbar */}
+        <RichTextEditor.Toolbar>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Bold />
+            <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+            <RichTextEditor.Strikethrough />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.H1 />
+            <RichTextEditor.H2 />
+            <RichTextEditor.H3 />
+            <RichTextEditor.H4 />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.AlignLeft />
+            <RichTextEditor.AlignCenter />
+            <RichTextEditor.AlignRight />
+          </RichTextEditor.ControlsGroup>
+
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Link />
+            <RichTextEditor.Unlink />
+          </RichTextEditor.ControlsGroup>
+        </RichTextEditor.Toolbar>
+
+        <RichTextEditor.Content />
+      </RichTextEditor>
+    </div>
+  )}
+</div>
+
+
+                     {/* NEW: Instruction Field - Add this right after description */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Instructions / Care Instructions
+                      </label>
+                      {isMounted && instructionEditor && (
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                          <RichTextEditor editor={instructionEditor}>
+                            {/* Remove sticky prop to keep toolbar at top */}
+                            <RichTextEditor.Toolbar>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Bold />
+                                <RichTextEditor.Italic />
+                                <RichTextEditor.Underline />
+                                <RichTextEditor.Strikethrough />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.H1 />
+                                <RichTextEditor.H2 />
+                                <RichTextEditor.H3 />
+                                <RichTextEditor.H4 />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.BulletList />
+                                <RichTextEditor.OrderedList />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.AlignLeft />
+                                <RichTextEditor.AlignCenter />
+                                <RichTextEditor.AlignRight />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Link />
+                                <RichTextEditor.Unlink />
+                              </RichTextEditor.ControlsGroup>
+                            </RichTextEditor.Toolbar>
+
+                            <RichTextEditor.Content />
+                          </RichTextEditor>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Add care instructions, washing guidelines, or any special notes for customers
+                      </p>
                     </div>
 
                     {/* Category, Targeted Customer, and Fabric - 3 Column Layout */}
@@ -2441,58 +2640,60 @@ const removeKeyword = (indexToRemove) => {
                     </label>
                   </div>
 
-                  {/* Tags Section - Always visible but can be collapsed */}
-                  <div className="mt-4">
-                    <div 
-                      className="flex items-center justify-between cursor-pointer py-2"
-                      onClick={() => setShowTags(!showTags)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-[#E39A65]" />
-                        <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
-                    </div>
+                 {/* Tags Section */}
+<div className="mt-4">
+  <div 
+    className="flex items-center justify-between cursor-pointer py-2"
+    onClick={() => setShowTags(!showTags)}
+  >
+    <div className="flex items-center gap-2">
+      <Tag className="w-4 h-4 text-[#E39A65]" />
+      <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
+    </div>
+    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
+  </div>
 
-                    {showTags && (
-                      <div className="mt-3">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {AVAILABLE_TAGS.map(tag => (
-                            <label key={tag} className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={formData.tags.includes(tag)}
-                                onChange={() => handleTagToggle(tag)}
-                                className="w-4 h-4 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
-                              />
-                              <span className="text-sm text-gray-600">{tag}</span>
-                            </label>
-                          ))}
-                        </div>
-                        
-                        {/* Selected Tags Display */}
-                        {formData.tags.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {formData.tags.map(tag => (
-                              <span
-                                key={tag}
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
-                              >
-                                {tag}
-                                <button
-                                  type="button"
-                                  onClick={() => handleTagToggle(tag)}
-                                  className="ml-1.5 text-orange-600 hover:text-orange-800"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+  {showTags && (
+    <div className="mt-3">
+      <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {AVAILABLE_TAGS.map(tag => (
+          <label key={tag} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio" // Changed from checkbox to radio
+              name="productTag" // Add name to group radio buttons
+              checked={formData.tags.includes(tag)}
+              onChange={() => handleTagToggle(tag)}
+              className="w-4 h-4 text-[#E39A65] border-gray-300 focus:ring-[#E39A65]"
+            />
+            <span className="text-sm text-gray-600">{tag}</span>
+          </label>
+        ))}
+      </div>
+      
+      {/* Selected Tags Display - Now shows only one tag */}
+      {formData.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {formData.tags.map(tag => (
+            <span
+              key={tag}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleTagToggle(tag)}
+                className="ml-1.5 text-orange-600 hover:text-orange-800"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+</div>
                 </div>
               </div>
             </div>

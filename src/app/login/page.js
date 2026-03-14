@@ -47,7 +47,7 @@
 //     const loadingToast = toast.loading('Signing in...');
 
 //     try {
-//       const response = await fetch('http://localhost:5000/api/auth/login', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/login', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -439,7 +439,7 @@ export default function LoginPage() {
     const loadingToast = toast.loading('Signing in...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -560,7 +560,7 @@ export default function LoginPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen mt-12 bg-gradient-to-br from-orange-50 to-amber-50 pt-24 pb-12">
+      <div className="min-h-screen md:mt-12 mt-4 bg-gradient-to-br from-orange-50 to-amber-50 pt-24 pb-12">
         <div className="container mx-auto px-4">
           {/* Header */}
           <motion.div
@@ -569,11 +569,11 @@ export default function LoginPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
+            <h1 className="text-2xl md:text-5xl font-bold text-gray-900 md:mb-3 mb-1">
               Welcome to{' '}
               <span style={{ color: '#d9884e' }}>B2B Marketplace</span>
             </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            <p className="text-gray-600  md:text-xl max-w-2xl mx-auto text-sm">
               Your one-stop destination for wholesale fashion and accessories
             </p>
           </motion.div>
@@ -707,17 +707,8 @@ export default function LoginPage() {
                       </div>
 
                       {/* Remember Me & Forgot Password */}
-                      <div className="flex items-center justify-between">
-                        <label className="flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            name="rememberMe"
-                            checked={formData.rememberMe}
-                            onChange={handleChange}
-                            className="rounded border-gray-300 text-[#d9884e] focus:ring-[#d9884e] cursor-pointer"
-                          />
-                          <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                        </label>
+                      <div className="flex justify-end ">
+                       
                         <button
                           type="button"
                           onClick={() => setShowForgotPassword(true)}
@@ -733,7 +724,7 @@ export default function LoginPage() {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full px-8 py-4 text-white rounded-lg hover:opacity-90 transition-all transform hover:scale-105 flex items-center justify-center gap-2 font-medium text-lg"
+                        className="w-full px-8 py-4 text-white rounded-lg hover:opacity-90 transition-all transform hover:scale-105 flex items-center justify-center gap-2 font-medium text-sm md:text-lg "
                         style={{ 
                           background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)',
                           opacity: isSubmitting ? 0.7 : 1

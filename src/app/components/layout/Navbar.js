@@ -38,7 +38,7 @@
 //   //   const token = localStorage.getItem('token');
 //   //   if (token) {
 //   //     try {
-//   //       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//   //       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //   //         headers: {
 //   //           'Authorization': `Bearer ${token}`
 //   //         }
@@ -63,7 +63,7 @@
 //       const controller = new AbortController();
 //       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -588,9 +588,9 @@
 //   //       const controller = new AbortController();
 //   //       const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
         
-//   //       console.log('🔍 Fetching cart from:', 'http://localhost:5000/api/inquiry-cart');
+//   //       console.log('🔍 Fetching cart from:', 'https://b2b-backend-rosy.vercel.app/api/inquiry-cart');
         
-//   //       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//   //       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //   //         headers: {
 //   //           'Authorization': `Bearer ${token}`,
 //   //           'Content-Type': 'application/json'
@@ -652,7 +652,7 @@
 //     const controller = new AbortController();
 //     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
     
-//     const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //       headers: {
 //         'Authorization': `Bearer ${token}`,
 //         'Content-Type': 'application/json'
@@ -700,7 +700,7 @@
 //   useEffect(() => {
 //     const testConnection = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/health');
+//         const response = await fetch('https://b2b-backend-rosy.vercel.app/api/health');
 //         const data = await response.json();
 //         console.log('✅ Backend connection test:', data);
 //       } catch (error) {
@@ -1224,7 +1224,7 @@
 //       const controller = new AbortController();
 //       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -1271,7 +1271,7 @@
 
 //     setSearchLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1343,7 +1343,7 @@
 //   useEffect(() => {
 //     const testConnection = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/health');
+//         const response = await fetch('https://b2b-backend-rosy.vercel.app/api/health');
 //         const data = await response.json();
 //         console.log('✅ Backend connection test:', data);
 //       } catch (error) {
@@ -1997,7 +1997,7 @@ export default function Navbar() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -2044,7 +2044,7 @@ export default function Navbar() {
 
     setSearchLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
       if (data.success) {
@@ -2116,7 +2116,7 @@ export default function Navbar() {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/health');
+        const response = await fetch('https://b2b-backend-rosy.vercel.app/api/health');
         const data = await response.json();
         console.log('✅ Backend connection test:', data);
       } catch (error) {

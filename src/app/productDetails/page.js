@@ -1,9 +1,12 @@
 
 
+
+// // app/productDetails/page.jsx
 // 'use client';
 
+// import { Suspense, useRef } from 'react';
 // import { useState, useEffect } from 'react';
-// import { useSearchParams } from 'next/navigation';
+// import { useRouter, useSearchParams } from 'next/navigation';
 // import Link from 'next/link';
 // import { 
 //   ChevronLeft, 
@@ -31,13 +34,18 @@
 //   ChevronRight,
 //   Star,
 //   Eye,
-//   AlertCircle
+//   AlertCircle,
+//   DollarSign,
+//   TrendingUp,
+//   Sparkles
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 // import Footer from '../components/layout/Footer';
 // import Navbar from '../components/layout/Navbar';
 // import AuthModal from '../components/AuthModal';
+// import { motion } from 'framer-motion';
 // import ProductReviews from '../components/product/ProductReviews';
+
 // // Helper function to format currency
 // const formatPrice = (price) => {
 //   return new Intl.NumberFormat('en-US', {
@@ -66,36 +74,38 @@
 //   return price?.toFixed(2) || '0.00';
 // };
 
-// // Loading Skeleton Component
+// // Loading Skeleton Component - Responsive
 // const ProductDetailsSkeleton = () => (
 //   <div className="min-h-screen bg-gray-50">
-//     <div className="container mx-auto px-4 max-w-7xl py-8">
-//       <div className="h-4 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
+//     <Navbar />
+//     <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 md:py-8 mt-16 sm:mt-20">
+//       <div className="h-4 bg-gray-200 rounded w-32 sm:w-48 mb-4 sm:mb-6 animate-pulse"></div>
       
-//       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+//       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 //         <div className="lg:col-span-5">
-//           <div className="flex gap-4">
-//             <div className="w-24 space-y-2">
+//           <div className="flex flex-col sm:flex-row gap-4">
+//             <div className="flex sm:flex-col gap-2 order-2 sm:order-1">
 //               {[1, 2, 3, 4].map(i => (
-//                 <div key={i} className="bg-gray-200 rounded-lg h-24 animate-pulse"></div>
+//                 <div key={i} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-200 rounded-lg animate-pulse"></div>
 //               ))}
 //             </div>
-//             <div className="flex-1 bg-gray-200 rounded-2xl h-[500px] animate-pulse"></div>
+//             <div className="flex-1 bg-gray-200 rounded-xl sm:rounded-2xl h-[300px] sm:h-[400px] lg:h-[500px] animate-pulse order-1 sm:order-2"></div>
 //           </div>
 //         </div>
-//         <div className="lg:col-span-7 space-y-6">
-//           <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-//           <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-//           <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
-//           <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-//           <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
+//         <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+//           <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+//           <div className="h-4 sm:h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+//           <div className="h-16 sm:h-20 bg-gray-200 rounded animate-pulse"></div>
+//           <div className="h-48 sm:h-56 lg:h-64 bg-gray-200 rounded animate-pulse"></div>
+//           <div className="h-40 sm:h-44 lg:h-48 bg-gray-200 rounded animate-pulse"></div>
 //         </div>
 //       </div>
 //     </div>
+//     <Footer />
 //   </div>
 // );
 
-// // Image Gallery Component
+// // Image Gallery Component - Responsive
 // const ImageGallery = ({ images = [], productName }) => {
 //   const [mainImage, setMainImage] = useState(0);
 //   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -110,14 +120,15 @@
 //   };
 
 //   return (
-//     <div className="flex gap-4">
-//       <div className="w-24 space-y-2">
+//     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+//       {/* Thumbnails - Horizontal on mobile, vertical on desktop */}
+//       <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
 //         {images.slice(0, 4).map((image, idx) => (
 //           <button
 //             key={idx}
 //             onClick={() => setMainImage(idx)}
 //             onMouseEnter={() => setMainImage(idx)}
-//             className={`relative w-full h-24 rounded-lg overflow-hidden border-2 transition-all ${
+//             className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border-2 transition-all ${
 //               mainImage === idx 
 //                 ? 'border-[#E39A65] shadow-md' 
 //                 : 'border-gray-200 hover:border-gray-300'
@@ -136,14 +147,15 @@
 //           </button>
 //         ))}
 //         {images.length > 4 && (
-//           <div className="w-full h-24 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+//           <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg bg-gray-100 flex items-center justify-center text-xs sm:text-sm text-gray-500">
 //             +{images.length - 4}
 //           </div>
 //         )}
 //       </div>
 
+//       {/* Main Image */}
 //       <div 
-//         className="flex-1 relative bg-gray-100 rounded-2xl overflow-hidden group cursor-zoom-in"
+//         className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2"
 //         onMouseEnter={() => setShowZoom(true)}
 //         onMouseLeave={() => setShowZoom(false)}
 //         onMouseMove={handleMouseMove}
@@ -151,7 +163,7 @@
 //         <img
 //           src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
 //           alt={`${productName} - Main view`}
-//           className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-150"
+//           className="w-full h-[300px] sm:h-[320px] lg:h-[420px] object-cover transition-transform duration-500 group-hover:scale-150"
 //           style={{
 //             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
 //           }}
@@ -159,24 +171,25 @@
         
 //         <button
 //           onClick={() => setIsFullscreen(true)}
-//           className="absolute top-4 right-4 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+//           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
 //         >
-//           <Maximize2 className="w-5 h-5 text-gray-700" />
+//           <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
 //         </button>
 //       </div>
 
+//       {/* Fullscreen Modal */}
 //       {isFullscreen && (
 //         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center mt-16">
 //           <button
 //             onClick={() => setIsFullscreen(false)}
-//             className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+//             className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
 //           >
-//             <X className="w-6 h-6 text-gray-900" />
+//             <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
 //           </button>
 //           <img
 //             src={images[mainImage]?.url || images[0]?.url}
 //             alt={productName}
-//             className="max-w-[90vw] max-h-[84vh] object-contain"
+//             className="max-w-[95vw] max-h-[85vh] object-contain"
 //           />
 //         </div>
 //       )}
@@ -184,7 +197,7 @@
 //   );
 // };
 
-// // Color Selector Component - Shows color circles with selection indication
+// // Color Selector Component - Shows ALL color circles with selection indication
 // const ColorSelector = ({ colors, selectedColor, onChange }) => {
 //   return (
 //     <div className="flex flex-wrap gap-2">
@@ -200,11 +213,11 @@
 //           title={color.code}
 //         >
 //           <div
-//             className="w-8 h-8 rounded-full border-2 border-white shadow-md"
+//             className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-md"
 //             style={{ backgroundColor: color.code }}
 //           />
 //           {selectedColor?.code === color.code && (
-//             <CheckCircle className="absolute -top-1 -right-1 w-4 h-4 text-[#E39A65] bg-white rounded-full" />
+//             <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65] bg-white rounded-full" />
 //           )}
 //         </button>
 //       ))}
@@ -212,50 +225,178 @@
 //   );
 // };
 
-// // Bulk Pricing Table Component
 // const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
 //   const pricingData = pricing.length > 0 ? pricing : [{ range: `${moq}+`, price: unitPrice }];
 
-//   return (
-//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-//         <h3 className="text-lg font-semibold text-gray-900">Bulk Prices</h3>
-//       </div>
-//       <div className="p-6">
-//         <table className="w-full">
-//           <thead className="bg-gray-50">
-//             <tr>
-//               <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Quantity</th>
-//               <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Price per unit</th>
-//             </tr>
-//           </thead>
-//           <tbody className="divide-y divide-gray-100">
-//             {pricingData.map((tier, index) => {
-//               const tierPrice = tier.price || unitPrice;
+//   // Helper function to calculate savings percentage
+//   const calculateSavings = (prevPrice, currentPrice) => {
+//     if (!prevPrice || !currentPrice) return null;
+//     const savingsPercent = ((prevPrice - currentPrice) / prevPrice * 100).toFixed(1);
+//     return savingsPercent;
+//   };
 
-//               return (
-//                 <tr key={index} className="hover:bg-gray-50">
-//                   <td className="py-3 px-4 text-gray-900">{tier.range || `${moq}+`}</td>
-//                   <td className="py-3 px-4">
-//                     <span className="font-semibold text-[#E39A65]">{formatPrice(tierPrice)}</span>
-//                   </td>
-//                 </tr>
-//               );
-//             })}
-//           </tbody>
-//         </table>
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, y: 20 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.5 }}
+//       className="bg-white rounded-lg sm:rounded-xl border border-[#E39A65]/20 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+//     >
+//       {/* Header with premium gradient using main color */}
+//       <div className="relative overflow-hidden">
+//         {/* Animated background effect */}
+//         <motion.div 
+//           className="absolute inset-0 bg-gradient-to-r from-[#E39A65] to-[#d48b54]"
+//           initial={{ x: '-100%' }}
+//           animate={{ x: '100%' }}
+//           transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+//           style={{ opacity: 0.15 }}
+//         />
+        
+//         {/* Main header content */}
+//         <div className="relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-[#E39A65] to-[#d48b54]">
+//           <div className="flex items-center justify-between flex-wrap gap-2">
+//             <div className="flex items-center gap-3">
+//               <div className="w-1 h-8 bg-gradient-to-b from-white to-amber-100 rounded-full"></div>
+//               <div>
+//                 <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+//                   <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+//                   Bulk Pricing
+//                 </h3>
+//                 <p className="text-xs text-white/80 mt-0.5">Volume discounts · Best wholesale rates</p>
+//               </div>
+//             </div>
+      
+//           </div>
+//         </div>
 //       </div>
-//     </div>
+      
+//       <div className="p-4 sm:p-6 bg-gradient-to-br from-white to-[#E39A65]/5">
+//         {/* Removed overflow-x-auto and negative margins to prevent scrollbar */}
+//         <div className="w-full">
+//           <table className="w-full">
+//             <thead>
+//               <tr className="border-b-2 border-[#E39A65]/20">
+//                 <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+//                   <div className="flex items-center gap-2">
+//                     <Package className="w-4 h-4 text-[#E39A65]" />
+//                     <span>Quantity</span>
+//                   </div>
+//                 </th>
+//                 <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+//                   <div className="flex items-center gap-2">
+//                     <DollarSign className="w-4 h-4 text-[#E39A65]" />
+//                     <span>Price/Unit</span>
+//                   </div>
+//                 </th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-[#E39A65]/10">
+//               {pricingData.map((tier, index) => {
+//                 const tierPrice = tier.price || unitPrice;
+//                 const prevPrice = index > 0 ? pricingData[index - 1].price : null;
+//                 const savings = prevPrice ? calculateSavings(prevPrice, tierPrice) : null;
+//                 const isBestValue = index === pricingData.length - 1 && pricingData.length > 1;
+
+//                 return (
+//                   <motion.tr 
+//                     key={index}
+//                     initial={{ opacity: 0, x: -10 }}
+//                     animate={{ opacity: 1, x: 0 }}
+//                     transition={{ delay: index * 0.1 }}
+//                     whileHover={{ 
+//                       backgroundColor: '#fef2e6',
+//                       scale: 1.01,
+//                       transition: { duration: 0.2 }
+//                     }}
+//                     className={`transition-all duration-200 cursor-default rounded-lg ${
+//                       isBestValue ? 'bg-[#E39A65]/5' : ''
+//                     }`}
+//                   >
+//                     <td className="py-3 px-2 sm:px-3">
+//                       <div className="flex items-center gap-2 flex-wrap">
+//                         <span className="text-sm font-medium text-gray-900">
+//                           {tier.range || `${moq}+`} pcs
+//                         </span>
+                    
+//                         {isBestValue && (
+//                           <motion.span 
+//                             initial={{ scale: 0 }}
+//                             animate={{ scale: 1 }}
+//                             className="px-2 py-0.5 bg-[#E39A65]/20 text-[#E39A65] text-[10px] font-medium rounded-full whitespace-nowrap"
+//                           >
+//                             Best Value
+//                           </motion.span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="py-3 px-2 sm:px-3">
+//                       <div className="flex items-center gap-2 flex-wrap">
+//                         <span className="font-bold text-[#E39A65] text-base">
+//                           {formatPrice(tierPrice)}
+//                         </span>
+//                         {savings && (
+//                           <motion.span 
+//                             initial={{ opacity: 0, x: -10 }}
+//                             animate={{ opacity: 1, x: 0 }}
+//                             className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-medium rounded-full whitespace-nowrap"
+//                           >
+//                             Save {savings}%
+//                           </motion.span>
+//                         )}
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 );
+//               })}
+//             </tbody>
+//           </table>
+//         </div>
+        
+//         {/* Professional border accent */}
+//         <div className="mt-4 pt-3 border-t border-[#E39A65]/20 relative">
+//           <div className="absolute -top-[2px] left-0 w-20 h-[2px] bg-gradient-to-r from-[#E39A65] to-transparent"></div>
+          
+//           {/* Footer with trust indicators */}
+//           <motion.div 
+//             initial={{ opacity: 0, y: 10 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             transition={{ delay: 0.3 }}
+//             className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2"
+//           >
+//             <div className="flex items-center gap-2 text-xs text-gray-600">
+//               <CheckCircle className="w-4 h-4 text-[#E39A65]" />
+//               <span className="whitespace-nowrap">Best price</span>
+//             </div>
+//             <div className="flex items-center gap-2 text-xs text-gray-600">
+//               <Clock className="w-4 h-4 text-[#E39A65]" />
+//               <span className="whitespace-nowrap">Inst. Quote</span>
+//             </div>
+//             <div className="flex items-center gap-2 text-xs text-gray-600 col-span-2 sm:col-span-1">
+//               <TrendingUp className="w-4 h-4 text-[#E39A65]" />
+//               <span className="whitespace-nowrap"> Discounts</span>
+//             </div>
+//           </motion.div>
+//         </div>
+//       </div>
+//     </motion.div>
 //   );
 // };
 
-// // Key Attributes Component
+// // Helper function to calculate savings percentage
+// const calculateSavings = (prevPrice, currentPrice) => {
+//   if (!prevPrice || !currentPrice) return null;
+//   const savingsPercent = ((prevPrice - currentPrice) / prevPrice * 100).toFixed(1);
+//   return `${savingsPercent}%`;
+// };
+
+// // Key Attributes Component - Responsive with grid
 // const KeyAttributes = ({ product }) => {
 //   const attributes = [
 //     { label: 'MOQ', value: `${product.moq} pieces` },
 //     { label: 'Fabric', value: product.fabric || 'Standard' },
 //     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
-//     { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).join(', ') || 'Standard' },
+//     { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).slice(0, 5).join(', ') + (product.sizes?.length > 5 ? ` +${product.sizes.length - 5} more` : '') || 'Standard' },
 //     ...(product.additionalInfo || []).map(info => ({
 //       label: info.fieldName,
 //       value: info.fieldValue
@@ -263,16 +404,16 @@
 //   ];
 
 //   return (
-//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-//         <h3 className="text-lg font-semibold text-gray-900">Key Attributes</h3>
+//     <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+//         <h3 className="text-base sm:text-lg font-semibold text-gray-900">Key Attributes</h3>
 //       </div>
-//       <div className="p-6">
-//         <div className="grid grid-cols-2 gap-4">
+//       <div className="p-4 sm:p-6">
+//         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
 //           {attributes.map((attr, index) => (
-//             <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
-//               <p className="text-sm text-gray-500 mb-1">{attr.label}</p>
-//               <p className="text-sm font-medium text-gray-900">{attr.value}</p>
+//             <div key={index} className="border-b border-gray-100 pb-2 sm:pb-3 last:border-0">
+//               <p className="text-xs sm:text-sm text-gray-500 mb-1">{attr.label}</p>
+//               <p className="text-xs sm:text-sm font-medium text-gray-900 break-words">{attr.value}</p>
 //             </div>
 //           ))}
 //         </div>
@@ -281,16 +422,16 @@
 //   );
 // };
 
-// // Description Component
+// // Description Component - Responsive
 // const Description = ({ product }) => {
 //   return (
-//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-//         <h3 className="text-lg font-semibold text-gray-900">Product Description</h3>
+//     <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+//         <h3 className="text-base sm:text-lg font-semibold text-gray-900">Product Description</h3>
 //       </div>
-//       <div className="p-6">
+//       <div className="p-4 sm:p-6">
 //         <div 
-//           className="prose prose-sm sm:prose lg:prose-lg max-w-none text-gray-600 leading-relaxed"
+//           className="prose prose-sm sm:prose max-w-none text-gray-600 leading-relaxed text-sm sm:text-base"
 //           dangerouslySetInnerHTML={{ 
 //             __html: product.description || 'No description available.' 
 //           }}
@@ -300,39 +441,39 @@
 //   );
 // };
 
-// // Shipping Info Component
+// // Shipping Info Component - Responsive
 // const ShippingInfo = () => {
 //   return (
-//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-//         <h3 className="text-lg font-semibold text-gray-900">Shipping Information</h3>
+//     <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+//         <h3 className="text-base sm:text-lg font-semibold text-gray-900">Shipping Information</h3>
 //       </div>
-//       <div className="p-6">
-//         <div className="space-y-4">
-//           <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-//             <Truck className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+//       <div className="p-4 sm:p-6">
+//         <div className="space-y-3 sm:space-y-4">
+//           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+//             <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
 //             <div>
-//               <h4 className="font-medium text-gray-900 mb-1">Global Shipping Available</h4>
-//               <p className="text-sm text-gray-600">
+//               <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Global Shipping Available</h4>
+//               <p className="text-xs sm:text-sm text-gray-600">
 //                 We ship worldwide with reliable carriers. Shipping costs calculated based on destination and order volume.
 //               </p>
 //             </div>
 //           </div>
-//           <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-//             <Clock className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+//           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+//             <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
 //             <div>
-//               <h4 className="font-medium text-gray-900 mb-1">Estimated Delivery Time</h4>
-//               <p className="text-sm text-gray-600">
+//               <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Estimated Delivery Time</h4>
+//               <p className="text-xs sm:text-sm text-gray-600">
 //                 Domestic: 3-5 business days<br />
 //                 International: 7-15 business days
 //               </p>
 //             </div>
 //           </div>
-//           <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-//             <Package className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+//           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+//             <Package className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
 //             <div>
-//               <h4 className="font-medium text-gray-900 mb-1">Bulk Order Shipping</h4>
-//               <p className="text-sm text-gray-600">
+//               <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Bulk Order Shipping</h4>
+//               <p className="text-xs sm:text-sm text-gray-600">
 //                 Special shipping rates available for bulk orders. Contact us for a customized quote.
 //               </p>
 //             </div>
@@ -343,11 +484,11 @@
 //   );
 // };
 
-// // Inquiry Item Component - Shows multiple sizes for a selected color with quantity inputs
+// // Inquiry Item Component - Responsive
+// // Inquiry Item Component - Shows ALL sizes
 // const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) => {
 //   const [sizeQuantities, setSizeQuantities] = useState(item.sizeQuantities || {});
 
-//   // Initialize size quantities when component mounts or item changes
 //   useEffect(() => {
 //     if (item.sizeQuantities) {
 //       setSizeQuantities(item.sizeQuantities);
@@ -358,10 +499,8 @@
 //     const newQuantities = { ...sizeQuantities, [size]: quantity };
 //     setSizeQuantities(newQuantities);
     
-//     // Calculate total quantity for this item
 //     const totalQty = Object.values(newQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
     
-//     // Update parent component with size quantities and total
 //     onUpdate(item.id, 'sizeQuantities', newQuantities);
 //     onUpdate(item.id, 'quantity', totalQty);
 //   };
@@ -370,40 +509,43 @@
 //     return Object.values(sizeQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
 //   };
 
+//   // Get ALL sizes (no limit)
+//   const allSizes = product.sizes?.filter(s => s.trim()) || [];
+
 //   return (
-//     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-//       <div className="flex items-center justify-between mb-3">
+//     <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+//       <div className="flex items-center justify-between mb-2 sm:mb-3">
 //         <div className="flex items-center gap-2">
 //           <div 
-//             className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+//             className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-sm"
 //             style={{ backgroundColor: item.color?.code || '#CCCCCC' }}
 //           />
-//           <h4 className="font-medium text-gray-900">
+//           <h4 className="text-xs sm:text-sm font-medium text-gray-900">
 //             {item.color?.code || 'Selected Color'} - Item {index + 1}
 //           </h4>
 //         </div>
 //         {showRemove && (
 //           <button
 //             onClick={() => onRemove(item.id)}
-//             className="p-1.5 hover:bg-red-100 rounded-lg transition-colors group"
+//             className="p-1 hover:bg-red-100 rounded-lg transition-colors group"
 //             title="Remove item"
 //           >
-//             <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-600" />
+//             <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 group-hover:text-red-600" />
 //           </button>
 //         )}
 //       </div>
 
-//       {/* Size Quantities Grid */}
-//       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-//         {product.sizes?.filter(s => s.trim()).map((size, idx) => (
+//       {/* Size Quantities Grid - Show ALL sizes */}
+//       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+//         {allSizes.map((size, idx) => (
 //           <div key={idx} className="flex flex-col">
-//             <label className="block text-xs text-gray-500 mb-1">{size}</label>
+//             <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">{size}</label>
 //             <input
 //               type="number"
 //               min="0"
 //               value={sizeQuantities[size] || ''}
 //               onChange={(e) => handleSizeQuantityChange(size, parseInt(e.target.value) || 0)}
-//               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+//               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
 //               placeholder="Qty"
 //             />
 //           </div>
@@ -411,98 +553,310 @@
 //       </div>
 
 //       {/* Item Total */}
-//       <div className="mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
-//         <span className="text-sm text-gray-600">Item Total:</span>
-//         <span className="text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
+//       <div className="mt-2 sm:mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
+//         <span className="text-xs sm:text-sm text-gray-600">Item Total:</span>
+//         <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
 //       </div>
 //     </div>
 //   );
 // };
 
-// // Related Product Card Component
+// // Related Product Card Component - Responsive
 // const RelatedProductCard = ({ product }) => {
-//   const [isHovered, setIsHovered] = useState(false);
 //   const productImages = product.images || [];
+//   const [activeIndex, setActiveIndex] = useState(0);
+//   const hasMultipleImages = productImages.length > 1;
 //   const firstTier = product.quantityBasedPricing?.[0];
+//   const primaryTag = product.tags?.[0];
 
-//   const handleInquireClick = (e) => {
-//     e.preventDefault();
-//     window.location.href = `/productDetails?id=${product._id}`;
+//   const handleImageHover = (index) => {
+//     setActiveIndex(index);
+//   };
+
+//   const handleImageLeave = () => {
+//     setActiveIndex(0);
+//   };
+
+//   // Helper function for tag styling (define this outside or import)
+//   const getTagStyles = (tag) => {
+//     const styles = {
+//       'Top Ranking': 'bg-gradient-to-r from-amber-500 to-orange-500',
+//       'New Arrival': 'bg-gradient-to-r from-blue-500 to-cyan-500',
+//       'Top Deal': 'bg-gradient-to-r from-green-500 to-emerald-500',
+//       'Best Seller': 'bg-gradient-to-r from-purple-500 to-pink-500',
+//       'Summer Collection': 'bg-gradient-to-r from-yellow-500 to-orange-400',
+//       'Winter Collection': 'bg-gradient-to-r from-indigo-500 to-blue-400',
+//       'Limited Edition': 'bg-gradient-to-r from-red-500 to-rose-500',
+//       'Trending': 'bg-gradient-to-r from-pink-500 to-rose-500',
+//     };
+//     return styles[tag] || 'bg-gradient-to-r from-gray-500 to-gray-600';
 //   };
 
 //   return (
-//     <Link href={`/productDetails?id=${product._id}`}>
-//       <div 
-//         className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 relative"
-//         onMouseEnter={() => setIsHovered(true)}
-//         onMouseLeave={() => setIsHovered(false)}
-//       >
-//         <div className="relative h-48 overflow-hidden bg-gray-100">
-//           <img
-//             src={productImages[0]?.url || 'https://via.placeholder.com/300x300?text=No+Image'}
-//             alt={product.productName}
-//             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-//           />
-//           <span className="absolute top-3 left-3 bg-[#E39A65] text-white text-xs px-2 py-1 rounded-full shadow-md">
-//             {product.category?.name || 'Uncategorized'}
-//           </span>
-//           <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-//             <span className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
-//               <Eye className="w-4 h-4" />
-//               View Details
-//             </span>
-//           </div>
-//         </div>
-//         <div className="p-4">
-//           <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 h-12" title={product.productName}>
-//             {product.productName}
-//           </h3>
-//           <div className="flex items-center justify-between mb-3">
-//             <div>
-//               <span className="text-lg font-bold text-[#E39A65]">
-//                 ${formatPriceNumber(product.pricePerUnit)}
-//               </span>
-//               <span className="text-xs text-gray-500 ml-1">/pc</span>
-//             </div>
-//             <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-//               MOQ: {product.moq}
-//             </span>
-//           </div>
-//           {firstTier && (
-//             <div className="text-xs bg-orange-50 p-2 rounded-lg">
-//               <span className="font-medium text-orange-700">Bulk: </span>
-//               <span className="text-gray-600">
-//                 {firstTier.range} @ ${formatPriceNumber(firstTier.price)}
-//               </span>
-//             </div>
-//           )}
-//           <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-//             <div className="flex items-center gap-1">
-//               <Package className="w-3 h-3" />
-//               <span>{product.sizes?.length || 0} sizes</span>
-//             </div>
-//             <div className="flex items-center gap-1">
-//               <Palette className="w-3 h-3" />
-//               <span>{product.colors?.length || 0} colors</span>
-//             </div>
-//           </div>
-//           <button 
-//             className="w-full mt-3 bg-[#E39A65] text-white py-2 rounded-lg text-sm font-medium hover:bg-[#d48b54] transition-colors flex items-center justify-center gap-2"
-//             onClick={handleInquireClick}
+//     <motion.div
+//       layout
+//       initial={{ opacity: 0, scale: 0.8 }}
+//       animate={{ opacity: 1, scale: 1 }}
+//       exit={{ opacity: 0, scale: 0.8 }}
+//       transition={{
+//         layout: { type: "spring", stiffness: 100, damping: 15 },
+//         opacity: { duration: 0.3 }
+//       }}
+//       whileHover={{ 
+//         y: -8,
+//         transition: { type: "spring", stiffness: 300, damping: 15 }
+//       }}
+//       onClick={() => window.location.href = `/productDetails?id=${product._id}`}
+//       className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer"
+//     >
+//       {/* Image Container */}
+//       <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden bg-gray-100">
+//         <motion.div 
+//           className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
+//           whileHover={{ opacity: 1 }}
+//         />
+        
+//         <motion.img
+//           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
+//           alt={product.productName || 'Product image'}
+//           className="w-full h-full object-cover"
+//           whileHover={{ scale: 1.1 }}
+//           transition={{ duration: 0.5 }}
+//           onError={(e) => {
+//             e.target.onerror = null;
+//             e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
+//           }}
+//         />
+        
+//         {/* Desktop Hover Icons */}
+//         <motion.div 
+//           className="absolute inset-0 bg-black/40 items-center justify-center gap-3 
+//                      hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
+//           initial={{ opacity: 0 }}
+//           whileHover={{ opacity: 1 }}
+//         >
+//           <div
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.location.href = `/productDetails?id=${product._id}`;
+//             }}
 //           >
-//             <ShoppingCart className="w-4 h-4" />
-//             Inquire Now
+//             <motion.div 
+//               className="bg-white rounded-full p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+//               whileHover={{ scale: 1.15 }}
+//               whileTap={{ scale: 0.95 }}
+//             >
+//               <Eye className="w-5 h-5 text-gray-700" />
+//             </motion.div>
+//           </div>
+          
+//           <div
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+//             }}
+//           >
+//             <motion.div 
+//               className="bg-[#E39A65] rounded-full p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+//               whileHover={{ scale: 1.15 }}
+//               whileTap={{ scale: 0.95 }}
+//             >
+//               <ShoppingCart className="w-5 h-5 text-white" />
+//             </motion.div>
+//           </div>
+//         </motion.div>
+
+//         {/* Mobile Icons - Always visible */}
+//         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-3 sm:hidden z-30">
+//           <button
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.location.href = `/productDetails?id=${product._id}`;
+//             }}
+//             className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+//           >
+//             <Eye className="w-4 h-4 text-gray-700" />
+//           </button>
+//           <button
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+//             }}
+//             className="bg-[#E39A65]/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+//           >
+//             <ShoppingCart className="w-4 h-4 text-white" />
 //           </button>
 //         </div>
+        
+//         {/* Category Badge */}
+//         <motion.span 
+//           initial={{ x: -20, opacity: 0 }}
+//           animate={{ x: 0, opacity: 1 }}
+//           transition={{ delay: 0.2 }}
+//           className="absolute top-3 left-3 bg-[#E39A65] text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20"
+//         >
+//           {product.category?.name || 'Uncategorized'}
+//         </motion.span>
+        
+//         {/* Tag Badge (if any) */}
+//         {primaryTag && (
+//           <motion.span 
+//             initial={{ x: 20, opacity: 0 }}
+//             animate={{ x: 0, opacity: 1 }}
+//             transition={{ delay: 0.3 }}
+//             className={`absolute top-3 right-3 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20 ${getTagStyles(primaryTag)}`}
+//           >
+//             {primaryTag}
+//           </motion.span>
+//         )}
+        
+//         {/* MOQ Badge */}
+//         <motion.span 
+//           initial={{ x: 20, opacity: 0 }}
+//           animate={{ x: 0, opacity: 1 }}
+//           transition={{ delay: 0.5 }}
+//           className="absolute bottom-3 right-3 bg-gray-900/90 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-lg z-20"
+//         >
+//           MOQ: {product.moq || 0}
+//         </motion.span>
+
+//         {/* Targeted Customer Badge */}
+//         {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
+//           <motion.span 
+//             initial={{ x: -20, opacity: 0 }}
+//             animate={{ x: 0, opacity: 1 }}
+//             transition={{ delay: 0.4 }}
+//             className="absolute bottom-3 left-3 bg-black/50 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full backdrop-blur-sm z-20"
+//           >
+//             {capitalizeFirst(product.targetedCustomer)}
+//           </motion.span>
+//         )}
 //       </div>
-//     </Link>
+
+//       {/* Thumbnail Gallery */}
+//       {hasMultipleImages && (
+//         <motion.div 
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ delay: 0.6 }}
+//           className="flex justify-center gap-1 py-2 px-2 bg-gray-50 border-t border-gray-100"
+//           onMouseLeave={handleImageLeave}
+//         >
+//           {productImages.slice(0, 4).map((image, index) => (
+//             <motion.button
+//               key={index}
+//               whileHover={{ scale: 1.1 }}
+//               whileTap={{ scale: 0.95 }}
+//               className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-md overflow-hidden transition-all duration-300 ${
+//                 activeIndex === index 
+//                   ? 'ring-2 ring-[#E39A65] ring-offset-2 scale-110 shadow-md' 
+//                   : 'opacity-60 hover:opacity-100'
+//               }`}
+//               onMouseEnter={() => handleImageHover(index)}
+//               onClick={(e) => {
+//                 e.stopPropagation();
+//                 handleImageHover(index);
+//               }}
+//             >
+//               <img
+//                 src={image.url}
+//                 alt=""
+//                 className="w-full h-full object-cover"
+//                 onError={(e) => {
+//                   e.target.onerror = null;
+//                   e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100';
+//                 }}
+//               />
+//             </motion.button>
+//           ))}
+//           {productImages.length > 4 && (
+//             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-gray-200 flex items-center justify-center text-[10px] sm:text-xs text-gray-600 font-medium">
+//               +{productImages.length - 4}
+//             </div>
+//           )}
+//         </motion.div>
+//       )}
+
+//       {/* Content */}
+//       <motion.div 
+//         initial={{ opacity: 0 }}
+//         animate={{ opacity: 1 }}
+//         transition={{ delay: 0.7 }}
+//         className="p-4"
+//       >
+//         {/* Title and Price */}
+//         <div className="flex items-start justify-between gap-2 mb-2">
+//           <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
+//             {truncateText(product.productName, 25)}
+//           </h3>
+//           <div className="flex-shrink-0 text-right">
+//             <span className="text-base font-bold text-[#E39A65]">
+//               ${formatPriceNumber(product.pricePerUnit)}
+//             </span>
+//             <span className="text-gray-500 text-[8px] ml-1">/pc</span>
+//           </div>
+//         </div>
+
+//         {/* Color Dots */}
+//         {product.colors && product.colors.length > 0 && (
+//           <div className="flex items-center gap-1 mb-2">
+//             {product.colors.slice(0, 4).map((color, i) => (
+//               <div
+//                 key={i}
+//                 className="w-4 h-4 rounded-full border border-white shadow-sm"
+//                 style={{ backgroundColor: color.code }}
+//                 title={color.name || color.code}
+//               />
+//             ))}
+//             {product.colors.length > 4 && (
+//               <span className="text-[8px] text-gray-400">+{product.colors.length - 4}</span>
+//             )}
+//           </div>
+//         )}
+
+//         {/* Bulk Price */}
+//         {firstTier && (
+//           <motion.div 
+//             whileHover={{ scale: 1.02 }}
+//             className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-2 mb-3 border border-orange-100/80"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <div className="flex justify-between items-center text-[10px]">
+//               <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
+//               <span className="font-bold text-[#E39A65]">${formatPriceNumber(firstTier.price)}/pc</span>
+//             </div>
+//           </motion.div>
+//         )}
+
+//         {/* Add to Inquiry Button */}
+//         <motion.div
+//           whileHover={{ scale: 1.02 }}
+//           whileTap={{ scale: 0.98 }}
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+//           }}
+//         >
+//           <div className="flex items-center justify-center gap-2 w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden cursor-pointer">
+//             <ShoppingCart className="w-3 h-3" />
+//             <span>Inquiry Now</span>
+//           </div>
+//         </motion.div>
+//       </motion.div>
+//     </motion.div>
 //   );
 // };
 
-// // Main Product Details Component
-// export default function ProductDetails() {
+// // Main Product Content Component
+// function ProductContent() {
+//    const router = useRouter();
 //   const searchParams = useSearchParams();
 //   const productId = searchParams.get('id');
+
+//   const [currentIndex, setCurrentIndex] = useState(0);
+// const [isHovered, setIsHovered] = useState(false);
+// const carouselRef = useRef(null);
+// const autoPlayRef = useRef(null);
   
 //   const [product, setProduct] = useState(null);
 //   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -524,6 +878,72 @@
 //   const [isInCart, setIsInCart] = useState(false);
 //   const [cartItemDetails, setCartItemDetails] = useState(null);
 
+
+//   // Auto-play functionality
+// useEffect(() => {
+//   if (relatedProducts.length <= 4) return;
+  
+//   const startAutoPlay = () => {
+//     if (!isHovered) {
+//       autoPlayRef.current = setInterval(() => {
+//         setCurrentIndex((prev) => 
+//           prev + 4 >= relatedProducts.length ? 0 : prev + 4
+//         );
+//       }, 5000); // Change every 5 seconds
+//     }
+//   };
+
+//   startAutoPlay();
+
+//   return () => {
+//     if (autoPlayRef.current) {
+//       clearInterval(autoPlayRef.current);
+//     }
+//   };
+// }, [isHovered, relatedProducts.length]);
+
+// const handleNext = () => {
+//   setCurrentIndex((prev) => 
+//     prev + 4 >= relatedProducts.length ? 0 : prev + 4
+//   );
+// };
+
+// const handlePrev = () => {
+//   setCurrentIndex((prev) => 
+//     prev - 4 < 0 ? Math.max(relatedProducts.length - 4, 0) : prev - 4
+//   );
+// };
+
+// const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + 4);
+
+//   // Scroll to inquiry form if hash present
+//   useEffect(() => {
+//     if (window.location.hash === '#inquiry-form') {
+//       const attemptScroll = (retries = 0) => {
+//         const formElement = document.getElementById('inquiry-form');
+        
+//         if (formElement) {
+//           const yOffset = -100;
+//           const y = formElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+//           window.scrollTo({
+//             top: y,
+//             behavior: 'smooth'
+//           });
+          
+//           formElement.classList.add('ring-4', 'ring-[#E39A65]/20', 'transition-all', 'duration-1000');
+//           setTimeout(() => {
+//             formElement.classList.remove('ring-4', 'ring-[#E39A65]/20');
+//           }, 2000);
+//         } else if (retries < 10) {
+//           setTimeout(() => attemptScroll(retries + 1), 300);
+//         }
+//       };
+      
+//       setTimeout(attemptScroll, 500);
+//     }
+//   }, []);
+
 //   // Check authentication status on mount
 //   useEffect(() => {
 //     checkAuthStatus();
@@ -544,7 +964,6 @@
 //     }
 //   };
 
-//   // Handle successful login/register
 //   const handleAuthSuccess = (userData, token) => {
 //     localStorage.setItem('token', token);
 //     localStorage.setItem('user', JSON.stringify(userData));
@@ -563,7 +982,6 @@
 //     }
 //   }, [productId]);
 
-//   // Check if product is in cart when product loads or auth changes
 //   useEffect(() => {
 //     if (product && isAuthenticated) {
 //       checkIfInCart();
@@ -573,7 +991,6 @@
 //     }
 //   }, [product, isAuthenticated]);
 
-//   // Listen for cart updates
 //   useEffect(() => {
 //     const handleCartUpdate = () => {
 //       if (product && isAuthenticated) {
@@ -588,20 +1005,15 @@
 //   const fetchProduct = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
 //       const data = await response.json();
       
 //       if (data.success) {
 //         setProduct(data.data);
-//         // Set default selections
 //         if (data.data.colors && data.data.colors.length > 0) {
 //           setSelectedColor(data.data.colors[0]);
 //         }
-        
-//         // Initialize with empty inquiry items
 //         setInquiryItems([]);
-        
-//         // Fetch related products
 //         fetchRelatedProducts(data.data.category?._id || data.data.category, data.data.targetedCustomer);
 //       } else {
 //         toast.error('Product not found');
@@ -614,33 +1026,32 @@
 //     }
 //   };
 
-//   const fetchRelatedProducts = async (categoryId, targetedCustomer) => {
-//     try {
-//       const queryParams = new URLSearchParams();
-//       queryParams.append('limit', 8);
-//       if (categoryId) queryParams.append('category', categoryId);
-//       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
-      
-//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
-//       const data = await response.json();
-      
-//       if (data.success) {
-//         const filtered = (data.data || []).filter(p => p._id !== productId);
-//         const shuffled = filtered.sort(() => 0.5 - Math.random());
-//         setRelatedProducts(shuffled.slice(0, 4));
-//       }
-//     } catch (error) {
-//       console.error('Error fetching related products:', error);
+//  const fetchRelatedProducts = async (categoryId, targetedCustomer) => {
+//   try {
+//     const queryParams = new URLSearchParams();
+//     queryParams.append('limit', 8); // You're fetching 8 products
+//     if (categoryId) queryParams.append('category', categoryId);
+//     if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
+    
+//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+//     const data = await response.json();
+    
+//     if (data.success) {
+//       const filtered = (data.data || []).filter(p => p._id !== productId);
+//       const shuffled = filtered.sort(() => 0.5 - Math.random());
+//       setRelatedProducts(shuffled.slice(0, 12)); // BUT HERE YOU'RE SLICING TO ONLY 4 PRODUCTS
 //     }
-//   };
+//   } catch (error) {
+//     console.error('Error fetching related products:', error);
+//   }
+// };
 
-//   // Check if product is already in cart
 //   const checkIfInCart = async () => {
 //     if (!isAuthenticated || !product) return;
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -665,15 +1076,12 @@
 //     }
 //   };
 
-//   // Calculate total quantity
 //   useEffect(() => {
 //     if (!product) return;
-    
 //     const totalQty = inquiryItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
 //     setTotalQuantity(totalQty);
 //   }, [inquiryItems, product]);
 
-//   // Calculate total price based on total quantity tier
 //   useEffect(() => {
 //     if (!product || totalQuantity === 0) {
 //       setTotalPrice(0);
@@ -683,7 +1091,6 @@
 //     let unitPrice = product.pricePerUnit;
     
 //     if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      
 //       const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
 //         const aMin = parseInt(a.range.split('-')[0]);
 //         const bMin = parseInt(b.range.split('-')[0]);
@@ -731,7 +1138,6 @@
 //     let unitPrice = product.pricePerUnit;
     
 //     if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      
 //       const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
 //         const aMin = parseInt(a.range.split('-')[0]);
 //         const bMin = parseInt(b.range.split('-')[0]);
@@ -774,14 +1180,12 @@
 
 //   const applicableUnitPrice = getApplicableUnitPrice();
 
-//   // Handle adding a new item with selected color
 //   const handleAddItem = () => {
 //     if (!selectedColor) {
 //       toast.error('Please select a color');
 //       return;
 //     }
 
-//     // Initialize empty size quantities object
 //     const initialSizeQuantities = {};
 //     product.sizes?.filter(s => s.trim()).forEach(size => {
 //       initialSizeQuantities[size] = 0;
@@ -813,9 +1217,7 @@
 //     }
 //   };
 
-//   // Handle submit inquiry - group all colors under ONE product
 //   const handleSubmitInquiry = async () => {
-//     // First check if user is authenticated
 //     if (!isAuthenticated) {
 //       setAuthModalTab('login');
 //       setShowAuthModal(true);
@@ -823,13 +1225,11 @@
 //       return;
 //     }
 
-//     // Then validate inquiry
 //     if (inquiryItems.length === 0) {
 //       toast.error('Please add at least one color');
 //       return;
 //     }
 
-//     // Check if any quantities are entered
 //     const hasQuantities = inquiryItems.some(item => {
 //       const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
 //       return total > 0;
@@ -840,13 +1240,11 @@
 //       return;
 //     }
 
-//     // Calculate total quantity across ALL colors
 //     const calculatedTotalQuantity = inquiryItems.reduce((total, item) => {
 //       const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
 //       return total + itemTotal;
 //     }, 0);
 
-//     // Check MOQ against total quantity
 //     if (calculatedTotalQuantity < product.moq) {
 //       toast.error(`Total quantity must be at least ${product.moq} pieces (currently ${calculatedTotalQuantity})`);
 //       return;
@@ -855,7 +1253,6 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       // Prepare colors data with their size quantities
 //       const colorsData = inquiryItems.map(item => {
 //         const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
         
@@ -866,7 +1263,6 @@
 //         };
 //       }).filter(item => item.totalQuantity > 0);
 
-//       // Create ONE cart item for this product with all colors
 //       const cartItem = {
 //         productId: product._id,
 //         productName: product.productName,
@@ -875,12 +1271,10 @@
 //         unitPrice: applicableUnitPrice,
 //         moq: product.moq,
 //         productImage: product.images?.[0]?.url,
-//         specialInstructions: specialInstructions // ADD THIS LINE
+//         specialInstructions: specialInstructions
 //       };
-      
-//     console.log('📤 Sending cart item with special instructions:', specialInstructions); // Debug log
 
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -894,15 +1288,12 @@
 //       if (data.success) {
 //         toast.success(`${colorsData.length} color(s) added for ${product.productName}! Total: ${calculatedTotalQuantity} pcs`);
         
-//         // Clear the form
 //         setInquiryItems([]);
 //         setSpecialInstructions('');
         
-//         // Update cart status
 //         setIsInCart(true);
 //         checkIfInCart();
         
-//         // Dispatch cart update event for navbar
 //         window.dispatchEvent(new Event('cart-update'));
 //       } else {
 //         toast.error(data.error || 'Failed to add to cart');
@@ -914,7 +1305,6 @@
 //     }
 //   };
 
-//   // Handle WhatsApp inquiry
 //   const handleWhatsAppInquiry = () => {
 //     if (!isAuthenticated) {
 //       setAuthModalTab('login');
@@ -928,10 +1318,8 @@
 //       return;
 //     }
 
-//     // Format the message with all product and inquiry details
 //     let message = `*Inquiry for ${product.productName}*\n\n`;
     
-//     // Customer/Buyer Information
 //     message += `*👤 BUYER INFORMATION*\n`;
 //     message += `• Company: ${user?.companyName || 'N/A'}\n`;
 //     message += `• Contact Person: ${user?.contactPerson || 'N/A'}\n`;
@@ -940,7 +1328,6 @@
 //     if (user?.whatsapp) message += `• WhatsApp: ${user.whatsapp}\n`;
 //     message += `• Country: ${user?.country || 'N/A'}\n\n`;
     
-//     // Product Information
 //     message += `*📦 PRODUCT DETAILS*\n`;
 //     message += `• Product: ${product.productName}\n`;
 //     message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
@@ -948,7 +1335,6 @@
 //     message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
 //     message += `• MOQ: ${product.moq} pieces\n\n`;
     
-//     // Inquiry Items with Size Breakdown
 //     message += `*🛒 INQUIRY ITEMS*\n`;
     
 //     inquiryItems.forEach((item, index) => {
@@ -970,13 +1356,11 @@
 //       message += `  *Item Total:* ${itemTotal} pcs\n`;
 //     });
     
-//     // Order Summary
 //     message += `\n*📊 ORDER SUMMARY*\n`;
 //     message += `• Total Quantity: ${totalQuantity} pieces\n`;
 //     message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
 //     message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
     
-//     // Special Instructions
 //     if (specialInstructions) {
 //       message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
 //       message += `${specialInstructions}\n`;
@@ -984,7 +1368,6 @@
     
 //     message += `\n*🕐 Inquiry sent:* ${new Date().toLocaleString()}\n`;
 
-//     // Get WhatsApp number from environment variable
 //     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685';
 //     const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, '');
 //     const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
@@ -1002,15 +1385,15 @@
 
 //   if (!product) {
 //     return (
-//       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+//       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
 //         <div className="text-center">
-//           <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-//           <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+//           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Product Not Found</h2>
+//           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">The product you're looking for doesn't exist or has been removed.</p>
 //           <Link 
 //             href="/products" 
-//             className="inline-flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//             className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-sm sm:text-base"
 //           >
-//             <ChevronLeft className="w-4 h-4" />
+//             <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
 //             Back to Products
 //           </Link>
 //         </div>
@@ -1018,141 +1401,171 @@
 //     );
 //   }
 
+//   // Get first 5 colors to display
+//   const colorsToShow = product.colors?.slice(0, 5) || [];
+//   const remainingColors = product.colors?.length > 5 ? product.colors.length - 5 : 0;
+
+//   // Get first 5 sizes to display
+//   const sizesToShow = product.sizes?.filter(s => s.trim()).slice(0, 5) || [];
+//   const remainingSizes = product.sizes?.filter(s => s.trim()).length > 5 ? product.sizes.filter(s => s.trim()).length - 5 : 0;
+
 //   return (
 //     <>
 //       <Navbar />
-//       <div className="min-h-screen bg-gray-50 mt-20">
-//         {/* Breadcrumb */}
-//         <div className="bg-white border-b border-gray-200 pb-2">
-//           <div className="container mx-auto px-4 max-w-7xl py-4">
-//             <div className="flex items-center gap-2 text-sm text-gray-600">
-//               <Link href="/" className="hover:text-[#E39A65] transition-colors">Home</Link>
-//               <span>/</span>
-//               <Link href="/products" className="hover:text-[#E39A65] transition-colors">Products</Link>
-//               <span>/</span>
-//               <span className="text-gray-900 font-medium">{product.productName}</span>
-//             </div>
-//           </div>
-//         </div>
+//       <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
+//         {/* Breadcrumb - Responsive */}
+//         <div className="bg-white border-b border-gray-200">
+//   <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
+//     <div className="flex items-center gap-2 sm:gap-3">
+//       {/* Back Button */}
+//       <button
+//         onClick={() => router.back()}
+//         className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+//         aria-label="Go back"
+//       >
+//         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+//       </button>
+      
+//       {/* Breadcrumb */}
+//       <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap pb-0.5 flex-1">
+//         <Link href="/" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Home</Link>
+//         <span className="flex-shrink-0">/</span>
+//         <Link href="/products" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Products</Link>
+//         <span className="flex-shrink-0">/</span>
+//         <span className="text-gray-900 font-medium truncate">{product.productName}</span>
+//       </div>
+//     </div>
+//   </div>
+// </div>
 
-//         <div className="container mx-auto px-4 max-w-7xl py-8">
+//         <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 lg:py-8">
 //           {/* Two Column Layout */}
-//           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+//           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
 //             {/* Left Column - Image Gallery */}
 //             <div className="lg:col-span-5">
-//               <div className="sticky top-24">
+//               <div className="lg:sticky lg:top-24">
 //                 <ImageGallery images={product.images} productName={product.productName} />
 //               </div>
 //             </div>
 
 //             {/* Right Column - Product Info & Inquiry Form */}
-//             <div className="lg:col-span-7 space-y-6">
+//             <div className="lg:col-span-7 space-y-4 sm:space-y-6">
 //               {/* Product Info Card */}
-//               <div className="bg-white rounded-xl border border-gray-200 p-6">
-//                 <div className="mb-4">
-//                   <div className="flex items-center gap-2 mb-3">
-//                     <span className="px-3 py-1 bg-[#E39A65] text-white text-sm rounded-full">
+//               <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+//                 <div className="mb-3 sm:mb-4">
+//                   <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
+//                     <span className="px-2 sm:px-3 py-1 bg-[#E39A65] text-white text-xs sm:text-sm rounded-full">
 //                       {product.category?.name || 'Uncategorized'}
 //                     </span>
 //                     {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-//                       <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
+//                       <span className="px-2 sm:px-3 py-1 bg-gray-100 text-gray-700 text-xs sm:text-sm rounded-full">
 //                         {capitalizeFirst(product.targetedCustomer)}
 //                       </span>
 //                     )}
 //                   </div>
-//                   <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.productName}</h1>
+//                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{product.productName}</h1>
 //                   <div 
-//                     className="text-gray-600 text-sm line-clamp-2 prose prose-sm max-w-none"
+//                     className="text-xs sm:text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none"
 //                     dangerouslySetInnerHTML={{ 
 //                       __html: product.description || 'No description available.' 
 //                     }}
 //                   />
 //                 </div>
 
-//                 <div className="flex items-baseline justify-between p-4 bg-orange-50 rounded-lg">
-//                   <div>
-//                     <span className="text-sm text-gray-600">Starting from</span>
-//                     <div className="text-3xl font-bold text-[#E39A65]">
-//                       {formatPrice(product.pricePerUnit)}
+//                 {/* Price and MOQ - Now side by side with bulk table below on large screens */}
+//                 <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
+//                   {/* Price and MOQ - Left side on large screens */}
+//                   <div className="lg:w-1/2">
+//                     <div className="flex items-baseline justify-between p-3 sm:p-4 bg-orange-50 rounded-lg mb-4">
+//                       <div>
+//                         <span className="text-xs sm:text-sm text-gray-600">Starting from</span>
+//                         <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#E39A65]">
+//                           {formatPrice(product.pricePerUnit)}
+//                         </div>
+//                       </div>
+//                       <div className="text-right">
+//                         <span className="text-xs sm:text-sm text-gray-600">MOQ</span>
+//                         <div className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">{product.moq} pieces</div>
+//                       </div>
 //                     </div>
-//                   </div>
-//                   <div className="text-right">
-//                     <span className="text-sm text-gray-600">MOQ</span>
-//                     <div className="text-xl font-semibold text-gray-900">{product.moq} pieces</div>
-//                   </div>
-//                 </div>
 
-//                 {/* Fabric Detail */}
-//                 {product.fabric && (
-//                   <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-//                     <span className="text-sm font-medium text-gray-700">Fabric: </span>
-//                     <span className="text-sm text-gray-600">{product.fabric}</span>
-//                   </div>
-//                 )}
+//                     {/* Fabric Detail */}
+//                     {product.fabric && (
+//                       <div className="mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
+//                         <span className="text-xs sm:text-sm font-medium text-gray-700">Fabric: </span>
+//                         <span className="text-xs sm:text-sm text-gray-600">{product.fabric}</span>
+//                       </div>
+//                     )}
 
-//                 {/* Available Colors */}
-//                 {product.colors && product.colors.length > 0 && (
-//                   <div className="mt-4">
-//                     <h3 className="text-sm font-medium text-gray-700 mb-3">Available Colors</h3>
-//                     <div className="flex flex-wrap gap-2">
-//                       {product.colors.map((color, index) => (
-//                         <div
-//                           key={index}
-//                           className="w-8 h-8 rounded-full border-2 border-white shadow-md"
-//                           style={{ backgroundColor: color.code }}
-//                           title={color.code}
-//                         />
-//                       ))}
-//                     </div>
-//                   </div>
-//                 )}
+//                  {/* Available Colors - Show all in rows of 5 */}
+// {product.colors && product.colors.length > 0 && (
+//   <div className="mb-4">
+//     <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Colors</h3>
+//     <div className="flex flex-wrap gap-1.5 sm:gap-2">
+//       {product.colors.map((color, index) => (
+//         <div
+//           key={index}
+//           className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 border-white shadow-md"
+//           style={{ backgroundColor: color.code }}
+//           title={color.code}
+//         />
+//       ))}
+//     </div>
+//     {/* Show count if more than 15 colors (optional) */}
+//     {product.colors.length > 15 && (
+//       <p className="text-xs text-gray-500 mt-2">{product.colors.length} colors available</p>
+//     )}
+//   </div>
+// )}
 
-//                 {/* Available Sizes */}
-//                 {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && (
-//                   <div className="mt-4">
-//                     <h3 className="text-sm font-medium text-gray-700 mb-3">Available Sizes</h3>
-//                     <div className="flex flex-wrap gap-2">
-//                       {product.sizes.filter(s => s.trim()).map((size, index) => (
-//                         <span
-//                           key={index}
-//                           className="px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg"
-//                         >
-//                           {size}
-//                         </span>
-//                       ))}
-//                     </div>
+// {/* Available Sizes - Show all in rows of 5 */}
+// {sizesToShow.length > 0 && (
+//   <div className="mb-4">
+//     <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Sizes</h3>
+//     <div className="flex flex-wrap gap-1.5 sm:gap-2">
+//       {product.sizes.filter(s => s.trim()).map((size, index) => (
+//         <span
+//           key={index}
+//           className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium bg-gray-100 text-gray-700 rounded-lg"
+//         >
+//           {size}
+//         </span>
+//       ))}
+//     </div>
+//     {/* Show count if more than 15 sizes (optional) */}
+//     {product.sizes.filter(s => s.trim()).length > 15 && (
+//       <p className="text-xs text-gray-500 mt-2">{product.sizes.filter(s => s.trim()).length} sizes available</p>
+//     )}
+//   </div>
+// )}
 //                   </div>
-//                 )}
 
-//                 {/* Bulk Pricing Table */}
-//                 <div className="mt-6">
-//                   <BulkPricingTable 
-//                     pricing={product.quantityBasedPricing} 
-//                     unitPrice={product.pricePerUnit}
-//                     moq={product.moq}
-//                   />
+//                   {/* Bulk Pricing Table - Right side on large screens */}
+//                   <div className="lg:w-1/2 mt-4 lg:mt-0">
+//                     <BulkPricingTable 
+//                       pricing={product.quantityBasedPricing} 
+//                       unitPrice={product.pricePerUnit}
+//                       moq={product.moq}
+//                     />
+//                   </div>
 //                 </div>
 //               </div>
 
 //               {/* Inquiry Form Card */}
-//               <div className="bg-white rounded-xl border border-gray-200 p-6">
-//                 <div className="flex items-center justify-between mb-4">
-//                   <h2 className="text-lg font-semibold text-gray-900">Create Your Inquiry</h2>
+//               <div id="inquiry-form" className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+//                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
+//                   <h2 className="text-base sm:text-lg font-semibold text-gray-900">Create Your Inquiry</h2>
 //                   {totalQuantity > 0 && (
-//                     <span className="text-sm text-gray-500">{totalQuantity} total pcs</span>
+//                     <span className="text-xs sm:text-sm text-gray-500">{totalQuantity} total pcs</span>
 //                   )}
 //                 </div>
                 
 //                 {/* Color Selection */}
 //                 {product.colors && product.colors.length > 0 && (
-//                   <div className="mb-4">
-//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   <div className="mb-3 sm:mb-4">
+//                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
 //                       Select Color to Add
-//                       {selectedColor && (
-//                         <span className="ml-2 text-xs text-gray-500">
-//                           (Currently selected: {selectedColor.code})
-//                         </span>
-//                       )}
+                    
 //                     </label>
 //                     <ColorSelector 
 //                       colors={product.colors}
@@ -1166,22 +1579,22 @@
 //                 <button
 //                   onClick={handleAddItem}
 //                   disabled={!selectedColor || isInCart}
-//                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+//                   className="w-full flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-3 sm:mb-4"
 //                 >
-//                   <Plus className="w-5 h-5" />
+//                   <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
 //                   Add Selected Color
 //                 </button>
 
 //                 {/* Already in cart notice */}
 //                 {isInCart && (
-//                   <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+//                   <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg">
 //                     <div className="flex items-start gap-2">
-//                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+//                       <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
 //                       <div>
-//                         <p className="text-sm font-medium text-green-800">
+//                         <p className="text-xs sm:text-sm font-medium text-green-800">
 //                           ✓ This product is already in your inquiry cart
 //                         </p>
-//                         <p className="text-xs text-green-600 mt-1">
+//                         <p className="text-[10px] sm:text-xs text-green-600 mt-1">
 //                           You can view or modify it in your cart
 //                         </p>
 //                       </div>
@@ -1190,22 +1603,23 @@
 //                 )}
 
 //                 {/* Quick size guide */}
-//                 {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && !isInCart && (
-//                   <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-//                     <p className="text-xs text-blue-700">
-//                       <span className="font-medium">Available Sizes:</span> {product.sizes.filter(s => s.trim()).join(', ')}
-//                     </p>
-//                     <p className="text-xs text-blue-600 mt-1">
-//                       Enter quantities for each size under each color item
-//                     </p>
-//                   </div>
-//                 )}
+//                 {/* Quick size guide - Show ALL sizes */}
+// {product.sizes?.filter(s => s.trim()).length > 0 && !isInCart && (
+//   <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 rounded-lg">
+//     <p className="text-[10px] sm:text-xs text-blue-700">
+//       <span className="font-medium">Available Sizes:</span> {product.sizes.filter(s => s.trim()).join(', ')}
+//     </p>
+//     <p className="text-[10px] sm:text-xs text-blue-600 mt-1">
+//       Enter quantities for each size under each color item
+//     </p>
+//   </div>
+// )}
 
-//                 {/* Inquiry Items List - Only show if not in cart */}
+//                 {/* Inquiry Items List */}
 //                 {!isInCart && inquiryItems.length > 0 && (
 //                   <>
-//                     <h3 className="text-md font-semibold text-gray-900 mb-3">Your Items</h3>
-//                     <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 mb-4">
+//                     <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-2 sm:mb-3">Your Items</h3>
+//                     <div className="space-y-2 sm:space-y-3 max-h-[350px] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 mb-3 sm:mb-4">
 //                       {inquiryItems.map((item, index) => (
 //                         <InquiryItem
 //                           key={item.id}
@@ -1220,40 +1634,40 @@
 //                     </div>
 
 //                     {/* Summary Cards */}
-//                     <div className="grid grid-cols-2 gap-3 mb-4">
-//                       <div className="p-3 bg-gray-50 rounded-lg">
-//                         <p className="text-xs text-gray-500 mb-1">Total Qty</p>
-//                         <p className="text-lg font-bold text-gray-900">{totalQuantity} pcs</p>
+//                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+//                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+//                         <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Total Qty</p>
+//                         <p className="text-base sm:text-lg font-bold text-gray-900">{totalQuantity} pcs</p>
 //                       </div>
-//                       <div className="p-3 bg-gray-50 rounded-lg">
-//                         <p className="text-xs text-gray-500 mb-1">Unit Price</p>
-//                         <p className="text-lg font-bold text-[#E39A65]">{formatPrice(applicableUnitPrice)}</p>
+//                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+//                         <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Unit Price</p>
+//                         <p className="text-base sm:text-lg font-bold text-[#E39A65]">{formatPrice(applicableUnitPrice)}</p>
 //                       </div>
-//                       <div className="p-3 bg-gray-50 rounded-lg col-span-2">
-//                         <p className="text-xs text-gray-500 mb-1">Estimated Total</p>
-//                         <p className="text-xl font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
+//                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg col-span-2">
+//                         <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Estimated Total</p>
+//                         <p className="text-lg sm:text-xl font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
 //                       </div>
 //                     </div>
 
 //                     {/* MOQ Warning */}
 //                     {totalQuantity < product.moq && totalQuantity > 0 && (
-//                       <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-//                         <p className="text-sm text-yellow-800">
+//                       <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+//                         <p className="text-xs sm:text-sm text-yellow-800">
 //                           ⚠️ Need {product.moq - totalQuantity} more pieces to meet MOQ
 //                         </p>
 //                       </div>
 //                     )}
 
 //                     {/* Special Instructions */}
-//                     <div className="mb-4">
-//                       <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     <div className="mb-3 sm:mb-4">
+//                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
 //                         Special Instructions
 //                       </label>
 //                       <textarea
 //                         value={specialInstructions}
 //                         onChange={(e) => setSpecialInstructions(e.target.value)}
 //                         rows="2"
-//                         className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
+//                         className="w-full px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
 //                         placeholder="Add any special requirements..."
 //                       />
 //                     </div>
@@ -1261,22 +1675,22 @@
 //                 )}
 
 //                 {/* Action Buttons */}
-//                 <div className="flex gap-3 mt-4">
+//                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
 //                   {isInCart ? (
 //                     <>
 //                       <Link 
 //                         href="/inquiry-cart" 
-//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+//                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-green-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-green-700 transition-colors"
 //                       >
-//                         <ShoppingCart className="w-4 h-4" />
+//                         <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
 //                         View in Cart
 //                       </Link>
 //                       <button
 //                         onClick={handleWhatsAppInquiry}
 //                         disabled={inquiryItems.length === 0}
-//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //                       >
-//                         <MessageCircle className="w-4 h-4" />
+//                         <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
 //                         Chat on WhatsApp
 //                       </button>
 //                     </>
@@ -1285,17 +1699,17 @@
 //                       <button
 //                         onClick={handleSubmitInquiry}
 //                         disabled={totalQuantity < product.moq || inquiryItems.length === 0}
-//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //                       >
-//                         <ShoppingCart className="w-4 h-4" />
-//                         Add to Inquiry Cart
+//                         <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+//                         Add to Cart
 //                       </button>
 //                       <button
 //                         onClick={handleWhatsAppInquiry}
 //                         disabled={inquiryItems.length === 0}
-//                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-green-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //                       >
-//                         <MessageCircle className="w-4 h-4" />
+//                         <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
 //                         Chat on WhatsApp
 //                       </button>
 //                     </>
@@ -1304,8 +1718,8 @@
 
 //                 {/* Empty State Message */}
 //                 {!isInCart && inquiryItems.length === 0 && (
-//                   <div className="text-center py-4 mt-2">
-//                     <p className="text-sm text-gray-500">
+//                   <div className="text-center py-3 sm:py-4 mt-2">
+//                     <p className="text-xs sm:text-sm text-gray-500">
 //                       Select a color and click "Add Selected Color" to start building your inquiry
 //                     </p>
 //                   </div>
@@ -1314,120 +1728,176 @@
 //             </div>
 //           </div>
 
-          
-// {/* Product Details Tabs */}
-// <div className="mt-8">
-//   <div className="border-b border-gray-200">
-//     <nav className="flex gap-8">
-//       {/* Your existing tab buttons */}
-//       <button
-//         onClick={() => setActiveTab('attributes')}
-//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//           activeTab === 'attributes'
-//             ? 'border-[#E39A65] text-[#E39A65]'
-//             : 'border-transparent text-gray-500 hover:text-gray-700'
-//         }`}
-//       >
-//         Key Attributes
-//       </button>
-//       <button
-//         onClick={() => setActiveTab('description')}
-//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//           activeTab === 'description'
-//             ? 'border-[#E39A65] text-[#E39A65]'
-//             : 'border-transparent text-gray-500 hover:text-gray-700'
-//         }`}
-//       >
-//         Description
-//       </button>
-//       <button
-//         onClick={() => setActiveTab('pricing')}
-//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//           activeTab === 'pricing'
-//             ? 'border-[#E39A65] text-[#E39A65]'
-//             : 'border-transparent text-gray-500 hover:text-gray-700'
-//         }`}
-//       >
-//         Bulk Pricing
-//       </button>
-//       <button
-//         onClick={() => setActiveTab('shipping')}
-//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//           activeTab === 'shipping'
-//             ? 'border-[#E39A65] text-[#E39A65]'
-//             : 'border-transparent text-gray-500 hover:text-gray-700'
-//         }`}
-//       >
-//         Shipping Info
-//       </button>
-//       {/* Add a Reviews tab */}
-//       <button
-//         onClick={() => setActiveTab('reviews')}
-//         className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-//           activeTab === 'reviews'
-//             ? 'border-[#E39A65] text-[#E39A65]'
-//             : 'border-transparent text-gray-500 hover:text-gray-700'
-//         }`}
-//       >
-//         Reviews
-//       </button>
-//     </nav>
-//   </div>
+//           {/* Product Details Tabs - Responsive */}
+//           <div className="mt-6 sm:mt-8">
+//             <div className="border-b border-gray-200 overflow-x-auto">
+//               <nav className="flex gap-4 sm:gap-6 lg:gap-8 min-w-max px-1">
+//                 {['attributes', 'description', 'pricing', 'shipping', 'reviews'].map((tab) => (
+//                   <button
+//                     key={tab}
+//                     onClick={() => setActiveTab(tab)}
+//                     className={`pb-3 sm:pb-4 px-1 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+//                       activeTab === tab
+//                         ? 'border-[#E39A65] text-[#E39A65]'
+//                         : 'border-transparent text-gray-500 hover:text-gray-700'
+//                     }`}
+//                   >
+//                     {tab === 'attributes' && 'Key Attributes'}
+//                     {tab === 'description' && 'Description'}
+//                     {tab === 'pricing' && 'Bulk Pricing'}
+//                     {tab === 'shipping' && 'Shipping Info'}
+//                     {tab === 'reviews' && 'Reviews'}
+//                   </button>
+//                 ))}
+//               </nav>
+//             </div>
 
-//   <div className="mt-6">
-//     {activeTab === 'attributes' && <KeyAttributes product={product} />}
-//     {activeTab === 'description' && <Description product={product} />}
-//     {activeTab === 'pricing' && (
-//       <BulkPricingTable 
-//         pricing={product.quantityBasedPricing} 
-//         unitPrice={product.pricePerUnit}
-//         moq={product.moq}
-//       />
-//     )}
-//     {activeTab === 'shipping' && <ShippingInfo />}
-//     {/* Add the reviews tab content */}
-//     {activeTab === 'reviews' && (
-//       <ProductReviews productId={product._id} />
-//     )}
-//   </div>
-// </div>
+//             <div className="mt-4 sm:mt-6">
+//               {activeTab === 'attributes' && <KeyAttributes product={product} />}
+//               {activeTab === 'description' && <Description product={product} />}
+//               {activeTab === 'pricing' && (
+//                 <BulkPricingTable 
+//                   pricing={product.quantityBasedPricing} 
+//                   unitPrice={product.pricePerUnit}
+//                   moq={product.moq}
+//                 />
+//               )}
+//               {activeTab === 'shipping' && <ShippingInfo />}
+//               {activeTab === 'reviews' && (
+//                 <ProductReviews productId={product._id} />
+//               )}
+//             </div>
+//           </div>
 
-//           {/* Related Products Section */}
-//           {relatedProducts.length > 0 && (
-//             <div className="mt-12">
-//               <div className="flex items-center justify-between mb-6">
+//           {/* Related Products Section - Responsive */}
+//           {/* {relatedProducts.length > 0 && (
+//             <div className="mt-8 sm:mt-10 lg:mt-12">
+//               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
 //                 <div>
-//                   <h2 className="text-2xl font-bold text-gray-900">Related Products</h2>
-//                   <p className="text-sm text-gray-500 mt-1">You might also be interested in these products</p>
+//                   <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Related Products</h2>
+//                   <p className="text-xs sm:text-sm text-gray-500 mt-1">You might also be interested in these products</p>
 //                 </div>
 //                 <Link 
 //                   href="/products" 
-//                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-sm font-medium group"
+//                   className="inline-flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-xs sm:text-sm font-medium group w-full sm:w-auto"
 //                 >
 //                   View All Products
-//                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+//                   <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
 //                 </Link>
 //               </div>
               
-//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
 //                 {relatedProducts.map((product) => (
 //                   <RelatedProductCard key={product._id} product={product} />
 //                 ))}
 //               </div>
 //             </div>
-//           )}
+//           )} */}
 
+// {relatedProducts.length > 0 && (
+//   <div className="mt-8 sm:mt-10 lg:mt-12">
+//     {/* Header with Browse All button */}
+//     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+//       <div>
+//         <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
+//           <Sparkles className="w-4 h-4 text-[#E39A65]" />
+//           <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
+//         </div>
+//         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+//           Related Products
+//         </h2>
+//       </div>
+      
+//       {/* Simple Browse All Button */}
+//       <Link 
+//         href="/products" 
+//         className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
+//       >
+//         <span>Browse all products</span>
+//         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+//       </Link>
+//     </div>
 
+//     {/* Carousel Container with padding for buttons */}
+//     <div className="relative px-4 sm:px-8 md:px-10">
+//       {/* Left Navigation Button */}
+//      {relatedProducts.length > 4 && (
+//   <button
+//     onClick={handlePrev}
+//     onMouseEnter={() => setIsHovered(true)}
+//     onMouseLeave={() => setIsHovered(false)}
+//     className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+//     style={{ transform: 'translateY(-50%)' }}
+//     aria-label="Previous products"
+//   >
+//     <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//   </button>
+// )}
+
+//       {/* Right Navigation Button */}
+//       {relatedProducts.length > 4 && (
+//         <button
+//           onClick={handleNext}
+//           onMouseEnter={() => setIsHovered(true)}
+//           onMouseLeave={() => setIsHovered(false)}
+//           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100 focus:opacity-100 "
+//           style={{ transform: 'translateY(-50%)' }}
+//           aria-label="Next products"
+//         >
+//           <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//         </button>
+//       )}
+
+//       {/* Products Grid with Animation - Added padding to prevent button overlap */}
+//       <div className="overflow-hidden">
+//         <motion.div 
+//           key={currentIndex}
+//           initial={{ opacity: 0, x: 20 }}
+//           animate={{ opacity: 1, x: 0 }}
+//           exit={{ opacity: 0, x: -20 }}
+//           transition={{ duration: 0.5 }}
+//           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6"
+//         >
+//           {visibleProducts.map((product) => (
+//             <RelatedProductCard key={product._id} product={product} />
+//           ))}
+//         </motion.div>
+//       </div>
+
+//       {/* Dots Indicator */}
+//       {relatedProducts.length > 4 && (
+//         <div className="flex items-center justify-center gap-2 mt-6">
+//           {Array.from({ length: Math.ceil(relatedProducts.length / 4) }).map((_, index) => (
+//             <button
+//               key={index}
+//               onClick={() => {
+//                 setCurrentIndex(index * 4);
+//                 setIsHovered(true);
+//                 setTimeout(() => setIsHovered(false), 3000);
+//               }}
+//               className={`h-2 rounded-full transition-all duration-300 ${
+//                 Math.floor(currentIndex / 4) === index
+//                   ? 'w-8 bg-[#E39A65]'
+//                   : 'w-2 bg-gray-300 hover:bg-gray-400'
+//               }`}
+//               aria-label={`Go to slide ${index + 1}`}
+//             />
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   </div>
+// )}
 //         </div>
 
-//         {/* WhatsApp Floating Button */}
-//         <div className="fixed bottom-6 right-6 z-50">
+//         {/* WhatsApp Floating Button - Responsive */}
+//         <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
 //           <button
 //             onClick={handleWhatsAppInquiry}
 //             disabled={inquiryItems.length === 0}
-//             className="flex items-center justify-center w-14 h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+//             className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
 //           >
-//             <MessageCircle className="w-6 h-6" />
+//             <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
 //           </button>
 //         </div>
 
@@ -1444,14 +1914,23 @@
 //   );
 // }
 
+// // Main page component with Suspense
+// export default function ProductDetailsPage() {
+//   return (
+//     <Suspense fallback={<ProductDetailsSkeleton />}>
+//       <ProductContent />
+//     </Suspense>
+//   );
+// }
+
 
 
 // app/productDetails/page.jsx
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useRef } from 'react';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ChevronLeft, 
@@ -1479,12 +1958,17 @@ import {
   ChevronRight,
   Star,
   Eye,
-  AlertCircle
+  AlertCircle,
+  DollarSign,
+  TrendingUp,
+  Sparkles,
+  BookOpen // Added for instruction tab
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
 import AuthModal from '../components/AuthModal';
+import { motion } from 'framer-motion';
 import ProductReviews from '../components/product/ProductReviews';
 
 // Helper function to format currency
@@ -1515,30 +1999,42 @@ const formatPriceNumber = (price) => {
   return price?.toFixed(2) || '0.00';
 };
 
-// Loading Skeleton Component - Moved OUTSIDE ProductContent
+// Rich Text Content Renderer Component
+const RichTextContent = ({ content, className = '' }) => {
+  if (!content) return <p className="text-gray-500 italic">No content available.</p>;
+
+  return (
+    <div 
+      className={`prose prose-sm sm:prose lg:prose-lg max-w-none rich-text-content ${className}`}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
+};
+
+// Loading Skeleton Component - Responsive
 const ProductDetailsSkeleton = () => (
   <div className="min-h-screen bg-gray-50">
     <Navbar />
-    <div className="container mx-auto px-4 max-w-7xl py-8 mt-20">
-      <div className="h-4 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
+    <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 md:py-8 mt-16 sm:mt-20">
+      <div className="h-4 bg-gray-200 rounded w-32 sm:w-48 mb-4 sm:mb-6 animate-pulse"></div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
         <div className="lg:col-span-5">
-          <div className="flex gap-4">
-            <div className="w-24 space-y-2">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex sm:flex-col gap-2 order-2 sm:order-1">
               {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-gray-200 rounded-lg h-24 animate-pulse"></div>
+                <div key={i} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-200 rounded-lg animate-pulse"></div>
               ))}
             </div>
-            <div className="flex-1 bg-gray-200 rounded-2xl h-[500px] animate-pulse"></div>
+            <div className="flex-1 bg-gray-200 rounded-xl sm:rounded-2xl h-[300px] sm:h-[400px] lg:h-[500px] animate-pulse order-1 sm:order-2"></div>
           </div>
         </div>
-        <div className="lg:col-span-7 space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-          <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-64 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
+        <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+          <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+          <div className="h-4 sm:h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+          <div className="h-16 sm:h-20 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-48 sm:h-56 lg:h-64 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-40 sm:h-44 lg:h-48 bg-gray-200 rounded animate-pulse"></div>
         </div>
       </div>
     </div>
@@ -1546,7 +2042,7 @@ const ProductDetailsSkeleton = () => (
   </div>
 );
 
-// Image Gallery Component
+// Image Gallery Component - Responsive
 const ImageGallery = ({ images = [], productName }) => {
   const [mainImage, setMainImage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -1561,14 +2057,15 @@ const ImageGallery = ({ images = [], productName }) => {
   };
 
   return (
-    <div className="flex gap-4">
-      <div className="w-24 space-y-2">
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+      {/* Thumbnails - Horizontal on mobile, vertical on desktop */}
+      <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
         {images.slice(0, 4).map((image, idx) => (
           <button
             key={idx}
             onClick={() => setMainImage(idx)}
             onMouseEnter={() => setMainImage(idx)}
-            className={`relative w-full h-24 rounded-lg overflow-hidden border-2 transition-all ${
+            className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border-2 transition-all ${
               mainImage === idx 
                 ? 'border-[#E39A65] shadow-md' 
                 : 'border-gray-200 hover:border-gray-300'
@@ -1587,14 +2084,15 @@ const ImageGallery = ({ images = [], productName }) => {
           </button>
         ))}
         {images.length > 4 && (
-          <div className="w-full h-24 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+          <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg bg-gray-100 flex items-center justify-center text-xs sm:text-sm text-gray-500">
             +{images.length - 4}
           </div>
         )}
       </div>
 
+      {/* Main Image */}
       <div 
-        className="flex-1 relative bg-gray-100 rounded-2xl overflow-hidden group cursor-zoom-in"
+        className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2"
         onMouseEnter={() => setShowZoom(true)}
         onMouseLeave={() => setShowZoom(false)}
         onMouseMove={handleMouseMove}
@@ -1602,7 +2100,7 @@ const ImageGallery = ({ images = [], productName }) => {
         <img
           src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
           alt={`${productName} - Main view`}
-          className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-150"
+          className="w-full h-[300px] sm:h-[320px] lg:h-[420px] object-cover transition-transform duration-500 group-hover:scale-150"
           style={{
             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
           }}
@@ -1610,24 +2108,25 @@ const ImageGallery = ({ images = [], productName }) => {
         
         <button
           onClick={() => setIsFullscreen(true)}
-          className="absolute top-4 right-4 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
         >
-          <Maximize2 className="w-5 h-5 text-gray-700" />
+          <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
         </button>
       </div>
 
+      {/* Fullscreen Modal */}
       {isFullscreen && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center mt-16">
           <button
             onClick={() => setIsFullscreen(false)}
-            className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
           >
-            <X className="w-6 h-6 text-gray-900" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
           </button>
           <img
             src={images[mainImage]?.url || images[0]?.url}
             alt={productName}
-            className="max-w-[90vw] max-h-[84vh] object-contain"
+            className="max-w-[95vw] max-h-[85vh] object-contain"
           />
         </div>
       )}
@@ -1635,7 +2134,7 @@ const ImageGallery = ({ images = [], productName }) => {
   );
 };
 
-// Color Selector Component - Shows color circles with selection indication
+// Color Selector Component - Shows ALL color circles with selection indication
 const ColorSelector = ({ colors, selectedColor, onChange }) => {
   return (
     <div className="flex flex-wrap gap-2">
@@ -1651,11 +2150,11 @@ const ColorSelector = ({ colors, selectedColor, onChange }) => {
           title={color.code}
         >
           <div
-            className="w-8 h-8 rounded-full border-2 border-white shadow-md"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-md"
             style={{ backgroundColor: color.code }}
           />
           {selectedColor?.code === color.code && (
-            <CheckCircle className="absolute -top-1 -right-1 w-4 h-4 text-[#E39A65] bg-white rounded-full" />
+            <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65] bg-white rounded-full" />
           )}
         </button>
       ))}
@@ -1663,50 +2162,168 @@ const ColorSelector = ({ colors, selectedColor, onChange }) => {
   );
 };
 
-// Bulk Pricing Table Component
 const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
   const pricingData = pricing.length > 0 ? pricing : [{ range: `${moq}+`, price: unitPrice }];
 
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Bulk Prices</h3>
-      </div>
-      <div className="p-6">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Quantity</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Price per unit</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {pricingData.map((tier, index) => {
-              const tierPrice = tier.price || unitPrice;
+  // Helper function to calculate savings percentage
+  const calculateSavings = (prevPrice, currentPrice) => {
+    if (!prevPrice || !currentPrice) return null;
+    const savingsPercent = ((prevPrice - currentPrice) / prevPrice * 100).toFixed(1);
+    return savingsPercent;
+  };
 
-              return (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 text-gray-900">{tier.range || `${moq}+`}</td>
-                  <td className="py-3 px-4">
-                    <span className="font-semibold text-[#E39A65]">{formatPrice(tierPrice)}</span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white rounded-lg sm:rounded-xl border border-[#E39A65]/20 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+    >
+      {/* Header with premium gradient using main color */}
+      <div className="relative overflow-hidden">
+        {/* Animated background effect */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-[#E39A65] to-[#d48b54]"
+          initial={{ x: '-100%' }}
+          animate={{ x: '100%' }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+          style={{ opacity: 0.15 }}
+        />
+        
+        {/* Main header content */}
+        <div className="relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-[#E39A65] to-[#d48b54]">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-8 bg-gradient-to-b from-white to-amber-100 rounded-full"></div>
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                  <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  Bulk Pricing
+                </h3>
+                <p className="text-xs text-white/80 mt-0.5">Volume discounts · Best wholesale rates</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+      
+      <div className="p-4 sm:p-6 bg-gradient-to-br from-white to-[#E39A65]/5">
+        <div className="w-full">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b-2 border-[#E39A65]/20">
+                <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <Package className="w-4 h-4 text-[#E39A65]" />
+                    <span>Quantity</span>
+                  </div>
+                </th>
+                <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-[#E39A65]" />
+                    <span>Price/Unit</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E39A65]/10">
+              {pricingData.map((tier, index) => {
+                const tierPrice = tier.price || unitPrice;
+                const prevPrice = index > 0 ? pricingData[index - 1].price : null;
+                const savings = prevPrice ? calculateSavings(prevPrice, tierPrice) : null;
+                const isBestValue = index === pricingData.length - 1 && pricingData.length > 1;
+
+                return (
+                  <motion.tr 
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ 
+                      backgroundColor: '#fef2e6',
+                      scale: 1.01,
+                      transition: { duration: 0.2 }
+                    }}
+                    className={`transition-all duration-200 cursor-default rounded-lg ${
+                      isBestValue ? 'bg-[#E39A65]/5' : ''
+                    }`}
+                  >
+                    <td className="py-3 px-2 sm:px-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium text-gray-900">
+                          {tier.range || `${moq}+`} pcs
+                        </span>
+                        {isBestValue && (
+                          <motion.span 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="px-2 py-0.5 bg-[#E39A65]/20 text-[#E39A65] text-[10px] font-medium rounded-full whitespace-nowrap"
+                          >
+                            Best Value
+                          </motion.span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-2 sm:px-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-[#E39A65] text-base">
+                          {formatPrice(tierPrice)}
+                        </span>
+                        {savings && (
+                          <motion.span 
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-medium rounded-full whitespace-nowrap"
+                          >
+                            Save {savings}%
+                          </motion.span>
+                        )}
+                      </div>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Professional border accent */}
+        <div className="mt-4 pt-3 border-t border-[#E39A65]/20 relative">
+          <div className="absolute -top-[2px] left-0 w-20 h-[2px] bg-gradient-to-r from-[#E39A65] to-transparent"></div>
+          
+          {/* Footer with trust indicators */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2"
+          >
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <CheckCircle className="w-4 h-4 text-[#E39A65]" />
+              <span className="whitespace-nowrap">Best price</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <Clock className="w-4 h-4 text-[#E39A65]" />
+              <span className="whitespace-nowrap">Inst. Quote</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-600 col-span-2 sm:col-span-1">
+              <TrendingUp className="w-4 h-4 text-[#E39A65]" />
+              <span className="whitespace-nowrap"> Discounts</span>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
-// Key Attributes Component
+// Key Attributes Component - Responsive with grid
 const KeyAttributes = ({ product }) => {
   const attributes = [
     { label: 'MOQ', value: `${product.moq} pieces` },
     { label: 'Fabric', value: product.fabric || 'Standard' },
     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
-    { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).join(', ') || 'Standard' },
+    { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).slice(0, 5).join(', ') + (product.sizes?.length > 5 ? ` +${product.sizes.length - 5} more` : '') || 'Standard' },
     ...(product.additionalInfo || []).map(info => ({
       label: info.fieldName,
       value: info.fieldValue
@@ -1714,16 +2331,16 @@ const KeyAttributes = ({ product }) => {
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Key Attributes</h3>
+    <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">Key Attributes</h3>
       </div>
-      <div className="p-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {attributes.map((attr, index) => (
-            <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
-              <p className="text-sm text-gray-500 mb-1">{attr.label}</p>
-              <p className="text-sm font-medium text-gray-900">{attr.value}</p>
+            <div key={index} className="border-b border-gray-100 pb-2 sm:pb-3 last:border-0">
+              <p className="text-xs sm:text-sm text-gray-500 mb-1">{attr.label}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-900 break-words">{attr.value}</p>
             </div>
           ))}
         </div>
@@ -1735,55 +2352,86 @@ const KeyAttributes = ({ product }) => {
 // Description Component
 const Description = ({ product }) => {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Product Description</h3>
+    <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-[#E39A65]" />
+          Product Description
+        </h3>
       </div>
-      <div className="p-6">
-        <div 
-          className="prose prose-sm sm:prose lg:prose-lg max-w-none text-gray-600 leading-relaxed"
-          dangerouslySetInnerHTML={{ 
-            __html: product.description || 'No description available.' 
-          }}
-        />
+      <div className="p-4 sm:p-6">
+        <RichTextContent content={product.description} />
       </div>
     </div>
   );
 };
 
-// Shipping Info Component
+// NEW: Instructions Component
+const Instructions = ({ product }) => {
+  if (!product.instruction) {
+    return (
+      <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#E39A65]" />
+            Care Instructions
+          </h3>
+        </div>
+        <div className="p-4 sm:p-6">
+          <p className="text-gray-500 italic">No care instructions available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-[#E39A65]" />
+          Care Instructions
+        </h3>
+      </div>
+      <div className="p-4 sm:p-6">
+        <RichTextContent content={product.instruction} />
+      </div>
+    </div>
+  );
+};
+
+// Shipping Info Component - Responsive
 const ShippingInfo = () => {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Shipping Information</h3>
+    <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">Shipping Information</h3>
       </div>
-      <div className="p-6">
-        <div className="space-y-4">
-          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-            <Truck className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+      <div className="p-4 sm:p-6">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+            <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">Global Shipping Available</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Global Shipping Available</h4>
+              <p className="text-xs sm:text-sm text-gray-600">
                 We ship worldwide with reliable carriers. Shipping costs calculated based on destination and order volume.
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-            <Clock className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">Estimated Delivery Time</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Estimated Delivery Time</h4>
+              <p className="text-xs sm:text-sm text-gray-600">
                 Domestic: 3-5 business days<br />
                 International: 7-15 business days
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-            <Package className="w-6 h-6 text-[#E39A65] flex-shrink-0" />
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+            <Package className="w-5 h-5 sm:w-6 sm:h-6 text-[#E39A65] flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-gray-900 mb-1">Bulk Order Shipping</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="text-sm sm:text-base font-medium text-gray-900 mb-1">Bulk Order Shipping</h4>
+              <p className="text-xs sm:text-sm text-gray-600">
                 Special shipping rates available for bulk orders. Contact us for a customized quote.
               </p>
             </div>
@@ -1794,11 +2442,10 @@ const ShippingInfo = () => {
   );
 };
 
-// Inquiry Item Component - Shows multiple sizes for a selected color with quantity inputs
+// Inquiry Item Component - Responsive
 const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) => {
   const [sizeQuantities, setSizeQuantities] = useState(item.sizeQuantities || {});
 
-  // Initialize size quantities when component mounts or item changes
   useEffect(() => {
     if (item.sizeQuantities) {
       setSizeQuantities(item.sizeQuantities);
@@ -1809,10 +2456,8 @@ const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) =
     const newQuantities = { ...sizeQuantities, [size]: quantity };
     setSizeQuantities(newQuantities);
     
-    // Calculate total quantity for this item
     const totalQty = Object.values(newQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
     
-    // Update parent component with size quantities and total
     onUpdate(item.id, 'sizeQuantities', newQuantities);
     onUpdate(item.id, 'quantity', totalQty);
   };
@@ -1821,40 +2466,43 @@ const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) =
     return Object.values(sizeQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
   };
 
+  // Get ALL sizes (no limit)
+  const allSizes = product.sizes?.filter(s => s.trim()) || [];
+
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-      <div className="flex items-center justify-between mb-3">
+    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center gap-2">
           <div 
-            className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-sm"
             style={{ backgroundColor: item.color?.code || '#CCCCCC' }}
           />
-          <h4 className="font-medium text-gray-900">
+          <h4 className="text-xs sm:text-sm font-medium text-gray-900">
             {item.color?.code || 'Selected Color'} - Item {index + 1}
           </h4>
         </div>
         {showRemove && (
           <button
             onClick={() => onRemove(item.id)}
-            className="p-1.5 hover:bg-red-100 rounded-lg transition-colors group"
+            className="p-1 hover:bg-red-100 rounded-lg transition-colors group"
             title="Remove item"
           >
-            <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-600" />
+            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 group-hover:text-red-600" />
           </button>
         )}
       </div>
 
-      {/* Size Quantities Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {product.sizes?.filter(s => s.trim()).map((size, idx) => (
+      {/* Size Quantities Grid - Show ALL sizes */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+        {allSizes.map((size, idx) => (
           <div key={idx} className="flex flex-col">
-            <label className="block text-xs text-gray-500 mb-1">{size}</label>
+            <label className="block text-[10px] sm:text-xs text-gray-500 mb-1">{size}</label>
             <input
               type="number"
               min="0"
               value={sizeQuantities[size] || ''}
               onChange={(e) => handleSizeQuantityChange(size, parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
               placeholder="Qty"
             />
           </div>
@@ -1862,98 +2510,310 @@ const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) =
       </div>
 
       {/* Item Total */}
-      <div className="mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
-        <span className="text-sm text-gray-600">Item Total:</span>
-        <span className="text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
+      <div className="mt-2 sm:mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
+        <span className="text-xs sm:text-sm text-gray-600">Item Total:</span>
+        <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
       </div>
     </div>
   );
 };
 
-// Related Product Card Component
+// Related Product Card Component - Responsive
 const RelatedProductCard = ({ product }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const productImages = product.images || [];
+  const [activeIndex, setActiveIndex] = useState(0);
+  const hasMultipleImages = productImages.length > 1;
   const firstTier = product.quantityBasedPricing?.[0];
+  const primaryTag = product.tags?.[0];
 
-  const handleInquireClick = (e) => {
-    e.preventDefault();
-    window.location.href = `/productDetails?id=${product._id}`;
+  const handleImageHover = (index) => {
+    setActiveIndex(index);
+  };
+
+  const handleImageLeave = () => {
+    setActiveIndex(0);
+  };
+
+  // Helper function for tag styling
+  const getTagStyles = (tag) => {
+    const styles = {
+      'Top Ranking': 'bg-gradient-to-r from-amber-500 to-orange-500',
+      'New Arrival': 'bg-gradient-to-r from-blue-500 to-cyan-500',
+      'Top Deal': 'bg-gradient-to-r from-green-500 to-emerald-500',
+      'Best Seller': 'bg-gradient-to-r from-purple-500 to-pink-500',
+      'Summer Collection': 'bg-gradient-to-r from-yellow-500 to-orange-400',
+      'Winter Collection': 'bg-gradient-to-r from-indigo-500 to-blue-400',
+      'Limited Edition': 'bg-gradient-to-r from-red-500 to-rose-500',
+      'Trending': 'bg-gradient-to-r from-pink-500 to-rose-500',
+    };
+    return styles[tag] || 'bg-gradient-to-r from-gray-500 to-gray-600';
   };
 
   return (
-    <Link href={`/productDetails?id=${product._id}`}>
-      <div 
-        className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 relative"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="relative h-48 overflow-hidden bg-gray-100">
-          <img
-            src={productImages[0]?.url || 'https://via.placeholder.com/300x300?text=No+Image'}
-            alt={product.productName}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-          />
-          <span className="absolute top-3 left-3 bg-[#E39A65] text-white text-xs px-2 py-1 rounded-full shadow-md">
-            {product.category?.name || 'Uncategorized'}
-          </span>
-          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-            <span className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              View Details
-            </span>
-          </div>
-        </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 h-12" title={product.productName}>
-            {product.productName}
-          </h3>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <span className="text-lg font-bold text-[#E39A65]">
-                ${formatPriceNumber(product.pricePerUnit)}
-              </span>
-              <span className="text-xs text-gray-500 ml-1">/pc</span>
-            </div>
-            <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-              MOQ: {product.moq}
-            </span>
-          </div>
-          {firstTier && (
-            <div className="text-xs bg-orange-50 p-2 rounded-lg">
-              <span className="font-medium text-orange-700">Bulk: </span>
-              <span className="text-gray-600">
-                {firstTier.range} @ ${formatPriceNumber(firstTier.price)}
-              </span>
-            </div>
-          )}
-          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-            <div className="flex items-center gap-1">
-              <Package className="w-3 h-3" />
-              <span>{product.sizes?.length || 0} sizes</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Palette className="w-3 h-3" />
-              <span>{product.colors?.length || 0} colors</span>
-            </div>
-          </div>
-          <button 
-            className="w-full mt-3 bg-[#E39A65] text-white py-2 rounded-lg text-sm font-medium hover:bg-[#d48b54] transition-colors flex items-center justify-center gap-2"
-            onClick={handleInquireClick}
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{
+        layout: { type: "spring", stiffness: 100, damping: 15 },
+        opacity: { duration: 0.3 }
+      }}
+      whileHover={{ 
+        y: -8,
+        transition: { type: "spring", stiffness: 300, damping: 15 }
+      }}
+      onClick={() => window.location.href = `/productDetails?id=${product._id}`}
+      className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer"
+    >
+      {/* Image Container */}
+      <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden bg-gray-100">
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
+          whileHover={{ opacity: 1 }}
+        />
+        
+        <motion.img
+          src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
+          alt={product.productName || 'Product image'}
+          className="w-full h-full object-cover"
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.5 }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
+          }}
+        />
+        
+        {/* Desktop Hover Icons */}
+        <motion.div 
+          className="absolute inset-0 bg-black/40 items-center justify-center gap-3 
+                     hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+        >
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `/productDetails?id=${product._id}`;
+            }}
           >
-            <ShoppingCart className="w-4 h-4" />
-            Inquire Now
+            <motion.div 
+              className="bg-white rounded-full p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Eye className="w-5 h-5 text-gray-700" />
+            </motion.div>
+          </div>
+          
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+            }}
+          >
+            <motion.div 
+              className="bg-[#E39A65] rounded-full p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ShoppingCart className="w-5 h-5 text-white" />
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Mobile Icons - Always visible */}
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-3 sm:hidden z-30">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `/productDetails?id=${product._id}`;
+            }}
+            className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+          >
+            <Eye className="w-4 h-4 text-gray-700" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+            }}
+            className="bg-[#E39A65]/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+          >
+            <ShoppingCart className="w-4 h-4 text-white" />
           </button>
         </div>
+        
+        {/* Category Badge */}
+        <motion.span 
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="absolute top-3 left-3 bg-[#E39A65] text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20"
+        >
+          {product.category?.name || 'Uncategorized'}
+        </motion.span>
+        
+        {/* Tag Badge (if any) */}
+        {primaryTag && (
+          <motion.span 
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className={`absolute top-3 right-3 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20 ${getTagStyles(primaryTag)}`}
+          >
+            {primaryTag}
+          </motion.span>
+        )}
+        
+        {/* MOQ Badge */}
+        <motion.span 
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="absolute bottom-3 right-3 bg-gray-900/90 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-lg z-20"
+        >
+          MOQ: {product.moq || 0}
+        </motion.span>
+
+        {/* Targeted Customer Badge */}
+        {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
+          <motion.span 
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="absolute bottom-3 left-3 bg-black/50 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full backdrop-blur-sm z-20"
+          >
+            {capitalizeFirst(product.targetedCustomer)}
+          </motion.span>
+        )}
       </div>
-    </Link>
+
+      {/* Thumbnail Gallery */}
+      {hasMultipleImages && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="flex justify-center gap-1 py-2 px-2 bg-gray-50 border-t border-gray-100"
+          onMouseLeave={handleImageLeave}
+        >
+          {productImages.slice(0, 4).map((image, index) => (
+            <motion.button
+              key={index}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-md overflow-hidden transition-all duration-300 ${
+                activeIndex === index 
+                  ? 'ring-2 ring-[#E39A65] ring-offset-2 scale-110 shadow-md' 
+                  : 'opacity-60 hover:opacity-100'
+              }`}
+              onMouseEnter={() => handleImageHover(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleImageHover(index);
+              }}
+            >
+              <img
+                src={image.url}
+                alt=""
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100';
+                }}
+              />
+            </motion.button>
+          ))}
+          {productImages.length > 4 && (
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-gray-200 flex items-center justify-center text-[10px] sm:text-xs text-gray-600 font-medium">
+              +{productImages.length - 4}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Content */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        className="p-4"
+      >
+        {/* Title and Price */}
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
+            {truncateText(product.productName, 25)}
+          </h3>
+          <div className="flex-shrink-0 text-right">
+            <span className="text-base font-bold text-[#E39A65]">
+              ${formatPriceNumber(product.pricePerUnit)}
+            </span>
+            <span className="text-gray-500 text-[8px] ml-1">/pc</span>
+          </div>
+        </div>
+
+        {/* Color Dots */}
+        {product.colors && product.colors.length > 0 && (
+          <div className="flex items-center gap-1 mb-2">
+            {product.colors.slice(0, 4).map((color, i) => (
+              <div
+                key={i}
+                className="w-4 h-4 rounded-full border border-white shadow-sm"
+                style={{ backgroundColor: color.code }}
+                title={color.name || color.code}
+              />
+            ))}
+            {product.colors.length > 4 && (
+              <span className="text-[8px] text-gray-400">+{product.colors.length - 4}</span>
+            )}
+          </div>
+        )}
+
+        {/* Bulk Price */}
+        {firstTier && (
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-2 mb-3 border border-orange-100/80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
+              <span className="font-bold text-[#E39A65]">${formatPriceNumber(firstTier.price)}/pc</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Add to Inquiry Button */}
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+          }}
+        >
+          <div className="flex items-center justify-center gap-2 w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden cursor-pointer">
+            <ShoppingCart className="w-3 h-3" />
+            <span>Inquiry Now</span>
+          </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-// Main Product Content Component that uses useSearchParams
+// Main Product Content Component
 function ProductContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const carouselRef = useRef(null);
+  const autoPlayRef = useRef(null);
   
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -1975,6 +2835,71 @@ function ProductContent() {
   const [isInCart, setIsInCart] = useState(false);
   const [cartItemDetails, setCartItemDetails] = useState(null);
 
+  // Auto-play functionality
+  useEffect(() => {
+    if (relatedProducts.length <= 4) return;
+    
+    const startAutoPlay = () => {
+      if (!isHovered) {
+        autoPlayRef.current = setInterval(() => {
+          setCurrentIndex((prev) => 
+            prev + 4 >= relatedProducts.length ? 0 : prev + 4
+          );
+        }, 5000);
+      }
+    };
+
+    startAutoPlay();
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [isHovered, relatedProducts.length]);
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => 
+      prev + 4 >= relatedProducts.length ? 0 : prev + 4
+    );
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => 
+      prev - 4 < 0 ? Math.max(relatedProducts.length - 4, 0) : prev - 4
+    );
+  };
+
+  const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + 4);
+
+  // Scroll to inquiry form if hash present
+  useEffect(() => {
+    if (window.location.hash === '#inquiry-form') {
+      const attemptScroll = (retries = 0) => {
+        const formElement = document.getElementById('inquiry-form');
+        
+        if (formElement) {
+          const yOffset = -100;
+          const y = formElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+          window.scrollTo({
+            top: y,
+            behavior: 'smooth'
+          });
+          
+          formElement.classList.add('ring-4', 'ring-[#E39A65]/20', 'transition-all', 'duration-1000');
+          setTimeout(() => {
+            formElement.classList.remove('ring-4', 'ring-[#E39A65]/20');
+          }, 2000);
+        } else if (retries < 10) {
+          setTimeout(() => attemptScroll(retries + 1), 300);
+        }
+      };
+      
+      setTimeout(attemptScroll, 500);
+    }
+  }, []);
+
   // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
@@ -1995,7 +2920,6 @@ function ProductContent() {
     }
   };
 
-  // Handle successful login/register
   const handleAuthSuccess = (userData, token) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -2014,7 +2938,6 @@ function ProductContent() {
     }
   }, [productId]);
 
-  // Check if product is in cart when product loads or auth changes
   useEffect(() => {
     if (product && isAuthenticated) {
       checkIfInCart();
@@ -2024,7 +2947,6 @@ function ProductContent() {
     }
   }, [product, isAuthenticated]);
 
-  // Listen for cart updates
   useEffect(() => {
     const handleCartUpdate = () => {
       if (product && isAuthenticated) {
@@ -2039,20 +2961,15 @@ function ProductContent() {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
       const data = await response.json();
       
       if (data.success) {
         setProduct(data.data);
-        // Set default selections
         if (data.data.colors && data.data.colors.length > 0) {
           setSelectedColor(data.data.colors[0]);
         }
-        
-        // Initialize with empty inquiry items
         setInquiryItems([]);
-        
-        // Fetch related products
         fetchRelatedProducts(data.data.category?._id || data.data.category, data.data.targetedCustomer);
       } else {
         toast.error('Product not found');
@@ -2072,26 +2989,25 @@ function ProductContent() {
       if (categoryId) queryParams.append('category', categoryId);
       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {
         const filtered = (data.data || []).filter(p => p._id !== productId);
         const shuffled = filtered.sort(() => 0.5 - Math.random());
-        setRelatedProducts(shuffled.slice(0, 4));
+        setRelatedProducts(shuffled.slice(0, 12));
       }
     } catch (error) {
       console.error('Error fetching related products:', error);
     }
   };
 
-  // Check if product is already in cart
   const checkIfInCart = async () => {
     if (!isAuthenticated || !product) return;
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2116,15 +3032,12 @@ function ProductContent() {
     }
   };
 
-  // Calculate total quantity
   useEffect(() => {
     if (!product) return;
-    
     const totalQty = inquiryItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
     setTotalQuantity(totalQty);
   }, [inquiryItems, product]);
 
-  // Calculate total price based on total quantity tier
   useEffect(() => {
     if (!product || totalQuantity === 0) {
       setTotalPrice(0);
@@ -2134,7 +3047,6 @@ function ProductContent() {
     let unitPrice = product.pricePerUnit;
     
     if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      
       const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
         const aMin = parseInt(a.range.split('-')[0]);
         const bMin = parseInt(b.range.split('-')[0]);
@@ -2182,7 +3094,6 @@ function ProductContent() {
     let unitPrice = product.pricePerUnit;
     
     if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      
       const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
         const aMin = parseInt(a.range.split('-')[0]);
         const bMin = parseInt(b.range.split('-')[0]);
@@ -2225,14 +3136,12 @@ function ProductContent() {
 
   const applicableUnitPrice = getApplicableUnitPrice();
 
-  // Handle adding a new item with selected color
   const handleAddItem = () => {
     if (!selectedColor) {
       toast.error('Please select a color');
       return;
     }
 
-    // Initialize empty size quantities object
     const initialSizeQuantities = {};
     product.sizes?.filter(s => s.trim()).forEach(size => {
       initialSizeQuantities[size] = 0;
@@ -2264,9 +3173,7 @@ function ProductContent() {
     }
   };
 
-  // Handle submit inquiry - group all colors under ONE product
   const handleSubmitInquiry = async () => {
-    // First check if user is authenticated
     if (!isAuthenticated) {
       setAuthModalTab('login');
       setShowAuthModal(true);
@@ -2274,13 +3181,11 @@ function ProductContent() {
       return;
     }
 
-    // Then validate inquiry
     if (inquiryItems.length === 0) {
       toast.error('Please add at least one color');
       return;
     }
 
-    // Check if any quantities are entered
     const hasQuantities = inquiryItems.some(item => {
       const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
       return total > 0;
@@ -2291,13 +3196,11 @@ function ProductContent() {
       return;
     }
 
-    // Calculate total quantity across ALL colors
     const calculatedTotalQuantity = inquiryItems.reduce((total, item) => {
       const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
       return total + itemTotal;
     }, 0);
 
-    // Check MOQ against total quantity
     if (calculatedTotalQuantity < product.moq) {
       toast.error(`Total quantity must be at least ${product.moq} pieces (currently ${calculatedTotalQuantity})`);
       return;
@@ -2306,7 +3209,6 @@ function ProductContent() {
     try {
       const token = localStorage.getItem('token');
       
-      // Prepare colors data with their size quantities
       const colorsData = inquiryItems.map(item => {
         const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
         
@@ -2317,7 +3219,6 @@ function ProductContent() {
         };
       }).filter(item => item.totalQuantity > 0);
 
-      // Create ONE cart item for this product with all colors
       const cartItem = {
         productId: product._id,
         productName: product.productName,
@@ -2328,10 +3229,8 @@ function ProductContent() {
         productImage: product.images?.[0]?.url,
         specialInstructions: specialInstructions
       };
-      
-      console.log('📤 Sending cart item with special instructions:', specialInstructions);
 
-      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2345,15 +3244,12 @@ function ProductContent() {
       if (data.success) {
         toast.success(`${colorsData.length} color(s) added for ${product.productName}! Total: ${calculatedTotalQuantity} pcs`);
         
-        // Clear the form
         setInquiryItems([]);
         setSpecialInstructions('');
         
-        // Update cart status
         setIsInCart(true);
         checkIfInCart();
         
-        // Dispatch cart update event for navbar
         window.dispatchEvent(new Event('cart-update'));
       } else {
         toast.error(data.error || 'Failed to add to cart');
@@ -2365,7 +3261,6 @@ function ProductContent() {
     }
   };
 
-  // Handle WhatsApp inquiry
   const handleWhatsAppInquiry = () => {
     if (!isAuthenticated) {
       setAuthModalTab('login');
@@ -2379,10 +3274,8 @@ function ProductContent() {
       return;
     }
 
-    // Format the message with all product and inquiry details
     let message = `*Inquiry for ${product.productName}*\n\n`;
     
-    // Customer/Buyer Information
     message += `*👤 BUYER INFORMATION*\n`;
     message += `• Company: ${user?.companyName || 'N/A'}\n`;
     message += `• Contact Person: ${user?.contactPerson || 'N/A'}\n`;
@@ -2391,7 +3284,6 @@ function ProductContent() {
     if (user?.whatsapp) message += `• WhatsApp: ${user.whatsapp}\n`;
     message += `• Country: ${user?.country || 'N/A'}\n\n`;
     
-    // Product Information
     message += `*📦 PRODUCT DETAILS*\n`;
     message += `• Product: ${product.productName}\n`;
     message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
@@ -2399,7 +3291,6 @@ function ProductContent() {
     message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
     message += `• MOQ: ${product.moq} pieces\n\n`;
     
-    // Inquiry Items with Size Breakdown
     message += `*🛒 INQUIRY ITEMS*\n`;
     
     inquiryItems.forEach((item, index) => {
@@ -2421,13 +3312,11 @@ function ProductContent() {
       message += `  *Item Total:* ${itemTotal} pcs\n`;
     });
     
-    // Order Summary
     message += `\n*📊 ORDER SUMMARY*\n`;
     message += `• Total Quantity: ${totalQuantity} pieces\n`;
     message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
     message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
     
-    // Special Instructions
     if (specialInstructions) {
       message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
       message += `${specialInstructions}\n`;
@@ -2435,7 +3324,6 @@ function ProductContent() {
     
     message += `\n*🕐 Inquiry sent:* ${new Date().toLocaleString()}\n`;
 
-    // Get WhatsApp number from environment variable
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685';
     const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, '');
     const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
@@ -2453,15 +3341,15 @@ function ProductContent() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-          <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Product Not Found</h2>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">The product you're looking for doesn't exist or has been removed.</p>
           <Link 
             href="/products" 
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+            className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-sm sm:text-base"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
             Back to Products
           </Link>
         </div>
@@ -2472,138 +3360,197 @@ function ProductContent() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 mt-20">
-        {/* Breadcrumb */}
-        <div className="bg-white border-b border-gray-200 pb-2">
-          <div className="container mx-auto px-4 max-w-7xl py-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Link href="/" className="hover:text-[#E39A65] transition-colors">Home</Link>
-              <span>/</span>
-              <Link href="/products" className="hover:text-[#E39A65] transition-colors">Products</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">{product.productName}</span>
+      <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
+        {/* Breadcrumb - Responsive */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Back Button */}
+              <button
+                onClick={() => router.back()}
+                className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+                aria-label="Go back"
+              >
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+              </button>
+              
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap pb-0.5 flex-1">
+                <Link href="/" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Home</Link>
+                <span className="flex-shrink-0">/</span>
+                <Link href="/products" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Products</Link>
+                <span className="flex-shrink-0">/</span>
+                <span className="text-gray-900 font-medium truncate">{product.productName}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 max-w-7xl py-8">
+        <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 lg:py-8">
           {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
             {/* Left Column - Image Gallery */}
             <div className="lg:col-span-5">
-              <div className="sticky top-24">
+              <div className="lg:sticky lg:top-24">
                 <ImageGallery images={product.images} productName={product.productName} />
               </div>
             </div>
 
             {/* Right Column - Product Info & Inquiry Form */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Product Info Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="mb-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-3 py-1 bg-[#E39A65] text-white text-sm rounded-full">
-                      {product.category?.name || 'Uncategorized'}
-                    </span>
-                    {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-                      <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                        {capitalizeFirst(product.targetedCustomer)}
-                      </span>
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+             {/* Product Info Card */}
+<div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+  <div className="mb-3 sm:mb-4">
+    {/* Modern Category & Target Row */}
+    <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 pb-3 border-b border-gray-100">
+      {/* Category with modern styling */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+          <Package className="w-3.5 h-3.5 text-[#E39A65]" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Category</span>
+          <span className="text-xs font-semibold text-gray-900">
+            {product.category?.name || 'Uncategorized'}
+          </span>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+
+      {/* Target Audience with modern styling */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+          <Users className="w-3.5 h-3.5 text-[#E39A65]" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Target</span>
+          <span className="text-xs font-semibold text-gray-900">
+            {product.targetedCustomer && product.targetedCustomer !== 'unisex' 
+              ? capitalizeFirst(product.targetedCustomer) 
+              : 'Unisex (All)'}
+          </span>
+        </div>
+      </div>
+
+      {/* Optional: MOQ as third item */}
+      <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center justify-center w-7 h-7 bg-green-50 rounded-lg">
+          <Package className="w-3.5 h-3.5 text-green-600" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ</span>
+          <span className="text-xs font-semibold text-gray-900">{product.moq} pcs</span>
+        </div>
+      </div>
+    </div>
+    
+    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{product.productName}</h1>
+    
+    {/* Product Description Preview */}
+    {product.description && (
+      <div 
+        className="text-xs sm:text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none rich-text-preview"
+        dangerouslySetInnerHTML={{ 
+          __html: product.description.length > 200 
+            ? product.description.substring(0, 200) + '...' 
+            : product.description
+        }}
+      />
+    )}
+  </div>
+                {/* Price and MOQ - Now side by side with bulk table below on large screens */}
+                <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
+                  {/* Price and MOQ - Left side on large screens */}
+                  <div className="lg:w-1/2">
+                    <div className="flex items-baseline justify-between p-3 sm:p-4 bg-orange-50 rounded-lg mb-4">
+                      <div>
+                        <span className="text-xs sm:text-sm text-gray-600">Starting from</span>
+                        <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#E39A65]">
+                          {formatPrice(product.pricePerUnit)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs sm:text-sm text-gray-600">MOQ</span>
+                        <div className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">{product.moq} pieces</div>
+                      </div>
+                    </div>
+
+                    {/* Fabric Detail */}
+                    {product.fabric && (
+                      <div className="mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700">Fabric: </span>
+                        <span className="text-xs sm:text-sm text-gray-600">{product.fabric}</span>
+                      </div>
+                    )}
+
+                    {/* Available Colors - Show all in rows of 5 */}
+                    {product.colors && product.colors.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Colors</h3>
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                          {product.colors.map((color, index) => (
+                            <div
+                              key={index}
+                              className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 border-white shadow-md"
+                              style={{ backgroundColor: color.code }}
+                              title={color.code}
+                            />
+                          ))}
+                        </div>
+                        {product.colors.length > 15 && (
+                          <p className="text-xs text-gray-500 mt-2">{product.colors.length} colors available</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Available Sizes - Show all in rows of 5 */}
+                    {product.sizes?.filter(s => s.trim()).length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Sizes</h3>
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                          {product.sizes.filter(s => s.trim()).map((size, index) => (
+                            <span
+                              key={index}
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium bg-gray-100 text-gray-700 rounded-lg"
+                            >
+                              {size}
+                            </span>
+                          ))}
+                        </div>
+                        {product.sizes.filter(s => s.trim()).length > 15 && (
+                          <p className="text-xs text-gray-500 mt-2">{product.sizes.filter(s => s.trim()).length} sizes available</p>
+                        )}
+                      </div>
                     )}
                   </div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.productName}</h1>
-                  <div 
-                    className="text-gray-600 text-sm line-clamp-2 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ 
-                      __html: product.description || 'No description available.' 
-                    }}
-                  />
-                </div>
 
-                <div className="flex items-baseline justify-between p-4 bg-orange-50 rounded-lg">
-                  <div>
-                    <span className="text-sm text-gray-600">Starting from</span>
-                    <div className="text-3xl font-bold text-[#E39A65]">
-                      {formatPrice(product.pricePerUnit)}
-                    </div>
+                  {/* Bulk Pricing Table - Right side on large screens */}
+                  <div className="lg:w-1/2 mt-4 lg:mt-0">
+                    <BulkPricingTable 
+                      pricing={product.quantityBasedPricing} 
+                      unitPrice={product.pricePerUnit}
+                      moq={product.moq}
+                    />
                   </div>
-                  <div className="text-right">
-                    <span className="text-sm text-gray-600">MOQ</span>
-                    <div className="text-xl font-semibold text-gray-900">{product.moq} pieces</div>
-                  </div>
-                </div>
-
-                {/* Fabric Detail */}
-                {product.fabric && (
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Fabric: </span>
-                    <span className="text-sm text-gray-600">{product.fabric}</span>
-                  </div>
-                )}
-
-                {/* Available Colors */}
-                {product.colors && product.colors.length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Available Colors</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {product.colors.map((color, index) => (
-                        <div
-                          key={index}
-                          className="w-8 h-8 rounded-full border-2 border-white shadow-md"
-                          style={{ backgroundColor: color.code }}
-                          title={color.code}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Available Sizes */}
-                {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Available Sizes</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {product.sizes.filter(s => s.trim()).map((size, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg"
-                        >
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Bulk Pricing Table */}
-                <div className="mt-6">
-                  <BulkPricingTable 
-                    pricing={product.quantityBasedPricing} 
-                    unitPrice={product.pricePerUnit}
-                    moq={product.moq}
-                  />
                 </div>
               </div>
 
               {/* Inquiry Form Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Create Your Inquiry</h2>
+              <div id="inquiry-form" className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 gap-2">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">Create Your Inquiry</h2>
                   {totalQuantity > 0 && (
-                    <span className="text-sm text-gray-500">{totalQuantity} total pcs</span>
+                    <span className="text-xs sm:text-sm text-gray-500">{totalQuantity} total pcs</span>
                   )}
                 </div>
                 
                 {/* Color Selection */}
                 {product.colors && product.colors.length > 0 && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-3 sm:mb-4">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                       Select Color to Add
-                      {selectedColor && (
-                        <span className="ml-2 text-xs text-gray-500">
-                          (Currently selected: {selectedColor.code})
-                        </span>
-                      )}
                     </label>
                     <ColorSelector 
                       colors={product.colors}
@@ -2617,22 +3564,22 @@ function ProductContent() {
                 <button
                   onClick={handleAddItem}
                   disabled={!selectedColor || isInCart}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                  className="w-full flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-3 sm:mb-4"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                   Add Selected Color
                 </button>
 
                 {/* Already in cart notice */}
                 {isInCart && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-green-800">
+                        <p className="text-xs sm:text-sm font-medium text-green-800">
                           ✓ This product is already in your inquiry cart
                         </p>
-                        <p className="text-xs text-green-600 mt-1">
+                        <p className="text-[10px] sm:text-xs text-green-600 mt-1">
                           You can view or modify it in your cart
                         </p>
                       </div>
@@ -2640,23 +3587,23 @@ function ProductContent() {
                   </div>
                 )}
 
-                {/* Quick size guide */}
-                {product.sizes && product.sizes.filter(s => s.trim()).length > 0 && !isInCart && (
-                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-xs text-blue-700">
+                {/* Quick size guide - Show ALL sizes */}
+                {product.sizes?.filter(s => s.trim()).length > 0 && !isInCart && (
+                  <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 rounded-lg">
+                    <p className="text-[10px] sm:text-xs text-blue-700">
                       <span className="font-medium">Available Sizes:</span> {product.sizes.filter(s => s.trim()).join(', ')}
                     </p>
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-[10px] sm:text-xs text-blue-600 mt-1">
                       Enter quantities for each size under each color item
                     </p>
                   </div>
                 )}
 
-                {/* Inquiry Items List - Only show if not in cart */}
+                {/* Inquiry Items List */}
                 {!isInCart && inquiryItems.length > 0 && (
                   <>
-                    <h3 className="text-md font-semibold text-gray-900 mb-3">Your Items</h3>
-                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 mb-4">
+                    <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-2 sm:mb-3">Your Items</h3>
+                    <div className="space-y-2 sm:space-y-3 max-h-[350px] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 mb-3 sm:mb-4">
                       {inquiryItems.map((item, index) => (
                         <InquiryItem
                           key={item.id}
@@ -2671,40 +3618,40 @@ function ProductContent() {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">Total Qty</p>
-                        <p className="text-lg font-bold text-gray-900">{totalQuantity} pcs</p>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Total Qty</p>
+                        <p className="text-base sm:text-lg font-bold text-gray-900">{totalQuantity} pcs</p>
                       </div>
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-gray-500 mb-1">Unit Price</p>
-                        <p className="text-lg font-bold text-[#E39A65]">{formatPrice(applicableUnitPrice)}</p>
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Unit Price</p>
+                        <p className="text-base sm:text-lg font-bold text-[#E39A65]">{formatPrice(applicableUnitPrice)}</p>
                       </div>
-                      <div className="p-3 bg-gray-50 rounded-lg col-span-2">
-                        <p className="text-xs text-gray-500 mb-1">Estimated Total</p>
-                        <p className="text-xl font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg col-span-2">
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Estimated Total</p>
+                        <p className="text-lg sm:text-xl font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
                       </div>
                     </div>
 
                     {/* MOQ Warning */}
                     {totalQuantity < product.moq && totalQuantity > 0 && (
-                      <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p className="text-sm text-yellow-800">
+                      <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-xs sm:text-sm text-yellow-800">
                           ⚠️ Need {product.moq - totalQuantity} more pieces to meet MOQ
                         </p>
                       </div>
                     )}
 
                     {/* Special Instructions */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="mb-3 sm:mb-4">
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                         Special Instructions
                       </label>
                       <textarea
                         value={specialInstructions}
                         onChange={(e) => setSpecialInstructions(e.target.value)}
                         rows="2"
-                        className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
+                        className="w-full px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
                         placeholder="Add any special requirements..."
                       />
                     </div>
@@ -2712,22 +3659,22 @@ function ProductContent() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 mt-4">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
                   {isInCart ? (
                     <>
                       <Link 
                         href="/inquiry-cart" 
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-green-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-green-700 transition-colors"
                       >
-                        <ShoppingCart className="w-4 h-4" />
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                         View in Cart
                       </Link>
                       <button
                         onClick={handleWhatsAppInquiry}
                         disabled={inquiryItems.length === 0}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <MessageCircle className="w-4 h-4" />
+                        <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                         Chat on WhatsApp
                       </button>
                     </>
@@ -2736,17 +3683,17 @@ function ProductContent() {
                       <button
                         onClick={handleSubmitInquiry}
                         disabled={totalQuantity < product.moq || inquiryItems.length === 0}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <ShoppingCart className="w-4 h-4" />
-                        Add to Inquiry Cart
+                        <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Add to Cart
                       </button>
                       <button
                         onClick={handleWhatsAppInquiry}
                         disabled={inquiryItems.length === 0}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-green-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <MessageCircle className="w-4 h-4" />
+                        <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                         Chat on WhatsApp
                       </button>
                     </>
@@ -2755,8 +3702,8 @@ function ProductContent() {
 
                 {/* Empty State Message */}
                 {!isInCart && inquiryItems.length === 0 && (
-                  <div className="text-center py-4 mt-2">
-                    <p className="text-sm text-gray-500">
+                  <div className="text-center py-3 sm:py-4 mt-2">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       Select a color and click "Add Selected Color" to start building your inquiry
                     </p>
                   </div>
@@ -2765,66 +3712,35 @@ function ProductContent() {
             </div>
           </div>
 
-          {/* Product Details Tabs */}
-          <div className="mt-8">
-            <div className="border-b border-gray-200">
-              <nav className="flex gap-8">
-                <button
-                  onClick={() => setActiveTab('attributes')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'attributes'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Key Attributes
-                </button>
-                <button
-                  onClick={() => setActiveTab('description')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'description'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Description
-                </button>
-                <button
-                  onClick={() => setActiveTab('pricing')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'pricing'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Bulk Pricing
-                </button>
-                <button
-                  onClick={() => setActiveTab('shipping')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'shipping'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Shipping Info
-                </button>
-                <button
-                  onClick={() => setActiveTab('reviews')}
-                  className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === 'reviews'
-                      ? 'border-[#E39A65] text-[#E39A65]'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Reviews
-                </button>
+          {/* Product Details Tabs - Responsive */}
+          <div className="mt-6 sm:mt-8">
+            <div className="border-b border-gray-200 overflow-x-auto">
+              <nav className="flex gap-4 sm:gap-6 lg:gap-8 min-w-max px-1">
+                {['attributes', 'description', 'instructions', 'pricing', 'shipping', 'reviews'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`pb-3 sm:pb-4 px-1 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      activeTab === tab
+                        ? 'border-[#E39A65] text-[#E39A65]'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {tab === 'attributes' && 'Key Attributes'}
+                    {tab === 'description' && 'Description'}
+                    {tab === 'instructions' && 'Care Instructions'}
+                    {tab === 'pricing' && 'Bulk Pricing'}
+                    {tab === 'shipping' && 'Shipping Info'}
+                    {tab === 'reviews' && 'Reviews'}
+                  </button>
+                ))}
               </nav>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               {activeTab === 'attributes' && <KeyAttributes product={product} />}
               {activeTab === 'description' && <Description product={product} />}
+              {activeTab === 'instructions' && <Instructions product={product} />}
               {activeTab === 'pricing' && (
                 <BulkPricingTable 
                   pricing={product.quantityBasedPricing} 
@@ -2841,38 +3757,109 @@ function ProductContent() {
 
           {/* Related Products Section */}
           {relatedProducts.length > 0 && (
-            <div className="mt-12">
-              <div className="flex items-center justify-between mb-6">
+            <div className="mt-8 sm:mt-10 lg:mt-12">
+              {/* Header with Browse All button */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Related Products</h2>
-                  <p className="text-sm text-gray-500 mt-1">You might also be interested in these products</p>
+                  <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
+                    <Sparkles className="w-4 h-4 text-[#E39A65]" />
+                    <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                    Related Products
+                  </h2>
                 </div>
+                
+                {/* Simple Browse All Button */}
                 <Link 
                   href="/products" 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-sm font-medium group"
+                  className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
                 >
-                  View All Products
+                  <span>Browse all products</span>
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((product) => (
-                  <RelatedProductCard key={product._id} product={product} />
-                ))}
+
+              {/* Carousel Container with padding for buttons */}
+              <div className="relative px-4 sm:px-8 md:px-10">
+                {/* Left Navigation Button */}
+                {relatedProducts.length > 4 && (
+                  <button
+                    onClick={handlePrev}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+                    style={{ transform: 'translateY(-50%)' }}
+                    aria-label="Previous products"
+                  >
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                  </button>
+                )}
+
+                {/* Right Navigation Button */}
+                {relatedProducts.length > 4 && (
+                  <button
+                    onClick={handleNext}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100 focus:opacity-100 "
+                    style={{ transform: 'translateY(-50%)' }}
+                    aria-label="Next products"
+                  >
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                  </button>
+                )}
+
+                {/* Products Grid with Animation */}
+                <div className="overflow-hidden">
+                  <motion.div 
+                    key={currentIndex}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6"
+                  >
+                    {visibleProducts.map((product) => (
+                      <RelatedProductCard key={product._id} product={product} />
+                    ))}
+                  </motion.div>
+                </div>
+
+                {/* Dots Indicator */}
+                {relatedProducts.length > 4 && (
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    {Array.from({ length: Math.ceil(relatedProducts.length / 4) }).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setCurrentIndex(index * 4);
+                          setIsHovered(true);
+                          setTimeout(() => setIsHovered(false), 3000);
+                        }}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          Math.floor(currentIndex / 4) === index
+                            ? 'w-8 bg-[#E39A65]'
+                            : 'w-2 bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
-        {/* WhatsApp Floating Button */}
-        <div className="fixed bottom-6 right-6 z-50">
+        {/* WhatsApp Floating Button - Responsive */}
+        <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
           <button
             onClick={handleWhatsAppInquiry}
             disabled={inquiryItems.length === 0}
-            className="flex items-center justify-center w-14 h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
@@ -2885,6 +3872,119 @@ function ProductContent() {
         />
       </div>
       <Footer />
+
+      {/* Add global styles for rich text content */}
+      <style jsx global>{`
+        .rich-text-content {
+          color: #374151;
+          line-height: 1.6;
+        }
+        
+        .rich-text-content h1 {
+          font-size: 2em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h2 {
+          font-size: 1.5em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h3 {
+          font-size: 1.17em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h4 {
+          font-size: 1em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content p {
+          margin: 0.75em 0;
+        }
+        
+        .rich-text-content ul {
+          list-style-type: disc;
+          padding-left: 1.5em;
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-content ol {
+          list-style-type: decimal;
+          padding-left: 1.5em;
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-content li {
+          margin: 0.25em 0;
+        }
+        
+        .rich-text-content a {
+          color: #2563eb;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        
+        .rich-text-content a:hover {
+          text-decoration: underline;
+          color: #1d4ed8;
+        }
+        
+        .rich-text-content strong {
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content em {
+          font-style: italic;
+        }
+        
+        .rich-text-content blockquote {
+          border-left: 4px solid #e5e7eb;
+          padding-left: 1em;
+          margin: 1em 0;
+          color: #6b7280;
+        }
+        
+        .rich-text-content code {
+          background-color: #f3f4f6;
+          padding: 0.2em 0.4em;
+          border-radius: 0.25em;
+          font-family: monospace;
+          font-size: 0.875em;
+        }
+        
+        .rich-text-content pre {
+          background-color: #f3f4f6;
+          padding: 1em;
+          border-radius: 0.5em;
+          overflow-x: auto;
+          font-family: monospace;
+          font-size: 0.875em;
+        }
+        
+        .rich-text-preview {
+          color: #6b7280;
+          line-height: 1.5;
+        }
+        
+        .rich-text-preview p {
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-preview a {
+          color: #2563eb;
+        }
+      `}</style>
     </>
   );
 }

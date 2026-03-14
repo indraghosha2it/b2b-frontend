@@ -530,8 +530,8 @@ const fetchDashboardData = async () => {
 
     // Build URL with date filters for inquiries - REMOVE the limit to get ALL data for counts
     // But keep limit for recent inquiries display
-    let statsUrl = `http://localhost:5000/api/moderator/inquiries?limit=1000`; // Get more for accurate counts
-    let recentUrl = `http://localhost:5000/api/moderator/inquiries?limit=10`; // For display only
+    let statsUrl = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?limit=1000`; // Get more for accurate counts
+    let recentUrl = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?limit=10`; // For display only
     
     if (filterType === 'month') {
       const startDate = new Date(selectedYear, selectedMonth, 1);
@@ -566,7 +566,7 @@ const fetchDashboardData = async () => {
     const recentData = await recentResponse.json();
     
     // Fetch ALL products (including inactive) - NO LIMIT to get all products
-    const productsResponse = await fetch('http://localhost:5000/api/products?limit=1000&includeInactive=true', {
+    const productsResponse = await fetch('https://b2b-backend-rosy.vercel.app/api/products?limit=1000&includeInactive=true', {
       headers: {
         'Authorization': `Bearer ${token}`
       }

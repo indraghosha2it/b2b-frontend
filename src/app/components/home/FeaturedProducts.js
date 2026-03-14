@@ -19,7 +19,9 @@ import {
   ChevronDown, 
   ChevronUp,
   ArrowDown,
-  ArrowUp
+  ArrowUp,
+  ShoppingCart,
+  Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -92,7 +94,7 @@ export default function FeaturedProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/products?isFeatured=true&limit=20&sort=-createdAt');
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?isFeatured=true&limit=20&sort=-createdAt');
       const data = await response.json();
       
       if (data.success) {
@@ -223,7 +225,7 @@ export default function FeaturedProducts() {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-3xl md:text-4xl font-bold text-gray-900 mb-3"
+              className="text-xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3"
             >
               Featured Collections
             </motion.h2>
@@ -417,12 +419,12 @@ export default function FeaturedProducts() {
           </motion.div>
         ) : (
           <>
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+                <motion.div 
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4 sm:px-0"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
               <AnimatePresence mode="wait">
                 {visibleProducts.map((product) => {
                   const firstTier = getFirstPricingTier(product.quantityBasedPricing);
@@ -434,191 +436,259 @@ export default function FeaturedProducts() {
                   const audienceStyle = product.targetedCustomer ? getTargetedAudienceStyle(product.targetedCustomer) : '';
                   
                   return (
-                    <motion.div
-                      key={product._id}
-                      variants={itemVariants}
-                      layout
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{
-                        layout: { type: "spring", stiffness: 100, damping: 15 },
-                        opacity: { duration: 0.3 }
-                      }}
-                      whileHover={{ 
-                        y: -8,
-                        transition: { type: "spring", stiffness: 300, damping: 15 }
-                      }}
-                      className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100/80 hover:border-[#E39A65]/20"
-                    >
-                      {/* Image Container */}
-                      <div className="relative h-40 overflow-hidden bg-gray-100">
-                        <motion.div 
-                          className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
-                          whileHover={{ opacity: 1 }}
-                        />
-                        
-                        <motion.img
-                          src={productImages[activeIndex]?.url || product.images?.[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
-                          alt={product.productName}
-                          className="w-full h-full object-cover"
-                          whileHover={{ scale: 1.1 }}
-                          transition={{ duration: 0.5 }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
-                          }}
-                        />
-                        
-                        {/* TOP LEFT - Category Badge */}
-                        <motion.span 
-                          initial={{ x: -20, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                          className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm text-gray-900 text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20"
-                        >
-                          {product.category?.name || 'Uncategorized'}
-                        </motion.span>
-                        
-                        {/* TOP RIGHT - Tag Badge */}
-                        {primaryTag && (
-                          <motion.span 
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className={`absolute top-2 right-2 ${tagStyle} text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20 flex items-center gap-0.5`}
-                          >
-                            {primaryTag === 'Top Ranking' && <Crown className="w-2 h-2" />}
-                            {primaryTag === 'New Arrival' && <Sparkles className="w-2 h-2" />}
-                            {primaryTag === 'Top Deal' && <Zap className="w-2 h-2" />}
-                            {primaryTag === 'Best Seller' && <Award className="w-2 h-2" />}
-                            {primaryTag === 'Summer Collection' && <Sun className="w-2 h-2" />}
-                            {primaryTag === 'Winter Collection' && <Snowflake className="w-2 h-2" />}
-                            {primaryTag === 'Limited Edition' && <Star className="w-2 h-2" />}
-                            {primaryTag === 'Trending' && <Flame className="w-2 h-2" />}
-                            <span className="max-w-[40px] truncate">{primaryTag}</span>
-                          </motion.span>
-                        )}
+  <motion.div
+  key={product._id}
+  variants={itemVariants}
+  layout
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  exit={{ opacity: 0, scale: 0.8 }}
+  transition={{
+    layout: { type: "spring", stiffness: 100, damping: 15 },
+    opacity: { duration: 0.3 }
+  }}
+  whileHover={{ 
+    y: -8,
+    transition: { type: "spring", stiffness: 300, damping: 15 }
+  }}
+  onClick={() => window.location.href = `/productDetails?id=${product._id}`}
+  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
+>
+  {/* Image Container */}
+  <div className="relative h-40 overflow-hidden bg-gray-100">
+    <motion.div 
+      className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
+      whileHover={{ opacity: 1 }}
+    />
+    
+    <motion.img
+      src={productImages[activeIndex]?.url || product.images?.[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
+      alt={product.productName}
+      className="w-full h-full object-cover"
+      whileHover={{ scale: 1.1 }}
+      transition={{ duration: 0.5 }}
+      onError={(e) => {
+        e.target.onerror = null;
+        e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
+      }}
+    />
+    
+    {/* Desktop Hover Icons */}
+    <motion.div 
+      className="absolute inset-0 bg-black/40 items-center justify-center gap-3 
+                 hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
+      initial={{ opacity: 0 }}
+      whileHover={{ opacity: 1 }}
+    >
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/productDetails?id=${product._id}`;
+        }}
+      >
+        <motion.div 
+          className="bg-white rounded-full p-2 sm:p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+        </motion.div>
+      </div>
+      
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+        }}
+      >
+        <motion.div 
+          className="bg-[#E39A65] rounded-full p-2 sm:p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        </motion.div>
+      </div>
+    </motion.div>
 
-                        {/* BOTTOM LEFT - Targeted Audience Badge */}
-                        {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-                          <motion.span 
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className={`absolute bottom-2 left-2 ${audienceStyle} text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20 flex items-center gap-0.5`}
-                          >
-                            <Users className="w-2 h-2" />
-                            {product.targetedCustomer?.charAt(0).toUpperCase() + product.targetedCustomer?.slice(1).toLowerCase()}
-                          </motion.span>
-                        )}
+    {/* Mobile Icons - Always visible */}
+    <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-3 sm:hidden z-30">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/productDetails?id=${product._id}`;
+        }}
+        className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+      >
+        <Eye className="w-4 h-4 text-gray-700" />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+        }}
+        className="bg-[#E39A65]/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+      >
+        <ShoppingCart className="w-4 h-4 text-white" />
+      </button>
+    </div>
+    
+    {/* TOP LEFT - Category Badge */}
+    <motion.span 
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm text-gray-900 text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20"
+    >
+      {product.category?.name || 'Uncategorized'}
+    </motion.span>
+    
+    {/* TOP RIGHT - Tag Badge */}
+    {primaryTag && (
+      <motion.span 
+        initial={{ x: 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className={`absolute top-2 right-2 ${tagStyle} text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20 flex items-center gap-0.5`}
+      >
+        {primaryTag === 'Top Ranking' && <Crown className="w-2 h-2" />}
+        {primaryTag === 'New Arrival' && <Sparkles className="w-2 h-2" />}
+        {primaryTag === 'Top Deal' && <Zap className="w-2 h-2" />}
+        {primaryTag === 'Best Seller' && <Award className="w-2 h-2" />}
+        {primaryTag === 'Summer Collection' && <Sun className="w-2 h-2" />}
+        {primaryTag === 'Winter Collection' && <Snowflake className="w-2 h-2" />}
+        {primaryTag === 'Limited Edition' && <Star className="w-2 h-2" />}
+        {primaryTag === 'Trending' && <Flame className="w-2 h-2" />}
+        <span className="max-w-[40px] truncate">{primaryTag}</span>
+      </motion.span>
+    )}
 
-                        {/* BOTTOM RIGHT - MOQ Badge */}
-                        <motion.span 
-                          initial={{ x: 20, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.5 }}
-                          className="absolute bottom-2 right-2 bg-gray-900/95 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20"
-                        >
-                          MOQ: {product.moq || 0}
-                        </motion.span>
-                      </div>
-                      {/* Thumbnail Gallery */}
-                      {hasMultipleImages && (
-                        <motion.div 
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.6 }}
-                          className="flex justify-center gap-2 py-1.5 px-1 bg-gray-50/80 border-t border-gray-100"
-                          onMouseLeave={() => handleMouseLeave(product._id)}
-                        >
-                          {productImages.slice(0, 4).map((image, index) => (
-                            <motion.button
-                              key={index}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.95 }}
-                              className={`relative w-8 h-8 rounded-md overflow-hidden transition-all duration-300 ${
-                                activeIndex === index 
-                                  ? 'ring-1 ring-[#E39A65] ring-offset-1 scale-110 shadow-md' 
-                                  : 'opacity-60 hover:opacity-100'
-                              }`}
-                              onMouseEnter={() => handleImageHover(product._id, index)}
-                            >
-                              <img
-                                src={image.url}
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-                            </motion.button>
-                          ))}
-                        </motion.div>
-                      )}
+    {/* BOTTOM LEFT - Targeted Audience Badge */}
+    {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
+      <motion.span 
+        initial={{ x: -20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className={`absolute bottom-2 left-2 ${audienceStyle} text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20 flex items-center gap-0.5`}
+      >
+        <Users className="w-2 h-2" />
+        {product.targetedCustomer?.charAt(0).toUpperCase() + product.targetedCustomer?.slice(1).toLowerCase()}
+      </motion.span>
+    )}
 
-                      {/* Content */}
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.7 }}
-                        className="p-3"
-                      >
-                        {/* Title and Price in same row */}
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
-                            {truncateText(product.productName, 30)}
-                          </h3>
-                          <div className="flex-shrink-0 text-right">
-                            <span className="text-base font-bold text-[#E39A65]">
-                              ${formatPrice(product.pricePerUnit)}
-                            </span>
-                            <span className="text-gray-500 text-[8px] ml-1">/pc</span>
-                          </div>
-                        </div>
+    {/* BOTTOM RIGHT - MOQ Badge */}
+    <motion.span 
+      initial={{ x: 20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ delay: 0.5 }}
+      className="absolute bottom-2 right-2 bg-gray-900/95 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20"
+    >
+      MOQ: {product.moq || 0}
+    </motion.span>
+  </div>
+  
+  {/* Thumbnail Gallery */}
+  {hasMultipleImages && (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.6 }}
+      className="flex justify-center gap-2 py-1.5 px-1 bg-gray-50/80 border-t border-gray-100"
+      onMouseLeave={() => handleMouseLeave(product._id)}
+    >
+      {productImages.slice(0, 4).map((image, index) => (
+        <motion.button
+          key={index}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className={`relative w-8 h-8 rounded-md overflow-hidden transition-all duration-300 ${
+            activeIndex === index 
+              ? 'ring-1 ring-[#E39A65] ring-offset-1 scale-110 shadow-md' 
+              : 'opacity-60 hover:opacity-100'
+          }`}
+          onMouseEnter={() => handleImageHover(product._id, index)}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleImageHover(product._id, index);
+          }}
+        >
+          <img
+            src={image.url}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </motion.button>
+      ))}
+    </motion.div>
+  )}
 
-                        {/* Color Dots */}
-                        {product.colors && product.colors.length > 0 && (
-                          <div className="flex items-center gap-1 mb-1.5">
-                            {product.colors.slice(0, 3).map((color, i) => (
-                              <motion.div
-                                key={i}
-                                whileHover={{ scale: 1.2 }}
-                                className="w-3 h-3 rounded-full border border-white shadow-sm"
-                                style={{ backgroundColor: color.code }}
-                                title={color.name || color.code}
-                              />
-                            ))}
-                            {product.colors.length > 3 && (
-                              <span className="text-[6px] text-gray-400">+{product.colors.length - 3}</span>
-                            )}
-                          </div>
-                        )}
+  {/* Content */}
+  <motion.div 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 0.7 }}
+    className="p-3"
+  >
+    {/* Title and Price in same row */}
+    <div className="flex items-start justify-between gap-2 mb-1">
+      <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
+        {truncateText(product.productName, 30)}
+      </h3>
+      <div className="flex-shrink-0 text-right">
+        <span className="text-base font-bold text-[#E39A65]">
+          ${formatPrice(product.pricePerUnit)}
+        </span>
+        <span className="text-gray-500 text-[8px] ml-1">/pc</span>
+      </div>
+    </div>
 
-                        {/* Bulk Price */}
-                        {firstTier && (
-                          <motion.div 
-                            whileHover={{ scale: 1.02 }}
-                            className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-1.5 mb-1.5 border border-orange-100/80"
-                          >
-                            <div className="flex justify-between items-center text-[8px]">
-                              <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
-                              <span className="font-bold text-[#E39A65]">${formatPrice(firstTier.price)}</span>
-                            </div>
-                          </motion.div>
-                        )}
+    {/* Color Dots */}
+    {product.colors && product.colors.length > 0 && (
+      <div className="flex items-center gap-1 mb-1.5">
+        {product.colors.slice(0, 3).map((color, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.2 }}
+            className="w-3 h-3 rounded-full border border-white shadow-sm"
+            style={{ backgroundColor: color.code }}
+            title={color.name || color.code}
+          />
+        ))}
+        {product.colors.length > 3 && (
+          <span className="text-[6px] text-gray-400">+{product.colors.length - 3}</span>
+        )}
+      </div>
+    )}
 
-                        {/* View Details Button */}
-                        <motion.div
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Link
-                            href={`/productDetails?id=${product._id}`}
-                            className="block w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-1.5 rounded-lg text-[10px] font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden"
-                          >
-                            View Details
-                          </Link>
-                        </motion.div>
-                      </motion.div>
-                    </motion.div>
+    {/* Bulk Price */}
+    {firstTier && (
+      <motion.div 
+        whileHover={{ scale: 1.02 }}
+        className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-1.5 mb-1.5 border border-orange-100/80"
+      >
+        <div className="flex justify-between items-center text-[8px]">
+          <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
+          <span className="font-bold text-[#E39A65]">${formatPrice(firstTier.price)}</span>
+        </div>
+      </motion.div>
+    )}
+
+    {/* Add to Inquiry Button with Cart Icon */}
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={(e) => {
+        e.stopPropagation();
+        window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+      }}
+    >
+      <div className="flex items-center justify-center gap-1.5 w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-1.5 rounded-lg text-[10px] font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden cursor-pointer">
+        <ShoppingCart className="w-3 h-3" />
+        <span>Add to Inquiry</span>
+      </div>
+    </motion.div>
+  </motion.div>
+</motion.div>
                   );
                 })}
               </AnimatePresence>

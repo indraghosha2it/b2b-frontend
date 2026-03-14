@@ -169,7 +169,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -236,7 +236,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -1343,7 +1343,7 @@ export default function ModeratorAllProducts() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -1406,7 +1406,7 @@ export default function ModeratorAllProducts() {
       }
       queryParams.append('sort', sortParam);
 
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

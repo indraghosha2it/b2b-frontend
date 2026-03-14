@@ -1,3 +1,5 @@
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -35,7 +37,12 @@
 //   Building2,
 //   FileText,
 //   Truck,
-//   Shield
+//   Shield,
+//   Star,
+//   Search,
+//   Award,
+//   TrendingUp,
+//   Sparkles
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -107,7 +114,7 @@
 //   </div>
 // );
 
-// // Image Gallery Component (reduced thumbnail size)
+// // Image Gallery Component
 // const ImageGallery = ({ images = [], productName }) => {
 //   const [mainImage, setMainImage] = useState(0);
 //   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -340,6 +347,137 @@
 //   );
 // };
 
+// // NEW: Featured & Tags Display Component
+// const FeaturedTagsDisplay = ({ isFeatured, tags }) => {
+//   if (!isFeatured && (!tags || tags.length === 0)) {
+//     return null;
+//   }
+
+//   return (
+//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-orange-50 border-b border-gray-200">
+//         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//           <Sparkles className="w-5 h-5 text-[#E39A65]" />
+//           Product Promotion
+//         </h3>
+//       </div>
+//       <div className="p-6">
+//         <div className="space-y-4">
+//           {/* Featured Status */}
+//           {isFeatured && (
+//             <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+//               <Star className="w-5 h-5 text-amber-500" />
+//               <div>
+//                 <p className="font-medium text-gray-900">Featured Product</p>
+//                 <p className="text-xs text-gray-500">This product is featured and appears in special sections</p>
+//               </div>
+//             </div>
+//           )}
+
+//           {/* Tags */}
+//           {tags && tags.length > 0 && (
+//             <div>
+//               <div className="flex items-center gap-2 mb-3">
+//                 <Tag className="w-4 h-4 text-[#E39A65]" />
+//                 <h4 className="text-sm font-medium text-gray-700">Product Tags/Labels</h4>
+//               </div>
+//               <div className="flex flex-wrap gap-2">
+//                 {tags.map((tag, index) => (
+//                   <span
+//                     key={index}
+//                     className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium"
+//                     style={{
+//                       backgroundColor: 
+//                         tag.includes('Top') ? '#FEF3C7' :
+//                         tag.includes('New') ? '#DBEAFE' :
+//                         tag.includes('Best') ? '#FCE7F3' :
+//                         tag.includes('Summer') ? '#FEF9C3' :
+//                         tag.includes('Winter') ? '#E0F2FE' :
+//                         tag.includes('Limited') ? '#FEE2E2' :
+//                         '#F3E8FF',
+//                       color:
+//                         tag.includes('Top') ? '#92400E' :
+//                         tag.includes('New') ? '#1E40AF' :
+//                         tag.includes('Best') ? '#9D174D' :
+//                         tag.includes('Summer') ? '#854D0E' :
+//                         tag.includes('Winter') ? '#0369A1' :
+//                         tag.includes('Limited') ? '#991B1B' :
+//                         '#5B21B6'
+//                     }}
+//                   >
+//                     {tag === 'Top Ranking' && <TrendingUp className="w-3 h-3 mr-1" />}
+//                     {tag === 'Best Seller' && <Award className="w-3 h-3 mr-1" />}
+//                     {tag === 'New Arrival' && <Sparkles className="w-3 h-3 mr-1" />}
+//                     {tag}
+//                   </span>
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// // NEW: Meta Settings Display Component
+// const MetaSettingsDisplay = ({ metaSettings }) => {
+//   if (!metaSettings || (!metaSettings.metaTitle && !metaSettings.metaDescription && (!metaSettings.metaKeywords || metaSettings.metaKeywords.length === 0))) {
+//     return null;
+//   }
+
+//   return (
+//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+//         <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//           <Search className="w-5 h-5 text-[#E39A65]" />
+//           SEO Settings
+//         </h3>
+//       </div>
+//       <div className="p-6">
+//         <div className="space-y-4">
+//           {/* Meta Title */}
+//           {metaSettings.metaTitle && (
+//             <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+//               <p className="text-xs font-medium text-blue-800 mb-1">Meta Title</p>
+//               <p className="text-sm text-gray-900">{metaSettings.metaTitle}</p>
+//               <p className="text-xs text-blue-600 mt-1">{metaSettings.metaTitle?.length || 0}/70 characters</p>
+//             </div>
+//           )}
+
+//           {/* Meta Description */}
+//           {metaSettings.metaDescription && (
+//             <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+//               <p className="text-xs font-medium text-green-800 mb-1">Meta Description</p>
+//               <p className="text-sm text-gray-900">{metaSettings.metaDescription}</p>
+//               <p className="text-xs text-green-600 mt-1">{metaSettings.metaDescription?.length || 0}/160 characters</p>
+//             </div>
+//           )}
+
+//           {/* Meta Keywords */}
+//           {metaSettings.metaKeywords && metaSettings.metaKeywords.length > 0 && (
+//             <div>
+//               <p className="text-xs font-medium text-gray-500 mb-2">Meta Keywords</p>
+//               <div className="flex flex-wrap gap-2">
+//                 {metaSettings.metaKeywords.map((keyword, index) => (
+//                   <span
+//                     key={index}
+//                     className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs"
+//                   >
+//                     {keyword}
+//                   </span>
+//                 ))}
+//               </div>
+//             </div>
+//           )}
+
+       
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
 // // Status Badge Component
 // const StatusBadge = ({ isActive }) => (
 //   <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
@@ -376,8 +514,7 @@
 //             <User className="w-6 h-6 text-[#E39A65]" />
 //           </div>
 //           <div className="flex-1">
-//             {/* <p className="font-medium text-gray-900">{createdBy.name || 'Unknown'}</p> */}
-//               {createdBy.contactPerson && (
+//             {createdBy.contactPerson && (
 //               <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
 //                 <User className="w-3.5 h-3.5" />
 //                 {createdBy.contactPerson}
@@ -389,8 +526,6 @@
 //                 {createdBy.email}
 //               </p>
 //             )}
-            
-
 //             {createdBy.role && (
 //               <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
 //                 <Building2 className="w-3.5 h-3.5" />
@@ -400,25 +535,29 @@
 //           </div>
 //         </div>
 //       </div>
-      
 //     </div>
-    
 //   );
 // };
 
-// // Key Attributes Component
+// // Key Attributes Component - Updated to include new fields
 // const KeyAttributes = ({ product }) => {
 //   const attributes = [
 //     { label: 'MOQ', value: `${product.moq} pieces` },
 //     { label: 'Fabric', value: product.fabric || 'Standard' },
 //     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
 //     { label: 'Category', value: product.category?.name || 'Uncategorized' },
-//     // { label: 'Slug', value: product.slug },
+//     { label: 'Views', value: product.views || 0 },
+
 //     ...(product.additionalInfo || []).map(info => ({
 //       label: info.fieldName,
 //       value: info.fieldValue
 //     }))
 //   ];
+
+//   // Add featured to attributes if true
+//   if (product.isFeatured) {
+//     attributes.push({ label: 'Featured', value: 'Yes' });
+//   }
 
 //   return (
 //     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -523,7 +662,7 @@
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -558,7 +697,7 @@
 //   const handleDeleteConfirm = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${deleteModal.id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${deleteModal.id}`, {
 //         method: 'DELETE',
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
@@ -582,7 +721,7 @@
 //   const handleToggleStatus = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}/toggle`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}/toggle`, {
 //         method: 'PUT',
 //         headers: { 
 //           'Authorization': `Bearer ${token}`,
@@ -650,6 +789,12 @@
 //                     {truncateText(product.productName, 30)}
 //                   </h1>
 //                   <StatusBadge isActive={product.isActive} />
+//                   {product.isFeatured && (
+//                     <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+//                       <Star className="w-3.5 h-3.5" />
+//                       Featured
+//                     </span>
+//                   )}
 //                 </div>
 //                 <div className="flex items-center gap-2 mt-1">
 //                   <p className="text-sm text-gray-500">
@@ -703,18 +848,18 @@
 
 //       {/* Main Content */}
 //       <div className="container mx-auto px-4 max-w-7xl py-8">
-//         {/* Breadcrumb - Removed product name from breadcrumb */}
-//        <div className="mb-6">
-//   <div className="flex items-center gap-2 text-sm text-gray-600">
-//     <Link href="/moderator/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
-//     <span>/</span>
-//     <Link href="/moderator/allProducts" className="hover:text-[#E39A65] transition-colors">All Products</Link>
-//     <span>/</span>
-//     <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
-//       {product.productName}
-//     </span>
-//   </div>
-// </div>
+//         {/* Breadcrumb */}
+//         <div className="mb-6">
+//           <div className="flex items-center gap-2 text-sm text-gray-600">
+//             <Link href="/admin/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
+//             <span>/</span>
+//             <Link href="/admin/allProducts" className="hover:text-[#E39A65] transition-colors">All Products</Link>
+//             <span>/</span>
+//             <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
+//               {product.productName}
+//             </span>
+//           </div>
+//         </div>
 
 //         {/* Two Column Layout */}
 //         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -743,107 +888,132 @@
 //                   <SizesDisplay sizes={product.sizes} />
 //                 </div>
 //               </div>
-              
 //             </div>
 //           </div>
 
 //           {/* Right Column - Product Details (7 columns) */}
-//         <div className="lg:col-span-7 space-y-6">
-//   {/* Product Info Card */}
-//   <div className="bg-white rounded-xl border border-gray-200 p-6">
-//     <div className="mb-4">
-//       <div className="flex items-center gap-2 mb-3">
-//         <span className="px-3 py-1 bg-[#E39A65] text-white text-sm rounded-full">
-//           {product.category?.name || 'Uncategorized'}
-//         </span>
-//         {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-//           <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-//             {capitalizeFirst(product.targetedCustomer)}
-//           </span>
-//         )}
-//       </div>
-      
-//       {/* Full Product Name */}
-//       <h1 className="text-2xl font-bold text-gray-900 mb-3" title={product.productName}>
-//         {product.productName}
-//       </h1>
-      
-//       {/* Product Description */}
-//       {product.description && (
-//         <div 
-//           className="text-gray-600 text-sm mb-4 prose prose-sm max-w-none"
-//           dangerouslySetInnerHTML={{ 
-//             __html: product.description || 'No description available.' 
-//           }}
-//         />
-//       )}
-//     </div>
+//           <div className="lg:col-span-7 space-y-6">
+//             {/* Product Info Card */}
+//             <div className="bg-white rounded-xl border border-gray-200 p-6">
+//               <div className="mb-4">
+//                 <div className="flex items-center gap-2 mb-3">
+//                   <span className="px-3 py-1 bg-[#E39A65] text-white text-sm rounded-full">
+//                     {product.category?.name || 'Uncategorized'}
+//                   </span>
+//                   {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
+//                     <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
+//                       {capitalizeFirst(product.targetedCustomer)}
+//                     </span>
+//                   )}
+//                 </div>
+                
+//                 {/* Full Product Name */}
+//                 <h1 className="text-2xl font-bold text-gray-900 mb-3" title={product.productName}>
+//                   {product.productName}
+//                 </h1>
+                
+//                 {/* Product Description */}
+//                 {product.description && (
+//                   <div 
+//                     className="text-gray-600 text-sm mb-4 prose prose-sm max-w-none"
+//                     dangerouslySetInnerHTML={{ 
+//                       __html: product.description || 'No description available.' 
+//                     }}
+//                   />
+//                 )}
+//               </div>
 
-//     <div className="flex items-baseline justify-between p-4 bg-orange-50 rounded-lg">
-//       <div>
-//         <span className="text-sm text-gray-600">Price Per Unit</span>
-//         <div className="text-3xl font-bold text-[#E39A65]">
-//           {formatPrice(product.pricePerUnit)}
-//         </div>
-//       </div>
-//       <div className="text-right">
-//         <span className="text-sm text-gray-600">MOQ</span>
-//         <div className="text-xl font-semibold text-gray-900">{product.moq} pieces</div>
-//       </div>
-//     </div>
+//               <div className="flex items-baseline justify-between p-4 bg-orange-50 rounded-lg">
+//                 <div>
+//                   <span className="text-sm text-gray-600">Price Per Unit</span>
+//                   <div className="text-3xl font-bold text-[#E39A65]">
+//                     {formatPrice(product.pricePerUnit)}
+//                   </div>
+//                 </div>
+//                 <div className="text-right">
+//                   <span className="text-sm text-gray-600">MOQ</span>
+//                   <div className="text-xl font-semibold text-gray-900">{product.moq} pieces</div>
+//                 </div>
+//               </div>
 
-//     {/* Fabric Detail */}
-//     {product.fabric && (
-//       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-//         <span className="text-sm font-medium text-gray-700">Fabric: </span>
-//         <span className="text-sm text-gray-600">{product.fabric}</span>
-//       </div>
-//     )}
+//               {/* Fabric Detail */}
+//               {product.fabric && (
+//                 <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+//                   <span className="text-sm font-medium text-gray-700">Fabric: </span>
+//                   <span className="text-sm text-gray-600">{product.fabric}</span>
+//                 </div>
+//               )}
 
-//     {/* Timestamps */}
-//     <div className="mt-4 grid grid-cols-2 gap-4">
-//       <div className="p-3 bg-gray-50 rounded-lg">
-//         <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-//           <Calendar className="w-3.5 h-3.5" />
-//           Created
-//         </div>
-//         <p className="text-sm font-medium text-gray-900">{formatDate(product.createdAt)}</p>
-//       </div>
-//       <div className="p-3 bg-gray-50 rounded-lg">
-//         <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-//           <Clock className="w-3.5 h-3.5" />
-//           Last Updated
-//         </div>
-//         <p className="text-sm font-medium text-gray-900">{formatDate(product.updatedAt)}</p>
-//       </div>
-//     </div>
+//               {/* Views and Inquiry Count */}
+//               <div className="mt-4 grid grid-cols-2 gap-4">
+//                 <div className="p-3 bg-gray-50 rounded-lg">
+//                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+//                     <Eye className="w-3.5 h-3.5" />
+//                     Views
+//                   </div>
+//                   <p className="text-sm font-medium text-gray-900">{product.views || 0}</p>
+//                 </div>
+//                 <div className="p-3 bg-gray-50 rounded-lg">
+//                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+//                     <Mail className="w-3.5 h-3.5" />
+//                     Inquiries
+//                   </div>
+//                   <p className="text-sm font-medium text-gray-900">{product.inquiryCount || 0}</p>
+//                 </div>
+//               </div>
 
+//               {/* Timestamps */}
+//               <div className="mt-4 grid grid-cols-2 gap-4">
+//                 <div className="p-3 bg-gray-50 rounded-lg">
+//                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+//                     <Calendar className="w-3.5 h-3.5" />
+//                     Created
+//                   </div>
+//                   <p className="text-sm font-medium text-gray-900">{formatDate(product.createdAt)}</p>
+//                 </div>
+//                 <div className="p-3 bg-gray-50 rounded-lg">
+//                   <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+//                     <Clock className="w-3.5 h-3.5" />
+//                     Last Updated
+//                   </div>
+//                   <p className="text-sm font-medium text-gray-900">{formatDate(product.updatedAt)}</p>
+//                 </div>
+//               </div>
+//             </div>
 
-//   </div>
+//             {/* NEW: Featured & Tags Display */}
+//             {(product.isFeatured || (product.tags && product.tags.length > 0)) && (
+//               <FeaturedTagsDisplay isFeatured={product.isFeatured} tags={product.tags} />
+//             )}
 
-//   {/* Bulk Pricing - Right side */}
-//   <BulkPricingTable 
-//     pricing={product.quantityBasedPricing} 
-//     unitPrice={product.pricePerUnit}
-//     moq={product.moq}
-//   />
+//             {/* NEW: Meta Settings Display */}
+//             {product.metaSettings && (
+//               <MetaSettingsDisplay metaSettings={product.metaSettings} />
+//             )}
 
-//   {/* Additional Information */}
-//   {product.additionalInfo && product.additionalInfo.length > 0 && (
-//     <div className="bg-white rounded-xl border border-gray-200 p-6">
-//       <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-//         <Info className="w-5 h-5 text-[#E39A65]" />
-//         Additional Information
-//       </h3>
-//       <AdditionalInfoDisplay additionalInfo={product.additionalInfo} />
-//     </div>
-//   )}
+//             {/* Bulk Pricing */}
+//             <BulkPricingTable 
+//               pricing={product.quantityBasedPricing} 
+//               unitPrice={product.pricePerUnit}
+//               moq={product.moq}
+//             />
 
-//   {/* Creator Info */}
-//   {product.createdBy && (
-//     <CreatorInfo createdBy={product.createdBy} />
-//   )}
-// </div>
+//             {/* Additional Information */}
+//             {product.additionalInfo && product.additionalInfo.length > 0 && (
+//               <div className="bg-white rounded-xl border border-gray-200 p-6">
+//                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+//                   <Info className="w-5 h-5 text-[#E39A65]" />
+//                   Additional Information
+//                 </h3>
+//                 <AdditionalInfoDisplay additionalInfo={product.additionalInfo} />
+//               </div>
+//             )}
+
+//             {/* Creator Info */}
+//             {product.createdBy && (
+//               <CreatorInfo createdBy={product.createdBy} />
+//             )}
+//           </div>
 //         </div>
 
 //         {/* Tabs Section at Bottom */}
@@ -949,6 +1119,7 @@
 //   );
 // }
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -991,7 +1162,8 @@ import {
   Search,
   Award,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  BookOpen // Added for instruction tab
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -1032,6 +1204,18 @@ const truncateText = (text, limit = 30) => {
   if (!text) return '';
   if (text.length <= limit) return text;
   return text.substring(0, limit) + '...';
+};
+
+// Rich Text Content Renderer Component
+const RichTextContent = ({ content, className = '' }) => {
+  if (!content) return <p className="text-gray-500 italic">No content available.</p>;
+
+  return (
+    <div 
+      className={`prose prose-sm sm:prose lg:prose-lg max-w-none rich-text-content ${className}`}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
 };
 
 // Loading Skeleton Component
@@ -1296,7 +1480,7 @@ const AdditionalInfoDisplay = ({ additionalInfo }) => {
   );
 };
 
-// NEW: Featured & Tags Display Component
+// Featured & Tags Display Component
 const FeaturedTagsDisplay = ({ isFeatured, tags }) => {
   if (!isFeatured && (!tags || tags.length === 0)) {
     return null;
@@ -1369,7 +1553,7 @@ const FeaturedTagsDisplay = ({ isFeatured, tags }) => {
   );
 };
 
-// NEW: Meta Settings Display Component
+// Meta Settings Display Component
 const MetaSettingsDisplay = ({ metaSettings }) => {
   if (!metaSettings || (!metaSettings.metaTitle && !metaSettings.metaDescription && (!metaSettings.metaKeywords || metaSettings.metaKeywords.length === 0))) {
     return null;
@@ -1419,8 +1603,6 @@ const MetaSettingsDisplay = ({ metaSettings }) => {
               </div>
             </div>
           )}
-
-       
         </div>
       </div>
     </div>
@@ -1495,8 +1677,7 @@ const KeyAttributes = ({ product }) => {
     { label: 'Fabric', value: product.fabric || 'Standard' },
     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
     { label: 'Category', value: product.category?.name || 'Uncategorized' },
-    { label: 'Views', value: product.views || 0 },
-
+  
     ...(product.additionalInfo || []).map(info => ({
       label: info.fieldName,
       value: info.fieldValue
@@ -1532,15 +1713,46 @@ const Description = ({ product }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Product Description</h3>
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-[#E39A65]" />
+          Product Description
+        </h3>
       </div>
       <div className="p-6">
-        <div 
-          className="prose prose-sm sm:prose lg:prose-lg max-w-none text-gray-600 leading-relaxed"
-          dangerouslySetInnerHTML={{ 
-            __html: product.description || 'No description available.' 
-          }}
-        />
+        <RichTextContent content={product.description} />
+      </div>
+    </div>
+  );
+};
+
+// NEW: Instructions Component
+const Instructions = ({ product }) => {
+  if (!product.instruction) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-[#E39A65]" />
+            Care Instructions
+          </h3>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-500 italic">No care instructions available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-[#E39A65]" />
+          Care Instructions
+        </h3>
+      </div>
+      <div className="p-6">
+        <RichTextContent content={product.instruction} />
       </div>
     </div>
   );
@@ -1611,7 +1823,7 @@ export default function AdminProductDetails() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1646,7 +1858,7 @@ export default function AdminProductDetails() {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${deleteModal.id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${deleteModal.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -1670,7 +1882,7 @@ export default function AdminProductDetails() {
   const handleToggleStatus = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${productId}/toggle`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}/toggle`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -1861,12 +2073,14 @@ export default function AdminProductDetails() {
                   {product.productName}
                 </h1>
                 
-                {/* Product Description */}
+                {/* Product Description - Preview */}
                 {product.description && (
                   <div 
-                    className="text-gray-600 text-sm mb-4 prose prose-sm max-w-none"
+                    className="text-gray-600 text-sm mb-4 prose prose-sm max-w-none rich-text-preview"
                     dangerouslySetInnerHTML={{ 
-                      __html: product.description || 'No description available.' 
+                      __html: product.description.length > 200 
+                        ? product.description.substring(0, 200) + '...' 
+                        : product.description
                     }}
                   />
                 )}
@@ -1893,23 +2107,7 @@ export default function AdminProductDetails() {
                 </div>
               )}
 
-              {/* Views and Inquiry Count */}
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    Views
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">{product.views || 0}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                    <Mail className="w-3.5 h-3.5" />
-                    Inquiries
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">{product.inquiryCount || 0}</p>
-                </div>
-              </div>
+              
 
               {/* Timestamps */}
               <div className="mt-4 grid grid-cols-2 gap-4">
@@ -1969,10 +2167,10 @@ export default function AdminProductDetails() {
         <div className="mt-8">
           {/* Tab Navigation */}
           <div className="border-b border-gray-200">
-            <nav className="flex gap-8">
+            <nav className="flex gap-8 overflow-x-auto pb-1">
               <button
                 onClick={() => setActiveTab('attributes')}
-                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === 'attributes'
                     ? 'border-[#E39A65] text-[#E39A65]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1982,7 +2180,7 @@ export default function AdminProductDetails() {
               </button>
               <button
                 onClick={() => setActiveTab('description')}
-                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === 'description'
                     ? 'border-[#E39A65] text-[#E39A65]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -1990,9 +2188,20 @@ export default function AdminProductDetails() {
               >
                 Description
               </button>
+              {/* NEW: Instructions Tab */}
+              <button
+                onClick={() => setActiveTab('instructions')}
+                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === 'instructions'
+                    ? 'border-[#E39A65] text-[#E39A65]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Care Instructions
+              </button>
               <button
                 onClick={() => setActiveTab('pricing')}
-                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === 'pricing'
                     ? 'border-[#E39A65] text-[#E39A65]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -2002,7 +2211,7 @@ export default function AdminProductDetails() {
               </button>
               <button
                 onClick={() => setActiveTab('shipping')}
-                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
+                className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === 'shipping'
                     ? 'border-[#E39A65] text-[#E39A65]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -2017,6 +2226,8 @@ export default function AdminProductDetails() {
           <div className="mt-6">
             {activeTab === 'attributes' && <KeyAttributes product={product} />}
             {activeTab === 'description' && <Description product={product} />}
+            {/* NEW: Instructions Tab Content */}
+            {activeTab === 'instructions' && <Instructions product={product} />}
             {activeTab === 'pricing' && (
               <BulkPricingTable 
                 pricing={product.quantityBasedPricing} 
@@ -2064,6 +2275,119 @@ export default function AdminProductDetails() {
           </div>
         </div>
       )}
+
+      {/* Add global styles for rich text content */}
+      <style jsx global>{`
+        .rich-text-content {
+          color: #374151;
+          line-height: 1.6;
+        }
+        
+        .rich-text-content h1 {
+          font-size: 2em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h2 {
+          font-size: 1.5em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h3 {
+          font-size: 1.17em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content h4 {
+          font-size: 1em;
+          margin: 0.5em 0;
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content p {
+          margin: 0.75em 0;
+        }
+        
+        .rich-text-content ul {
+          list-style-type: disc;
+          padding-left: 1.5em;
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-content ol {
+          list-style-type: decimal;
+          padding-left: 1.5em;
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-content li {
+          margin: 0.25em 0;
+        }
+        
+        .rich-text-content a {
+          color: #2563eb;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        
+        .rich-text-content a:hover {
+          text-decoration: underline;
+          color: #1d4ed8;
+        }
+        
+        .rich-text-content strong {
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .rich-text-content em {
+          font-style: italic;
+        }
+        
+        .rich-text-content blockquote {
+          border-left: 4px solid #e5e7eb;
+          padding-left: 1em;
+          margin: 1em 0;
+          color: #6b7280;
+        }
+        
+        .rich-text-content code {
+          background-color: #f3f4f6;
+          padding: 0.2em 0.4em;
+          border-radius: 0.25em;
+          font-family: monospace;
+          font-size: 0.875em;
+        }
+        
+        .rich-text-content pre {
+          background-color: #f3f4f6;
+          padding: 1em;
+          border-radius: 0.5em;
+          overflow-x: auto;
+          font-family: monospace;
+          font-size: 0.875em;
+        }
+        
+        .rich-text-preview {
+          color: #6b7280;
+          line-height: 1.5;
+        }
+        
+        .rich-text-preview p {
+          margin: 0.5em 0;
+        }
+        
+        .rich-text-preview a {
+          color: #2563eb;
+        }
+      `}</style>
     </div>
   );
 }

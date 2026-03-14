@@ -85,6 +85,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import LayoutContent from "./components/layout/LayoutContent";
 import WhatsAppButton from "./components/layout/WhatsAppButton";
+import ScrollToTop from "./components/layout/ScrollToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,6 +119,7 @@ export default function RootLayout({ children }) {
           theme="light"
         />
         <WhatsAppButton />
+        <ScrollToTop />
       </body>
     </html>
   );

@@ -126,7 +126,7 @@
 //         params.append('search', searchTerm);
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -159,7 +159,7 @@
 //     const token = localStorage.getItem('token');
     
 //     // Fetch a larger limit to get all reviews (adjust limit as needed)
-//     const response = await fetch('http://localhost:5000/api/reviews?limit=1000', {
+//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1000', {
 //       headers: {
 //         'Authorization': `Bearer ${token}`
 //       }
@@ -225,7 +225,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -255,7 +255,7 @@
 //   setActionLoading(true);
 //   try {
 //     const token = localStorage.getItem('token');
-//     const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
+//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
 //       method: 'PUT',
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -291,7 +291,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${responseModal.review._id}/respond`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${responseModal.review._id}/respond`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1009,7 +1009,7 @@ export default function ModeratorManageReviews() {
         params.append('search', searchTerm);
       }
 
-      const response = await fetch(`http://localhost:5000/api/reviews?${params}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1041,7 +1041,7 @@ export default function ModeratorManageReviews() {
       const token = localStorage.getItem('token');
       
       // Fetch a larger limit to get all reviews
-      const response = await fetch('http://localhost:5000/api/reviews?limit=1000', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/reviews?limit=1000', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1098,7 +1098,7 @@ export default function ModeratorManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/feature`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/feature`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1127,7 +1127,7 @@ export default function ModeratorManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/moderate`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/moderate`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1229,7 +1229,7 @@ export default function ModeratorManageReviews() {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

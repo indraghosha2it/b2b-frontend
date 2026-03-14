@@ -1,7 +1,4 @@
 
-
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -26,7 +23,10 @@
 //   Users,
 //   Info,
 //   Hash,
-//   Type
+//   Type,
+//   Star,
+//   Search,
+//   Tag
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -77,6 +77,18 @@
 //   { value: 'unisex', label: 'Unisex' }
 // ];
 
+// // Available tags (matching your schema)
+// const AVAILABLE_TAGS = [
+//   'Top Ranking',
+//   'New Arrival',
+//   'Top Deal',
+//   'Best Seller',
+//   'Summer Collection',
+//   'Winter Collection',
+//   'Limited Edition',
+//   'Trending'
+// ];
+
 // export default function ModeratorCreateProduct() {
 //   const router = useRouter();
 //   const [isLoading, setIsLoading] = useState(false);
@@ -85,11 +97,17 @@
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
+//   const [keywordInput, setKeywordInput] = useState('');
+
+  
+//   // New state for collapsible sections
+//   const [showTags, setShowTags] = useState(false);
+//   const [showMeta, setShowMeta] = useState(false);
   
 //   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
-//   // Form state with additionalInfo
+//   // Form state with all fields including new ones
 //   const [formData, setFormData] = useState({
 //     productName: '',
 //     description: '',
@@ -107,8 +125,58 @@
 //       { code: '#0000FF' },
 //       { code: '#000000' }
 //     ],
-//     additionalInfo: [] // New field for additional information
+//     additionalInfo: [],
+//     // NEW FIELDS
+//     isFeatured: false,
+//     tags: [],
+//     metaSettings: {
+//       metaTitle: '',
+//       metaDescription: '',
+//       metaKeywords: []
+//     }
 //   });
+//   // Add these handlers
+// const addKeyword = () => {
+//   if (!keywordInput.trim()) return;
+  
+//   // Split by comma if multiple keywords are pasted at once
+//   const keywordsToAdd = keywordInput
+//     .split(',')
+//     .map(k => k.trim())
+//     .filter(k => k !== '');
+  
+//   setFormData(prev => ({
+//     ...prev,
+//     metaSettings: {
+//       ...prev.metaSettings,
+//       metaKeywords: [...(prev.metaSettings.metaKeywords || []), ...keywordsToAdd]
+//     }
+//   }));
+//   setKeywordInput('');
+// };
+
+// const handleKeywordKeyDown = (e) => {
+//   if (e.key === 'Enter' || e.key === ',') {
+//     e.preventDefault();
+//     addKeyword();
+//   }
+// };
+
+// const handleKeywordBlur = () => {
+//   if (keywordInput.trim()) {
+//     addKeyword();
+//   }
+// };
+
+// const removeKeyword = (indexToRemove) => {
+//   setFormData(prev => ({
+//     ...prev,
+//     metaSettings: {
+//       ...prev.metaSettings,
+//       metaKeywords: prev.metaSettings.metaKeywords.filter((_, index) => index !== indexToRemove)
+//     }
+//   }));
+// };
 
 //   // Image state for 4 images
 //   const [productImages, setProductImages] = useState([
@@ -187,7 +255,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -392,7 +460,6 @@
 //     updatedInfo[index] = { ...updatedInfo[index], [field]: value };
 //     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
     
-//     // Clear error for this field if it exists
 //     if (errors[`additionalInfo_${index}_${field}`]) {
 //       setErrors(prev => ({ ...prev, [`additionalInfo_${index}_${field}`]: null }));
 //     }
@@ -415,6 +482,31 @@
 //     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
 //   };
 
+//   // ========== NEW HANDLERS FOR TAGS AND META ==========
+  
+//   // Handle tag toggle
+//   const handleTagToggle = (tag) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       tags: prev.tags.includes(tag)
+//         ? prev.tags.filter(t => t !== tag)
+//         : [...prev.tags, tag]
+//     }));
+//   };
+
+//   // Handle meta settings change
+//   const handleMetaChange = (field, value) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       metaSettings: {
+//         ...prev.metaSettings,
+//         [field]: value
+//       }
+//     }));
+//   };
+
+
+
 //   // Validate additional info
 //   const validateAdditionalInfo = () => {
 //     let isValid = true;
@@ -435,7 +527,7 @@
 //     return isValid;
 //   };
 
-//   // Validate form
+//   // Validate form - Updated with new fields validation
 //   const validateForm = () => {
 //     const newErrors = {};
 
@@ -477,15 +569,24 @@
 //       newErrors.colors = 'At least one color is required';
 //     }
 
+//     // Validate meta title length
+//     if (formData.metaSettings.metaTitle && formData.metaSettings.metaTitle.length > 70) {
+//       newErrors.metaTitle = 'Meta title should not exceed 70 characters';
+//     }
+
+//     // Validate meta description length
+//     if (formData.metaSettings.metaDescription && formData.metaSettings.metaDescription.length > 160) {
+//       newErrors.metaDescription = 'Meta description should not exceed 160 characters';
+//     }
+
 //     setErrors(newErrors);
     
-//     // Validate additional info separately
 //     const isAdditionalInfoValid = validateAdditionalInfo();
     
 //     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
 //   };
 
-//   // Handle form submission
+//   // Handle form submission - Updated with new fields
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
@@ -530,6 +631,11 @@
 //       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
 //       formDataToSend.append('colors', JSON.stringify(formData.colors));
 //       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
+      
+//       // Append new fields
+//       formDataToSend.append('isFeatured', formData.isFeatured);
+//       formDataToSend.append('tags', JSON.stringify(formData.tags));
+//       formDataToSend.append('metaSettings', JSON.stringify(formData.metaSettings));
 
 //       // Append images
 //       productImages.forEach((img, index) => {
@@ -543,7 +649,7 @@
 //         console.log('FormData entry:', pair[0], pair[1]);
 //       }
 
-//       const response = await fetch('http://localhost:5000/api/products', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -954,7 +1060,7 @@
 //               </div>
 //             </div>
 
-//             {/* NEW ROW: Additional Information (without suggested fields) */}
+//             {/* Additional Information Section */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1043,7 +1149,250 @@
 //               </div>
 //             </div>
 
-//             {/* Row 3: Bulk Pricing (Full Width) */}
+//             {/* NEW: Featured & Tags Section */}
+//             <div className="mb-6">
+//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                 <div className="p-5 border-b border-gray-200">
+//                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                     <Star className="w-5 h-5 text-[#E39A65]" />
+//                     Product Promotion
+//                   </h2>
+//                   <p className="text-xs text-gray-500 mt-1">
+//                     Mark as featured and add tags to highlight your product
+//                   </p>
+//                 </div>
+                
+//                 <div className="p-5">
+//                   {/* Featured Checkbox */}
+//                   <div className="mb-4">
+//                     <label className="flex items-center gap-3 cursor-pointer">
+//                       <input
+//                         type="checkbox"
+//                         checked={formData.isFeatured}
+//                         onChange={(e) => {
+//                           setFormData({ ...formData, isFeatured: e.target.checked });
+//                           setShowTags(e.target.checked);
+//                         }}
+//                         className="w-5 h-5 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
+//                       />
+//                       <div>
+//                         <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
+//                         <p className="text-xs text-gray-500">Featured products will appear in special sections</p>
+//                       </div>
+//                     </label>
+//                   </div>
+
+//                   {/* Tags Section */}
+//                   <div className="mt-4">
+//                     <div 
+//                       className="flex items-center justify-between cursor-pointer py-2"
+//                       onClick={() => setShowTags(!showTags)}
+//                     >
+//                       <div className="flex items-center gap-2">
+//                         <Tag className="w-4 h-4 text-[#E39A65]" />
+//                         <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
+//                       </div>
+//                       <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
+//                     </div>
+
+//                     {showTags && (
+//                       <div className="mt-3">
+//                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+//                           {AVAILABLE_TAGS.map(tag => (
+//                             <label key={tag} className="flex items-center gap-2 cursor-pointer">
+//                               <input
+//                                 type="checkbox"
+//                                 checked={formData.tags.includes(tag)}
+//                                 onChange={() => handleTagToggle(tag)}
+//                                 className="w-4 h-4 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
+//                               />
+//                               <span className="text-sm text-gray-600">{tag}</span>
+//                             </label>
+//                           ))}
+//                         </div>
+                        
+//                         {/* Selected Tags Display */}
+//                         {formData.tags.length > 0 && (
+//                           <div className="mt-4 flex flex-wrap gap-2">
+//                             {formData.tags.map(tag => (
+//                               <span
+//                                 key={tag}
+//                                 className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+//                               >
+//                                 {tag}
+//                                 <button
+//                                   type="button"
+//                                   onClick={() => handleTagToggle(tag)}
+//                                   className="ml-1.5 text-orange-600 hover:text-orange-800"
+//                                 >
+//                                   <X className="w-3 h-3" />
+//                                 </button>
+//                               </span>
+//                             ))}
+//                           </div>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* NEW: Meta Settings (SEO) Section */}
+//             <div className="mb-6">
+//               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//                 <div className="p-5 border-b border-gray-200">
+//                   <div 
+//                     className="flex items-center justify-between cursor-pointer"
+//                     onClick={() => setShowMeta(!showMeta)}
+//                   >
+//                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                       <Search className="w-5 h-5 text-[#E39A65]" />
+//                       Meta Settings (SEO)
+//                     </h2>
+//                     <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
+//                   </div>
+//                   <p className="text-xs text-gray-500 mt-1">
+//                     Optimize your product for search engines
+//                   </p>
+//                 </div>
+                
+//                 {showMeta && (
+//                   <div className="p-5">
+//                     <div className="space-y-4">
+//                       {/* Meta Title */}
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           Meta Title
+//                         </label>
+//                         <input
+//                           type="text"
+//                           value={formData.metaSettings.metaTitle}
+//                           onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
+//                           maxLength="70"
+//                           placeholder="Enter meta title (max 70 characters)"
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+//                             errors.metaTitle ? 'border-red-500' : 'border-gray-300'
+//                           }`}
+//                         />
+//                         <div className="flex justify-between mt-1">
+//                           <p className="text-xs text-gray-500">Appears in search engine results</p>
+//                           <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 60 ? 'text-orange-600' : 'text-gray-500'}`}>
+//                             {formData.metaSettings.metaTitle?.length || 0}/70
+//                           </span>
+//                         </div>
+//                         {errors.metaTitle && (
+//                           <p className="text-xs text-red-600 mt-1">{errors.metaTitle}</p>
+//                         )}
+//                       </div>
+
+//                       {/* Meta Description */}
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           Meta Description
+//                         </label>
+//                         <textarea
+//                           value={formData.metaSettings.metaDescription}
+//                           onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
+//                           maxLength="160"
+//                           placeholder="Enter meta description (max 160 characters)"
+//                           rows="3"
+//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none ${
+//                             errors.metaDescription ? 'border-red-500' : 'border-gray-300'
+//                           }`}
+//                         />
+//                         <div className="flex justify-between mt-1">
+//                           <p className="text-xs text-gray-500">Brief description for search results</p>
+//                           <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 150 ? 'text-orange-600' : 'text-gray-500'}`}>
+//                             {formData.metaSettings.metaDescription?.length || 0}/160
+//                           </span>
+//                         </div>
+//                         {errors.metaDescription && (
+//                           <p className="text-xs text-red-600 mt-1">{errors.metaDescription}</p>
+//                         )}
+//                       </div>
+// {/* Meta Keywords - Chip Input Style */}
+// <div>
+//   <label className="block text-sm font-medium text-gray-700 mb-1">
+//     Meta Keywords
+//   </label>
+  
+//   {/* Display existing keywords as chips */}
+//   {formData.metaSettings.metaKeywords?.length > 0 && (
+//     <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+//       {formData.metaSettings.metaKeywords.map((keyword, index) => (
+//         <span
+//           key={index}
+//           className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+//         >
+//           {keyword}
+//           <button
+//             type="button"
+//             onClick={() => removeKeyword(index)}
+//             className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
+//           >
+//             <X className="w-3 h-3" />
+//           </button>
+//         </span>
+//       ))}
+//     </div>
+//   )}
+  
+//   {/* Input for new keywords */}
+//   <div className="relative">
+//     <input
+//       type="text"
+//       value={keywordInput}
+//       onChange={(e) => setKeywordInput(e.target.value)}
+//       onKeyDown={handleKeywordKeyDown}
+//       onBlur={handleKeywordBlur}
+//       placeholder="Type a keyword and press Enter or comma to add"
+//       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition pr-20"
+//     />
+//     {keywordInput.trim() && (
+//       <button
+//         type="button"
+//         onClick={addKeyword}
+//         className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#E39A65] text-white text-xs font-medium rounded hover:bg-[#d48b54] transition-colors"
+//       >
+//         Add
+//       </button>
+//     )}
+//   </div>
+//   <p className="text-xs text-gray-500 mt-1">
+//     Type a keyword and press Enter or comma to add. Keywords appear as chips above.
+//   </p>
+  
+//   {/* Debug display - remove after testing */}
+//   {/* <div className="mt-2 text-xs text-gray-400">
+//     Current keywords array: {JSON.stringify(formData.metaSettings.metaKeywords)}
+//   </div> */}
+// </div>
+
+//                       {/* SEO Preview */}
+//                       {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+//                         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+//                           <h4 className="text-xs font-medium text-gray-700 mb-2">Search Engine Preview:</h4>
+//                           <div className="space-y-1">
+//                             <div className="text-blue-600 text-sm font-medium truncate">
+//                               {formData.metaSettings.metaTitle || formData.productName || 'Product Title'}
+//                             </div>
+//                             <div className="text-green-600 text-xs">
+//                               {typeof window !== 'undefined' ? window.location.origin : ''}/product/{formData.productName?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}
+//                             </div>
+//                             <div className="text-gray-600 text-xs line-clamp-2">
+//                               {formData.metaSettings.metaDescription || formData.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Product description will appear here...'}
+//                             </div>
+//                           </div>
+//                         </div>
+//                       )}
+//                     </div>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+
+//             {/* Bulk Pricing Section */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1229,45 +1578,24 @@ import { RichTextEditor } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
-import TipTapLink from '@tiptap/extension-link';
+import Link from '@tiptap/extension-link'; // Changed from TipTapLink to Link
 import '@mantine/tiptap/styles.css';
 import '@mantine/core/styles.css';
 
 // Predefined colors for quick selection
 const PREDEFINED_COLORS = [
-  '#FF0000', // Red
-  '#0000FF', // Blue
-  '#00FF00', // Green
-  '#FFFF00', // Yellow
-  '#FF00FF', // Magenta
-  '#00FFFF', // Cyan
-  '#000000', // Black
-  '#FFFFFF', // White
-  '#808080', // Gray
-  '#800000', // Maroon
-  '#808000', // Olive
-  '#008000', // Dark Green
-  '#800080', // Purple
-  '#008080', // Teal
-  '#000080', // Navy
-  '#FFA500', // Orange
-  '#FFC0CB', // Pink
-  '#A52A2A', // Brown
-  '#E39A65', // Your brand color
-  '#4A90E2', // Blue
-  '#50C878', // Emerald
-  '#9B59B6', // Purple
-  '#E74C3C', // Red
-  '#F39C12', // Orange
-  '#1ABC9C', // Turquoise
+  '#FF0000', '#0000FF', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF',
+  '#000000', '#FFFFFF', '#808080', '#800000', '#808000', '#008000',
+  '#800080', '#008080', '#000080', '#FFA500', '#FFC0CB', '#A52A2A',
+  '#E39A65', '#4A90E2', '#50C878', '#9B59B6', '#E74C3C', '#F39C12', '#1ABC9C'
 ];
 
 // Targeted customer options
 const TARGETED_CUSTOMERS = [
-  { value: 'ladies', label: 'Ladies' },
-  { value: 'gents', label: 'Gents' },
-  { value: 'kids', label: 'Kids' },
-  { value: 'unisex', label: 'Unisex' }
+  { value: 'ladies', label: 'Ladies', icon: '👩' },
+  { value: 'gents', label: 'Gents', icon: '👨' },
+  { value: 'kids', label: 'Kids', icon: '🧒' },
+  { value: 'unisex', label: 'Unisex', icon: '👤' }
 ];
 
 // Available tags (matching your schema)
@@ -1287,12 +1615,12 @@ export default function ModeratorCreateProduct() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [keywordInput, setKeywordInput] = useState('');
 
-  
   // New state for collapsible sections
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
@@ -1300,10 +1628,11 @@ export default function ModeratorCreateProduct() {
   // Refs for click outside detection
   const colorPickerRef = useRef(null);
   
-  // Form state with all fields including new ones
+  // Form state with all fields including instruction
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
+    instruction: '', // ADDED instruction field
     category: '',
     targetedCustomer: 'unisex',
     fabric: '',
@@ -1328,48 +1657,6 @@ export default function ModeratorCreateProduct() {
       metaKeywords: []
     }
   });
-  // Add these handlers
-const addKeyword = () => {
-  if (!keywordInput.trim()) return;
-  
-  // Split by comma if multiple keywords are pasted at once
-  const keywordsToAdd = keywordInput
-    .split(',')
-    .map(k => k.trim())
-    .filter(k => k !== '');
-  
-  setFormData(prev => ({
-    ...prev,
-    metaSettings: {
-      ...prev.metaSettings,
-      metaKeywords: [...(prev.metaSettings.metaKeywords || []), ...keywordsToAdd]
-    }
-  }));
-  setKeywordInput('');
-};
-
-const handleKeywordKeyDown = (e) => {
-  if (e.key === 'Enter' || e.key === ',') {
-    e.preventDefault();
-    addKeyword();
-  }
-};
-
-const handleKeywordBlur = () => {
-  if (keywordInput.trim()) {
-    addKeyword();
-  }
-};
-
-const removeKeyword = (indexToRemove) => {
-  setFormData(prev => ({
-    ...prev,
-    metaSettings: {
-      ...prev.metaSettings,
-      metaKeywords: prev.metaSettings.metaKeywords.filter((_, index) => index !== indexToRemove)
-    }
-  }));
-};
 
   // Image state for 4 images
   const [productImages, setProductImages] = useState([
@@ -1410,11 +1697,20 @@ const removeKeyword = (indexToRemove) => {
     };
   }, []);
 
-  // Initialize TipTap editor only on client side
+  // Initialize TipTap editor for description
   const editor = useEditor({
     extensions: [
-      StarterKit,
-      TipTapLink.configure({
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+      Link.configure({
         openOnClick: false,
         HTMLAttributes: {
           rel: 'noopener noreferrer',
@@ -1431,10 +1727,49 @@ const removeKeyword = (indexToRemove) => {
     editable: true,
   });
 
+  // Initialize TipTap editor for instructions
+  const instructionEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          rel: 'noopener noreferrer',
+          target: '_blank',
+        },
+      }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: formData.instruction,
+    onUpdate: ({ editor }) => {
+      setFormData(prev => ({ ...prev, instruction: editor.getHTML() }));
+    },
+    immediatelyRender: false,
+    editable: true,
+  });
+
   // Fetch categories on mount
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Fetch category details when category is selected
+  useEffect(() => {
+    if (formData.category) {
+      fetchCategoryDetails(formData.category);
+    } else {
+      setSelectedCategoryDetails(null);
+    }
+  }, [formData.category]);
 
   // Check user role
   useEffect(() => {
@@ -1442,13 +1777,13 @@ const removeKeyword = (indexToRemove) => {
     if (user.role !== 'moderator' && user.role !== 'admin') {
       router.push('/login');
     }
-  }, []);
+  }, [router]);
 
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1463,6 +1798,24 @@ const removeKeyword = (indexToRemove) => {
       toast.error('Failed to fetch categories');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCategoryDetails = async (categoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setSelectedCategoryDetails(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching category details:', error);
     }
   };
 
@@ -1526,30 +1879,9 @@ const removeKeyword = (indexToRemove) => {
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log('Field changed:', name, 'Value:', value);
-    
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value 
-    }));
-    
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  };
-
-  // Specific handler for targeted customer
-  const handleTargetedCustomerChange = (e) => {
-    const value = e.target.value;
-    console.log('Targeted customer changed to:', value);
-    
-    setFormData(prev => ({
-      ...prev,
-      targetedCustomer: value
-    }));
-    
-    if (errors.targetedCustomer) {
-      setErrors(prev => ({ ...prev, targetedCustomer: null }));
     }
   };
 
@@ -1675,15 +2007,13 @@ const removeKeyword = (indexToRemove) => {
     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
   };
 
-  // ========== NEW HANDLERS FOR TAGS AND META ==========
+  // ========== HANDLERS FOR TAGS AND META ==========
   
   // Handle tag toggle
   const handleTagToggle = (tag) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.includes(tag)
-        ? prev.tags.filter(t => t !== tag)
-        : [...prev.tags, tag]
+     tags: prev.tags.includes(tag) ? [] : [tag] 
     }));
   };
 
@@ -1698,7 +2028,47 @@ const removeKeyword = (indexToRemove) => {
     }));
   };
 
+  // Add keyword handler
+  const addKeyword = () => {
+    if (!keywordInput.trim()) return;
+    
+    const keywordsToAdd = keywordInput
+      .split(',')
+      .map(k => k.trim())
+      .filter(k => k !== '');
+    
+    setFormData(prev => ({
+      ...prev,
+      metaSettings: {
+        ...prev.metaSettings,
+        metaKeywords: [...(prev.metaSettings.metaKeywords || []), ...keywordsToAdd]
+      }
+    }));
+    setKeywordInput('');
+  };
 
+  const handleKeywordKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addKeyword();
+    }
+  };
+
+  const handleKeywordBlur = () => {
+    if (keywordInput.trim()) {
+      addKeyword();
+    }
+  };
+
+  const removeKeyword = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      metaSettings: {
+        ...prev.metaSettings,
+        metaKeywords: prev.metaSettings.metaKeywords.filter((_, index) => index !== indexToRemove)
+      }
+    }));
+  };
 
   // Validate additional info
   const validateAdditionalInfo = () => {
@@ -1720,7 +2090,7 @@ const removeKeyword = (indexToRemove) => {
     return isValid;
   };
 
-  // Validate form - Updated with new fields validation
+  // Validate form
   const validateForm = () => {
     const newErrors = {};
 
@@ -1762,12 +2132,10 @@ const removeKeyword = (indexToRemove) => {
       newErrors.colors = 'At least one color is required';
     }
 
-    // Validate meta title length
     if (formData.metaSettings.metaTitle && formData.metaSettings.metaTitle.length > 70) {
       newErrors.metaTitle = 'Meta title should not exceed 70 characters';
     }
 
-    // Validate meta description length
     if (formData.metaSettings.metaDescription && formData.metaSettings.metaDescription.length > 160) {
       newErrors.metaDescription = 'Meta description should not exceed 160 characters';
     }
@@ -1779,11 +2147,9 @@ const removeKeyword = (indexToRemove) => {
     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
   };
 
-  // Handle form submission - Updated with new fields
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log('Submitting form with data:', formData);
 
     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
     if (hasEmptyPrice) {
@@ -1807,14 +2173,13 @@ const removeKeyword = (indexToRemove) => {
         price: tier.price === '' ? 0 : parseFloat(tier.price)
       }));
 
-      // Filter out empty additional info rows
       const processedAdditionalInfo = formData.additionalInfo.filter(
         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
       );
 
-      // Append all form data
       formDataToSend.append('productName', formData.productName);
       formDataToSend.append('description', formData.description);
+      formDataToSend.append('instruction', formData.instruction || ''); // ADDED instruction field
       formDataToSend.append('category', formData.category);
       formDataToSend.append('targetedCustomer', formData.targetedCustomer);
       formDataToSend.append('fabric', formData.fabric);
@@ -1825,24 +2190,17 @@ const removeKeyword = (indexToRemove) => {
       formDataToSend.append('colors', JSON.stringify(formData.colors));
       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
       
-      // Append new fields
       formDataToSend.append('isFeatured', formData.isFeatured);
       formDataToSend.append('tags', JSON.stringify(formData.tags));
       formDataToSend.append('metaSettings', JSON.stringify(formData.metaSettings));
 
-      // Append images
       productImages.forEach((img, index) => {
         if (img.file) {
           formDataToSend.append('images', img.file);
         }
       });
 
-      // Debug: Check what's in FormData
-      for (let pair of formDataToSend.entries()) {
-        console.log('FormData entry:', pair[0], pair[1]);
-      }
-
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1851,7 +2209,6 @@ const removeKeyword = (indexToRemove) => {
       });
 
       const data = await response.json();
-      console.log('Server response:', data);
 
       if (data.success) {
         toast.success('Product created successfully!');
@@ -1865,6 +2222,12 @@ const removeKeyword = (indexToRemove) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Get icon for selected customer
+  const getSelectedCustomerIcon = () => {
+    const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
+    return customer ? customer.icon : '👤';
   };
 
   return (
@@ -1937,33 +2300,93 @@ const removeKeyword = (indexToRemove) => {
                         Description
                       </label>
                       {isMounted && editor && (
-                        <RichTextEditor editor={editor}>
-                          <RichTextEditor.Toolbar sticky stickyOffset={60}>
-                            <RichTextEditor.ControlsGroup>
-                              <RichTextEditor.Bold />
-                              <RichTextEditor.Italic />
-                              <RichTextEditor.Underline />
-                              <RichTextEditor.Strikethrough />
-                              <RichTextEditor.ClearFormatting />
-                            </RichTextEditor.ControlsGroup>
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                          <RichTextEditor editor={editor}>
+                            <RichTextEditor.Toolbar>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Bold />
+                                <RichTextEditor.Italic />
+                                <RichTextEditor.Underline />
+                                <RichTextEditor.Strikethrough />
+                              </RichTextEditor.ControlsGroup>
 
-                            <RichTextEditor.ControlsGroup>
-                              <RichTextEditor.H1 />
-                              <RichTextEditor.H2 />
-                              <RichTextEditor.H3 />
-                              <RichTextEditor.H4 />
-                            </RichTextEditor.ControlsGroup>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.H1 />
+                                <RichTextEditor.H2 />
+                                <RichTextEditor.H3 />
+                                <RichTextEditor.H4 />
+                              </RichTextEditor.ControlsGroup>
 
-                            <RichTextEditor.ControlsGroup>
-                              <RichTextEditor.AlignLeft />
-                              <RichTextEditor.AlignCenter />
-                              <RichTextEditor.AlignRight />
-                            </RichTextEditor.ControlsGroup>
-                          </RichTextEditor.Toolbar>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.BulletList />
+                                <RichTextEditor.OrderedList />
+                              </RichTextEditor.ControlsGroup>
 
-                          <RichTextEditor.Content />
-                        </RichTextEditor>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.AlignLeft />
+                                <RichTextEditor.AlignCenter />
+                                <RichTextEditor.AlignRight />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Link />
+                                <RichTextEditor.Unlink />
+                              </RichTextEditor.ControlsGroup>
+                            </RichTextEditor.Toolbar>
+
+                            <RichTextEditor.Content />
+                          </RichTextEditor>
+                        </div>
                       )}
+                    </div>
+
+                    {/* NEW: Instruction Field with Rich Text Editor */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Instructions / Care Instructions
+                      </label>
+                      {isMounted && instructionEditor && (
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                          <RichTextEditor editor={instructionEditor}>
+                            <RichTextEditor.Toolbar>
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Bold />
+                                <RichTextEditor.Italic />
+                                <RichTextEditor.Underline />
+                                <RichTextEditor.Strikethrough />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.H1 />
+                                <RichTextEditor.H2 />
+                                <RichTextEditor.H3 />
+                                <RichTextEditor.H4 />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.BulletList />
+                                <RichTextEditor.OrderedList />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.AlignLeft />
+                                <RichTextEditor.AlignCenter />
+                                <RichTextEditor.AlignRight />
+                              </RichTextEditor.ControlsGroup>
+
+                              <RichTextEditor.ControlsGroup>
+                                <RichTextEditor.Link />
+                                <RichTextEditor.Unlink />
+                              </RichTextEditor.ControlsGroup>
+                            </RichTextEditor.Toolbar>
+
+                            <RichTextEditor.Content />
+                          </RichTextEditor>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Add care instructions, washing guidelines, or any special notes for customers
+                      </p>
                     </div>
 
                     {/* Category, Targeted Customer, and Fabric - 3 Column Layout */}
@@ -1989,6 +2412,15 @@ const removeKeyword = (indexToRemove) => {
                         {errors.category && (
                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
                         )}
+                        
+                        {/* Show selected category details */}
+                        {selectedCategoryDetails && (
+                          <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
+                            <p className="text-xs text-gray-600">
+                              <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Targeted Customer */}
@@ -1999,20 +2431,25 @@ const removeKeyword = (indexToRemove) => {
                             Target Customer <span className="text-red-500">*</span>
                           </div>
                         </label>
-                        <select
-                          name="targetedCustomer"
-                          value={formData.targetedCustomer}
-                          onChange={handleTargetedCustomerChange}
-                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-                            errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                        >
-                          {TARGETED_CUSTOMERS.map(customer => (
-                            <option key={customer.value} value={customer.value}>
-                              {customer.label}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select
+                            name="targetedCustomer"
+                            value={formData.targetedCustomer}
+                            onChange={handleChange}
+                            className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition appearance-none ${
+                              errors.targetedCustomer ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            {TARGETED_CUSTOMERS.map(customer => (
+                              <option key={customer.value} value={customer.value}>
+                                {customer.icon} {customer.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                            <span className="text-lg">{getSelectedCustomerIcon()}</span>
+                          </div>
+                        </div>
                         {errors.targetedCustomer && (
                           <p className="text-xs text-red-600 mt-1">{errors.targetedCustomer}</p>
                         )}
@@ -2039,13 +2476,20 @@ const removeKeyword = (indexToRemove) => {
                       </div>
                     </div>
 
-                    {/* Info message for selected customer */}
+                    {/* Quick Stats for Selected Customer */}
                     {formData.targetedCustomer && (
-                      <div className="mt-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
-                        <p className="text-xs text-gray-600">
-                          <span className="font-medium">Selected customer:</span>{' '}
-                          {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label}
-                        </p>
+                      <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">{getSelectedCustomerIcon()}</span>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label} Collection
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              This product will be shown in the {formData.targetedCustomer} section
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -2253,7 +2697,7 @@ const removeKeyword = (indexToRemove) => {
               </div>
             </div>
 
-            {/* Additional Information Section */}
+            {/* Row 3: Additional Information */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2262,7 +2706,7 @@ const removeKeyword = (indexToRemove) => {
                     Additional Information
                   </h2>
                   <p className="text-xs text-gray-500 mt-1">
-                    Add custom fields for extra product details (e.g., Care Instructions, Country of Origin, Warranty, etc.)
+                    Add custom fields for extra product details (e.g., Material Care, Country of Origin, Warranty, etc.)
                   </p>
                 </div>
                 
@@ -2283,7 +2727,7 @@ const removeKeyword = (indexToRemove) => {
                               type="text"
                               value={info.fieldName}
                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-                              placeholder="e.g., Care Instructions, Country, Warranty"
+                              placeholder="e.g., Material Care, Country, Warranty"
                               className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
                                 errors[`additionalInfo_${index}_fieldName`] ? 'border-red-500' : 'border-gray-300'
                               }`}
@@ -2337,12 +2781,39 @@ const removeKeyword = (indexToRemove) => {
                       <PlusCircle className="w-4 h-4" />
                       Add Additional Information
                     </button>
+
+                    {/* Example suggestions */}
+                    {formData.additionalInfo.length === 0 && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-xs font-medium text-blue-800 mb-2">Suggested fields:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Care Instructions', 'Country of Origin', 'Warranty', 'Material Composition', 'Season', 'Occasion'].map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  additionalInfo: [
+                                    ...prev.additionalInfo,
+                                    { fieldName: suggestion, fieldValue: '' }
+                                  ]
+                                }));
+                              }}
+                              className="px-2 py-1 text-xs bg-white text-blue-700 rounded-full border border-blue-300 hover:bg-blue-100 transition-colors"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* NEW: Featured & Tags Section */}
+            {/* NEW ROW: Featured & Tags */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2376,62 +2847,64 @@ const removeKeyword = (indexToRemove) => {
                   </div>
 
                   {/* Tags Section */}
-                  <div className="mt-4">
-                    <div 
-                      className="flex items-center justify-between cursor-pointer py-2"
-                      onClick={() => setShowTags(!showTags)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-[#E39A65]" />
-                        <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
-                    </div>
+<div className="mt-4">
+  <div 
+    className="flex items-center justify-between cursor-pointer py-2"
+    onClick={() => setShowTags(!showTags)}
+  >
+    <div className="flex items-center gap-2">
+      <Tag className="w-4 h-4 text-[#E39A65]" />
+      <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
+    </div>
+    <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
+  </div>
 
-                    {showTags && (
-                      <div className="mt-3">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {AVAILABLE_TAGS.map(tag => (
-                            <label key={tag} className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={formData.tags.includes(tag)}
-                                onChange={() => handleTagToggle(tag)}
-                                className="w-4 h-4 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
-                              />
-                              <span className="text-sm text-gray-600">{tag}</span>
-                            </label>
-                          ))}
-                        </div>
-                        
-                        {/* Selected Tags Display */}
-                        {formData.tags.length > 0 && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {formData.tags.map(tag => (
-                              <span
-                                key={tag}
-                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
-                              >
-                                {tag}
-                                <button
-                                  type="button"
-                                  onClick={() => handleTagToggle(tag)}
-                                  className="ml-1.5 text-orange-600 hover:text-orange-800"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+  {showTags && (
+    <div className="mt-3">
+      <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {AVAILABLE_TAGS.map(tag => (
+          <label key={tag} className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio" // Changed from checkbox to radio
+              name="productTag" // Add name to group radio buttons
+              checked={formData.tags.includes(tag)}
+              onChange={() => handleTagToggle(tag)}
+              className="w-4 h-4 text-[#E39A65] border-gray-300 focus:ring-[#E39A65]"
+            />
+            <span className="text-sm text-gray-600">{tag}</span>
+          </label>
+        ))}
+      </div>
+      
+      {/* Selected Tags Display - Now shows only one tag */}
+      {formData.tags.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {formData.tags.map(tag => (
+            <span
+              key={tag}
+              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleTagToggle(tag)}
+                className="ml-1.5 text-orange-600 hover:text-orange-800"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+</div>
                 </div>
               </div>
             </div>
 
-            {/* NEW: Meta Settings (SEO) Section */}
+            {/* NEW ROW: Meta Settings (SEO) */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -2504,63 +2977,59 @@ const removeKeyword = (indexToRemove) => {
                           <p className="text-xs text-red-600 mt-1">{errors.metaDescription}</p>
                         )}
                       </div>
-{/* Meta Keywords - Chip Input Style */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Meta Keywords
-  </label>
-  
-  {/* Display existing keywords as chips */}
-  {formData.metaSettings.metaKeywords?.length > 0 && (
-    <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-      {formData.metaSettings.metaKeywords.map((keyword, index) => (
-        <span
-          key={index}
-          className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
-        >
-          {keyword}
-          <button
-            type="button"
-            onClick={() => removeKeyword(index)}
-            className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </span>
-      ))}
-    </div>
-  )}
-  
-  {/* Input for new keywords */}
-  <div className="relative">
-    <input
-      type="text"
-      value={keywordInput}
-      onChange={(e) => setKeywordInput(e.target.value)}
-      onKeyDown={handleKeywordKeyDown}
-      onBlur={handleKeywordBlur}
-      placeholder="Type a keyword and press Enter or comma to add"
-      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition pr-20"
-    />
-    {keywordInput.trim() && (
-      <button
-        type="button"
-        onClick={addKeyword}
-        className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#E39A65] text-white text-xs font-medium rounded hover:bg-[#d48b54] transition-colors"
-      >
-        Add
-      </button>
-    )}
-  </div>
-  <p className="text-xs text-gray-500 mt-1">
-    Type a keyword and press Enter or comma to add. Keywords appear as chips above.
-  </p>
-  
-  {/* Debug display - remove after testing */}
-  {/* <div className="mt-2 text-xs text-gray-400">
-    Current keywords array: {JSON.stringify(formData.metaSettings.metaKeywords)}
-  </div> */}
-</div>
+
+                      {/* Meta Keywords */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Keywords
+                        </label>
+                        
+                        {/* Display existing keywords as chips */}
+                        {formData.metaSettings.metaKeywords?.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            {formData.metaSettings.metaKeywords.map((keyword, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                              >
+                                {keyword}
+                                <button
+                                  type="button"
+                                  onClick={() => removeKeyword(index)}
+                                  className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Input for new keywords */}
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={keywordInput}
+                            onChange={(e) => setKeywordInput(e.target.value)}
+                            onKeyDown={handleKeywordKeyDown}
+                            onBlur={handleKeywordBlur}
+                            placeholder="Type a keyword and press Enter or comma to add"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition pr-20"
+                          />
+                          {keywordInput.trim() && (
+                            <button
+                              type="button"
+                              onClick={addKeyword}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-[#E39A65] text-white text-xs font-medium rounded hover:bg-[#d48b54] transition-colors"
+                            >
+                              Add
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Type a keyword and press Enter or comma to add. Keywords appear as chips above.
+                        </p>
+                      </div>
 
                       {/* SEO Preview */}
                       {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (

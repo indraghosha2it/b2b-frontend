@@ -306,7 +306,7 @@ export default function WhyChooseUs() {
             </div>
 
             {/* Heading */}
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
               Your Trusted
               <span className="relative ml-3">
                 <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-[#cd7332] to-[#c98250]">

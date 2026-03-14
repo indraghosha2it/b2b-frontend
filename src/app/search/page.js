@@ -46,7 +46,7 @@
 //   const performSearch = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -574,7 +574,7 @@ function SearchContent() {
   const performSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
       if (data.success) {
@@ -920,63 +920,63 @@ const ProductCard = ({ product }) => {
     <>
       <Navbar />
       
-      {/* Hero Search Section - Responsive height */}
-      <section className="relative bg-gradient-to-br from-orange-50 via-amber-50 to-orange-50 pt-20 md:pt-24 lg:pt-32 pb-10 md:pb-16 lg:pb-20 overflow-hidden">
-        {/* Decorative Elements - Adjusted for mobile */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-64 md:w-96 h-64 md:h-96 bg-orange-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-64 md:w-96 h-64 md:h-96 bg-amber-200 rounded-full opacity-20 blur-3xl animate-pulse delay-1000"></div>
-        </div>
+    {/* Hero Search Section - Smaller height */}
+<section className="relative bg-gradient-to-br from-orange-50 via-amber-50 to-orange-50 pt-16 md:pt-20 lg:pt-24 pb-8 md:pb-12 lg:pb-16 overflow-hidden">
+  {/* Decorative Elements - Smaller for compact look */}
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute -top-20 -right-20 w-48 md:w-64 lg:w-80 h-48 md:h-64 lg:h-80 bg-orange-200 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+    <div className="absolute -bottom-20 -left-20 w-48 md:w-64 lg:w-80 h-48 md:h-64 lg:h-80 bg-amber-200 rounded-full opacity-20 blur-3xl animate-pulse delay-1000"></div>
+  </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+  <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center max-w-3xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h1 className=" mt-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 md:mb-3 lg:mb-4">
+          Search <span className="text-[#E39A65]">Results</span>
+        </h1>
+        <p className="text-sm md:text-base lg:text-lg text-gray-600 mb-3 md:mb-4 lg:mb-6">
+          {loading ? 'Searching...' : `Found ${results.length} ${results.length === 1 ? 'result' : 'results'} for`}
+        </p>
+        
+        {/* Search Bar - Smaller */}
+        <form onSubmit={handleSearch} className="max-w-xl mx-auto transform hover:scale-105 transition-transform duration-300 px-4 md:px-0">
+          <div className="relative group">
+            <input
+              type="text"
+              placeholder="Search products, categories..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full px-4 md:px-5 lg:px-6 py-2.5 md:py-3 lg:py-4 pr-12 md:pr-14 text-sm md:text-base border-2 border-transparent bg-white/90 backdrop-blur-sm rounded-lg md:rounded-xl focus:ring-4 focus:ring-[#E39A65]/20 focus:border-[#E39A65] outline-none transition-all shadow-lg group-hover:shadow-xl"
+            />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 md:p-2.5 bg-gradient-to-r from-[#E39A65] to-[#d48b54] text-white rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-300"
             >
-              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-3 md:mb-4 lg:mb-6">
-                Search <span className="text-[#E39A65]">Results</span>
-              </h1>
-              <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-4 md:mb-6 lg:mb-8">
-                {loading ? 'Searching...' : `Found ${results.length} ${results.length === 1 ? 'result' : 'results'} for`}
-              </p>
-              
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="max-w-2xl mx-auto transform hover:scale-105 transition-transform duration-300 px-4 md:px-0">
-                <div className="relative group">
-                  <input
-                    type="text"
-                    placeholder="Search products, categories..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="w-full px-4 md:px-6 lg:px-8 py-3 md:py-4 lg:py-5 pr-12 md:pr-14 lg:pr-16 text-base md:text-lg border-2 border-transparent bg-white/90 backdrop-blur-sm rounded-xl md:rounded-2xl focus:ring-4 focus:ring-[#E39A65]/20 focus:border-[#E39A65] outline-none transition-all shadow-xl group-hover:shadow-2xl"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 md:right-3 top-1/2 transform -translate-y-1/2 p-2 md:p-3 lg:p-4 bg-gradient-to-r from-[#E39A65] to-[#d48b54] text-white rounded-lg md:rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300"
-                  >
-                    <Search className="w-4 h-4 md:w-5 h-4 md:h-5" />
-                  </button>
-                </div>
-              </form>
-
-              {/* Search Query Display */}
-              {query && !loading && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="mt-4 md:mt-6 inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg"
-                >
-                  <span className="text-xs md:text-sm text-gray-600">Showing results for:</span>
-                  <span className="font-semibold text-[#E39A65] text-sm md:text-lg">"{query}"</span>
-                </motion.div>
-              )}
-            </motion.div>
+              <Search className="w-4 h-4" />
+            </button>
           </div>
-        </div>
-      </section>
+        </form>
+
+        {/* Search Query Display - Smaller */}
+        {query && !loading && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-3 md:mt-4 inline-flex items-center gap-2 px-4 md:px-5 py-1.5 md:py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md"
+          >
+            <span className="text-xs text-gray-600">Showing results for:</span>
+            <span className="font-semibold text-[#E39A65] text-sm">"{query}"</span>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  </div>
+</section>
 
       {/* Results Section */}
       <section className="py-12 md:py-16 bg-white">

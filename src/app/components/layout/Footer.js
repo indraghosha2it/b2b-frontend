@@ -2,7 +2,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaFacebookF, 
@@ -13,21 +12,23 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
   FaClock,
-  FaPaperPlane,
   FaTruck,
   FaShieldAlt,
   FaStar,
   FaCheckCircle,
   FaBuilding,
   FaGlobe,
-  FaBox
+  FaBox,
+  FaArrowRight,
+  FaIndustry,
+  FaShip,
+  FaHeadset
 } from 'react-icons/fa';
 import { MdVerified, MdEmail } from 'react-icons/md';
+import { HiOutlineBadgeCheck } from 'react-icons/hi';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState('');
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
   // Company info from your About page
   const companyInfo = {
@@ -45,15 +46,6 @@ export default function Footer() {
     }
   };
 
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email) {
-      setSubscriptionStatus('success');
-      setEmail('');
-      setTimeout(() => setSubscriptionStatus(null), 3000);
-    }
-  };
-
   const quickLinks = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
@@ -67,28 +59,33 @@ export default function Footer() {
     { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
     { name: 'Returns Policy', href: '/returns' },
-    { name: 'Sitemap', href: '/sitemap' },
   ];
 
   const wholesaleFeatures = [
-    { icon: <FaBox />, text: 'Low MOQ' },
-    { icon: <FaTruck />, text: 'Global Shipping' },
-    { icon: <FaStar />, text: 'Premium Quality' },
-    { icon: <FaBuilding />, text: 'B2B Focused' },
-    { icon: <FaGlobe />, text: 'Worldwide' },
-    { icon: <FaCheckCircle />, text: 'Verified' },
+    { icon: <FaBox />, text: 'Low MOQ', desc: 'Starting from 100 pcs' },
+    { icon: <FaTruck />, text: 'Global Shipping', desc: 'To 50+ countries' },
+    { icon: <FaStar />, text: 'Premium Quality', desc: 'Certified materials' },
+    { icon: <FaIndustry />, text: 'Custom Manufacturing', desc: 'Your branding' },
+    { icon: <FaShip />, text: 'Bulk Orders', desc: 'Sea & air freight' },
+    { icon: <FaHeadset />, text: '24/7 Support', desc: 'Via WhatsApp' },
   ];
 
   return (
-    <footer className="relative text-white overflow-hidden" style={{ backgroundColor: '#2A2A2A' }}>
-      {/* Top Accent Bar */}
-      <div className="absolute top-0 left-0 w-full h-1" style={{ background: 'linear-gradient(90deg, #E39A65 0%, #FBFFFF 50%, #E39A65 100%)' }}></div>
+    <footer className="relative text-white overflow-hidden" style={{ backgroundColor: '#1A1A1A' }}>
+      {/* Top Gradient Bar */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#E39A65] via-[#FBFFFF] to-[#E39A65]"></div>
+      
+      {/* Decorative Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-64 h-64 bg-[#E39A65] rounded-full filter blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#884F52] rounded-full filter blur-3xl"></div>
+      </div>
       
       {/* Main Footer */}
-      <div className="container mx-auto px-4 py-12 lg:py-16">
+      <div className="container mx-auto px-4 py-16 lg:py-10 relative z-10">
         
-        {/* Wholesale Features Bar */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-12">
+        {/* Wholesale Features Grid - Enhanced */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
           {wholesaleFeatures.map((feature, index) => (
             <motion.div
               key={index}
@@ -96,239 +93,312 @@ export default function Footer() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="flex flex-col items-center text-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10"
+              whileHover={{ y: -5 }}
+              className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:border-[#E39A65]/30 transition-all duration-300"
             >
-              <div className="text-xl mb-1" style={{ color: '#E39A65' }}>{feature.icon}</div>
-              <span className="text-xs font-medium text-white/90">{feature.text}</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#E39A65]/0 to-[#E39A65]/0 group-hover:from-[#E39A65]/5 group-hover:to-[#884F52]/5 rounded-xl transition-all duration-500"></div>
+              <div className="relative z-10 flex flex-col items-center text-center">
+                <div className="text-2xl mb-2 text-[#E39A65] group-hover:scale-110 transition-transform duration-300">
+                  {feature.icon}
+                </div>
+                <span className="text-sm font-semibold text-white mb-1">{feature.text}</span>
+                <span className="text-xs text-white/50">{feature.desc}</span>
+              </div>
             </motion.div>
           ))}
         </div>
 
         {/* Main Grid - 3 Columns Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-4">
           
-          {/* Column 1: Company Info & Contact */}
-          <div>
-            <Link href="/" className="inline-block mb-4">
-              <img 
-                src="https://i.ibb.co.com/fzkq5JRV/favicon.png"
-                alt="Asian Clothify - B2B Wholesale Apparel"
-                className="h-12 w-auto"
-                style={{ filter: 'none' }} // Remove white filter to keep original colors
-              />
-            </Link>
+          {/* Column 1: Company Info (5 columns) */}
+          <div className="lg:col-span-5">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#E39A65] blur-md opacity-50 rounded-full"></div>
+                <img 
+                  src="https://i.ibb.co.com/fzkq5JRV/favicon.png"
+                  alt="Asian Clothify - B2B Wholesale Apparel"
+                  className="h-14 w-auto relative z-10"
+                />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-[#E39A65] to-[#FBFFFF] bg-clip-text text-transparent">
+                  {companyInfo.name}
+                </h2>
+                <p className="text-xs text-white/60">Est. 2018 · Bangladesh</p>
+              </div>
+            </div>
             
-            <p className="text-white/80 text-sm mb-4 leading-relaxed">
-              {companyInfo.tagline} - Premium wholesale apparel for businesses worldwide. Low MOQ, fast global shipping, and custom manufacturing options.
+            <p className="text-white/70 text-sm mb-6 leading-relaxed max-w-md">
+              {companyInfo.tagline} — Premium wholesale apparel for businesses worldwide. Low MOQ, fast global shipping, and custom manufacturing options.
             </p>
 
-            {/* Verified B2B Badge */}
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-4 w-fit">
-              <MdVerified className="text-blue-400" />
-              <span className="text-xs font-medium">Verified B2B Wholesale Supplier</span>
-            </div>
-
-            {/* Contact Details */}
-            <div className="space-y-3 text-white/80 text-sm mb-4">
-              <div className="flex items-start gap-3">
-                <FaMapMarkerAlt className="mt-1 flex-shrink-0" style={{ color: '#E39A65' }} />
-                <span>{companyInfo.address}</span>
+            {/* Verified Badges */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+                <HiOutlineBadgeCheck className="text-blue-400 text-lg" />
+                <span className="text-xs font-medium">Verified Supplier</span>
               </div>
-              <div className="flex items-center gap-3">
-                <FaPhone style={{ color: '#E39A65' }} />
-                <a href={`tel:${companyInfo.phone}`} className="hover:text-white transition-colors">
-                  {companyInfo.phone}
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <FaEnvelope style={{ color: '#E39A65' }} />
-                <a href={`mailto:${companyInfo.email}`} className="hover:text-white transition-colors">
-                  {companyInfo.email}
-                </a>
-              </div>
-              <div className="flex items-start gap-3">
-                <FaClock className="mt-1 flex-shrink-0" style={{ color: '#E39A65' }} />
-                <span>{companyInfo.hours}</span>
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+                <FaShieldAlt className="text-green-400 text-sm" />
+                <span className="text-xs font-medium">Trade Assurance</span>
               </div>
             </div>
 
-            {/* WhatsApp Business Button */}
-            <a 
-              href={`https://wa.me/${companyInfo.whatsapp}?text=Hi%20Asian%20Clothify%2C%20I'm%20interested%20in%20your%20wholesale%20products`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105"
-              style={{ backgroundColor: '#25D366' }}
-            >
-              <FaWhatsapp className="text-white text-lg" />
-              <span className="text-white font-medium">Chat with Wholesale Team</span>
-            </a>
+            {/* Contact Details - Enhanced */}
+            <div className="space-y-4 mb-6">
+              <motion.a 
+                href={`https://maps.google.com/?q=${encodeURIComponent(companyInfo.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 text-white/70 hover:text-white transition-colors group"
+                whileHover={{ x: 5 }}
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#E39A65]/20 transition-colors">
+                  <FaMapMarkerAlt className="text-[#E39A65] text-sm" />
+                </div>
+                <span className="text-sm">{companyInfo.address}</span>
+              </motion.a>
+              
+              <motion.a 
+                href={`tel:${companyInfo.phone}`}
+                className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group"
+                whileHover={{ x: 5 }}
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#E39A65]/20 transition-colors">
+                  <FaPhone className="text-[#E39A65] text-sm" />
+                </div>
+                <span className="text-sm">{companyInfo.phone}</span>
+              </motion.a>
+              
+              <motion.a 
+                href={`mailto:${companyInfo.email}`}
+                className="flex items-center gap-3 text-white/70 hover:text-white transition-colors group"
+                whileHover={{ x: 5 }}
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#E39A65]/20 transition-colors">
+                  <FaEnvelope className="text-[#E39A65] text-sm" />
+                </div>
+                <span className="text-sm">{companyInfo.email}</span>
+              </motion.a>
+              
+              <div className="flex items-start gap-3 text-white/70">
+                <div className="w-8 h-8 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0">
+                  <FaClock className="text-[#E39A65] text-sm" />
+                </div>
+                <span className="text-sm">{companyInfo.hours}</span>
+              </div>
+            </div>
+
+         
           </div>
 
-          {/* Column 2: Quick Links & Support */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 relative inline-block">
+          {/* Column 2: Quick Links & Support (3 columns) */}
+          <div className="lg:col-span-3">
+            <h3 className="text-lg font-semibold mb-6 relative inline-block">
               Quick Links
-              <span className="absolute -bottom-1 left-0 w-8 h-0.5" style={{ backgroundColor: '#E39A65' }}></span>
+              <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-[#E39A65] to-transparent"></span>
             </h3>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               {/* Quick Links */}
               <div>
-                <ul className="space-y-2">
-                  {quickLinks.map((link) => (
-                    <li key={link.name}>
+                <ul className="space-y-3">
+                  {quickLinks.map((link, index) => (
+                    <motion.li 
+                      key={link.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
                       <Link 
                         href={link.href}
-                        className="text-white/70 hover:text-white transition-colors duration-200 text-sm flex items-center gap-2"
+                        className="text-white/60 hover:text-white transition-colors duration-200 text-sm flex items-center gap-2 group"
                       >
-                        <span className="w-1 h-1 rounded-full bg-white/30"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 group-hover:bg-[#E39A65] transition-colors"></span>
                         {link.name}
                       </Link>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
 
               {/* Support Links */}
               <div>
-                <ul className="space-y-2">
-                  {supportLinks.map((link) => (
-                    <li key={link.name}>
+                <h4 className="text-sm font-semibold text-white/80 mb-3">Support</h4>
+                <ul className="space-y-3">
+                  {supportLinks.map((link, index) => (
+                    <motion.li 
+                      key={link.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
                       <Link 
                         href={link.href}
-                        className="text-white/70 hover:text-white transition-colors duration-200 text-sm flex items-center gap-2"
+                        className="text-white/60 hover:text-white transition-colors duration-200 text-sm flex items-center gap-2 group"
                       >
-                        <span className="w-1 h-1 rounded-full bg-white/30"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/30 group-hover:bg-[#E39A65] transition-colors"></span>
                         {link.name}
                       </Link>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
               </div>
             </div>
 
-            {/* Social Links */}
-            <div className="mt-6">
-              <h4 className="text-sm font-semibold mb-3 text-white/90">Follow Us</h4>
+            {/* Social Links - Enhanced */}
+            <div className="mt-8">
+              <h4 className="text-sm font-semibold text-white/80 mb-4">Connect With Us</h4>
               <div className="flex gap-3">
-                <a 
-                  href={`https://facebook.com/${companyInfo.social.facebook}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#E39A65]"
-                >
-                  <FaFacebookF className="text-white" />
-                </a>
-                <a 
-                  href={`https://instagram.com/${companyInfo.social.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#E39A65]"
-                >
-                  <FaInstagram className="text-white" />
-                </a>
-                <a 
-                  href={`https://twitter.com/${companyInfo.social.twitter}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-[#E39A65]"
-                >
-                  <FaTwitter className="text-white" />
-                </a>
+                {[
+                  { icon: <FaFacebookF />, href: `https://facebook.com/${companyInfo.social.facebook}`, color: '#1877F2' },
+                  { icon: <FaInstagram />, href: `https://instagram.com/${companyInfo.social.instagram}`, color: '#E4405F' },
+                  { icon: <FaTwitter />, href: `https://twitter.com/${companyInfo.social.twitter}`, color: '#1DA1F2' },
+                ].map((social, index) => (
+                  <motion.a
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:scale-110 transition-all duration-300 relative overflow-hidden group"
+                    whileHover={{ y: -3 }}
+                    style={{ '--social-color': social.color }}
+                  >
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(135deg, ${social.color}80 0%, ${social.color} 100%)` }}></div>
+                    <span className="relative z-10 text-white/70 group-hover:text-white transition-colors">
+                      {social.icon}
+                    </span>
+                  </motion.a>
+                ))}
               </div>
             </div>
-          </div>
-
-          {/* Column 3: Newsletter & B2B Benefits */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 relative inline-block">
-              B2B Newsletter
-              <span className="absolute -bottom-1 left-0 w-8 h-0.5" style={{ backgroundColor: '#E39A65' }}></span>
-            </h3>
-            
-            <p className="text-white/70 text-sm mb-4">
-              Subscribe for wholesale updates, bulk deals, and new arrivals
-            </p>
-
-            <form onSubmit={handleSubscribe} className="mb-6">
-              <div className="relative mb-3">
-                <MdEmail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your business email"
-                  className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:border-[#E39A65] text-white placeholder-white/50 transition-colors"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"
-                style={{ backgroundColor: '#E39A65', color: '#2A2A2A' }}
-              >
-                <FaPaperPlane className="text-sm" />
-                Subscribe to B2B Updates
-              </button>
-            </form>
-
-            {subscriptionStatus === 'success' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-green-500/20 border border-green-500 text-green-300 px-4 py-2 rounded-lg text-sm text-center"
-              >
-                ✓ Successfully subscribed to B2B newsletter!
-              </motion.div>
-            )}
-
-            {/* B2B Benefits */}
-            <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'rgba(227,154,101,0.1)' }}>
-              <h4 className="font-semibold mb-2 text-sm">Why B2B with us?</h4>
-              <ul className="space-y-2 text-sm text-white/80">
-                <li className="flex items-center gap-2">
-                  <FaCheckCircle className="text-xs" style={{ color: '#E39A65' }} />
-                  <span>Low MOQ starting from 100 pcs</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <FaCheckCircle className="text-xs" style={{ color: '#E39A65' }} />
-                  <span>Bulk pricing tiers available</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <FaCheckCircle className="text-xs" style={{ color: '#E39A65' }} />
-                  <span>Custom manufacturing & branding</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <FaCheckCircle className="text-xs" style={{ color: '#E39A65' }} />
-                  <span>Global shipping to 50+ countries</span>
-                </li>
-              </ul>
+            <div className='mt-8'>
+                    <motion.a 
+              href={`https://wa.me/${companyInfo.whatsapp}?text=Hi%20Asian%20Clothify%2C%20I'm%20interested%20in%20your%20wholesale%20products`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl group relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)' }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <FaWhatsapp className="text-white text-xl relative z-10" />
+              <span className="text-white font-semibold relative z-10">Chat with Team</span>
+              <FaArrowRight className="text-white text-sm relative z-10 group-hover:translate-x-1 transition-transform" />
+            </motion.a>
             </div>
+           
           </div>
+
+          {/* Column 3: B2B Benefits (4 columns) */}
+          <div className="lg:col-span-4">
+  <div className="bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+    <h3 className="text-lg font-semibold mb-6 relative inline-block">
+      B2B Benefits
+      <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-[#E39A65] to-transparent"></span>
+    </h3>
+
+    <div className="space-y-4">
+      <motion.div 
+        className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#E39A65]/20 transition-all duration-300"
+        whileHover={{ x: 5 }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0">
+          <FaBox className="text-[#E39A65]" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-white">Low Minimum Order Quantity</h4>
+          <p className="text-xs text-white/50">Start with as low as 100 pieces per design</p>
+        </div>
+      </motion.div>
+
+      <motion.div 
+        className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#E39A65]/20 transition-all duration-300"
+        whileHover={{ x: 5 }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0">
+          <FaStar className="text-[#E39A65]" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-white">Tiered Bulk Pricing</h4>
+          <p className="text-xs text-white/50">Better prices for larger quantities</p>
+        </div>
+      </motion.div>
+
+      {/* <motion.div 
+        className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#E39A65]/20 transition-all duration-300"
+        whileHover={{ x: 5 }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0">
+          <FaBuilding className="text-[#E39A65]" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-white">Custom Manufacturing</h4>
+          <p className="text-xs text-white/50">Your branding, labels, and packaging</p>
+        </div>
+      </motion.div> */}
+
+      <motion.div 
+        className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-[#E39A65]/20 transition-all duration-300"
+        whileHover={{ x: 5 }}
+      >
+        <div className="w-10 h-10 rounded-lg bg-[#E39A65]/10 flex items-center justify-center flex-shrink-0">
+          <FaGlobe className="text-[#E39A65]" />
+        </div>
+        <div>
+          <h4 className="font-semibold text-sm text-white">Global Shipping</h4>
+          <p className="text-xs text-white/50">Express, air, and sea freight options</p>
+        </div>
+      </motion.div>
+    </div>
+
+    {/* Trust Badge */}
+    <div className="mt-6 pt-6 border-t border-white/10">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-white/40">Trusted by 500+ businesses worldwide</span>
+        <div className="flex items-center gap-1">
+          {[1,2,3,4,5].map((star) => (
+            <FaStar key={star} className="text-yellow-500 text-xs" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-6 border-t border-white/10">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-            <p className="text-white/60 text-sm">
-              © {currentYear} Asian Clothify. All rights reserved. | B2B Wholesale Clothing Platform
+        {/* Bottom Bar - Enhanced */}
+        <div className="pt-8 border-t border-white/10">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
+            <p className="text-white/40 text-sm">
+              © {currentYear} <span className="text-white/60 font-medium">Asian Clothify</span>. All rights reserved. | B2B Wholesale Clothing Platform
             </p>
             
-            {/* Payment Methods */}
-            <div className="flex items-center gap-3">
-              <span className="text-white/60 text-sm">Accepted Payments:</span>
+            {/* Payment Methods - Enhanced */}
+            <div className="flex items-center gap-4">
+              <span className="text-white/40 text-sm">Accepted Payments:</span>
               <div className="flex gap-2">
-                <div className="px-2 py-1 bg-white/10 rounded text-xs font-medium">Bank Transfer</div>
-                <div className="px-2 py-1 bg-white/10 rounded text-xs font-medium">L/C</div>
-                <div className="px-2 py-1 bg-white/10 rounded text-xs font-medium">Stripe</div>
+                {['Bank Transfer', 'L/C', 'Stripe'].map((method, index) => (
+                  <div 
+                    key={index}
+                    className="px-3 py-1.5 bg-white/5 rounded-lg text-xs font-medium text-white/60 border border-white/10 hover:border-[#E39A65]/30 transition-colors"
+                  >
+                    {method}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Business Info */}
-          <div className="mt-4 text-center text-white/40 text-xs">
-            <p>Asian Clothify - Premium B2B Wholesale Apparel Supplier based in Savar, Dhaka, Bangladesh. Serving global markets with quality clothing since 2018.</p>
+          <div className="mt-6 text-center">
+            <p className="text-white/40 text-xs tracking-wide">
+              Asian Clothify — Premium B2B Wholesale Apparel Supplier • Savar, Dhaka, Bangladesh • Serving Global Markets Since 2018
+            </p>
           </div>
         </div>
       </div>

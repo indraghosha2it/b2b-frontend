@@ -615,7 +615,7 @@
 //       }
 
 //       // Build query params - using the same admin endpoint but with moderator permissions
-// let url = `http://localhost:5000/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;      
+// let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;      
 //       if (activeFilter !== 'All') {
 //         url += `&status=${activeFilter.toLowerCase()}`;
 //       }
@@ -1615,7 +1615,7 @@ const fetchInquiries = async () => {
     }
 
     // Build query params for paginated inquiries
-    let url = `http://localhost:5000/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+    let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
     
     if (activeFilter !== 'All') {
       url += `&status=${activeFilter.toLowerCase()}`;
