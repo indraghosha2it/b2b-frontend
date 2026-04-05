@@ -570,6 +570,8 @@ const FilterSidebar = ({
 // };
 
 const ProductGridCard = ({ product }) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const capitalizeFirst = (str) => {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -615,7 +617,7 @@ const ProductGridCard = ({ product }) => {
   };
 
   const productImages = product.images || [];
-  const [activeIndex, setActiveIndex] = useState(0);
+  
   const hasMultipleImages = productImages.length > 1;
   const firstTier = getFirstPricingTier(product.quantityBasedPricing);
   const primaryTag = product.tags?.[0];
@@ -629,6 +631,17 @@ const ProductGridCard = ({ product }) => {
   const handleImageLeave = () => {
     setActiveIndex(0);
   };
+  
+  useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth < 768); // 768px is typical md breakpoint
+  };
+  
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
 
   return (
     <motion.div
@@ -644,8 +657,14 @@ const ProductGridCard = ({ product }) => {
         y: -8,
         transition: { type: "spring", stiffness: 300, damping: 15 }
       }}
-      onClick={() => window.location.href = `/productDetails?id=${product._id}`}
-      className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
+onClick={() => {
+  if (isMobile) {
+    window.location.href = `/productDetails?id=${product._id}`;
+  } else {
+    window.open(`/productDetails?id=${product._id}`, '_blank');
+  }
+}}
+   className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
     >
       {/* Image Container - Only Tag badge on image */}
       <div className="relative h-40 sm:h-52 overflow-hidden bg-gray-100">
@@ -677,7 +696,7 @@ const ProductGridCard = ({ product }) => {
           <div
             onClick={(e) => {
               e.stopPropagation();
-              window.location.href = `/productDetails?id=${product._id}`;
+              window.open(`/productDetails?id=${product._id}`, '_blank');
             }}
           >
             <motion.div 
@@ -692,7 +711,7 @@ const ProductGridCard = ({ product }) => {
           <div
             onClick={(e) => {
               e.stopPropagation();
-              window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+      window.open(`/productDetails?id=${product._id}#inquiry-form`, '_blank');    
             }}
           >
             <motion.div 
@@ -967,7 +986,7 @@ const ProductListCard = ({ product }) => {
         y: -8,
         transition: { type: "spring", stiffness: 300, damping: 15 }
       }}
-      onClick={() => window.location.href = `/productDetails?id=${product._id}`}
+onClick={() => window.open(`/productDetails?id=${product._id}`, '_blank')}
       className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer"
     >
       <div className="flex flex-col md:flex-row">
@@ -1003,8 +1022,8 @@ const ProductListCard = ({ product }) => {
               <div
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.location.href = `/productDetails?id=${product._id}`;
-                }}
+            window.open(`/productDetails?id=${product._id}`, '_blank');                }}
+                
               >
                 <motion.div 
                   className="bg-white rounded-full p-2.5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
@@ -1018,7 +1037,7 @@ const ProductListCard = ({ product }) => {
               <div
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
+                  window.open(`/productDetails?id=${product._id}#inquiry-form`, '_blank');
                 }}
               >
                 <motion.div 
@@ -1388,7 +1407,7 @@ export default function ProductsClient() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
+      const response = await fetch('http://localhost:5000/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data);
@@ -1437,7 +1456,7 @@ export default function ProductsClient() {
       }
       queryParams.append('sort', sortParam);
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {

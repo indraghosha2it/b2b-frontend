@@ -39,7 +39,7 @@
 //     setLoading(true);
 //     setError(null);
 //     try {
-//       const url = `https://b2b-backend-rosy.vercel.app/api/reviews/product/${productId}?limit=100&sort=${sortBy === 'highest' ? '-rating' : '-createdAt'}`;
+//       const url = `http://localhost:5000/api/reviews/product/${productId}?limit=100&sort=${sortBy === 'highest' ? '-rating' : '-createdAt'}`;
       
 //       const response = await fetch(url);
       
@@ -107,7 +107,7 @@
 //         return;
 //       }
 
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/helpful`, {
+//       const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/helpful`, {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -495,7 +495,7 @@ const fetchAllReviews = async () => {
     }
 
     // Fetch public reviews (approved only)
-    const url = `https://b2b-backend-rosy.vercel.app/api/reviews/product/${productId}?limit=100&sort=${sortBy === 'highest' ? '-rating' : '-createdAt'}`;
+    const url = `http://localhost:5000/api/reviews/product/${productId}?limit=100&sort=${sortBy === 'highest' ? '-rating' : '-createdAt'}`;
     console.log('Fetching reviews from:', url);
     
     const response = await fetch(url);
@@ -543,7 +543,7 @@ const fetchAllReviews = async () => {
 const fetchUserReview = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/product/${productId}/my-review`, {
+    const response = await fetch(`http://localhost:5000/api/reviews/product/${productId}/my-review`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -608,7 +608,7 @@ const fetchUserReview = async () => {
         return;
       }
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${reviewId}/helpful`, {
+      const response = await fetch(`http://localhost:5000/api/reviews/${reviewId}/helpful`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -107,7 +107,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/me', {
+//       const response = await fetch('http://localhost:5000/api/auth/me', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -182,7 +182,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/profile', {
+//       const response = await fetch('http://localhost:5000/api/auth/profile', {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -278,7 +278,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/change-password', {
+//       const response = await fetch('http://localhost:5000/api/auth/change-password', {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1310,7 +1310,7 @@ export default function CustomerSettings() {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/me', {
+      const response = await fetch('http://localhost:5000/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1386,7 +1386,7 @@ export default function CustomerSettings() {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/profile', {
+      const response = await fetch('http://localhost:5000/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1482,7 +1482,7 @@ export default function CustomerSettings() {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/change-password', {
+      const response = await fetch('http://localhost:5000/api/auth/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -24,7 +24,8 @@ import {
   FileText,
   Package,
   Users,
-  CheckCircle
+  CheckCircle,
+  Youtube
 } from 'lucide-react';
 import Navbar from '@/app/components/layout/Navbar';
 import Footer from '@/app/components/layout/Footer';
@@ -41,10 +42,10 @@ export default function BlogDetailsClient() {
   const [showImageModal, setShowImageModal] = useState(false);
   
   // Video player state
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const videoRef = React.useRef(null);
+  // const [isPlaying, setIsPlaying] = useState(false);
+  // const [isMuted, setIsMuted] = useState(false);
+  // const [progress, setProgress] = useState(0);
+  // const videoRef = React.useRef(null);
 
   // Categories for reference
   const categories = [
@@ -71,7 +72,7 @@ export default function BlogDetailsClient() {
       
       setLoading(true);
       try {
-        const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/${blogId}`);
+        const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -100,7 +101,7 @@ export default function BlogDetailsClient() {
   // Fetch related posts
   const fetchRelatedPosts = async (category, currentId) => {
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs?category=${category}&limit=3`);
+      const response = await fetch(`http://localhost:5000/api/blogs?category=${category}&limit=3`);
       const data = await response.json();
       if (data.success) {
         setRelatedPosts(data.data.filter(post => post._id !== currentId).slice(0, 3));
@@ -395,76 +396,30 @@ export default function BlogDetailsClient() {
                 dangerouslySetInnerHTML={{ __html: blog.content }}
               />
 
-              {/* Video Section - Using videoUrl from your DB */}
-              {blog.videoUrl && (
-                <motion.div 
-                  className="mb-12"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Play className="w-6 h-6 text-[#E39A65]" />
-                    Video Story
-                  </h3>
-                  <div className="relative rounded-2xl overflow-hidden bg-black shadow-xl group">
-                    <video
-                      ref={videoRef}
-                      src={blog.videoUrl}
-                      className="w-full aspect-video"
-                      onTimeUpdate={handleVideoProgress}
-                      onClick={togglePlay}
-                      poster={blog.featuredImage}
-                    />
-                    
-                    {/* Custom Video Controls */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={togglePlay}
-                          className="p-2 bg-white/20 backdrop-blur rounded-full hover:bg-white/30 transition-colors"
-                        >
-                          {isPlaying ? (
-                            <Pause className="w-5 h-5 text-white" />
-                          ) : (
-                            <Play className="w-5 h-5 text-white" />
-                          )}
-                        </button>
-                        
-                        <div 
-                          className="flex-1 h-1 bg-white/30 rounded-full cursor-pointer"
-                          onClick={handleSeek}
-                        >
-                          <div 
-                            className="h-full bg-[#E39A65] rounded-full relative"
-                            style={{ width: `${progress}%` }}
-                          >
-                            <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#E39A65] rounded-full"></div>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={toggleMute}
-                          className="p-2 bg-white/20 backdrop-blur rounded-full hover:bg-white/30 transition-colors"
-                        >
-                          {isMuted ? (
-                            <VolumeX className="w-5 h-5 text-white" />
-                          ) : (
-                            <Volume2 className="w-5 h-5 text-white" />
-                          )}
-                        </button>
-
-                        <button
-                          onClick={handleFullscreen}
-                          className="p-2 bg-white/20 backdrop-blur rounded-full hover:bg-white/30 transition-colors"
-                        >
-                          <Maximize2 className="w-5 h-5 text-white" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+              {/* YouTube Video Section */}
+{blog.youtubeVideo && blog.youtubeVideo.videoId && (
+  <motion.div 
+    className="mb-12"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.3 }}
+  >
+    <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <Youtube className="w-6 h-6 text-red-600" />
+      Featured Video
+    </h3>
+    <div className="relative rounded-2xl overflow-hidden bg-black shadow-xl aspect-video">
+      <iframe
+        src={`https://www.youtube.com/embed/${blog.youtubeVideo.videoId}`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="absolute top-0 left-0 w-full h-full"
+      ></iframe>
+    </div>
+  </motion.div>
+)}
 
               {/* Additional Sections with Rich Text */}
               {blog.paragraphs && blog.paragraphs.length > 0 && (

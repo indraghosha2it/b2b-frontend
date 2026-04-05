@@ -54,7 +54,7 @@ export default function ResetPassword({ email, otp, onBack }) {
     try {
       console.log('Sending reset request:', { email, otp, password: '***' });
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/reset-password', {
+      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

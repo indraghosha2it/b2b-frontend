@@ -390,7 +390,7 @@
 //       }
 
 //       // Fetch customer's invoices
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/my-invoices`, {
+//       const response = await fetch(`http://localhost:5000/api/invoices/my-invoices`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -1404,7 +1404,7 @@ export default function CustomerInvoicesPage() {
       }
 
       // Fetch customer's invoices
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/my-invoices`, {
+      const response = await fetch(`http://localhost:5000/api/invoices/my-invoices`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

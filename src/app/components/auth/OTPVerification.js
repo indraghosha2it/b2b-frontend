@@ -86,7 +86,7 @@
 //     const loadingToast = toast.loading('Verifying OTP...');
 
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/verify-otp', {
+//       const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -134,7 +134,7 @@
 //     const loadingToast = toast.loading('Sending new OTP...');
 
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/resend-otp', {
+//       const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -314,7 +314,7 @@ export default function OTPVerification({ email, onBack, onSuccess }) {
 //     const loadingToast = toast.loading('Verifying OTP...');
 
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/verify-otp', {
+//       const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -369,7 +369,7 @@ const handleSubmit = async (e) => {
   try {
     console.log('📤 Sending OTP verification request for:', email);
     
-    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/verify-otp', {
+    const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ const handleSubmit = async (e) => {
     const loadingToast = toast.loading('Sending new OTP...');
 
     try {
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/resend-otp', {
+      const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -91,7 +91,7 @@
 //         return;
 //       }
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -115,7 +115,7 @@
 
 //   const fetchProductDetails = async (productId) => {
 //     try {
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
 //       const data = await response.json();
 //       if (data.success) {
 //         setProductDetails(prev => ({
@@ -202,7 +202,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
+//       const response = await fetch(`http://localhost:5000/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -277,7 +277,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}`, {
+//       const response = await fetch(`http://localhost:5000/api/inquiry-cart/item/${itemId}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -327,7 +327,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/clear', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/clear', {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -414,7 +414,7 @@
 
 //       console.log('📤 Saving edited colors:', JSON.stringify(cartItem, null, 2));
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -602,7 +602,7 @@
 
 //       console.log('📤 Adding new color to existing product:', JSON.stringify(cartItem, null, 2));
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -686,7 +686,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/upload', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/upload', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -732,7 +732,7 @@
 //     setSubmitting(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/submit', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/submit', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -1458,7 +1458,7 @@ export default function InquiryCartPage() {
         return;
       }
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1482,7 +1482,7 @@ export default function InquiryCartPage() {
 
   const fetchProductDetails = async (productId) => {
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
       const data = await response.json();
       if (data.success) {
         setProductDetails(prev => ({
@@ -1569,7 +1569,7 @@ export default function InquiryCartPage() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
+      const response = await fetch(`http://localhost:5000/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1644,7 +1644,7 @@ export default function InquiryCartPage() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}`, {
+      const response = await fetch(`http://localhost:5000/api/inquiry-cart/item/${itemId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1694,7 +1694,7 @@ export default function InquiryCartPage() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/clear', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/clear', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1781,7 +1781,7 @@ export default function InquiryCartPage() {
 
       console.log('📤 Saving edited colors:', JSON.stringify(cartItem, null, 2));
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1969,7 +1969,7 @@ export default function InquiryCartPage() {
 
       console.log('📤 Adding new color to existing product:', JSON.stringify(cartItem, null, 2));
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -2053,7 +2053,7 @@ export default function InquiryCartPage() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/upload', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2099,7 +2099,7 @@ export default function InquiryCartPage() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/submit', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/submit', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

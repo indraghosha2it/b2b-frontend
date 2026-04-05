@@ -272,7 +272,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
+//       const response = await fetch('http://localhost:5000/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -291,7 +291,7 @@
 //   const fetchCategoryDetails = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -310,7 +310,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -792,7 +792,7 @@
 //         }
 //       });
 
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -2090,7 +2090,7 @@ export default function ModeratorEditProduct() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
+      const response = await fetch('http://localhost:5000/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2107,7 +2107,7 @@ export default function ModeratorEditProduct() {
   const fetchCategoryDetails = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2124,7 +2124,7 @@ export default function ModeratorEditProduct() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2675,7 +2675,7 @@ const handleMultipleImageSelect = async (e) => {
 
       console.log('Submitting payload:', payload);
 
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

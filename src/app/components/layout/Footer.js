@@ -482,9 +482,9 @@ export default function Footer() {
 
   const companyInfo = {
     name: "Asian Clothify",
-    tagline: "Premium B2B Wholesale Apparel Supplier",
+    tagline: "Top clothing seller in Bangladesh",
     address: "49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh",
-    phone: "01305-785685",
+    phone: "+8801305-785685",
     email: "info@asianclothify.com",
     whatsapp: "8801305785685",
     hours: "Mon-Fri: 9AM - 6PM | Sat: 10AM - 4PM",
@@ -581,7 +581,7 @@ export default function Footer() {
                 <h2 className="text-xl font-bold bg-gradient-to-r from-[#E39A65] to-[#FBFFFF] bg-clip-text text-transparent">
                   {companyInfo.name}
                 </h2>
-                <p className="text-xs text-white/60">Est. 2018 · Bangladesh</p>
+                <p className="text-xs text-white/60">Est. 2026 · Bangladesh</p>
               </div>
             </div>
             

@@ -123,7 +123,7 @@
 
 //   const fetchProducts = async () => {
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?isFeatured=true&limit=20&sort=-createdAt');
+//       const response = await fetch('http://localhost:5000/api/products?isFeatured=true&limit=20&sort=-createdAt');
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -847,12 +847,15 @@ const getTargetedAudienceStyle = (audience) => {
 };
 
 export default function FeaturedProducts() {
+
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTag, setActiveTag] = useState('all');
   const [activeImageIndex, setActiveImageIndex] = useState({});
   const [visibleCount, setVisibleCount] = useState(5); // Default to 5 for desktop
+  const [isMobile, setIsMobile] = useState(false);
+
 
   // Use effect to handle responsive initial count
   useEffect(() => {
@@ -873,6 +876,17 @@ export default function FeaturedProducts() {
     // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth < 768); // 768px is typical md breakpoint
+  };
+  
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  
+  return () => window.removeEventListener('resize', checkMobile);
+}, []);
 
   const [isExpanding, setIsExpanding] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
@@ -902,7 +916,7 @@ export default function FeaturedProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?isFeatured=true&limit=20&sort=-createdAt');
+      const response = await fetch('http://localhost:5000/api/products?isFeatured=true&limit=20&sort=-createdAt');
       const data = await response.json();
       
       if (data.success) {
@@ -944,6 +958,18 @@ export default function FeaturedProducts() {
     return text.substring(0, limit) + '...';
   };
 
+
+  const handleProductNavigation = (e, productId, hasHash = false) => {
+  const url = hasHash 
+    ? `/productDetails?id=${productId}#inquiry-form`
+    : `/productDetails?id=${productId}`;
+  
+  if (isMobile) {
+    window.location.href = url; // Same tab on mobile
+  } else {
+    window.open(url, '_blank'); // New tab on desktop
+  }
+};
   // Image hover handlers
   const handleImageHover = (productId, imageIndex) => {
     setActiveImageIndex(prev => ({ ...prev, [productId]: imageIndex }));
@@ -952,6 +978,7 @@ export default function FeaturedProducts() {
   const handleMouseLeave = (productId) => {
     setActiveImageIndex(prev => ({ ...prev, [productId]: 0 }));
   };
+
 
   // Show more products
   const handleShowMore = () => {
@@ -1246,7 +1273,7 @@ export default function FeaturedProducts() {
                         y: -8,
                         transition: { type: "spring", stiffness: 300, damping: 15 }
                       }}
-                      onClick={() => window.location.href = `/productDetails?id=${product._id}`}
+                      onClick={(e) => handleProductNavigation(e, product._id, false)}
                       className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
                     >
                       {/* Image Container - Full image without badges except Tag */}
@@ -1278,12 +1305,12 @@ export default function FeaturedProducts() {
     initial={{ opacity: 0 }}
     whileHover={{ opacity: 1 }}
   >
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        window.location.href = `/productDetails?id=${product._id}`;
-      }}
-    >
+   <div
+  onClick={(e) => {
+    e.stopPropagation();
+    handleProductNavigation(e, product._id, false);
+  }}
+>
       <motion.div 
         className="bg-white rounded-full p-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
         whileHover={{ scale: 1.15 }}
@@ -1293,12 +1320,12 @@ export default function FeaturedProducts() {
       </motion.div>
     </div>
     
-    <div
-      onClick={(e) => {
-        e.stopPropagation();
-        window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
-      }}
-    >
+  <div
+  onClick={(e) => {
+    e.stopPropagation();
+    handleProductNavigation(e, product._id, true);
+  }}
+>
       <motion.div 
         className="bg-[#E39A65] rounded-full p-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg hover:shadow-xl"
         whileHover={{ scale: 1.15 }}
@@ -1311,23 +1338,23 @@ export default function FeaturedProducts() {
 
   {/* Mobile Icons - Right side center */}
   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:hidden z-30">
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        window.location.href = `/productDetails?id=${product._id}`;
-      }}
-      className="bg-white/95 backdrop-blur-sm rounded-full p-1.5 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white"
-    >
+   <button
+  onClick={(e) => {
+    e.stopPropagation();
+    handleProductNavigation(e, product._id, false);
+  }}
+  className="bg-white/95 backdrop-blur-sm rounded-full p-1.5 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white"
+>
       <Eye className="w-3.5 h-3.5 text-gray-700" />
     </button>
     
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
-      }}
-      className="bg-[#E39A65]/95 backdrop-blur-sm rounded-full p-1.5 shadow-lg active:scale-95 transition-all duration-200 hover:bg-[#E39A65]"
-    >
+   <button
+  onClick={(e) => {
+    e.stopPropagation();
+    handleProductNavigation(e, product._id, true);
+  }}
+  className="bg-[#E39A65]/95 backdrop-blur-sm rounded-full p-1.5 shadow-lg active:scale-95 transition-all duration-200 hover:bg-[#E39A65]"
+>
       <ShoppingCart className="w-3.5 h-3.5 text-white" />
     </button>
   </div>

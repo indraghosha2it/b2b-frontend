@@ -309,7 +309,7 @@
 //   //   setUpdating(true);
 //   //   try {
 //   //     const token = localStorage.getItem('token');
-//   //     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+//   //     const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
 //   //       method: 'PUT',
 //   //       headers: {
 //   //         'Authorization': `Bearer ${token}`,
@@ -337,7 +337,7 @@
 //   setUpdatingMarkQuoted(true);
 //   try {
 //     const token = localStorage.getItem('token');
-//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+//     const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
 //       method: 'PUT',
 //       headers: {
 //         'Authorization': `Bearer ${token}`,
@@ -364,7 +364,7 @@
 //   setDeleting(true);
 //   try {
 //     const token = localStorage.getItem('token');
-//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+//     const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
 //       method: 'PUT',
 //       headers: {
 //         'Authorization': `Bearer ${token}`,
@@ -391,7 +391,7 @@
 //     setDeleting(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}`, {
+//       const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -556,7 +556,7 @@
 //     const token = localStorage.getItem('token');
     
 //     // Fetch invoices associated with this inquiry
-//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices?inquiryId=${inquiry._id}`, {
+//     const response = await fetch(`http://localhost:5000/api/invoices?inquiryId=${inquiry._id}`, {
 //       headers: {
 //         'Authorization': `Bearer ${token}`
 //       }
@@ -1288,7 +1288,7 @@
 //       }
 
 //       // First, fetch ALL inquiries for stats (no pagination)
-//       const allInquiriesResponse = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/all`, {
+//       const allInquiriesResponse = await fetch(`http://localhost:5000/api/admin/inquiries/all`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -1303,7 +1303,7 @@
 //       }
 
 //       // Then fetch paginated inquiries for display
-//       let url = `https://b2b-backend-rosy.vercel.app/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `http://localhost:5000/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       if (activeFilter !== 'All') {
 //         url += `&status=${activeFilter.toLowerCase()}`;
@@ -1890,7 +1890,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
     setUpdatingMarkQuoted(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+      const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1917,7 +1917,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
     setDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}/status`, {
+      const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -1945,7 +1945,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
     setDeleting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/${inquiry._id}`, {
+      const response = await fetch(`http://localhost:5000/api/admin/inquiries/${inquiry._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2061,7 +2061,7 @@ const AdminInquiryCard = ({ inquiry, onRefresh }) => {
   const handleViewInvoice = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices?inquiryId=${inquiry._id}`, {
+      const response = await fetch(`http://localhost:5000/api/invoices?inquiryId=${inquiry._id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2698,7 +2698,7 @@ export default function AdminInquiriesPage() {
         return;
       }
 
-      const allInquiriesResponse = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/inquiries/all`, {
+      const allInquiriesResponse = await fetch(`http://localhost:5000/api/admin/inquiries/all`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2711,7 +2711,7 @@ export default function AdminInquiriesPage() {
         calculateAllStats(dateFilteredAll);
       }
 
-      let url = `https://b2b-backend-rosy.vercel.app/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `http://localhost:5000/api/admin/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (activeFilter !== 'All') {
         url += `&status=${activeFilter.toLowerCase()}`;

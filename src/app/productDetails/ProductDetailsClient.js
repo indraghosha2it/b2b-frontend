@@ -1036,7 +1036,7 @@
 //   const fetchProduct = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
+//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1064,7 +1064,7 @@
 //       if (categoryId) queryParams.append('category', categoryId);
 //       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1082,7 +1082,7 @@
     
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -1305,7 +1305,7 @@
 //         specialInstructions: specialInstructions
 //       };
 
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//       const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2114,6 +2114,8 @@ import AuthModal from '../components/AuthModal';
 import { motion } from 'framer-motion';
 import ProductReviews from '../components/product/ProductReviews';
 import MetadataUpdater from './MetadataUpdater'; // Import the MetadataUpdater
+import FullscreenModal from '../components/FullscreenModal'; // Adjust path as needed
+
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -2156,31 +2158,224 @@ const RichTextContent = ({ content, className = '' }) => {
 };
 
 // Image Gallery Component
-// Image Gallery Component
+// const ImageGallery = ({ images = [], productName }) => {
+//   const [mainImage, setMainImage] = useState(0);
+//   const [isFullscreen, setIsFullscreen] = useState(false);
+//   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+//   const [imageLoaded, setImageLoaded] = useState({});
+//   const [isTransitioning, setIsTransitioning] = useState(false);
+
+//   const handleMouseMove = (e) => {
+//     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+//     const x = ((e.clientX - left) / width) * 100;
+//     const y = ((e.clientY - top) / height) * 100;
+//     setZoomPosition({ x, y });
+//   };
+
+//   // Preload images on hover
+//   const preloadImage = (src) => {
+//     const img = new Image();
+//     img.src = src;
+//   };
+
+//   // Preload adjacent images
+//   useEffect(() => {
+//     if (images.length > 0) {
+//       // Preload next and previous images
+//       const nextIndex = (mainImage + 1) % images.length;
+//       const prevIndex = (mainImage - 1 + images.length) % images.length;
+      
+//       if (images[nextIndex]?.url) preloadImage(images[nextIndex].url);
+//       if (images[prevIndex]?.url) preloadImage(images[prevIndex].url);
+//     }
+//   }, [mainImage, images]);
+
+//   const handleImageChange = (idx) => {
+//     if (idx === mainImage) return;
+    
+//     setIsTransitioning(true);
+//     setMainImage(idx);
+    
+//     // Mark new image as not loaded
+//     setImageLoaded(prev => ({ ...prev, [idx]: false }));
+//   };
+
+//   const handleImageLoad = (idx) => {
+//     setImageLoaded(prev => ({ ...prev, [idx]: true }));
+//     setTimeout(() => {
+//       setIsTransitioning(false);
+//     }, 100);
+//   };
+
+//   // Calculate thumbnail size based on number of images
+//   const getThumbnailSize = () => {
+//     const count = images.length;
+//     if (count <= 4) return 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
+//     if (count <= 6) return 'w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16';
+//     return 'w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14';
+//   };
+
+//   return (
+//     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+//       {/* Thumbnails - No scrollbar, all images visible */}
+//       <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+//         <div className="flex sm:flex-row lg:flex-col gap-2">
+//           {images.map((image, idx) => (
+//             <button
+//               key={idx}
+//               onClick={() => handleImageChange(idx)}
+//               onMouseEnter={() => {
+//                 // Preload on hover for smoother experience
+//                 preloadImage(image.url);
+//                 handleImageChange(idx);
+//               }}
+//               className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
+//                 mainImage === idx 
+//                   ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
+//                   : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+//               }`}
+//             >
+//               <img
+//                 src={image.url}
+//                 alt={`${productName} - Thumbnail ${idx + 1}`}
+//                 className="w-full h-full object-cover"
+//                 loading="lazy"
+//                 onError={(e) => {
+//                   e.target.onerror = null;
+//                   e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+//                 }}
+//               />
+//               {mainImage === idx && (
+//                 <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
+//                   <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
+//                 </div>
+//               )}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* Main Image - Centered with flexbox */}
+//       <div 
+//         className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
+//         onMouseMove={handleMouseMove}
+//       >
+//         {/* Loading skeleton - shows while transitioning */}
+//         {(isTransitioning || !imageLoaded[mainImage]) && (
+//           <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
+//             <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+//           </div>
+//         )}
+        
+//         <div className="relative w-full h-full flex items-center justify-center">
+//           <img
+//             key={mainImage}
+//             src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
+//             alt={`${productName} - Main view`}
+//             className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
+//               imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+//             }`}
+//             style={{
+//               objectPosition: 'center',
+//             }}
+//             onLoad={() => handleImageLoad(mainImage)}
+//             loading={mainImage === 0 ? "eager" : "lazy"}
+//             fetchPriority={mainImage === 0 ? "high" : "auto"}
+//             decoding="async"
+//             onError={(e) => {
+//               e.target.onerror = null;
+//               e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
+//               handleImageLoad(mainImage);
+//             }}
+//           />
+//         </div>
+        
+//         {/* Zoom overlay effect */}
+//         <div 
+//           className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none z-20"
+//         />
+        
+//         <button
+//           onClick={() => setIsFullscreen(true)}
+//           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
+//           aria-label="View fullscreen"
+//         >
+//           <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+//         </button>
+
+//         {/* Image counter badge */}
+//         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
+//           {mainImage + 1} / {images.length}
+//         </div>
+//       </div>
+
+//       {/* Fullscreen Modal */}
+//       {isFullscreen && (
+//         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+//           <button
+//             onClick={() => setIsFullscreen(false)}
+//             className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors z-10"
+//           >
+//             <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+//           </button>
+          
+//           {/* Fullscreen navigation */}
+//           {images.length > 1 && (
+//             <>
+//               <button
+//                 onClick={() => {
+//                   const newIndex = mainImage > 0 ? mainImage - 1 : images.length - 1;
+//                   handleImageChange(newIndex);
+//                 }}
+//                 className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+//               >
+//                 <ChevronLeft className="w-6 h-6 text-white" />
+//               </button>
+              
+//               <button
+//                 onClick={() => {
+//                   const newIndex = mainImage < images.length - 1 ? mainImage + 1 : 0;
+//                   handleImageChange(newIndex);
+//                 }}
+//                 className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+//               >
+//                 <ChevronRight className="w-6 h-6 text-white" />
+//               </button>
+//             </>
+//           )}
+          
+//           <img
+//             src={images[mainImage]?.url || images[0]?.url}
+//             alt={productName}
+//             className="max-w-[95vw] max-h-[85vh] object-contain"
+//             loading="lazy"
+//           />
+          
+//           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-sm px-3 py-1 rounded-full">
+//             {mainImage + 1} / {images.length}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// Image Gallery Component - With Portal Modal
+
+// Image Gallery Component - Without Zoom Effect
 const ImageGallery = ({ images = [], productName }) => {
   const [mainImage, setMainImage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState({});
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const handleMouseMove = (e) => {
-    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - left) / width) * 100;
-    const y = ((e.clientY - top) / height) * 100;
-    setZoomPosition({ x, y });
-  };
-
-  // Preload images on hover
   const preloadImage = (src) => {
     const img = new Image();
     img.src = src;
   };
 
-  // Preload adjacent images
   useEffect(() => {
     if (images.length > 0) {
-      // Preload next and previous images
       const nextIndex = (mainImage + 1) % images.length;
       const prevIndex = (mainImage - 1 + images.length) % images.length;
       
@@ -2194,8 +2389,6 @@ const ImageGallery = ({ images = [], productName }) => {
     
     setIsTransitioning(true);
     setMainImage(idx);
-    
-    // Mark new image as not loaded
     setImageLoaded(prev => ({ ...prev, [idx]: false }));
   };
 
@@ -2206,7 +2399,6 @@ const ImageGallery = ({ images = [], productName }) => {
     }, 100);
   };
 
-  // Calculate thumbnail size based on number of images
   const getThumbnailSize = () => {
     const count = images.length;
     if (count <= 4) return 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
@@ -2215,147 +2407,102 @@ const ImageGallery = ({ images = [], productName }) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-      {/* Thumbnails - No scrollbar, all images visible */}
-      <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
-        <div className="flex sm:flex-row lg:flex-col gap-2">
-          {images.map((image, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleImageChange(idx)}
-              onMouseEnter={() => {
-                // Preload on hover for smoother experience
-                preloadImage(image.url);
-                handleImageChange(idx);
-              }}
-              className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
-                mainImage === idx 
-                  ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
-                  : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-              }`}
-            >
-              <img
-                src={image.url}
-                alt={`${productName} - Thumbnail ${idx + 1}`}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+    <>
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        {/* Thumbnails */}
+        <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+          <div className="flex sm:flex-row lg:flex-col gap-2">
+            {images.map((image, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleImageChange(idx)}
+                onMouseEnter={() => {
+                  preloadImage(image.url);
+                  handleImageChange(idx);
                 }}
-              />
-              {mainImage === idx && (
-                <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Image - Centered with flexbox */}
-      <div 
-        className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
-        onMouseMove={handleMouseMove}
-      >
-        {/* Loading skeleton - shows while transitioning */}
-        {(isTransitioning || !imageLoaded[mainImage]) && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+                className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
+                  mainImage === idx 
+                    ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                }`}
+              >
+                <img
+                  src={image.url}
+                  alt={`${productName} - Thumbnail ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                  }}
+                />
+                {mainImage === idx && (
+                  <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
+                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
+                  </div>
+                )}
+              </button>
+            ))}
           </div>
-        )}
-        
-        <div className="relative w-full h-full flex items-center justify-center">
-          <img
-            key={mainImage}
-            src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
-            alt={`${productName} - Main view`}
-            className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
-              imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-            style={{
-              objectPosition: 'center',
-            }}
-            onLoad={() => handleImageLoad(mainImage)}
-            loading={mainImage === 0 ? "eager" : "lazy"}
-            fetchPriority={mainImage === 0 ? "high" : "auto"}
-            decoding="async"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
-              handleImageLoad(mainImage);
-            }}
-          />
         </div>
-        
-        {/* Zoom overlay effect */}
+
+        {/* Main Image - No zoom effect */}
         <div 
-          className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none z-20"
-        />
-        
-        <button
-          onClick={() => setIsFullscreen(true)}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
-          aria-label="View fullscreen"
+          className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-default order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
         >
-          <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-        </button>
-
-        {/* Image counter badge */}
-        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
-          {mainImage + 1} / {images.length}
-        </div>
-      </div>
-
-      {/* Fullscreen Modal */}
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-          <button
-            onClick={() => setIsFullscreen(false)}
-            className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors z-10"
-          >
-            <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-          </button>
-          
-          {/* Fullscreen navigation */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={() => {
-                  const newIndex = mainImage > 0 ? mainImage - 1 : images.length - 1;
-                  handleImageChange(newIndex);
-                }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
-              >
-                <ChevronLeft className="w-6 h-6 text-white" />
-              </button>
-              
-              <button
-                onClick={() => {
-                  const newIndex = mainImage < images.length - 1 ? mainImage + 1 : 0;
-                  handleImageChange(newIndex);
-                }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
-              >
-                <ChevronRight className="w-6 h-6 text-white" />
-              </button>
-            </>
+          {(isTransitioning || !imageLoaded[mainImage]) && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+            </div>
           )}
           
-          <img
-            src={images[mainImage]?.url || images[0]?.url}
-            alt={productName}
-            className="max-w-[95vw] max-h-[85vh] object-contain"
-            loading="lazy"
-          />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <img
+              key={mainImage}
+              src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
+              alt={`${productName} - Main view`}
+              className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
+                imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`}
+              style={{
+                objectPosition: 'center',
+              }}
+              onLoad={() => handleImageLoad(mainImage)}
+              loading={mainImage === 0 ? "eager" : "lazy"}
+              fetchPriority={mainImage === 0 ? "high" : "auto"}
+              decoding="async"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
+                handleImageLoad(mainImage);
+              }}
+            />
+          </div>
           
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-sm px-3 py-1 rounded-full">
+          <button
+            onClick={() => setIsFullscreen(true)}
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
+            aria-label="View fullscreen"
+          >
+            <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+          </button>
+
+          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
             {mainImage + 1} / {images.length}
           </div>
         </div>
-      )}
-    </div>
+      </div>
+
+      {/* Fullscreen Modal using Portal */}
+      <FullscreenModal
+        isOpen={isFullscreen}
+        onClose={() => setIsFullscreen(false)}
+        images={images}
+        currentIndex={mainImage}
+        onImageChange={handleImageChange}
+        productName={productName}
+      />
+    </>
   );
 };
 
@@ -3213,7 +3360,7 @@ useEffect(() => {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -3241,7 +3388,7 @@ useEffect(() => {
       if (categoryId) queryParams.append('category', categoryId);
       if (targetedCustomer) queryParams.append('targetedCustomer', targetedCustomer);
       
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {
@@ -3259,7 +3406,7 @@ useEffect(() => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -3508,7 +3655,7 @@ useEffect(() => {
         specialInstructions: specialInstructions
       };
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

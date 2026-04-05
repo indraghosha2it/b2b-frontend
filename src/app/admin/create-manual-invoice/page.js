@@ -443,7 +443,7 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
   const searchProducts = async () => {
     setSearching(true);
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
+      const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
       const data = await response.json();
       if (data.success) {
         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -611,7 +611,7 @@ const CustomerSearchDropdown = ({ value, onChange, onSelect }) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers?search=${encodeURIComponent(searchTerm)}&limit=10&role=customer`, {
+      const response = await fetch(`http://localhost:5000/api/admin/customers?search=${encodeURIComponent(searchTerm)}&limit=10&role=customer`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -807,7 +807,7 @@ export default function CreateManualInvoicePage() {
     setLoadingNextNumber(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/next-number', {
+      const response = await fetch('http://localhost:5000/api/invoices/next-number', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -866,7 +866,7 @@ export default function CreateManualInvoicePage() {
   // Fetch product details for available colors and sizes
   const fetchProductDetails = async (productId) => {
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
+      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
       const data = await response.json();
       if (data.success) {
         setProductDetails(prev => ({
@@ -1174,7 +1174,7 @@ export default function CreateManualInvoicePage() {
 
       const token = localStorage.getItem('token');
       
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/upload/company-logo', {
+      const response = await fetch('http://localhost:5000/api/upload/company-logo', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1202,7 +1202,7 @@ export default function CreateManualInvoicePage() {
 
   const resetToDefaultLogo = () => {
     if (invoiceData.company.logoPublicId) {
-      fetch(`https://b2b-backend-rosy.vercel.app/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
+      fetch(`http://localhost:5000/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1438,7 +1438,7 @@ export default function CreateManualInvoicePage() {
         userId: invoicePayload.userId
       });
 
-      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
+      const response = await fetch('http://localhost:5000/api/invoices', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -420,7 +420,7 @@
 
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
+//       const response = await fetch('http://localhost:5000/api/categories');
 //       const data = await response.json();
 //       if (data.success) {
 //         setCategories(data.data);
@@ -471,7 +471,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1925,7 +1925,7 @@
 
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
+//       const response = await fetch('http://localhost:5000/api/categories');
 //       const data = await response.json();
 //       if (data.success) {
 //         setCategories(data.data);
@@ -1976,7 +1976,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {

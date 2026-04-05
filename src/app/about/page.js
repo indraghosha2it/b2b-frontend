@@ -70,7 +70,7 @@
 //   // Add this function to fetch featured products
 // const fetchFeaturedProducts = async () => {
 //   try {
-//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?isFeatured=true&limit=3&sort=-createdAt');
+//     const response = await fetch('http://localhost:5000/api/products?isFeatured=true&limit=3&sort=-createdAt');
 //     const data = await response.json();
     
 //     if (data.success) {
