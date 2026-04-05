@@ -528,26 +528,25 @@ const fetchDashboardData = async () => {
       return;
     }
 
-    // Build URL with date filters for inquiries - REMOVE the limit to get ALL data for counts
-    // But keep limit for recent inquiries display
-    let statsUrl = `http://localhost:5000/api/moderator/inquiries?limit=1000`; // Get more for accurate counts
-    let recentUrl = `http://localhost:5000/api/moderator/inquiries?limit=10`; // For display only
+    // Build URL parameters based on filter type (using year/month, not startDate/endDate)
+    let statsUrl = 'http://localhost:5000/api/moderator/inquiries?limit=10000';
+    let recentUrl = 'http://localhost:5000/api/moderator/inquiries?limit=10';
     
+    // Add date filters based on filter type (matches backend expectations)
     if (filterType === 'month') {
-      const startDate = new Date(selectedYear, selectedMonth, 1);
-      const endDate = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59);
-      const dateParam = `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-      statsUrl += dateParam;
-      recentUrl += dateParam;
+      statsUrl += `&year=${selectedYear}&month=${selectedMonth + 1}`; // month is 1-12 for backend
+      recentUrl += `&year=${selectedYear}&month=${selectedMonth + 1}`;
+      console.log(`Filtering by month: ${selectedMonth + 1}/${selectedYear}`);
     } else if (filterType === 'year') {
-      const startDate = new Date(selectedYear, 0, 1);
-      const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
-      const dateParam = `&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-      statsUrl += dateParam;
-      recentUrl += dateParam;
+      statsUrl += `&year=${selectedYear}`;
+      recentUrl += `&year=${selectedYear}`;
+      console.log(`Filtering by year: ${selectedYear}`);
     }
+    // For 'all', no date parameters added
 
-    // Fetch ALL inquiries for stats (with higher limit to get all)
+    console.log('Fetching stats from:', statsUrl);
+    
+    // Fetch ALL inquiries for stats (with pagination limit but will get all via the 10000 limit)
     const statsResponse = await fetch(statsUrl, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -555,8 +554,9 @@ const fetchDashboardData = async () => {
     });
     
     const statsData = await statsResponse.json();
-    
-    // Fetch recent inquiries for display (only 10)
+    console.log('Stats API Response:', statsData);
+
+    // Fetch recent inquiries for display (limit 10, with same filters)
     const recentResponse = await fetch(recentUrl, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -565,7 +565,7 @@ const fetchDashboardData = async () => {
     
     const recentData = await recentResponse.json();
     
-    // Fetch ALL products (including inactive) - NO LIMIT to get all products
+    // Fetch ALL products (no date filtering needed for products)
     const productsResponse = await fetch('http://localhost:5000/api/products?limit=1000&includeInactive=true', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -575,68 +575,71 @@ const fetchDashboardData = async () => {
     const productsData = await productsResponse.json();
     console.log('Products API Response:', productsData);
 
-    // Process stats data - USE PAGINATION TOTAL FOR ACCURATE COUNTS
+    // Process stats data - USE THE DATA FROM THE API RESPONSE
     if (statsData.success) {
-      // Get the TOTAL count from pagination, not just the returned list length
+      // The API returns stats in the stats array
+      const apiStats = statsData.data?.stats || [];
+      
+      // Extract counts from stats array
+      const submittedCount = apiStats.find(s => s._id === 'submitted')?.count || 0;
+      const quotedCount = apiStats.find(s => s._id === 'quoted')?.count || 0;
+      const acceptedCount = apiStats.find(s => s._id === 'accepted')?.count || 0;
+      const invoicedCount = apiStats.find(s => s._id === 'invoiced')?.count || 0;
+      const paidCount = apiStats.find(s => s._id === 'paid')?.count || 0;
+      const cancelledCount = apiStats.find(s => s._id === 'cancelled')?.count || 0;
+      
+      // Total inquiries from pagination
       const totalInquiries = statsData.data?.pagination?.total || 0;
       
-      // For status breakdown, we need the actual list to count statuses
-      // But if the API returns all items, we can use the list
-      const allInquiries = statsData.data?.inquiries || [];
+      // Pending quotations = submitted status
+      const pendingQuotations = submittedCount;
       
-      // If we have all inquiries, count directly; otherwise, we might need a separate API call
-      // For now, assuming the API returns all items when limit is high enough
-      const submitted = allInquiries.filter(i => i.status === 'submitted').length;
-      const quoted = allInquiries.filter(i => i.status === 'quoted').length;
-      const accepted = allInquiries.filter(i => i.status === 'accepted').length;
-      const invoiced = allInquiries.filter(i => i.status === 'invoiced').length;
-      const paid = allInquiries.filter(i => i.status === 'paid').length;
-      const cancelled = allInquiries.filter(i => i.status === 'cancelled').length;
+      // Pending invoices = accepted status (ready to invoice)
+      const pendingInvoices = acceptedCount;
 
-      console.log('Stats from ALL data:', {
-        total: totalInquiries,
-        totalFromList: allInquiries.length,
-        submitted,
-        quoted,
-        accepted,
-        invoiced,
-        paid,
-        cancelled
+      console.log('Filtered Stats:', {
+        filterType,
+        selectedMonth,
+        selectedYear,
+        totalInquiries,
+        submittedCount,
+        quotedCount,
+        acceptedCount,
+        invoicedCount,
+        paidCount,
+        cancelledCount,
+        pendingQuotations,
+        pendingInvoices
       });
 
-      setStats(prev => ({
-        ...prev,
+      setStats({
+        totalProducts: productsData.pagination?.total || productsData.data?.length || 0,
         totalInquiries,
-        pendingQuotations: submitted,
-        pendingInvoices: accepted,
-        submitted,
-        quoted,
-        accepted,
-        invoiced,
-        paid,
-        cancelled
-      }));
+        pendingQuotations,
+        pendingInvoices,
+        submitted: submittedCount,
+        quoted: quotedCount,
+        accepted: acceptedCount,
+        invoiced: invoicedCount,
+        paid: paidCount,
+        cancelled: cancelledCount
+      });
+    } else {
+      console.error('Stats API returned unsuccessful:', statsData);
     }
 
-    // Set recent inquiries for display (these are just 10 items)
+    // Set recent inquiries for display
     if (recentData.success) {
       const recentInquiries = recentData.data?.inquiries || [];
       setInquiries(recentInquiries);
+      console.log('Recent inquiries count:', recentInquiries.length);
     }
 
     // Process products data
     if (productsData.success) {
-      // Use pagination total for accurate product count
-      const totalProductsCount = productsData.pagination?.total || productsData.data?.length || 0;
       const productsList = productsData.data || [];
-      
       setProducts(productsList);
-      setStats(prev => ({
-        ...prev,
-        totalProducts: totalProductsCount
-      }));
-
-      console.log('Total products count (including inactive):', totalProductsCount);
+      console.log('Products count:', productsList.length);
     }
 
   } catch (error) {
