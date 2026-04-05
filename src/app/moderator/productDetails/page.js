@@ -1068,11 +1068,13 @@ const ProductDetailsSkeleton = () => (
   </div>
 );
 
-// Image Gallery Component
+// Image Gallery Component - Optimized with all images
 const ImageGallery = ({ images = [], productName }) => {
   const [mainImage, setMainImage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [imageLoaded, setImageLoaded] = useState({});
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -1081,9 +1083,47 @@ const ImageGallery = ({ images = [], productName }) => {
     setZoomPosition({ x, y });
   };
 
+  // Preload images on hover
+  const preloadImage = (src) => {
+    const img = new Image();
+    img.src = src;
+  };
+
+  // Preload adjacent images
+  useEffect(() => {
+    if (images.length > 0) {
+      const nextIndex = (mainImage + 1) % images.length;
+      const prevIndex = (mainImage - 1 + images.length) % images.length;
+      
+      if (images[nextIndex]?.url) preloadImage(images[nextIndex].url);
+      if (images[prevIndex]?.url) preloadImage(images[prevIndex].url);
+    }
+  }, [mainImage, images]);
+
+  const handleImageChange = (idx) => {
+    if (idx === mainImage) return;
+    
+    setIsTransitioning(true);
+    setMainImage(idx);
+    setImageLoaded(prev => ({ ...prev, [idx]: false }));
+  };
+
+  const handleImageLoad = (idx) => {
+    setImageLoaded(prev => ({ ...prev, [idx]: true }));
+    setTimeout(() => setIsTransitioning(false), 100);
+  };
+
+  // Calculate thumbnail size based on number of images
+  const getThumbnailSize = () => {
+    const count = images.length;
+    if (count <= 4) return 'w-16 h-16 sm:w-20 sm:h-20';
+    if (count <= 6) return 'w-14 h-14 sm:w-16 sm:h-16';
+    return 'w-12 h-12 sm:w-14 sm:h-14';
+  };
+
   if (!images || images.length === 0) {
     return (
-      <div className="bg-gray-100 rounded-2xl h-[500px] flex items-center justify-center">
+      <div className="bg-gray-100 rounded-2xl h-[400px] flex items-center justify-center">
         <div className="text-center">
           <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500">No images available</p>
@@ -1093,86 +1133,133 @@ const ImageGallery = ({ images = [], productName }) => {
   }
 
   return (
-    <div className="flex gap-3">
-      <div className="w-20 space-y-2">
-        {images.slice(0, 4).map((image, idx) => (
-          <button
-            key={idx}
-            onClick={() => setMainImage(idx)}
-            onMouseEnter={() => setMainImage(idx)}
-            className={`relative w-full h-20 rounded-lg overflow-hidden border-2 transition-all ${
-              mainImage === idx 
-                ? 'border-[#E39A65] shadow-md' 
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <img
-              src={image.url}
-              alt={`${productName} - Thumbnail ${idx + 1}`}
-              className="w-full h-full object-cover"
-            />
-            {mainImage === idx && (
-              <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
-                <Check className="w-3 h-3 text-[#E39A65]" />
-              </div>
-            )}
-          </button>
-        ))}
-        {images.length > 4 && (
-          <div className="w-full h-20 rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">
-            +{images.length - 4}
-          </div>
-        )}
+    <div className="flex flex-col sm:flex-row gap-4">
+      {/* Thumbnails - All images visible */}
+      <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+        <div className="flex sm:flex-col gap-2">
+          {images.map((image, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleImageChange(idx)}
+              onMouseEnter={() => {
+                preloadImage(image.url);
+                handleImageChange(idx);
+              }}
+              className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
+                mainImage === idx 
+                  ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
+                  : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+              }`}
+            >
+              <img
+                src={image.url}
+                alt={`${productName} - Thumbnail ${idx + 1}`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                }}
+              />
+              {mainImage === idx && (
+                <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-[#E39A65]" />
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* Main Image */}
       <div 
-        className="flex-1 relative bg-gray-100 rounded-2xl overflow-hidden group cursor-zoom-in"
+        className="flex-1 relative bg-gray-100 rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2 flex items-center justify-center min-h-[400px]"
         onMouseMove={handleMouseMove}
       >
-        <img
-          src={images[mainImage]?.url || images[0]?.url}
-          alt={`${productName} - Main view`}
-          className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-150"
-          style={{
-            transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-          }}
-        />
+        {/* Loading skeleton */}
+        {(isTransitioning || !imageLoaded[mainImage]) && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+          </div>
+        )}
+        
+        <div className="relative w-full h-full flex items-center justify-center">
+          <img
+            key={mainImage}
+            src={images[mainImage]?.url || images[0]?.url}
+            alt={`${productName} - Main view`}
+            className={`w-full h-auto max-h-[400px] object-contain transition-all duration-300 ${
+              imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+            style={{
+              objectPosition: 'center',
+            }}
+            onLoad={() => handleImageLoad(mainImage)}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
+              handleImageLoad(mainImage);
+            }}
+          />
+        </div>
         
         <button
           onClick={() => setIsFullscreen(true)}
-          className="absolute top-4 right-4 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+          className="absolute top-4 right-4 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-20"
         >
           <Maximize2 className="w-5 h-5 text-gray-700" />
         </button>
+
+        {/* Image counter badge */}
+        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-20">
+          {mainImage + 1} / {images.length}
+        </div>
       </div>
 
+      {/* Fullscreen Modal */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
           <button
             onClick={() => setIsFullscreen(false)}
-            className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors z-10"
           >
             <X className="w-6 h-6 text-gray-900" />
           </button>
-          <button
-            onClick={() => setMainImage(prev => Math.max(0, prev - 1))}
-            disabled={mainImage === 0}
-            className="absolute left-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-6 h-6 text-white" />
-          </button>
+          
+          {/* Fullscreen navigation */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={() => {
+                  const newIndex = mainImage > 0 ? mainImage - 1 : images.length - 1;
+                  handleImageChange(newIndex);
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+              
+              <button
+                onClick={() => {
+                  const newIndex = mainImage < images.length - 1 ? mainImage + 1 : 0;
+                  handleImageChange(newIndex);
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+              >
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+            </>
+          )}
+          
           <img
-            src={images[mainImage]?.url}
+            src={images[mainImage]?.url || images[0]?.url}
             alt={productName}
             className="max-w-[90vw] max-h-[90vh] object-contain"
           />
-          <button
-            onClick={() => setMainImage(prev => Math.min(images.length - 1, prev + 1))}
-            disabled={mainImage === images.length - 1}
-            className="absolute right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="w-6 h-6 text-white" />
-          </button>
+          
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm">
             {mainImage + 1} / {images.length}
           </div>
@@ -1181,7 +1268,6 @@ const ImageGallery = ({ images = [], productName }) => {
     </div>
   );
 };
-
 // Bulk Pricing Table Component
 const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
   const pricingData = pricing.length > 0 ? pricing : [{ range: `${moq}+`, price: unitPrice }];
@@ -1600,7 +1686,7 @@ export default function ModeratorProductDetails() {
         setProduct(data.data);
       } else {
         toast.error('Product not found');
-        router.push('/moderator/allProducts');
+        router.push('/moderator/all-products');
       }
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -1633,7 +1719,7 @@ export default function ModeratorProductDetails() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
           <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
           <Link
-            href="/moderator/allProducts"
+            href="/moderator/all-products"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -1651,7 +1737,7 @@ export default function ModeratorProductDetails() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/moderator/allProducts" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Link href="/moderator/all-products" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
@@ -1706,7 +1792,7 @@ export default function ModeratorProductDetails() {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link href="/moderator/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
             <span>/</span>
-            <Link href="/moderator/allProducts" className="hover:text-[#E39A65] transition-colors">All Products</Link>
+            <Link href="/moderator/all-products" className="hover:text-[#E39A65] transition-colors">All Products</Link>
             <span>/</span>
             <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
               {product.productName}
@@ -1834,10 +1920,7 @@ export default function ModeratorProductDetails() {
               <FeaturedTagsDisplay isFeatured={product.isFeatured} tags={product.tags} />
             )}
 
-            {/* Meta Settings Display */}
-            {product.metaSettings && (
-              <MetaSettingsDisplay metaSettings={product.metaSettings} />
-            )}
+           
 
             {/* Bulk Pricing */}
             <BulkPricingTable 
@@ -1845,6 +1928,11 @@ export default function ModeratorProductDetails() {
               unitPrice={product.pricePerUnit}
               moq={product.moq}
             />
+
+             {/* Meta Settings Display */}
+            {product.metaSettings && (
+              <MetaSettingsDisplay metaSettings={product.metaSettings} />
+            )}
 
             {/* Additional Information */}
             {product.additionalInfo && product.additionalInfo.length > 0 && (
@@ -2047,6 +2135,18 @@ export default function ModeratorProductDetails() {
         .rich-text-preview a {
           color: #2563eb;
         }
+          @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
       `}</style>
     </div>
   );

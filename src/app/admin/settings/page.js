@@ -551,22 +551,16 @@ export default function Settings() {
                             <p className="text-sm text-gray-900">{formatDate(userData.createdAt)}</p>
                           </div>
                         </div>
-
+{/* 
                         <div className="flex items-start gap-3">
                           <Clock className="w-4 h-4 text-gray-400 mt-0.5" />
                           <div>
                             <p className="text-xs text-gray-500">Last Login</p>
                             <p className="text-sm text-gray-900">{formatDate(userData.lastLogin)}</p>
                           </div>
-                        </div>
+                        </div> */}
 
-                        <div className="flex items-start gap-3">
-                          <span className="w-4 h-4 text-gray-400">📊</span>
-                          <div>
-                            <p className="text-xs text-gray-500">Login Count</p>
-                            <p className="text-sm text-gray-900">{userData.loginCount} times</p>
-                          </div>
-                        </div>
+                      
                       </div>
                     </div>
                   </div>

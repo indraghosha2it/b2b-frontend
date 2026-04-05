@@ -19,7 +19,7 @@ export default function RegistrationForm({ onSuccess }) {
     zipCode: '',
     password: '',
     confirmPassword: '',
-    businessType: 'Retailer',
+    
     agreeToTerms: false
   });
 
@@ -77,7 +77,7 @@ export default function RegistrationForm({ onSuccess }) {
           zipCode: formData.zipCode,
           role: 'customer',
           password: formData.password,
-          businessType: formData.businessType
+         
         }),
       });
 
@@ -323,22 +323,7 @@ export default function RegistrationForm({ onSuccess }) {
           </div>
         </div>
 
-        {/* Business Type */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Business Type
-          </label>
-          <select
-            name="businessType"
-            value={formData.businessType}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#d9884e]"
-          >
-            {['Retailer', 'Wholesaler', 'Distributor', 'Manufacturer', 'E-commerce Store', 'Boutique', 'Fashion Brand'].map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
+       
 
         {/* Terms Checkbox */}
         <div className="flex items-start">

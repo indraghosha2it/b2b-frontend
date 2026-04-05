@@ -1,3 +1,6 @@
+
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -6,7 +9,7 @@
 // import { 
 //   LayoutDashboard, 
 //   ShoppingBag, 
-//   Package,
+//   PackagePlus,
 //   Users, 
 //   BarChart3, 
 //   Settings, 
@@ -22,13 +25,18 @@
 //   Eye,
 //   FileEdit,
 //   ClipboardList,
-//   HelpCircle
+//   HelpCircle,
+//   FolderPlus,
+//   Newspaper,
+//   Edit,
+//   Star
 // } from 'lucide-react';
 
 // export default function ModeratorLayout({ children }) {
 //   const [sidebarOpen, setSidebarOpen] = useState(false);
 //   const [userMenuOpen, setUserMenuOpen] = useState(false);
 //   const [user, setUser] = useState(null);
+//   const [isLoading, setIsLoading] = useState(true);
 //   const pathname = usePathname();
 //   const router = useRouter();
 
@@ -42,17 +50,27 @@
 //     const userData = localStorage.getItem('user');
     
 //     if (!token || !userData) {
-//       router.push('/login');
+//       logout();
 //       return;
 //     }
 
-//     const parsedUser = JSON.parse(userData);
-//     if (parsedUser.role !== 'moderator') {
-//       router.push('/unauthorized');
-//       return;
-//     }
+//     try {
+//       const parsedUser = JSON.parse(userData);
+      
+//       // IMMEDIATE LOGOUT if role is not moderator
+//       if (parsedUser.role !== 'moderator') {
+//         console.log('Unauthorized moderator access attempt by:', parsedUser.role);
+//         logout();
+//         return;
+//       }
 
-//     setUser(parsedUser);
+//       setUser(parsedUser);
+//     } catch (error) {
+//       console.error('Error parsing user data:', error);
+//       logout();
+//     } finally {
+//       setIsLoading(false);
+//     }
 //   }, [router]);
 
 //   const navigation = [
@@ -62,28 +80,26 @@
 //       icon: LayoutDashboard,
 //       current: pathname === '/moderator/dashboard'
 //     },
+
 //     {
-//       name: 'Products',
-//       href: '/moderator/products',
-//       icon: Package,
-//       current: pathname.startsWith('/moderator/products'),
-//       subItems: [
-//         { name: 'All Products', href: '/moderator/products' },
-//         { name: 'Add New Product', href: '/moderator/products/create' },
-//         { name: 'Pending Approval', href: '/moderator/products/pending' }
-//       ]
+//       name: 'Create Categories',
+//       href: '/moderator/createCategories',
+//       icon: FolderPlus,
+//       current: pathname.startsWith('/moderator/createCategories')
 //     },
 //     {
-//       name: 'Categories',
-//       href: '/moderator/categories',
-//       icon: ShoppingBag,
-//       current: pathname.startsWith('/moderator/categories')
+//       name: 'Create Products',
+//       href: '/moderator/create-products',
+//       icon: PackagePlus,
+//       current: pathname.startsWith('/moderator/create-products'),
+     
 //     },
+  
 //     {
-//       name: 'Product Images',
-//       href: '/moderator/images',
+//       name: 'All Products ',
+//       href: '/moderator/allProducts',
 //       icon: Image,
-//       current: pathname.startsWith('/moderator/images')
+//       current: pathname.startsWith('/moderator/allProducts')
 //     },
 //     {
 //       name: 'Inquiries',
@@ -91,24 +107,26 @@
 //       icon: MessageSquare,
 //       current: pathname.startsWith('/moderator/inquiries')
 //     },
-//     {
-//       name: 'Reviews',
-//       href: '/moderator/reviews',
-//       icon: Eye,
-//       current: pathname.startsWith('/moderator/reviews')
+//       {
+//       name: 'Create Blog',
+//       href: '/moderator/create-blog',
+//       icon: Newspaper,
+//       current: pathname.startsWith('/moderator/create-blog')
 //     },
-//     {
-//       name: 'Inventory',
-//       href: '/moderator/inventory',
-//       icon: ClipboardList,
-//       current: pathname.startsWith('/moderator/inventory')
+//       {
+//       name: 'Manage Blogs',
+//       href: '/moderator/manage-blogs',
+//       icon: Edit,
+//       current: pathname.startsWith('/moderator/manage-blogs')
 //     },
-//     {
-//       name: 'Reports',
-//       href: '/moderator/reports',
-//       icon: BarChart3,
-//       current: pathname.startsWith('/moderator/reports')
+//       {
+//       name: 'Manage Reviews',
+//       href: '/moderator/manage-reviews',
+//       icon: Star,
+//       current: pathname.startsWith('/moderator/manage-reviews')
 //     },
+    
+   
 //     {
 //       name: 'Settings',
 //       href: '/moderator/settings',
@@ -122,6 +140,18 @@
 //     localStorage.removeItem('user');
 //     router.push('/login');
 //   };
+
+//   // Show loading spinner while checking authentication
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f8f8f8' }}>
+//         <div className="text-center">
+//           <div className="w-16 h-16 border-4 border-[#E39A65] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+//           <p className="text-gray-600">Loading...</p>
+//         </div>
+//       </div>
+//     );
+//   }
 
 //   return (
 //     <>
@@ -150,13 +180,14 @@
 //         <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
 //           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
 //         }`}>
-//           {/* Sidebar header with logo - Using #E39A65 color */}
-//           <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: '#E39A65' }}>
-//             <div className="flex items-center justify-center w-full">
+//           {/* Sidebar header with logo */}
+//                   <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
+//           <div className="flex items-center justify-center w-full">
+//             <Link href="/">
 //               <img 
 //                 src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
 //                 alt="Asian Clothify Logo" 
-//                 className="h-20 w-auto object-contain drop-shadow-md"
+//                 className="h-20 w-auto object-contain drop-shadow-md cursor-pointer hover:opacity-90 transition-opacity"
 //                 onError={(e) => {
 //                   e.target.onerror = null;
 //                   e.target.style.display = 'none';
@@ -164,18 +195,11 @@
 //                   parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
 //                 }}
 //               />
-//             </div>
-            
-//             {/* Mobile close button */}
-//             <button 
-//               onClick={() => setSidebarOpen(false)}
-//               className="absolute right-4 lg:hidden text-white/80 hover:text-white"
-//             >
-//               <X className="w-5 h-5" />
-//             </button>
+//             </Link>
 //           </div>
+//         </div>
 
-//           {/* User info - In sidebar below header - Using #2A2A2A for text */}
+//           {/* User info */}
 //           {user && (
 //             <div className="px-4 py-4 border-b border-gray-200" style={{ backgroundColor: '#faf1e9' }}>
 //               <div className="flex items-center gap-3">
@@ -201,8 +225,8 @@
 //           )}
 
 //           {/* Navigation */}
-//           <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto">
-//             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">MODERATOR MENU</p>
+//         <nav className="px-3 py-4 h-[calc(100vh-11rem)] overflow-y-auto pb-24">          
+//       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">MODERATOR MENU</p>
 //             <div className="space-y-1">
 //               {navigation.map((item) => (
 //                 <div key={item.name}>
@@ -248,7 +272,7 @@
 //             </div>
 //           </nav>
 
-//           {/* Logout button at bottom */}
+//           {/* Logout button */}
 //           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
 //             <button
 //               onClick={logout}
@@ -273,11 +297,11 @@
 
 //         {/* Main content */}
 //         <div className="lg:ml-72 min-h-screen">
-//           {/* Top header - Increased height with #2A2A2A color */}
+//           {/* Top header */}
 //           <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm" style={{ margin: 0, borderBottomColor: '#E39A65' }}>
 //             <div className="px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
 //               <div className="flex items-center justify-between h-20" style={{ margin: 0 }}>
-//                 {/* Left section - Welcome message and mobile menu */}
+//                 {/* Left section */}
 //                 <div className="flex items-center gap-3">
 //                   <button
 //                     onClick={() => setSidebarOpen(true)}
@@ -287,7 +311,7 @@
 //                     <Menu className="w-5 h-5" />
 //                   </button>
                   
-//                   {/* Welcome Message - LARGER TEXT with #E39A65 and #2A2A2A */}
+//                   {/* Welcome Message */}
 //                   {user && (
 //                     <div>
 //                       <span className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>Welcome back,</span>
@@ -296,9 +320,8 @@
 //                   )}
 //                 </div>
 
-//                 {/* Right section - all icons */}
+//                 {/* Right section */}
 //                 <div className="flex items-center gap-3">
-//                   {/* Homepage Button */}
 //                   <Link 
 //                     href="/" 
 //                     className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -308,23 +331,11 @@
 //                     <Home className="w-5 h-5" />
 //                   </Link>
 
-//                   {/* Help/Support */}
-//                   <Link 
-//                     href="/moderator/help" 
-//                     className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-//                     style={{ color: '#2A2A2A' }}
-//                     title="Help & Support"
-//                   >
-//                     <HelpCircle className="w-5 h-5" />
-//                   </Link>
+                 
 
-//                   {/* Notifications */}
-//                   <button className="relative w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-//                     <Bell className="w-5 h-5" style={{ color: '#2A2A2A' }} />
-//                     <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#E39A65' }}></span>
-//                   </button>
+                
 
-//                   {/* User Dropdown - Shows full name and avatar */}
+//                   {/* User Dropdown */}
 //                   {user && (
 //                     <div className="relative">
 //                       <button
@@ -349,7 +360,6 @@
 //                             onClick={() => setUserMenuOpen(false)}
 //                           />
 //                           <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
-//                             {/* User Info in Dropdown */}
 //                             <div className="px-4 py-3 border-b border-gray-200">
 //                               <p className="text-sm font-semibold" style={{ color: '#2A2A2A' }}>{user.contactPerson || 'Moderator'}</p>
 //                               <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
@@ -364,7 +374,6 @@
 //                               </div>
 //                             </div>
                             
-//                             {/* Settings Option */}
 //                             <Link
 //                               href="/moderator/settings"
 //                               className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
@@ -375,18 +384,8 @@
 //                               <span>Settings</span>
 //                             </Link>
                             
-//                             {/* Help Option */}
-//                             <Link
-//                               href="/moderator/help"
-//                               className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
-//                               style={{ color: '#2A2A2A' }}
-//                               onClick={() => setUserMenuOpen(false)}
-//                             >
-//                               <HelpCircle className="w-4 h-4" style={{ color: '#E39A65' }} />
-//                               <span>Help & Support</span>
-//                             </Link>
+                           
                             
-//                             {/* Logout Option */}
 //                             <button
 //                               onClick={() => {
 //                                 setUserMenuOpen(false);
@@ -409,25 +408,15 @@
 //           </header>
 
 //           {/* Page content */}
-//           <main className="py-6 px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
-//             {/* Page title with #2A2A2A */}
-//             <div className="mb-6">
-//               <h1 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
-//                 {pathname.split('/').pop() === 'moderator' || pathname.split('/').pop() === 'dashboard' 
-//                   ? 'Moderator Dashboard' 
-//                   : pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + 
-//                     pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').slice(1) || 'Dashboard'}
-//               </h1>
-//             </div>
-
-//             {/* Child content */}
-//             {children}
-//           </main>
+//          <main className="" style={{ margin: 0, padding: 0 }}>
+//         {children}
+//         </main>
 //         </div>
 //       </div>
 //     </>
 //   );
 // }
+
 
 
 'use client';
@@ -469,6 +458,80 @@ export default function ModeratorLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  // Helper function to normalize pathname (remove trailing slash)
+  const normalizePath = (path) => {
+    if (path && path !== '/' && path.endsWith('/')) {
+      return path.slice(0, -1);
+    }
+    return path;
+  };
+
+  // Helper function to check if a route is active
+  const isActive = (href) => {
+    const currentPath = normalizePath(pathname);
+    
+    // Dashboard
+    if (href === '/moderator/dashboard') {
+      return currentPath === '/moderator/dashboard';
+    }
+    
+    // Create Categories
+    if (href === '/moderator/create-categories') {
+      return currentPath === '/moderator/create-categories' || 
+             currentPath === '/moderator/createCategory' ||
+             currentPath.startsWith('/moderator/create-categories/');
+    }
+    
+    // Create Products
+    if (href === '/moderator/create-products') {
+      return currentPath === '/moderator/create-products' || 
+             currentPath === '/moderator/createProduct' ||
+             currentPath.startsWith('/moderator/create-products/');
+    }
+    
+    // All Products
+    if (href === '/moderator/all-roducts') {
+      return currentPath === '/moderator/all-products' || 
+             currentPath === '/moderator/editProduct' ||
+             currentPath === '/moderator/viewProduct' ||
+             currentPath.startsWith('/moderator/all-products/') ||
+             currentPath.startsWith('/moderator/products/');
+    }
+    
+    // Inquiries
+    if (href === '/moderator/inquiries') {
+      return currentPath === '/moderator/inquiries' || 
+             currentPath.startsWith('/moderator/inquiries/');
+    }
+    
+    // Create Blog
+    if (href === '/moderator/create-blog') {
+      return currentPath === '/moderator/create-blog';
+    }
+    
+    // Manage Blogs
+    if (href === '/moderator/manage-blogs') {
+      return currentPath === '/moderator/manage-blogs' || 
+             currentPath === '/moderator/editBlog' ||
+             currentPath.startsWith('/moderator/manage-blogs/') ||
+             currentPath.startsWith('/moderator/allBlogs/');
+    }
+    
+    // Manage Reviews
+    if (href === '/moderator/manage-reviews') {
+      return currentPath === '/moderator/manage-reviews' || 
+             currentPath.startsWith('/moderator/manage-reviews/');
+    }
+    
+    // Settings
+    if (href === '/moderator/settings') {
+      return currentPath === '/moderator/settings' || 
+             currentPath.startsWith('/moderator/settings/');
+    }
+    
+    return false;
+  };
+
   useEffect(() => {
     // Add global style to remove any body padding/margin
     document.body.style.margin = '0';
@@ -507,60 +570,46 @@ export default function ModeratorLayout({ children }) {
       name: 'Dashboard',
       href: '/moderator/dashboard',
       icon: LayoutDashboard,
-      current: pathname === '/moderator/dashboard'
     },
-
     {
       name: 'Create Categories',
-      href: '/moderator/createCategories',
+      href: '/moderator/create-categories',
       icon: FolderPlus,
-      current: pathname.startsWith('/moderator/createCategories')
     },
     {
       name: 'Create Products',
-      href: '/moderator/createProducts',
+      href: '/moderator/create-products',
       icon: PackagePlus,
-      current: pathname.startsWith('/moderator/createProducts'),
-     
     },
-  
     {
-      name: 'All Products ',
-      href: '/moderator/allProducts',
+      name: 'All Products',
+      href: '/moderator/all-products',
       icon: Image,
-      current: pathname.startsWith('/moderator/allProducts')
     },
     {
       name: 'Inquiries',
       href: '/moderator/inquiries',
       icon: MessageSquare,
-      current: pathname.startsWith('/moderator/inquiries')
     },
-      {
+    {
       name: 'Create Blog',
-      href: '/moderator/createBlog',
+      href: '/moderator/create-blog',
       icon: Newspaper,
-      current: pathname.startsWith('/moderator/createBlog')
     },
-      {
+    {
       name: 'Manage Blogs',
-      href: '/moderator/manageBlogs',
+      href: '/moderator/manage-blogs',
       icon: Edit,
-      current: pathname.startsWith('/moderator/manageBlogs')
     },
-      {
+    {
       name: 'Manage Reviews',
-      href: '/moderator/manageReviews',
+      href: '/moderator/manage-reviews',
       icon: Star,
-      current: pathname.startsWith('/moderator/manageReviews')
     },
-    
-   
     {
       name: 'Settings',
       href: '/moderator/settings',
       icon: Settings,
-      current: pathname.startsWith('/moderator/settings')
     }
   ];
 
@@ -610,23 +659,23 @@ export default function ModeratorLayout({ children }) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
           {/* Sidebar header with logo */}
-                  <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
-          <div className="flex items-center justify-center w-full">
-            <Link href="/">
-              <img 
-                src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
-                alt="Asian Clothify Logo" 
-                className="h-20 w-auto object-contain drop-shadow-md cursor-pointer hover:opacity-90 transition-opacity"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                  const parent = e.target.parentElement;
-                  parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
-                }}
-              />
-            </Link>
+          <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
+            <div className="flex items-center justify-center w-full">
+              <Link href="/">
+                <img 
+                  src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
+                  alt="Asian Clothify Logo" 
+                  className="h-20 w-auto object-contain drop-shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.style.display = 'none';
+                    const parent = e.target.parentElement;
+                    parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
+                  }}
+                />
+              </Link>
+            </div>
           </div>
-        </div>
 
           {/* User info */}
           {user && (
@@ -654,50 +703,32 @@ export default function ModeratorLayout({ children }) {
           )}
 
           {/* Navigation */}
-        <nav className="px-3 py-4 h-[calc(100vh-11rem)] overflow-y-auto pb-24">          
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">MODERATOR MENU</p>
+          <nav className="px-3 py-4 h-[calc(100vh-11rem)] overflow-y-auto pb-24">          
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">MODERATOR MENU</p>
             <div className="space-y-1">
-              {navigation.map((item) => (
-                <div key={item.name}>
+              {navigation.map((item) => {
+                const active = isActive(item.href);
+                return (
                   <Link
+                    key={item.name}
                     href={item.href}
                     className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                      item.current
+                      active
                         ? 'text-white shadow-md'
-                        : 'hover:bg-orange-50' 
+                        : 'text-gray-700 hover:bg-orange-50'
                     }`}
-                    style={item.current ? { background: '#E39A65' } : { color: '#2A2A2A' }}
+                    style={active ? { background: '#E39A65' } : {}}
                   >
                     <div className="flex items-center gap-3">
                       <item.icon className={`w-5 h-5 ${
-                        item.current ? 'text-white' : 'text-gray-400'
+                        active ? 'text-white' : 'text-gray-400'
                       }`} />
                       <span>{item.name}</span>
                     </div>
-                    {item.current && <ChevronRight className="w-4 h-4 text-white" />}
+                    {active && <ChevronRight className="w-4 h-4 text-white" />}
                   </Link>
-                  
-                  {/* Sub-items for Products */}
-                  {item.name === 'Products' && item.current && (
-                    <div className="ml-11 mt-1 space-y-1">
-                      {item.subItems?.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          className={`block px-4 py-2 text-sm rounded-lg ${
-                            pathname === subItem.href
-                              ? 'font-medium'
-                              : 'text-gray-600 hover:text-orange-600'
-                          }`}
-                          style={pathname === subItem.href ? { color: '#E39A65' } : {}}
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </nav>
 
@@ -760,10 +791,6 @@ export default function ModeratorLayout({ children }) {
                     <Home className="w-5 h-5" />
                   </Link>
 
-                 
-
-                
-
                   {/* User Dropdown */}
                   {user && (
                     <div className="relative">
@@ -813,8 +840,6 @@ export default function ModeratorLayout({ children }) {
                               <span>Settings</span>
                             </Link>
                             
-                           
-                            
                             <button
                               onClick={() => {
                                 setUserMenuOpen(false);
@@ -837,9 +862,9 @@ export default function ModeratorLayout({ children }) {
           </header>
 
           {/* Page content */}
-         <main className="" style={{ margin: 0, padding: 0 }}>
-        {children}
-        </main>
+          <main className="" style={{ margin: 0, padding: 0 }}>
+            {children}
+          </main>
         </div>
       </div>
     </>

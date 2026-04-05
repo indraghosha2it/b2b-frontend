@@ -1,3 +1,7 @@
+
+
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -44,7 +48,13 @@
 //   ChevronsRight,
 //   BarChart3,
 //   PieChart,
-//   Activity
+//   Activity,
+//   CalendarRange,
+//   Inbox,
+//   AlertOctagon,
+//   ArrowRight,
+//   Zap,
+//   Receipt
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -67,6 +77,12 @@
 //     hour: '2-digit',
 //     minute: '2-digit'
 //   });
+// };
+
+// // Get month name
+// const getMonthName = (monthIndex) => {
+//   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+//   return months[monthIndex];
 // };
 
 // // Status Badge
@@ -544,12 +560,25 @@
 //   );
 // };
 
-// // Filter Bar
-// const FilterBar = ({ onFilter, activeFilter, setActiveFilter, onDateFilter }) => {
+// // Filter Bar - Status filters on left, Month/Year filter on right
+// const FilterBar = ({ 
+//   onFilter, 
+//   activeFilter, 
+//   setActiveFilter,
+//   filterType,
+//   setFilterType,
+//   selectedMonth,
+//   setSelectedMonth,
+//   selectedYear,
+//   setSelectedYear,
+//   onMonthChange,
+//   onYearChange
+// }) => {
 //   const filters = ['All', 'Submitted', 'Quoted', 'Accepted', 'Invoiced', 'Cancelled'];
 
 //   return (
-//     <div className="flex flex-wrap items-center gap-2">
+//     <div className="flex flex-wrap items-center justify-between gap-3">
+//       {/* Status Filters on Left */}
 //       <div className="flex flex-wrap gap-2">
 //         {filters.map((filter) => (
 //           <button
@@ -568,17 +597,88 @@
 //           </button>
 //         ))}
 //       </div>
-      
-//       <select
-//         onChange={(e) => onDateFilter(e.target.value)}
-//         className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-//       >
-//         <option value="all">All Time</option>
-//         <option value="today">Today</option>
-//         <option value="week">This Week</option>
-//         <option value="month">This Month</option>
-//         <option value="year">This Year</option>
-//       </select>
+
+//       {/* Month/Year Filter on Right */}
+//       <div className="flex items-center gap-2">
+//         <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+//           <button
+//             onClick={() => setFilterType('all')}
+//             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+//               filterType === 'all' 
+//                 ? 'bg-[#E39A65] text-white' 
+//                 : 'bg-white text-gray-600 hover:bg-gray-50'
+//             }`}
+//           >
+//             All
+//           </button>
+//           <button
+//             onClick={() => setFilterType('year')}
+//             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+//               filterType === 'year' 
+//                 ? 'bg-[#E39A65] text-white' 
+//                 : 'bg-white text-gray-600 hover:bg-gray-50'
+//             }`}
+//           >
+//             Year
+//           </button>
+//           <button
+//             onClick={() => setFilterType('month')}
+//             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+//               filterType === 'month' 
+//                 ? 'bg-[#E39A65] text-white' 
+//                 : 'bg-white text-gray-600 hover:bg-gray-50'
+//             }`}
+//           >
+//             Month
+//           </button>
+//         </div>
+
+//         {/* Month Navigation */}
+//         {filterType === 'month' && (
+//           <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => onMonthChange(-1)}
+//               className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+//               title="Previous month"
+//             >
+//               <ChevronLeft className="w-4 h-4" />
+//             </button>
+//             <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+//               {getMonthName(selectedMonth)} {selectedYear}
+//             </span>
+//             <button
+//               onClick={() => onMonthChange(1)}
+//               className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+//               title="Next month"
+//             >
+//               <ChevronRight className="w-4 h-4" />
+//             </button>
+//           </div>
+//         )}
+
+//         {/* Year Navigation */}
+//         {filterType === 'year' && (
+//           <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => onYearChange(-1)}
+//               className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+//               title="Previous year"
+//             >
+//               <ChevronLeft className="w-4 h-4" />
+//             </button>
+//             <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+//               {selectedYear}
+//             </span>
+//             <button
+//               onClick={() => onYearChange(1)}
+//               className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+//               title="Next year"
+//             >
+//               <ChevronRight className="w-4 h-4" />
+//             </button>
+//           </div>
+//         )}
+//       </div>
 //     </div>
 //   );
 // };
@@ -590,7 +690,12 @@
 //   const [loading, setLoading] = useState(true);
 //   const [refreshing, setRefreshing] = useState(false);
 //   const [activeFilter, setActiveFilter] = useState('All');
-//   const [dateRange, setDateRange] = useState('all');
+  
+//   // Date filter state
+//   const [filterType, setFilterType] = useState('all'); // 'all', 'year', 'month'
+//   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+//   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [itemsPerPage] = useState(10);
 //   const [totalInquiries, setTotalInquiries] = useState(0);
@@ -606,61 +711,87 @@
 //   });
 //   const router = useRouter();
 
-//   const fetchInquiries = async () => {
-//     try {
-//       const token = localStorage.getItem('token');
-//       if (!token) {
-//         router.push('/login');
-//         return;
-//       }
-
-//       // Build query params - using the same admin endpoint but with moderator permissions
-// let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;      
-//       if (activeFilter !== 'All') {
-//         url += `&status=${activeFilter.toLowerCase()}`;
-//       }
+//   // Filter inquiries by date
+//   const filterByDate = (inquiriesList) => {
+//     if (filterType === 'all') return inquiriesList;
+    
+//     return inquiriesList.filter(inquiry => {
+//       const inquiryDate = new Date(inquiry.createdAt);
+//       const inquiryYear = inquiryDate.getFullYear();
+//       const inquiryMonth = inquiryDate.getMonth();
       
-//       if (dateRange !== 'all') {
-//         const now = new Date();
-//         let startDate;
-        
-//         switch(dateRange) {
-//           case 'today':
-//             startDate = new Date(now.setHours(0, 0, 0, 0));
-//             break;
-//           case 'week':
-//             startDate = new Date(now.setDate(now.getDate() - 7));
-//             break;
-//           case 'month':
-//             startDate = new Date(now.setMonth(now.getMonth() - 1));
-//             break;
-//           case 'year':
-//             startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-//             break;
-//           default:
-//             startDate = null;
-//         }
-        
-//         if (startDate) {
-//           url += `&startDate=${startDate.toISOString()}`;
-//         }
+//       if (filterType === 'year') {
+//         return inquiryYear === selectedYear;
+//       } else if (filterType === 'month') {
+//         return inquiryYear === selectedYear && inquiryMonth === selectedMonth;
 //       }
+//       return true;
+//     });
+//   };
 
-//       const response = await fetch(url, {
-//         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
-//       });
+// const fetchInquiries = async () => {
+//   try {
+//     setLoading(true);
+//     const token = localStorage.getItem('token');
+//     if (!token) {
+//       router.push('/login');
+//       return;
+//     }
 
-//       const data = await response.json();
+//     // Build query params for paginated inquiries
+//     let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+    
+//     if (activeFilter !== 'All') {
+//       url += `&status=${activeFilter.toLowerCase()}`;
+//     }
+    
+//     // Add date filter for paginated results
+//     if (filterType === 'year') {
+//       url += `&year=${selectedYear}`;
+//     } else if (filterType === 'month') {
+//       url += `&month=${selectedMonth + 1}&year=${selectedYear}`; // month+1 because JS months are 0-indexed
+//     }
+
+//     console.log('Fetching moderator inquiries from:', url);
+
+//     const response = await fetch(url, {
+//       headers: {
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+
+//     const data = await response.json();
+    
+//     if (data.success) {
+//       setInquiries(data.data.inquiries);
+//       setFilteredInquiries(data.data.inquiries);
+//       setTotalInquiries(data.data.pagination.total);
+//       setTotalPages(data.data.pagination.pages);
       
-//       if (data.success) {
-//         setInquiries(data.data.inquiries);
-//         setFilteredInquiries(data.data.inquiries);
-//         setTotalInquiries(data.data.pagination.total);
-//         setTotalPages(data.data.pagination.pages);
+//       // Calculate stats from ALL inquiries using the stats array from the response
+//       if (data.data.stats && Array.isArray(data.data.stats)) {
+//         const submitted = data.data.stats.find(s => s._id === 'submitted')?.count || 0;
+//         const quoted = data.data.stats.find(s => s._id === 'quoted')?.count || 0;
+//         const accepted = data.data.stats.find(s => s._id === 'accepted')?.count || 0;
+//         const invoiced = data.data.stats.find(s => s._id === 'invoiced')?.count || 0;
+//         const paid = data.data.stats.find(s => s._id === 'paid')?.count || 0;
+//         const cancelled = data.data.stats.find(s => s._id === 'cancelled')?.count || 0;
         
-//         // Calculate stats from current page
+//         // Calculate total value from ALL invoices
+//         const totalValue = data.data.totalValue || data.data.stats.reduce((sum, stat) => sum + (stat.totalValue || 0), 0);
+        
+//         setStats({
+//           total: data.data.pagination.total, // This is the total count from ALL pages
+//           submitted,
+//           quoted,
+//           accepted,
+//           invoiced,
+//           paid,
+//           cancelled,
+//           totalValue
+//         });
+//       } else {
+//         // Fallback: calculate stats from current page only (less accurate)
 //         const totalValue = data.data.inquiries.reduce((sum, i) => sum + (i.subtotal || 0), 0);
         
 //         setStats({
@@ -669,28 +800,30 @@
 //           quoted: data.data.inquiries.filter(i => i.status === 'quoted').length,
 //           accepted: data.data.inquiries.filter(i => i.status === 'accepted').length,
 //           invoiced: data.data.inquiries.filter(i => i.status === 'invoiced').length,
+//           paid: data.data.inquiries.filter(i => i.status === 'paid').length,
 //           cancelled: data.data.inquiries.filter(i => i.status === 'cancelled').length,
 //           totalValue
 //         });
-//       } else {
-//         // If unauthorized, redirect
-//         if (response.status === 403) {
-//           toast.error('You do not have permission to view this page');
-//           router.push('/dashboard');
-//         }
 //       }
-//     } catch (error) {
-//       console.error('Fetch error:', error);
-//       toast.error('Failed to load inquiries');
-//     } finally {
-//       setLoading(false);
-//       setRefreshing(false);
+//     } else {
+//       // If unauthorized, redirect
+//       if (response.status === 403) {
+//         toast.error('You do not have permission to view this page');
+//         router.push('/dashboard');
+//       }
 //     }
-//   };
+//   } catch (error) {
+//     console.error('Fetch error:', error);
+//     toast.error('Failed to load inquiries');
+//   } finally {
+//     setLoading(false);
+//     setRefreshing(false);
+//   }
+// };
 
 //   useEffect(() => {
 //     fetchInquiries();
-//   }, [currentPage, activeFilter, dateRange]);
+//   }, [currentPage, activeFilter, filterType, selectedMonth, selectedYear]);
 
 //   const handleRefresh = () => {
 //     setRefreshing(true);
@@ -721,14 +854,41 @@
 //     setCurrentPage(1);
 //   };
 
-//   const handleDateFilter = (range) => {
-//     setDateRange(range);
-//     setCurrentPage(1);
+//   const handleMonthChange = (increment) => {
+//     let newMonth = selectedMonth + increment;
+//     let newYear = selectedYear;
+    
+//     if (newMonth < 0) {
+//       newMonth = 11;
+//       newYear = selectedYear - 1;
+//     } else if (newMonth > 11) {
+//       newMonth = 0;
+//       newYear = selectedYear + 1;
+//     }
+    
+//     setSelectedMonth(newMonth);
+//     setSelectedYear(newYear);
+//     setFilterType('month');
+//   };
+
+//   const handleYearChange = (increment) => {
+//     setSelectedYear(selectedYear + increment);
+//     setFilterType('year');
 //   };
 
 //   const handlePageChange = (page) => {
 //     setCurrentPage(page);
 //     document.getElementById('inquiries-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+//   };
+
+//   const getFilterDisplayText = () => {
+//     if (filterType === 'all') {
+//       return 'All Time';
+//     } else if (filterType === 'year') {
+//       return `Year: ${selectedYear}`;
+//     } else {
+//       return `${getMonthName(selectedMonth)} ${selectedYear}`;
+//     }
 //   };
 
 //   if (loading) {
@@ -749,9 +909,14 @@
 //         <div className="container mx-auto px-4 max-w-7xl py-4">
 //           <div className="flex items-center justify-between mb-4">
 //             <div>
-//               <h1 className="text-2xl font-bold text-gray-900">Inquiry Management (Moderator View)</h1>
-//               <p className="text-xs text-gray-500 mt-0.5">
+//               <h1 className="text-2xl font-bold text-gray-900">Inquiry Management</h1>
+//               <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
 //                 Total {totalInquiries} inquiries • {formatPrice(stats.totalValue)} total value • View Only Mode
+//                 {filterType !== 'all' && (
+//                   <span className="ml-2 text-[#E39A65] font-medium">
+//                     • Showing: {getFilterDisplayText()}
+//                   </span>
+//                 )}
 //               </p>
 //             </div>
 //             <button
@@ -765,7 +930,7 @@
 //           </div>
 
 //           {/* Stats */}
-//           <div className="grid grid-cols-6 gap-3">
+//           <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3">
 //             <StatCard 
 //               title="Total" 
 //               value={totalInquiries} 
@@ -815,7 +980,14 @@
 //             onFilter={handleFilter} 
 //             activeFilter={activeFilter}
 //             setActiveFilter={setActiveFilter}
-//             onDateFilter={handleDateFilter}
+//             filterType={filterType}
+//             setFilterType={setFilterType}
+//             selectedMonth={selectedMonth}
+//             setSelectedMonth={setSelectedMonth}
+//             selectedYear={selectedYear}
+//             setSelectedYear={setSelectedYear}
+//             onMonthChange={handleMonthChange}
+//             onYearChange={handleYearChange}
 //           />
 //         </div>
 
@@ -826,9 +998,9 @@
 //             {totalInquiries > itemsPerPage && (
 //               <> (Page {currentPage} of {totalPages})</>
 //             )}
-//             {dateRange !== 'all' && (
+//             {filterType !== 'all' && (
 //               <span className="ml-1 text-[#E39A65]">
-//                 • Filtered by: {dateRange}
+//                 • {getFilterDisplayText()}
 //               </span>
 //             )}
 //           </p>
@@ -846,8 +1018,21 @@
 //               </div>
 //               <h2 className="text-lg font-semibold text-gray-900 mb-2">No inquiries found</h2>
 //               <p className="text-sm text-gray-500 mb-4">
-//                 {totalInquiries === 0 ? "No inquiries have been submitted yet" : "Try adjusting your filters"}
+//                 {totalInquiries === 0 
+//                   ? "No inquiries have been submitted yet" 
+//                   : filterType !== 'all'
+//                     ? `No inquiries found for ${getFilterDisplayText().toLowerCase()}`
+//                     : "Try adjusting your filters"}
 //               </p>
+//               {filterType !== 'all' && totalInquiries > 0 && (
+//                 <button
+//                   onClick={() => setFilterType('all')}
+//                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                 >
+//                   <CalendarRange className="w-4 h-4" />
+//                   View All Time
+//                 </button>
+//               )}
 //             </div>
 //           ) : (
 //             <>
@@ -875,7 +1060,6 @@
 //     </div>
 //   );
 // }
-
 
 
 'use client';
@@ -911,6 +1095,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Globe,
   Paperclip,
   Edit,
   Trash2,
@@ -1005,14 +1190,14 @@ const StatusBadge = ({ status }) => {
   const config = statusConfig[status] || statusConfig.submitted;
 
   return (
-    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${config.bg}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`}></span>
-      <span className={`text-xs font-medium ${config.text}`}>{config.label}</span>
+    <div className={`inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full ${config.bg}`}>
+      <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${config.dot}`}></span>
+      <span className={`text-[10px] sm:text-xs font-medium ${config.text}`}>{config.label}</span>
     </div>
   );
 };
 
-// Modern Stat Card Component
+// Modern Stat Card Component - Compact Responsive
 const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => {
   const colorClasses = {
     amber: {
@@ -1062,53 +1247,52 @@ const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => {
   const theme = colorClasses[color] || colorClasses.gray;
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border ${theme.border} ${theme.bg} p-5 hover:shadow-lg transition-all duration-300 group`}>
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
-      <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
+    <div className={`relative overflow-hidden rounded-xl sm:rounded-2xl border ${theme.border} ${theme.bg} p-2 sm:p-4 hover:shadow-lg transition-all duration-300 group`}>
+      <div className="absolute top-0 right-0 w-12 sm:w-20 h-12 sm:h-20 bg-white/20 rounded-full -translate-y-6 translate-x-6 group-hover:scale-110 transition-transform duration-500"></div>
+      <div className="absolute bottom-0 left-0 w-10 sm:w-14 h-10 sm:h-14 bg-white/10 rounded-full translate-y-6 -translate-x-6 group-hover:scale-110 transition-transform duration-500"></div>
       
       <div className="relative z-10">
-        <div className="flex items-start justify-between mb-3">
-          <div className={`p-2.5 rounded-xl ${theme.iconBg} shadow-lg shadow-${color}-500/20`}>
-            <Icon className={`w-4 h-4 ${theme.icon}`} />
+        <div className="flex items-start justify-between mb-1 sm:mb-2">
+          <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl ${theme.iconBg} shadow-lg shadow-${color}-500/20`}>
+            <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${theme.icon}`} />
           </div>
           {trend && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-lg bg-white/60 backdrop-blur-sm ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-              <TrendingUp className={`w-3 h-3 ${trend < 0 ? 'rotate-180' : ''}`} />
-              <span className="text-xs font-medium">{trend > 0 ? '+' : ''}{trend}%</span>
+            <div className={`flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg bg-white/60 backdrop-blur-sm ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <TrendingUp className={`w-2 h-2 sm:w-3 sm:h-3 ${trend < 0 ? 'rotate-180' : ''}`} />
+              <span className="text-[8px] sm:text-xs font-medium">{trend > 0 ? '+' : ''}{trend}%</span>
             </div>
           )}
         </div>
         
-        <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
-        <p className={`text-xs font-medium ${theme.text} uppercase tracking-wider`}>{title}</p>
-        {subtitle && <p className="text-[10px] text-gray-400 mt-2">{subtitle}</p>}
+        <p className="text-base sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1">{value}</p>
+        <p className={`text-[8px] sm:text-[10px] font-medium ${theme.text} uppercase tracking-wider`}>{title}</p>
+        {subtitle && <p className="text-[7px] sm:text-[9px] text-gray-400 mt-0.5 sm:mt-1 line-clamp-1">{subtitle}</p>}
       </div>
     </div>
   );
 };
 
-// Pagination Component
+// Pagination Component - Responsive
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const getPageNumbers = () => {
     const pages = [];
-    const maxVisible = 5;
+    const maxVisible = 3;
     
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
+      if (currentPage <= 2) {
+        for (let i = 1; i <= 3; i++) {
           pages.push(i);
         }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 4; i <= totalPages; i++) {
+      } else if (currentPage >= totalPages - 1) {
+        for (let i = totalPages - 2; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           pages.push(i);
         }
       }
@@ -1119,30 +1303,30 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl mt-4">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl mt-4">
       <button
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
-        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="First page"
       >
-        <ChevronsLeft className="w-4 h-4" />
+        <ChevronsLeft className="w-3 h-3 sm:w-4 sm:h-4" />
       </button>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="Previous page"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
       </button>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         {getPageNumbers().map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`w-8 h-8 text-sm font-medium rounded-lg transition-colors ${
+            className={`w-6 h-6 sm:w-8 sm:h-8 text-[10px] sm:text-sm font-medium rounded-lg transition-colors ${
               currentPage === page
                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
                 : 'text-gray-700 hover:bg-gray-100'
@@ -1156,43 +1340,39 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="Next page"
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
       </button>
       <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
-        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-1 sm:p-2 text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="Last page"
       >
-        <ChevronsRight className="w-4 h-4" />
+        <ChevronsRight className="w-3 h-3 sm:w-4 sm:h-4" />
       </button>
     </div>
   );
 };
 
-// Moderator Inquiry Card - View Only + WhatsApp
+// Moderator Inquiry Card - Responsive (View Only)
 const ModeratorInquiryCard = ({ inquiry }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const handleDownloadAttachment = async (file) => {
     try {
       toast.loading('Downloading file...', { id: 'download' });
-      
       const response = await fetch(file.fileUrl);
       const blob = await response.blob();
-      
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = file.fileName;
-      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
       window.URL.revokeObjectURL(blobUrl);
       toast.success('File downloaded successfully', { id: 'download' });
     } catch (error) {
@@ -1203,10 +1383,7 @@ const ModeratorInquiryCard = ({ inquiry }) => {
   };
 
   const handleWhatsApp = () => {
-    if (!inquiry.userDetails?.whatsapp) {
-      toast.error('No WhatsApp number available');
-      return;
-    }
+    if (!inquiry.userDetails?.whatsapp) return;
     
     const productSummary = inquiry.items.map(p => 
       `• ${p.productName}: ${p.colors.length} colors, ${p.totalQuantity} pcs`
@@ -1227,18 +1404,18 @@ const ModeratorInquiryCard = ({ inquiry }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
       {/* Header with Customer Info */}
-      <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#E39A65] to-[#d48b54] rounded-lg flex items-center justify-center shadow-md">
-              <FileText className="w-4 h-4 text-white" />
+      <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-[#E39A65] to-[#d48b54] rounded-lg flex items-center justify-center shadow-md">
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-gray-900">{inquiry.inquiryNumber}</h3>
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                <h3 className="font-semibold text-gray-900 text-xs sm:text-sm">{inquiry.inquiryNumber}</h3>
                 <StatusBadge status={inquiry.status} />
               </div>
-              <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-[10px] sm:text-xs text-gray-500 mt-0.5">
                 <span>{formatDate(inquiry.createdAt)}</span>
                 <span>•</span>
                 <span>{inquiry.totalItems} products</span>
@@ -1249,44 +1426,44 @@ const ModeratorInquiryCard = ({ inquiry }) => {
           </div>
           
           {/* Only View Details button - no action buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
             >
-              <Eye className="w-3.5 h-3.5" />
-              {showDetails ? 'Hide Details' : 'View Details'}
+              <Eye className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+              {showDetails ? 'Hide' : 'View'}
             </button>
           </div>
         </div>
 
-        {/* Customer Info Row */}
-        <div className="grid grid-cols-4 gap-4 mt-3 text-xs">
+        {/* Customer Info Row - Responsive Grid */}
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-2 sm:mt-3 text-[10px] sm:text-xs">
           <div className="flex items-center gap-1.5 text-gray-600">
-            <Building2 className="w-3.5 h-3.5 text-gray-400" />
+            <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
             <span className="truncate">{inquiry.userDetails?.companyName || 'N/A'}</span>
           </div>
           <div className="flex items-center gap-1.5 text-gray-600">
-            <User className="w-3.5 h-3.5 text-gray-400" />
+            <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
             <span className="truncate">{inquiry.userDetails?.contactPerson || 'N/A'}</span>
           </div>
           <div className="flex items-center gap-1.5 text-gray-600">
-            <Mail className="w-3.5 h-3.5 text-gray-400" />
+            <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
             <a href={`mailto:${inquiry.userDetails?.email}`} className="truncate hover:text-[#E39A65]">
               {inquiry.userDetails?.email || 'N/A'}
             </a>
           </div>
           <div className="flex items-center gap-1.5 text-gray-600">
-            <Phone className="w-3.5 h-3.5 text-gray-400" />
+            <Phone className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400" />
             <span className="truncate">{inquiry.userDetails?.phone || 'N/A'}</span>
           </div>
         </div>
 
         {/* Address Row */}
         {(inquiry.userDetails?.address || inquiry.userDetails?.city || inquiry.userDetails?.country) && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-2">
-            <MapPin className="w-3.5 h-3.5 text-gray-400" />
-            <span>
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-500 mt-1.5 sm:mt-2">
+            <MapPin className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-gray-400" />
+            <span className="truncate">
               {[inquiry.userDetails?.address, inquiry.userDetails?.city, inquiry.userDetails?.country]
                 .filter(Boolean).join(', ')}
             </span>
@@ -1296,15 +1473,15 @@ const ModeratorInquiryCard = ({ inquiry }) => {
 
       {/* Collapsible Details */}
       {showDetails && (
-        <div className="p-4 border-b border-gray-100 bg-gray-50/30">
+        <div className="p-3 sm:p-4 border-b border-gray-100 bg-gray-50/30">
           {/* Products Section */}
-          <div className="mb-4">
-            <h4 className="text-xs font-semibold text-gray-700 mb-2">Products</h4>
-            <div className="space-y-3">
+          <div className="mb-3 sm:mb-4">
+            <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2">Products</h4>
+            <div className="space-y-2 sm:space-y-3">
               {inquiry.items.map((product, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-3 border border-gray-100">
-                  <div className="flex items-start gap-2 mb-2">
-                    <div className="w-8 h-8 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                <div key={idx} className="bg-white rounded-lg p-2 sm:p-3 border border-gray-100">
+                  <div className="flex items-start gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                       <img 
                         src={product.productImage || 'https://via.placeholder.com/32'} 
                         alt=""
@@ -1312,35 +1489,35 @@ const ModeratorInquiryCard = ({ inquiry }) => {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-900">{product.productName}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-[10px] sm:text-xs font-medium text-gray-900">{product.productName}</p>
+                      <p className="text-[8px] sm:text-[10px] text-gray-500">
                         Total: {product.totalQuantity} pcs • {formatPrice(product.totalQuantity * product.unitPrice)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                     {product.colors.map((color, cIdx) => (
-                      <div key={cIdx} className="text-xs flex items-center gap-1">
+                      <div key={cIdx} className="text-[8px] sm:text-[10px] flex items-center gap-1">
                         <div 
-                          className="w-4 h-4 rounded-full border border-gray-300 shadow-sm flex-shrink-0" 
+                          className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-300 shadow-sm flex-shrink-0" 
                           style={{ backgroundColor: color.color.code }} 
                           title={`${color.totalForColor} pcs`}
                         />
-                        <div className="flex flex-wrap gap-1">
+                        <div className="flex flex-wrap gap-0.5 sm:gap-1">
                           {color.sizeQuantities.map((sq, sIdx) => (
-                            <span key={sIdx} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded">
+                            <span key={sIdx} className="text-[7px] sm:text-[9px] bg-gray-100 px-1 sm:px-1.5 py-0.5 rounded">
                               {sq.size}:{sq.quantity}
                             </span>
                           ))}
                         </div>
-                        <span className="text-gray-500 ml-auto text-[10px]">{color.totalForColor}pcs</span>
+                        <span className="text-gray-500 ml-auto text-[7px] sm:text-[9px]">{color.totalForColor}pcs</span>
                       </div>
                     ))}
                   </div>
 
                   {product.specialInstructions && (
-                    <div className="mt-2 text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                    <div className="mt-1.5 sm:mt-2 text-[8px] sm:text-[10px] text-blue-600 bg-blue-50 p-1.5 sm:p-2 rounded">
                       📝 Product Note: {product.specialInstructions}
                     </div>
                   )}
@@ -1351,34 +1528,34 @@ const ModeratorInquiryCard = ({ inquiry }) => {
 
           {/* Special Instructions */}
           {inquiry.specialInstructions && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">Special Instructions</h4>
-              <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-                <p className="text-xs text-amber-700">{inquiry.specialInstructions}</p>
+            <div className="mb-3 sm:mb-4">
+              <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2">Special Instructions</h4>
+              <div className="bg-amber-50 rounded-lg p-2 sm:p-3 border border-amber-100">
+                <p className="text-[8px] sm:text-[10px] text-amber-700">{inquiry.specialInstructions}</p>
               </div>
             </div>
           )}
 
           {/* Attachments */}
           {inquiry.attachments && inquiry.attachments.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-xs font-semibold text-gray-700 mb-2">Attachments</h4>
-              <div className="space-y-2">
+            <div className="mb-3 sm:mb-4">
+              <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2">Attachments</h4>
+              <div className="space-y-1.5 sm:space-y-2">
                 {inquiry.attachments.map((file, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-2 border border-gray-200">
-                    <div className="flex items-center gap-2">
-                      <Paperclip className="w-3.5 h-3.5 text-gray-400" />
-                      <span className="text-xs text-gray-600">{file.fileName}</span>
-                      <span className="text-[10px] text-gray-400">
+                  <div key={idx} className="flex items-center justify-between bg-white rounded-lg p-1.5 sm:p-2 border border-gray-200">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <Paperclip className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-gray-400" />
+                      <span className="text-[8px] sm:text-[10px] text-gray-600 truncate max-w-[120px] sm:max-w-none">{file.fileName}</span>
+                      <span className="text-[7px] sm:text-[9px] text-gray-400">
                         ({(file.fileSize / 1024).toFixed(1)} KB)
                       </span>
                     </div>
                     <button
                       onClick={() => handleDownloadAttachment(file)}
-                      className="p-1 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-1"
+                      className="p-0.5 sm:p-1 text-blue-600 hover:bg-blue-50 rounded flex items-center gap-0.5"
                       title="Download"
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      <Download className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
                     </button>
                   </div>
                 ))}
@@ -1389,24 +1566,23 @@ const ModeratorInquiryCard = ({ inquiry }) => {
       )}
 
       {/* Footer with Total Value and WhatsApp */}
-      <div className="px-4 py-2 flex items-center justify-between bg-gray-50/30">
-        <div className="flex items-center gap-4 text-xs">
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 bg-gray-50/30">
+        <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
           <span className="text-gray-500">Total Value:</span>
-          <span className="font-semibold text-[#E39A65]">{formatPrice(inquiry.subtotal)}</span>
+          <span className="font-semibold text-[#E39A65] text-xs sm:text-sm">{formatPrice(inquiry.subtotal)}</span>
         </div>
         
-        {/* WhatsApp Button - Only show if customer has WhatsApp number */}
         {inquiry.userDetails?.whatsapp ? (
           <button
             onClick={handleWhatsApp}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-medium"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1.5 text-[10px] sm:text-xs bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-medium"
             title={`WhatsApp ${inquiry.userDetails.contactPerson || 'customer'}`}
           >
-            <MessageCircle className="w-3.5 h-3.5" />
-            WhatsApp Customer
+            <MessageCircle className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden xs:inline">WhatsApp</span>
           </button>
         ) : (
-          <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg">
+          <span className="text-[10px] sm:text-xs text-gray-400 bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-lg">
             No WhatsApp
           </span>
         )}
@@ -1415,13 +1591,13 @@ const ModeratorInquiryCard = ({ inquiry }) => {
   );
 };
 
-// Search Bar
+// Search Bar - Responsive
 const SearchBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <Search className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
       <input
         type="text"
         placeholder="Search by inquiry #, company, contact, product..."
@@ -1430,13 +1606,13 @@ const SearchBar = ({ onSearch }) => {
           setSearchTerm(e.target.value);
           onSearch(e.target.value);
         }}
-        className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+        className="w-full pl-8 sm:pl-9 pr-3 sm:pr-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
       />
     </div>
   );
 };
 
-// Filter Bar - Status filters on left, Month/Year filter on right
+// Filter Bar - Responsive
 const FilterBar = ({ 
   onFilter, 
   activeFilter, 
@@ -1453,9 +1629,9 @@ const FilterBar = ({
   const filters = ['All', 'Submitted', 'Quoted', 'Accepted', 'Invoiced', 'Cancelled'];
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      {/* Status Filters on Left */}
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+      {/* Status Filters */}
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {filters.map((filter) => (
           <button
             key={filter}
@@ -1463,7 +1639,7 @@ const FilterBar = ({
               setActiveFilter(filter);
               onFilter(filter);
             }}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium rounded-lg transition-colors ${
               activeFilter === filter
                 ? 'bg-[#E39A65] text-white shadow-md shadow-[#E39A65]/20'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1474,12 +1650,12 @@ const FilterBar = ({
         ))}
       </div>
 
-      {/* Month/Year Filter on Right */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+      {/* Month/Year Filter */}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
           <button
             onClick={() => setFilterType('all')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
               filterType === 'all' 
                 ? 'bg-[#E39A65] text-white' 
                 : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -1489,7 +1665,7 @@ const FilterBar = ({
           </button>
           <button
             onClick={() => setFilterType('year')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
               filterType === 'year' 
                 ? 'bg-[#E39A65] text-white' 
                 : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -1499,7 +1675,7 @@ const FilterBar = ({
           </button>
           <button
             onClick={() => setFilterType('month')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
               filterType === 'month' 
                 ? 'bg-[#E39A65] text-white' 
                 : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -1511,46 +1687,46 @@ const FilterBar = ({
 
         {/* Month Navigation */}
         {filterType === 'month' && (
-          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
             <button
               onClick={() => onMonthChange(-1)}
-              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
               title="Previous month"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
-            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200 whitespace-nowrap">
               {getMonthName(selectedMonth)} {selectedYear}
             </span>
             <button
               onClick={() => onMonthChange(1)}
-              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
               title="Next month"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
 
         {/* Year Navigation */}
         {filterType === 'year' && (
-          <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
             <button
               onClick={() => onYearChange(-1)}
-              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
               title="Previous year"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
-            <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
               {selectedYear}
             </span>
             <button
               onClick={() => onYearChange(1)}
-              className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
               title="Next year"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
           </div>
         )}
@@ -1567,8 +1743,7 @@ export default function ModeratorInquiriesPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   
-  // Date filter state
-  const [filterType, setFilterType] = useState('all'); // 'all', 'year', 'month'
+  const [filterType, setFilterType] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   
@@ -1576,6 +1751,7 @@ export default function ModeratorInquiriesPage() {
   const [itemsPerPage] = useState(10);
   const [totalInquiries, setTotalInquiries] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  
   const [stats, setStats] = useState({
     total: 0,
     submitted: 0,
@@ -1585,117 +1761,78 @@ export default function ModeratorInquiriesPage() {
     cancelled: 0,
     totalValue: 0
   });
+
   const router = useRouter();
 
-  // Filter inquiries by date
-  const filterByDate = (inquiriesList) => {
-    if (filterType === 'all') return inquiriesList;
-    
-    return inquiriesList.filter(inquiry => {
-      const inquiryDate = new Date(inquiry.createdAt);
-      const inquiryYear = inquiryDate.getFullYear();
-      const inquiryMonth = inquiryDate.getMonth();
+  const fetchInquiries = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
+      // Build query params
+      let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+      
+      if (activeFilter !== 'All') {
+        url += `&status=${activeFilter.toLowerCase()}`;
+      }
       
       if (filterType === 'year') {
-        return inquiryYear === selectedYear;
+        url += `&year=${selectedYear}`;
       } else if (filterType === 'month') {
-        return inquiryYear === selectedYear && inquiryMonth === selectedMonth;
+        url += `&month=${selectedMonth + 1}&year=${selectedYear}`;
       }
-      return true;
-    });
-  };
 
-const fetchInquiries = async () => {
-  try {
-    setLoading(true);
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    // Build query params for paginated inquiries
-    let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
-    
-    if (activeFilter !== 'All') {
-      url += `&status=${activeFilter.toLowerCase()}`;
-    }
-    
-    // Add date filter for paginated results
-    if (filterType === 'year') {
-      url += `&year=${selectedYear}`;
-    } else if (filterType === 'month') {
-      url += `&month=${selectedMonth + 1}&year=${selectedYear}`; // month+1 because JS months are 0-indexed
-    }
-
-    console.log('Fetching moderator inquiries from:', url);
-
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    const data = await response.json();
-    
-    if (data.success) {
-      setInquiries(data.data.inquiries);
-      setFilteredInquiries(data.data.inquiries);
-      setTotalInquiries(data.data.pagination.total);
-      setTotalPages(data.data.pagination.pages);
+      const data = await response.json();
       
-      // Calculate stats from ALL inquiries using the stats array from the response
-      if (data.data.stats && Array.isArray(data.data.stats)) {
-        const submitted = data.data.stats.find(s => s._id === 'submitted')?.count || 0;
-        const quoted = data.data.stats.find(s => s._id === 'quoted')?.count || 0;
-        const accepted = data.data.stats.find(s => s._id === 'accepted')?.count || 0;
-        const invoiced = data.data.stats.find(s => s._id === 'invoiced')?.count || 0;
-        const paid = data.data.stats.find(s => s._id === 'paid')?.count || 0;
-        const cancelled = data.data.stats.find(s => s._id === 'cancelled')?.count || 0;
+      if (data.success) {
+        setInquiries(data.data.inquiries);
+        setFilteredInquiries(data.data.inquiries);
+        setTotalInquiries(data.data.pagination.total);
+        setTotalPages(data.data.pagination.pages);
         
-        // Calculate total value from ALL invoices
-        const totalValue = data.data.totalValue || data.data.stats.reduce((sum, stat) => sum + (stat.totalValue || 0), 0);
-        
-        setStats({
-          total: data.data.pagination.total, // This is the total count from ALL pages
-          submitted,
-          quoted,
-          accepted,
-          invoiced,
-          paid,
-          cancelled,
-          totalValue
-        });
+        // Calculate stats from the response
+        if (data.data.stats && Array.isArray(data.data.stats)) {
+          const submitted = data.data.stats.find(s => s._id === 'submitted')?.count || 0;
+          const quoted = data.data.stats.find(s => s._id === 'quoted')?.count || 0;
+          const accepted = data.data.stats.find(s => s._id === 'accepted')?.count || 0;
+          const invoiced = data.data.stats.find(s => s._id === 'invoiced')?.count || 0;
+          const cancelled = data.data.stats.find(s => s._id === 'cancelled')?.count || 0;
+          const totalValue = data.data.totalValue || 0;
+          
+          setStats({
+            total: data.data.pagination.total,
+            submitted,
+            quoted,
+            accepted,
+            invoiced,
+            cancelled,
+            totalValue
+          });
+        }
       } else {
-        // Fallback: calculate stats from current page only (less accurate)
-        const totalValue = data.data.inquiries.reduce((sum, i) => sum + (i.subtotal || 0), 0);
-        
-        setStats({
-          total: data.data.pagination.total,
-          submitted: data.data.inquiries.filter(i => i.status === 'submitted').length,
-          quoted: data.data.inquiries.filter(i => i.status === 'quoted').length,
-          accepted: data.data.inquiries.filter(i => i.status === 'accepted').length,
-          invoiced: data.data.inquiries.filter(i => i.status === 'invoiced').length,
-          paid: data.data.inquiries.filter(i => i.status === 'paid').length,
-          cancelled: data.data.inquiries.filter(i => i.status === 'cancelled').length,
-          totalValue
-        });
+        if (response.status === 403) {
+          toast.error('You do not have permission to view this page');
+          router.push('/dashboard');
+        }
       }
-    } else {
-      // If unauthorized, redirect
-      if (response.status === 403) {
-        toast.error('You do not have permission to view this page');
-        router.push('/dashboard');
-      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      toast.error('Failed to load inquiries');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  } catch (error) {
-    console.error('Fetch error:', error);
-    toast.error('Failed to load inquiries');
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchInquiries();
@@ -1771,8 +1908,8 @@ const fetchInquiries = async () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-[#E39A65] mx-auto mb-4" />
-          <p className="text-sm text-gray-500">Loading inquiries...</p>
+          <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-[#E39A65] mx-auto mb-3 sm:mb-4" />
+          <p className="text-xs sm:text-sm text-gray-500">Loading inquiries...</p>
         </div>
       </div>
     );
@@ -1780,16 +1917,16 @@ const fetchInquiries = async () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Header - Responsive */}
       <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
-        <div className="container mx-auto px-4 max-w-7xl py-4">
-          <div className="flex items-center justify-between mb-4">
+        <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Inquiry Management (Moderator View)</h1>
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                Total {totalInquiries} inquiries • {formatPrice(stats.totalValue)} total value • View Only Mode
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inquiry Management</h1>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-1">
+                Total {stats.total} inquiries • {formatPrice(stats.totalValue)} total value • View Only Mode
                 {filterType !== 'all' && (
-                  <span className="ml-2 text-[#E39A65] font-medium">
+                  <span className="text-[#E39A65] font-medium">
                     • Showing: {getFilterDisplayText()}
                   </span>
                 )}
@@ -1798,59 +1935,29 @@ const fetchInquiries = async () => {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-              Refresh
+              <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden xs:inline">Refresh</span>
             </button>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-6 gap-3">
-            <StatCard 
-              title="Total" 
-              value={totalInquiries} 
-              icon={ShoppingBag} 
-              color="gray" 
-            />
-            <StatCard 
-              title="Submitted" 
-              value={stats.submitted} 
-              icon={Clock} 
-              color="amber" 
-            />
-            <StatCard 
-              title="Quoted" 
-              value={stats.quoted} 
-              icon={FileText} 
-              color="blue" 
-            />
-            <StatCard 
-              title="Accepted" 
-              value={stats.accepted} 
-              icon={CheckSquare} 
-              color="emerald" 
-            />
-            <StatCard 
-              title="Invoiced" 
-              value={stats.invoiced} 
-              icon={FileOutput} 
-              color="purple" 
-            />
-            <StatCard 
-              title="Cancelled" 
-              value={stats.cancelled} 
-              icon={XCircle} 
-              color="rose" 
-            />
+          {/* Stats - Responsive Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+            <StatCard title="Total" value={stats.total} icon={ShoppingBag} color="gray" />
+            <StatCard title="Submitted" value={stats.submitted} icon={Clock} color="amber" />
+            <StatCard title="Quoted" value={stats.quoted} icon={FileText} color="blue" />
+            <StatCard title="Accepted" value={stats.accepted} icon={CheckSquare} color="emerald" />
+            <StatCard title="Invoiced" value={stats.invoiced} icon={FileOutput} color="purple" />
+            <StatCard title="Cancelled" value={stats.cancelled} icon={XCircle} color="rose" />
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 max-w-7xl py-4">
+      <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
         {/* Search and Filter */}
-        <div className="space-y-3 mb-4">
+        <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
           <SearchBar onSearch={handleSearch} />
           <FilterBar 
             onFilter={handleFilter} 
@@ -1868,19 +1975,19 @@ const fetchInquiries = async () => {
         </div>
 
         {/* Results Summary */}
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-gray-500">
+        <div className="flex flex-wrap items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-3">
+          <p className="text-[9px] sm:text-xs text-gray-500">
             Showing <span className="font-medium">{filteredInquiries.length}</span> inquiries 
             {totalInquiries > itemsPerPage && (
               <> (Page {currentPage} of {totalPages})</>
             )}
             {filterType !== 'all' && (
-              <span className="ml-1 text-[#E39A65]">
+              <span className="text-[#E39A65]">
                 • {getFilterDisplayText()}
               </span>
             )}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-[9px] sm:text-xs text-gray-500">
             Total Inquiries: <span className="font-semibold text-[#E39A65]">{totalInquiries}</span>
           </p>
         </div>
@@ -1888,31 +1995,31 @@ const fetchInquiries = async () => {
         {/* Inquiries List */}
         <div id="inquiries-list">
           {filteredInquiries.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <FileSearch className="w-8 h-8 text-gray-400" />
+            <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <FileSearch className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">No inquiries found</h2>
-              <p className="text-sm text-gray-500 mb-4">
-                {totalInquiries === 0 
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">No inquiries found</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                {stats.total === 0 
                   ? "No inquiries have been submitted yet" 
                   : filterType !== 'all'
                     ? `No inquiries found for ${getFilterDisplayText().toLowerCase()}`
                     : "Try adjusting your filters"}
               </p>
-              {filterType !== 'all' && totalInquiries > 0 && (
+              {filterType !== 'all' && stats.total > 0 && (
                 <button
                   onClick={() => setFilterType('all')}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-[10px] sm:text-sm rounded-lg hover:bg-[#d48b54] transition-colors"
                 >
-                  <CalendarRange className="w-4 h-4" />
+                  <CalendarRange className="w-3 h-3 sm:w-4 sm:h-4" />
                   View All Time
                 </button>
               )}
             </div>
           ) : (
             <>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {filteredInquiries.map((inquiry) => (
                   <ModeratorInquiryCard 
                     key={inquiry._id} 

@@ -61,16 +61,6 @@
 //   });
 // };
 
-
-// // Generate invoice number (for initial display)
-// const generateInvoiceNumber = () => {
-//   const date = new Date();
-//   const year = date.getFullYear().toString().slice(-2);
-//   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-//   // Use '0001' as placeholder - backend will replace with actual sequence
-//   return `INV-${year}${month}-0001`;
-// };
-
 // // Default logo URL
 // const DEFAULT_LOGO_URL = 'https://i.ibb.co.com/60xkJ1Wd/favicon.png';
 
@@ -135,7 +125,8 @@
 //         value={displayValue}
 //         onChange={handleChange}
 //         onBlur={handleBlur}
-//         className="w-14 px-1 py-1.5 text-xs text-center border-none focus:outline-none focus:ring-2 focus:ring-[#E39A65] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+//           onWheel={(e) => e.target.blur()}
+//         className="w-14 px-1 py-1.5 text-xs text-center border-none focus:outline-none focus:ring-2 focus:ring-[#E39A65] "
 //         placeholder="0"
 //       />
 //       <button
@@ -523,6 +514,7 @@
 //   const router = useRouter();
   
 //   const [loading, setLoading] = useState(false);
+//   const [loadingNextNumber, setLoadingNextNumber] = useState(true);
 //   const [saving, setSaving] = useState(false);
 //   const [uploadingLogo, setUploadingLogo] = useState(false);
 //   const [productDetails, setProductDetails] = useState({});
@@ -531,63 +523,111 @@
 //   const [amountPaid, setAmountPaid] = useState(0);
 //   const [dynamicFields, setDynamicFields] = useState([]);
   
-//  const [invoiceData, setInvoiceData] = useState({
-//   invoiceNumber: generateInvoiceNumber(),
-//   invoiceDate: new Date().toISOString().split('T')[0],
-//   dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-//   inquiryId: '',
-//   inquiryNumber: '',
-//   userId: '', // Add this for customer userId
-//   company: {
-//     logo: DEFAULT_LOGO_URL,
-//     logoPublicId: '',
-//     companyName: 'Asian Clothify',
-//     contactPerson: '',
-//     email: 'info@asianclothify.com',
-//     phone: '+8801305-785685',
-//     address: '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
-//   },
-//   customer: { // Make sure this is properly initialized
-//     companyName: '',
-//     contactPerson: '',
-//     email: '',
-//     phone: '',
-//     whatsapp: '',
-//     billingAddress: '',
-//     billingCity: '',
-//     billingZipCode: '',
-//     billingCountry: '',
-//     shippingAddress: '',
-//     shippingCity: '',
-//     shippingZipCode: '',
-//     shippingCountry: ''
-//   },
-//   bankDetails: {
-//     bankName: '',
-//     accountName: '',
-//     accountNumber: '',
-//     accountType: '',
-//     routingNumber: '',
-//     swiftCode: '',
-//     iban: '',
-//     bankAddress: ''
-//   },
-//   items: [],
-//   subtotal: 0,
-//   vatPercentage: 0,
-//   vatAmount: 0,
-//   totalAfterVat: 0,
-//   discountPercentage: 0,
-//   discountAmount: 0,
-//   totalAfterDiscount: 0,
-//   shippingCost: 0,
-//   finalTotal: 0,
-//   amountPaid: 0,
-//   dueAmount: 0,
-//   notes: '',
-//   terms: 'This invoice is issued for wholesale purposes only and confirms the agreed products, quantities, prices, and payment terms; all sales are subject to availability and are non-returnable unless stated otherwise.',
-//   status: 'draft'
-// });
+//   const [invoiceData, setInvoiceData] = useState({
+//     invoiceNumber: '',
+//     invoiceDate: new Date().toISOString().split('T')[0],
+//     dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+//     inquiryId: '',
+//     inquiryNumber: '',
+//     userId: '',
+//     company: {
+//       logo: DEFAULT_LOGO_URL,
+//       logoPublicId: '',
+//       companyName: 'Asian Clothify',
+//       contactPerson: '',
+//       email: 'info@asianclothify.com',
+//       phone: '+8801305-785685',
+//       address: '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
+//     },
+//     customer: {
+//       companyName: '',
+//       contactPerson: '',
+//       email: '',
+//       phone: '',
+//       whatsapp: '',
+//       billingAddress: '',
+//       billingCity: '',
+//       billingZipCode: '',
+//       billingCountry: '',
+//       shippingAddress: '',
+//       shippingCity: '',
+//       shippingZipCode: '',
+//       shippingCountry: ''
+//     },
+//     bankDetails: {
+//       bankName: '',
+//       accountName: '',
+//       accountNumber: '',
+//       accountType: '',
+//       routingNumber: '',
+//       swiftCode: '',
+//       iban: '',
+//       bankAddress: ''
+//     },
+//     items: [],
+//     subtotal: 0,
+//     vatPercentage: 0,
+//     vatAmount: 0,
+//     totalAfterVat: 0,
+//     discountPercentage: 0,
+//     discountAmount: 0,
+//     totalAfterDiscount: 0,
+//     shippingCost: 0,
+//     finalTotal: 0,
+//     amountPaid: 0,
+//     dueAmount: 0,
+//     notes: '',
+//     terms: 'This invoice is issued for wholesale purposes only and confirms the agreed products, quantities, prices, and payment terms; all sales are subject to availability and are non-returnable unless stated otherwise.',
+//     status: 'draft'
+//   });
+
+//   // Fetch the next invoice number when component mounts
+//   useEffect(() => {
+//     fetchNextInvoiceNumber();
+//   }, []);
+
+//   const fetchNextInvoiceNumber = async () => {
+//     setLoadingNextNumber(true);
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/next-number', {
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+      
+//       const data = await response.json();
+//       if (data.success) {
+//         setInvoiceData(prev => ({
+//           ...prev,
+//           invoiceNumber: data.data
+//         }));
+//         console.log('Next invoice number:', data.data);
+//       } else {
+//         console.error('Failed to fetch next invoice number');
+//         // Fallback to a temporary number if API fails
+//         const date = new Date();
+//         const year = date.getFullYear().toString().slice(-2);
+//         const month = (date.getMonth() + 1).toString().padStart(2, '0');
+//         setInvoiceData(prev => ({
+//           ...prev,
+//           invoiceNumber: `INV-${year}${month}-TEMP`
+//         }));
+//       }
+//     } catch (error) {
+//       console.error('Error fetching next invoice number:', error);
+//       // Fallback
+//       const date = new Date();
+//       const year = date.getFullYear().toString().slice(-2);
+//       const month = (date.getMonth() + 1).toString().padStart(2, '0');
+//       setInvoiceData(prev => ({
+//         ...prev,
+//         invoiceNumber: `INV-${year}${month}-TEMP`
+//       }));
+//     } finally {
+//       setLoadingNextNumber(false);
+//     }
+//   };
 
 //   // Handler functions for dynamic fields
 //   const handleAddField = () => {
@@ -609,279 +649,153 @@
 //     setDynamicFields(prev => prev.filter(fieldItem => fieldItem.id !== id));
 //   };
 
-//   // Parse items and customer data from URL params
+//   useEffect(() => {
+//     const inquiryId = searchParams.get('inquiryId');
+//     const inquiryNumber = searchParams.get('inquiryNumber');
+//     const userIdParam = searchParams.get('userId'); 
+//     const itemsParam = searchParams.get('items');
+//     const totalAmount = parseFloat(searchParams.get('totalAmount') || '0');
+//     const specialInstructions = searchParams.get('specialInstructions');
+    
+//     console.log('🔍 URL Params - Raw values:', { 
+//       inquiryId, 
+//       inquiryNumber, 
+//       userIdParam, 
+//       userIdParamType: typeof userIdParam,
+//       userIdParamValue: userIdParam,
+//       itemsParam: itemsParam ? 'exists' : 'missing',
+//       itemsParamLength: itemsParam?.length,
+//       totalAmount 
+//     });
 
+//     // Validate userIdParam - it should be a valid ObjectId string (24 characters hex)
+//     if (userIdParam && (userIdParam === '[object Object]' || userIdParam.includes('[object'))) {
+//       console.error('❌ Invalid userId format in URL params:', userIdParam);
+//       toast.error('Invalid user ID format in URL. Please check the inquiry data.');
+//     }
 
-// // useEffect(() => {
-// //   const inquiryId = searchParams.get('inquiryId');
-// //   const inquiryNumber = searchParams.get('inquiryNumber');
-// //   const userIdParam = searchParams.get('userId'); 
-// //   const itemsParam = searchParams.get('items');
-// //   const totalAmount = parseFloat(searchParams.get('totalAmount') || '0');
-// //   const specialInstructions = searchParams.get('specialInstructions');
-  
-// //   console.log('🔍 URL Params - Raw values:', { 
-// //     inquiryId, 
-// //     inquiryNumber, 
-// //     userIdParam, 
-// //     userIdParamType: typeof userIdParam,
-// //     userIdParamValue: userIdParam,
-// //     itemsParam: itemsParam ? 'exists' : 'missing',
-// //     totalAmount 
-// //   });
-
-// //   // Validate userIdParam - it should be a valid ObjectId string (24 characters hex)
-// //   if (userIdParam && (userIdParam === '[object Object]' || userIdParam.includes('[object'))) {
-// //     console.error('❌ Invalid userId format in URL params:', userIdParam);
-// //     toast.error('Invalid user ID format in URL. Please check the inquiry data.');
-// //   }
-
-// //   const customerData = {
-// //     companyName: searchParams.get('companyName') || '',
-// //     contactPerson: searchParams.get('contactPerson') || '',
-// //     email: searchParams.get('email') || '',
-// //     phone: searchParams.get('phone') || '',
-// //     whatsapp: searchParams.get('whatsapp') || '',
-// //     billingAddress: searchParams.get('address') || '',
-// //     billingCity: searchParams.get('city') || '',
-// //     billingZipCode: searchParams.get('zipCode') || '',
-// //     billingCountry: searchParams.get('country') || '',
-// //     shippingAddress: '',
-// //     shippingCity: '',
-// //     shippingZipCode: '',
-// //     shippingCountry: ''
-// //   };
-
-// //   setInvoiceData(prev => {
-// //     // Ensure prev.customer exists
-// //     const currentCustomer = prev.customer || {
-// //       companyName: '',
-// //       contactPerson: '',
-// //       email: '',
-// //       phone: '',
-// //       whatsapp: '',
-// //       billingAddress: '',
-// //       billingCity: '',
-// //       billingZipCode: '',
-// //       billingCountry: '',
-// //       shippingAddress: '',
-// //       shippingCity: '',
-// //       shippingZipCode: '',
-// //       shippingCountry: ''
-// //     };
-
-// //     // Clean the userId - if it's "[object Object]", set to empty string
-// //     let cleanUserId = userIdParam;
-// //     if (cleanUserId === '[object Object]' || (cleanUserId && cleanUserId.includes('[object'))) {
-// //       console.warn('⚠️ Cleaning invalid userId:', cleanUserId);
-// //       cleanUserId = '';
-// //     }
-
-// //     const updatedData = {
-// //       ...prev,
-// //       inquiryId: inquiryId || prev.inquiryId,
-// //       inquiryNumber: inquiryNumber || prev.inquiryNumber,
-// //       userId: cleanUserId || prev.userId, // Store the cleaned userId
-// //       customer: {
-// //         ...currentCustomer,
-// //         ...customerData
-// //       }
-// //     };
-
-// //     console.log('📦 Updated invoiceData:', {
-// //       userId: updatedData.userId,
-// //       inquiryId: updatedData.inquiryId,
-// //       inquiryNumber: updatedData.inquiryNumber
-// //     });
-
-// //     if (itemsParam) {
-// //       try {
-// //         const parsedItems = JSON.parse(itemsParam);
-// //         updatedData.items = parsedItems.map(item => ({
-// //           ...item,
-// //           unitPrice: item.unitPrice || 0,
-// //           total: (item.totalQuantity || 0) * (item.unitPrice || 0),
-// //           colors: (item.colors || []).map(color => ({
-// //             ...color,
-// //             sizeQuantities: (color.sizeQuantities || []).map(sq => ({
-// //               size: sq.size,
-// //               quantity: sq.quantity || 0
-// //             }))
-// //           }))
-// //         }));
-// //         updatedData.subtotal = totalAmount;
-        
-// //         const initialExpandedState = {};
-// //         parsedItems.forEach((_, index) => {
-// //           initialExpandedState[index] = true;
-// //         });
-// //         setExpandedItems(initialExpandedState);
-        
-// //         parsedItems.forEach(item => {
-// //           if (item.productId) {
-// //             fetchProductDetails(item.productId);
-// //           }
-// //         });
-// //       } catch (error) {
-// //         console.error('Error parsing items:', error);
-// //         toast.error('Failed to load inquiry items');
-// //       }
-// //     }
-
-// //     if (specialInstructions) {
-// //       updatedData.notes = specialInstructions;
-// //     }
-
-// //     return updatedData;
-// //   });
-// // }, [searchParams]);
-// useEffect(() => {
-//   const inquiryId = searchParams.get('inquiryId');
-//   const inquiryNumber = searchParams.get('inquiryNumber');
-//   const userIdParam = searchParams.get('userId'); 
-//   const itemsParam = searchParams.get('items');
-//   const totalAmount = parseFloat(searchParams.get('totalAmount') || '0');
-//   const specialInstructions = searchParams.get('specialInstructions');
-  
-//   console.log('🔍 URL Params - Raw values:', { 
-//     inquiryId, 
-//     inquiryNumber, 
-//     userIdParam, 
-//     userIdParamType: typeof userIdParam,
-//     userIdParamValue: userIdParam,
-//     itemsParam: itemsParam ? 'exists' : 'missing',
-//     itemsParamLength: itemsParam?.length,
-//     totalAmount 
-//   });
-
-//   // Validate userIdParam - it should be a valid ObjectId string (24 characters hex)
-//   if (userIdParam && (userIdParam === '[object Object]' || userIdParam.includes('[object'))) {
-//     console.error('❌ Invalid userId format in URL params:', userIdParam);
-//     toast.error('Invalid user ID format in URL. Please check the inquiry data.');
-//   }
-
-//   const customerData = {
-//     companyName: searchParams.get('companyName') || '',
-//     contactPerson: searchParams.get('contactPerson') || '',
-//     email: searchParams.get('email') || '',
-//     phone: searchParams.get('phone') || '',
-//     whatsapp: searchParams.get('whatsapp') || '',
-//     billingAddress: searchParams.get('address') || '',
-//     billingCity: searchParams.get('city') || '',
-//     billingZipCode: searchParams.get('zipCode') || '',
-//     billingCountry: searchParams.get('country') || '',
-//     shippingAddress: '',
-//     shippingCity: '',
-//     shippingZipCode: '',
-//     shippingCountry: ''
-//   };
-
-//   setInvoiceData(prev => {
-//     // Ensure prev.customer exists
-//     const currentCustomer = prev.customer || {
-//       companyName: '',
-//       contactPerson: '',
-//       email: '',
-//       phone: '',
-//       whatsapp: '',
-//       billingAddress: '',
-//       billingCity: '',
-//       billingZipCode: '',
-//       billingCountry: '',
+//     const customerData = {
+//       companyName: searchParams.get('companyName') || '',
+//       contactPerson: searchParams.get('contactPerson') || '',
+//       email: searchParams.get('email') || '',
+//       phone: searchParams.get('phone') || '',
+//       whatsapp: searchParams.get('whatsapp') || '',
+//       billingAddress: searchParams.get('address') || '',
+//       billingCity: searchParams.get('city') || '',
+//       billingZipCode: searchParams.get('zipCode') || '',
+//       billingCountry: searchParams.get('country') || '',
 //       shippingAddress: '',
 //       shippingCity: '',
 //       shippingZipCode: '',
 //       shippingCountry: ''
 //     };
 
-//     // Clean the userId - if it's "[object Object]", set to empty string
-//     let cleanUserId = userIdParam;
-//     if (cleanUserId === '[object Object]' || (cleanUserId && cleanUserId.includes('[object'))) {
-//       console.warn('⚠️ Cleaning invalid userId:', cleanUserId);
-//       cleanUserId = '';
-//     }
+//     setInvoiceData(prev => {
+//       // Ensure prev.customer exists
+//       const currentCustomer = prev.customer || {
+//         companyName: '',
+//         contactPerson: '',
+//         email: '',
+//         phone: '',
+//         whatsapp: '',
+//         billingAddress: '',
+//         billingCity: '',
+//         billingZipCode: '',
+//         billingCountry: '',
+//         shippingAddress: '',
+//         shippingCity: '',
+//         shippingZipCode: '',
+//         shippingCountry: ''
+//       };
 
-//     const updatedData = {
-//       ...prev,
-//       inquiryId: inquiryId || prev.inquiryId,
-//       inquiryNumber: inquiryNumber || prev.inquiryNumber,
-//       userId: cleanUserId || prev.userId,
-//       customer: {
-//         ...currentCustomer,
-//         ...customerData
+//       // Clean the userId - if it's "[object Object]", set to empty string
+//       let cleanUserId = userIdParam;
+//       if (cleanUserId === '[object Object]' || (cleanUserId && cleanUserId.includes('[object'))) {
+//         console.warn('⚠️ Cleaning invalid userId:', cleanUserId);
+//         cleanUserId = '';
 //       }
-//     };
 
-//     console.log('📦 Updated invoiceData:', {
-//       userId: updatedData.userId,
-//       inquiryId: updatedData.inquiryId,
-//       inquiryNumber: updatedData.inquiryNumber
-//     });
+//       const updatedData = {
+//         ...prev,
+//         inquiryId: inquiryId || prev.inquiryId,
+//         inquiryNumber: inquiryNumber || prev.inquiryNumber,
+//         userId: cleanUserId || prev.userId,
+//         customer: {
+//           ...currentCustomer,
+//           ...customerData
+//         }
+//       };
 
-//     if (itemsParam) {
-//       try {
-//         const parsedItems = JSON.parse(itemsParam);
-        
-//         // Debug parsed items to check for images
-//         console.log('📦 Raw parsed items:', parsedItems);
-//         console.log('📦 Items with image check:', parsedItems.map(item => ({
-//           productId: item.productId,
-//           productName: item.productName,
-//           hasProductImage: !!item.productImage,
-//           productImage: item.productImage,
-//           colorsCount: item.colors?.length,
-//           totalQuantity: item.totalQuantity
-//         })));
+//       console.log('📦 Updated invoiceData:', {
+//         userId: updatedData.userId,
+//         inquiryId: updatedData.inquiryId,
+//         inquiryNumber: updatedData.inquiryNumber
+//       });
 
-//         updatedData.items = parsedItems.map(item => ({
-//           ...item,
-//           unitPrice: item.unitPrice || 0,
-//           total: (item.totalQuantity || 0) * (item.unitPrice || 0),
-//           productImage: item.productImage || '', // Preserve product image
-//           colors: (item.colors || []).map(color => ({
-//             ...color,
-//             sizeQuantities: (color.sizeQuantities || []).map(sq => ({
-//               size: sq.size,
-//               quantity: sq.quantity || 0
+//       if (itemsParam) {
+//         try {
+//           const parsedItems = JSON.parse(itemsParam);
+          
+//           // Debug parsed items to check for images
+//           console.log('📦 Raw parsed items:', parsedItems);
+//           console.log('📦 Items with image check:', parsedItems.map(item => ({
+//             productId: item.productId,
+//             productName: item.productName,
+//             hasProductImage: !!item.productImage,
+//             productImage: item.productImage,
+//             colorsCount: item.colors?.length,
+//             totalQuantity: item.totalQuantity
+//           })));
+
+//           updatedData.items = parsedItems.map(item => ({
+//             ...item,
+//             unitPrice: item.unitPrice || 0,
+//             total: (item.totalQuantity || 0) * (item.unitPrice || 0),
+//             productImage: item.productImage || '', // Preserve product image
+//             colors: (item.colors || []).map(color => ({
+//               ...color,
+//               sizeQuantities: (color.sizeQuantities || []).map(sq => ({
+//                 size: sq.size,
+//                 quantity: sq.quantity || 0
+//               }))
 //             }))
-//           }))
-//         }));
+//           }));
 
-//         updatedData.subtotal = totalAmount;
-        
-//         // Log final items with images after mapping
-//         console.log('📦 Final items after mapping:', updatedData.items.map(item => ({
-//           productName: item.productName,
-//           hasImage: !!item.productImage,
-//           imageUrl: item.productImage
-//         })));
+//           updatedData.subtotal = totalAmount;
+          
+//           // Log final items with images after mapping
+//           console.log('📦 Final items after mapping:', updatedData.items.map(item => ({
+//             productName: item.productName,
+//             hasImage: !!item.productImage,
+//             imageUrl: item.productImage
+//           })));
 
-//         const initialExpandedState = {};
-//         parsedItems.forEach((_, index) => {
-//           initialExpandedState[index] = true;
-//         });
-//         setExpandedItems(initialExpandedState);
-        
-//         parsedItems.forEach(item => {
-//           if (item.productId) {
-//             fetchProductDetails(item.productId);
-//           }
-//         });
-//       } catch (error) {
-//         console.error('❌ Error parsing items:', error);
-//         console.error('❌ Items param that failed:', itemsParam);
-//         toast.error('Failed to load inquiry items');
+//           const initialExpandedState = {};
+//           parsedItems.forEach((_, index) => {
+//             initialExpandedState[index] = true;
+//           });
+//           setExpandedItems(initialExpandedState);
+          
+//           parsedItems.forEach(item => {
+//             if (item.productId) {
+//               fetchProductDetails(item.productId);
+//             }
+//           });
+//         } catch (error) {
+//           console.error('❌ Error parsing items:', error);
+//           console.error('❌ Items param that failed:', itemsParam);
+//           toast.error('Failed to load inquiry items');
+//         }
 //       }
-//     }
 
-//     if (specialInstructions) {
-//       updatedData.notes = specialInstructions;
-//       console.log('📝 Special instructions added:', specialInstructions);
-//     }
+//       if (specialInstructions) {
+//         updatedData.notes = specialInstructions;
+//         console.log('📝 Special instructions added:', specialInstructions);
+//       }
 
-//     return updatedData;
-//   });
-// }, [searchParams]);
+//       return updatedData;
+//     });
+//   }, [searchParams]);
 
 //   // Fetch product details for available colors and sizes
 //   const fetchProductDetails = async (productId) => {
@@ -1164,26 +1078,16 @@
 //     }));
 //   };
 
-//   // const handleBankDetailsChange = (field, value) => {
-//   //   setInvoiceData(prev => ({
-//   //     ...prev,
-//   //     bankDetails: {
-//   //       ...prev.bankDetails,
-//   //       [field]: value
-//   //     }
-//   //   }));
-//   // };
-
-
 //   const handleBankDetailsChange = (field, value) => {
-//   setInvoiceData(prev => ({
-//     ...prev,
-//     bankDetails: {
-//       ...(prev.bankDetails || {}), // Ensure bankDetails exists
-//       [field]: value
-//     }
-//   }));
-// };
+//     setInvoiceData(prev => ({
+//       ...prev,
+//       bankDetails: {
+//         ...(prev.bankDetails || {}),
+//         [field]: value
+//       }
+//     }));
+//   };
+
 //   const handleLogoUpload = async (e) => {
 //     const file = e.target.files[0];
 //     if (!file) return;
@@ -1313,207 +1217,194 @@
 //     }
 //   };
 
-
-// // const handleSaveInvoice = async (invoiceStatus = 'draft') => {
-// //   setSaving(true);
-// //   try {
-// //     const token = localStorage.getItem('token');
-    
-// //     const validDynamicFields = dynamicFields.filter(
-// //       field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
-// //     );
-    
-// //     // Get the current admin user from localStorage
-// //     const userStr = localStorage.getItem('user');
-// //     let adminId = null;
-    
-// //     if (userStr) {
-// //       try {
-// //         const user = JSON.parse(userStr);
-// //         adminId = user.id;
-// //       } catch (e) {
-// //         console.error('Error parsing user data:', e);
-// //       }
-// //     }
-
-// //     // Get userId directly from URL params as the most reliable source
-// //     let userIdFromUrl = searchParams.get('userId');
-    
-// //     console.log('🔍 UserId from URL params:', userIdFromUrl, 'Type:', typeof userIdFromUrl);
-    
-// //     // Validate the userId from URL
-// //     if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
-// //       console.error('❌ Invalid userId in URL params:', userIdFromUrl);
-// //       toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
-// //       setSaving(false);
-// //       return;
-// //     }
-
-// //     // Use the URL userId directly - it should be a clean string
-// //     const processedUserId = userIdFromUrl;
-
-// //     console.log('✅ Using userId:', processedUserId);
-
-// //     // Get the payment status from your existing status object
-// //     const paymentStatusText = status.text;
-
-// //     // Format the items to match backend schema - ENSURE productImage IS INCLUDED
-// //     const formattedItems = invoiceData.items.map(item => {
-// //       console.log(`📦 Formatting item ${item.productName} with image:`, item.productImage);
+//   // const handleSaveInvoice = async (invoiceStatus = 'draft') => {
+//   //   setSaving(true);
+//   //   try {
+//   //     const token = localStorage.getItem('token');
       
-// //       return {
-// //         productId: item.productId,
-// //         productName: item.productName,
-// //         colors: item.colors.map(color => ({
-// //           color: {
-// //             code: color.color.code,
-// //             name: color.color.name || color.color.code
-// //           },
-// //           sizeQuantities: color.sizeQuantities.map(sq => ({
-// //             size: sq.size,
-// //             quantity: sq.quantity
-// //           })),
-// //           totalForColor: color.totalForColor
-// //         })),
-// //         totalQuantity: item.totalQuantity,
-// //         unitPrice: item.unitPrice,
-// //         moq: item.moq,
-// //         productImage: item.productImage || '', // CRITICAL: Ensure productImage is included
-// //         total: item.total
-// //       };
-// //     });
+//   //     const validDynamicFields = dynamicFields.filter(
+//   //       field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
+//   //     );
+      
+//   //     // Get the current admin user from localStorage
+//   //     const userStr = localStorage.getItem('user');
+//   //     let adminId = null;
+      
+//   //     if (userStr) {
+//   //       try {
+//   //         const user = JSON.parse(userStr);
+//   //         adminId = user.id;
+//   //       } catch (e) {
+//   //         console.error('Error parsing user data:', e);
+//   //       }
+//   //     }
 
-// //     // Log formatted items to verify images
-// //     console.log('📦 Formatted items with images:', formattedItems.map(item => ({
-// //       product: item.productName,
-// //       hasImage: !!item.productImage,
-// //       imageUrl: item.productImage
-// //     })));
+//   //     // Get userId directly from URL params
+//   //     let userIdFromUrl = searchParams.get('userId');
+      
+//   //     if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
+//   //       console.error('❌ Invalid userId in URL params:', userIdFromUrl);
+//   //       toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
+//   //       setSaving(false);
+//   //       return;
+//   //     }
 
-// //     // Create payload matching backend schema
-// //     const invoicePayload = {
-// //       invoiceNumber: invoiceData.invoiceNumber,
-// //       invoiceDate: invoiceData.invoiceDate,
-// //       dueDate: invoiceData.dueDate,
-// //       inquiryId: invoiceData.inquiryId,
-// //       inquiryNumber: invoiceData.inquiryNumber,
+//   //     const processedUserId = userIdFromUrl;
+//   //     const paymentStatusText = status.text;
       
-// //       // Customer info
-// //       customer: {
-// //         companyName: invoiceData.customer?.companyName || '',
-// //         contactPerson: invoiceData.customer?.contactPerson || '',
-// //         email: invoiceData.customer?.email || '',
-// //         phone: invoiceData.customer?.phone || '',
-// //         whatsapp: invoiceData.customer?.whatsapp || '',
-// //         billingAddress: invoiceData.customer?.billingAddress || '',
-// //         billingCity: invoiceData.customer?.billingCity || '',
-// //         billingZipCode: invoiceData.customer?.billingZipCode || '',
-// //         billingCountry: invoiceData.customer?.billingCountry || '',
-// //         shippingAddress: invoiceData.customer?.shippingAddress || '',
-// //         shippingCity: invoiceData.customer?.shippingCity || '',
-// //         shippingZipCode: invoiceData.customer?.shippingZipCode || '',
-// //         shippingCountry: invoiceData.customer?.shippingCountry || ''
-// //       },
-      
-// //       // Company info
-// //       company: {
-// //         logo: invoiceData.company?.logo || '',
-// //         logoPublicId: invoiceData.company?.logoPublicId || '',
-// //         companyName: invoiceData.company?.companyName || 'Asian Clothify',
-// //         contactPerson: invoiceData.company?.contactPerson || '',
-// //         email: invoiceData.company?.email || 'info@asianclothify.com',
-// //         phone: invoiceData.company?.phone || '+8801305-785685',
-// //         address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
-// //       },
-      
-// //       // Bank details
-// //       bankDetails: {
-// //         bankName: invoiceData.bankDetails?.bankName || '',
-// //         accountName: invoiceData.bankDetails?.accountName || '',
-// //         accountNumber: invoiceData.bankDetails?.accountNumber || '',
-// //         accountType: invoiceData.bankDetails?.accountType || '',
-// //         routingNumber: invoiceData.bankDetails?.routingNumber || '',
-// //         swiftCode: invoiceData.bankDetails?.swiftCode || '',
-// //         iban: invoiceData.bankDetails?.iban || '',
-// //         bankAddress: invoiceData.bankDetails?.bankAddress || ''
-// //       },
-      
-// //       // Items - with images included
-// //       items: formattedItems,
-      
-// //       // Calculations
-// //       subtotal: subtotal,
-// //       vatPercentage: vatPercentage,
-// //       vatAmount: vatAmount,
-// //       totalAfterVat: totalAfterVat,
-// //       discountPercentage: discountPercentage,
-// //       discountAmount: discountAmount,
-// //       totalAfterDiscount: totalAfterDiscount,
-// //       shippingCost: shippingCost,
-// //       finalTotal: finalTotal,
-// //       amountPaid: paidAmount,
-// //       dueAmount: dueAmount,
-      
-// //       // Status fields
-// //       paymentStatus: paymentStatusText.toLowerCase(),
-// //       status: invoiceStatus === 'draft' ? 'draft' : 'sent',
-      
-// //       // Additional info
-// //       notes: invoiceData.notes || '',
-// //       terms: invoiceData.terms || '',
-// //       customFields: validDynamicFields,
-      
-// //       // Tracking - USE URL USERID DIRECTLY
-// //       userId: processedUserId,
-// //       createdBy: adminId,
-      
-// //       createdAt: new Date().toISOString()
-// //     };
+//   //     // Calculate percentages
+//   //     const paidPercentage = finalTotal > 0 ? (paidAmount / finalTotal) * 100 : 0;
+//   //     const unpaidPercentage = finalTotal > 0 ? (dueAmount / finalTotal) * 100 : 0;
 
-// //     console.log('📤 Final invoice payload - items with images:', 
-// //       invoicePayload.items.map(item => ({
-// //         product: item.productName,
-// //         hasImage: !!item.productImage,
-// //         imageUrl: item.productImage
-// //       }))
-// //     );
+//   //     // Format the items
+//   //     const formattedItems = invoiceData.items.map(item => {
+//   //       return {
+//   //         productId: item.productId,
+//   //         productName: item.productName,
+//   //         colors: item.colors.map(color => ({
+//   //           color: {
+//   //             code: color.color.code,
+//   //             name: color.color.name || color.color.code
+//   //           },
+//   //           sizeQuantities: color.sizeQuantities.map(sq => ({
+//   //             size: sq.size,
+//   //             quantity: sq.quantity
+//   //           })),
+//   //           totalForColor: color.totalForColor
+//   //         })),
+//   //         totalQuantity: item.totalQuantity,
+//   //         unitPrice: item.unitPrice,
+//   //         moq: item.moq,
+//   //         productImage: item.productImage || '',
+//   //         total: item.total
+//   //       };
+//   //     });
 
-// //     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
-// //       method: 'POST',
-// //       headers: {
-// //         'Authorization': `Bearer ${token}`,
-// //         'Content-Type': 'application/json'
-// //       },
-// //       body: JSON.stringify(invoicePayload)
-// //     });
+//   //     // Create payload
+//   //     const invoicePayload = {
+//   //       invoiceNumber: invoiceData.invoiceNumber,
+//   //       invoiceDate: invoiceData.invoiceDate,
+//   //       dueDate: invoiceData.dueDate,
+//   //       inquiryId: invoiceData.inquiryId,
+//   //       inquiryNumber: invoiceData.inquiryNumber,
+        
+//   //       // Customer info
+//   //       customer: {
+//   //         companyName: invoiceData.customer?.companyName || '',
+//   //         contactPerson: invoiceData.customer?.contactPerson || '',
+//   //         email: invoiceData.customer?.email || '',
+//   //         phone: invoiceData.customer?.phone || '',
+//   //         whatsapp: invoiceData.customer?.whatsapp || '',
+//   //         billingAddress: invoiceData.customer?.billingAddress || '',
+//   //         billingCity: invoiceData.customer?.billingCity || '',
+//   //         billingZipCode: invoiceData.customer?.billingZipCode || '',
+//   //         billingCountry: invoiceData.customer?.billingCountry || '',
+//   //         shippingAddress: invoiceData.customer?.shippingAddress || '',
+//   //         shippingCity: invoiceData.customer?.shippingCity || '',
+//   //         shippingZipCode: invoiceData.customer?.shippingZipCode || '',
+//   //         shippingCountry: invoiceData.customer?.shippingCountry || ''
+//   //       },
+        
+//   //       // Company info
+//   //       company: {
+//   //         logo: invoiceData.company?.logo || '',
+//   //         logoPublicId: invoiceData.company?.logoPublicId || '',
+//   //         companyName: invoiceData.company?.companyName || 'Asian Clothify',
+//   //         contactPerson: invoiceData.company?.contactPerson || '',
+//   //         email: invoiceData.company?.email || 'info@asianclothify.com',
+//   //         phone: invoiceData.company?.phone || '+8801305-785685',
+//   //         address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
+//   //       },
+        
+//   //       // Bank details
+//   //       bankDetails: {
+//   //         bankName: invoiceData.bankDetails?.bankName || '',
+//   //         accountName: invoiceData.bankDetails?.accountName || '',
+//   //         accountNumber: invoiceData.bankDetails?.accountNumber || '',
+//   //         accountType: invoiceData.bankDetails?.accountType || '',
+//   //         routingNumber: invoiceData.bankDetails?.routingNumber || '',
+//   //         swiftCode: invoiceData.bankDetails?.swiftCode || '',
+//   //         iban: invoiceData.bankDetails?.iban || '',
+//   //         bankAddress: invoiceData.bankDetails?.bankAddress || ''
+//   //       },
+        
+//   //       // Items
+//   //       items: formattedItems,
+        
+//   //       // Calculations
+//   //       subtotal: subtotal,
+//   //       vatPercentage: vatPercentage,
+//   //       vatAmount: vatAmount,
+//   //       totalAfterVat: totalAfterVat,
+//   //       discountPercentage: discountPercentage,
+//   //       discountAmount: discountAmount,
+//   //       totalAfterDiscount: totalAfterDiscount,
+//   //       shippingCost: shippingCost,
+//   //       finalTotal: finalTotal,
+//   //       amountPaid: paidAmount,
+//   //       dueAmount: dueAmount,
+        
+//   //       // NEW: Percentage fields
+//   //       paidPercentage: Math.round(paidPercentage * 100) / 100,
+//   //       unpaidPercentage: Math.round(unpaidPercentage * 100) / 100,
+        
+//   //       // Status fields
+//   //       paymentStatus: paymentStatusText.toLowerCase(),
+//   //       status: invoiceStatus === 'draft' ? 'draft' : 'sent',
+        
+//   //       // Additional info
+//   //       notes: invoiceData.notes || '',
+//   //       terms: invoiceData.terms || '',
+//   //       customFields: validDynamicFields,
+        
+//   //       // Tracking
+//   //       userId: processedUserId,
+//   //       createdBy: adminId,
+        
+//   //       createdAt: new Date().toISOString()
+//   //     };
 
-// //     // Get the response as text first for debugging
-// //     const responseText = await response.text();
-// //     console.log('📥 Response:', responseText);
+//   //     console.log('📤 Final invoice payload with percentages:', {
+//   //       amountPaid: invoicePayload.amountPaid,
+//   //       dueAmount: invoicePayload.dueAmount,
+//   //       paidPercentage: invoicePayload.paidPercentage,
+//   //       unpaidPercentage: invoicePayload.unpaidPercentage
+//   //     });
 
-// //     let data;
-// //     try {
-// //       data = JSON.parse(responseText);
-// //     } catch (e) {
-// //       console.error('Failed to parse response:', responseText);
-// //       throw new Error('Invalid response from server');
-// //     }
-    
-// //     if (response.ok && data.success) {
-// //       toast.success(`Invoice ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
-// //       router.push('/admin/invoices');
-// //     } else {
-// //       toast.error(data.error || data.message || 'Failed to save invoice');
-// //     }
-// //   } catch (error) {
-// //     console.error('Save invoice error:', error);
-// //     toast.error('Failed to save invoice: ' + error.message);
-// //   } finally {
-// //     setSaving(false);
-// //   }
-// // };
+//   //     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
+//   //       method: 'POST',
+//   //       headers: {
+//   //         'Authorization': `Bearer ${token}`,
+//   //         'Content-Type': 'application/json'
+//   //       },
+//   //       body: JSON.stringify(invoicePayload)
+//   //     });
 
-// const handleSaveInvoice = async (invoiceStatus = 'draft') => {
+//   //     const responseText = await response.text();
+//   //     let data;
+//   //     try {
+//   //       data = JSON.parse(responseText);
+//   //     } catch (e) {
+//   //       console.error('Failed to parse response:', responseText);
+//   //       throw new Error('Invalid response from server');
+//   //     }
+      
+//   //     if (response.ok && data.success) {
+//   //       toast.success(`Invoice ${data.data.invoiceNumber} ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
+//   //       router.push('/admin/invoices');
+//   //     } else {
+//   //       toast.error(data.error || data.message || 'Failed to save invoice');
+//   //     }
+//   //   } catch (error) {
+//   //     console.error('Save invoice error:', error);
+//   //     toast.error('Failed to save invoice: ' + error.message);
+//   //   } finally {
+//   //     setSaving(false);
+//   //   }
+//   // };
+
+
+//   const handleSaveInvoice = async (invoiceStatus = 'draft') => {
 //   setSaving(true);
 //   try {
 //     const token = localStorage.getItem('token');
@@ -1548,9 +1439,9 @@
 //     const processedUserId = userIdFromUrl;
 //     const paymentStatusText = status.text;
     
-//     // Calculate percentages
-//     const paidPercentage = finalTotal > 0 ? (paidAmount / finalTotal) * 100 : 0;
-//     const unpaidPercentage = finalTotal > 0 ? (dueAmount / finalTotal) * 100 : 0;
+//     // Calculate percentages with proper rounding
+//     const paidPercentage = finalTotal > 0 ? Number(((paidAmount / finalTotal) * 100).toFixed(2)) : 0;
+//     const unpaidPercentage = finalTotal > 0 ? Number(((dueAmount / finalTotal) * 100).toFixed(2)) : 0;
 
 //     // Format the items
 //     const formattedItems = invoiceData.items.map(item => {
@@ -1569,14 +1460,25 @@
 //           totalForColor: color.totalForColor
 //         })),
 //         totalQuantity: item.totalQuantity,
-//         unitPrice: item.unitPrice,
+//         unitPrice: Number(item.unitPrice.toFixed(2)),
 //         moq: item.moq,
 //         productImage: item.productImage || '',
-//         total: item.total
+//         total: Number(item.total.toFixed(2))
 //       };
 //     });
 
-//     // Create payload
+//     // Round all monetary values to 2 decimal places
+//     const roundedSubtotal = Number(subtotal.toFixed(2));
+//     const roundedVatAmount = Number(vatAmount.toFixed(2));
+//     const roundedTotalAfterVat = Number(totalAfterVat.toFixed(2));
+//     const roundedDiscountAmount = Number(discountAmount.toFixed(2));
+//     const roundedTotalAfterDiscount = Number(totalAfterDiscount.toFixed(2));
+//     const roundedShippingCost = Number(shippingCost.toFixed(2));
+//     const roundedFinalTotal = Number(finalTotal.toFixed(2));
+//     const roundedPaidAmount = Number(paidAmount.toFixed(2));
+//     const roundedDueAmount = Number(dueAmount.toFixed(2));
+
+//     // Create payload with rounded values
 //     const invoicePayload = {
 //       invoiceNumber: invoiceData.invoiceNumber,
 //       invoiceDate: invoiceData.invoiceDate,
@@ -1627,22 +1529,22 @@
 //       // Items
 //       items: formattedItems,
       
-//       // Calculations
-//       subtotal: subtotal,
+//       // Calculations - ALL ROUNDED
+//       subtotal: roundedSubtotal,
 //       vatPercentage: vatPercentage,
-//       vatAmount: vatAmount,
-//       totalAfterVat: totalAfterVat,
+//       vatAmount: roundedVatAmount,
+//       totalAfterVat: roundedTotalAfterVat,
 //       discountPercentage: discountPercentage,
-//       discountAmount: discountAmount,
-//       totalAfterDiscount: totalAfterDiscount,
-//       shippingCost: shippingCost,
-//       finalTotal: finalTotal,
-//       amountPaid: paidAmount,
-//       dueAmount: dueAmount,
+//       discountAmount: roundedDiscountAmount,
+//       totalAfterDiscount: roundedTotalAfterDiscount,
+//       shippingCost: roundedShippingCost,
+//       finalTotal: roundedFinalTotal,
+//       amountPaid: roundedPaidAmount,
+//       dueAmount: roundedDueAmount,
       
-//       // NEW: Percentage fields
-//       paidPercentage: Math.round(paidPercentage * 100) / 100, // Round to 2 decimals
-//       unpaidPercentage: Math.round(unpaidPercentage * 100) / 100,
+//       // Percentage fields
+//       paidPercentage: paidPercentage,
+//       unpaidPercentage: unpaidPercentage,
       
 //       // Status fields
 //       paymentStatus: paymentStatusText.toLowerCase(),
@@ -1660,11 +1562,12 @@
 //       createdAt: new Date().toISOString()
 //     };
 
-//     console.log('📤 Final invoice payload with percentages:', {
+//     console.log('📤 Final invoice payload with rounded values:', {
 //       amountPaid: invoicePayload.amountPaid,
 //       dueAmount: invoicePayload.dueAmount,
 //       paidPercentage: invoicePayload.paidPercentage,
-//       unpaidPercentage: invoicePayload.unpaidPercentage
+//       unpaidPercentage: invoicePayload.unpaidPercentage,
+//       finalTotal: invoicePayload.finalTotal
 //     });
 
 //     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
@@ -1677,6 +1580,9 @@
 //     });
 
 //     const responseText = await response.text();
+//     console.log('Response status:', response.status);
+//     console.log('Response text:', responseText);
+    
 //     let data;
 //     try {
 //       data = JSON.parse(responseText);
@@ -1686,7 +1592,7 @@
 //     }
     
 //     if (response.ok && data.success) {
-//       toast.success(`Invoice ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
+//       toast.success(`Invoice ${data.data.invoiceNumber} ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
 //       router.push('/admin/invoices');
 //     } else {
 //       toast.error(data.error || data.message || 'Failed to save invoice');
@@ -1698,10 +1604,9 @@
 //     setSaving(false);
 //   }
 // };
-// const handleSendInvoice = () => {
-//   handleSaveInvoice('sent'); // This passes 'sent' as the invoiceStatus parameter
-// };
-
+//   const handleSendInvoice = () => {
+//     handleSaveInvoice('sent');
+//   };
 
 //   if (!invoiceData.inquiryId) {
 //     return (
@@ -1771,14 +1676,26 @@
 //           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 //             <div>
 //               <label className="block text-xs font-medium text-gray-500 mb-1">
-//                 Invoice Number
+//                 Invoice Number <span className="text-green-600 font-normal">(Auto-generated)</span>
 //               </label>
-//               <input
-//                 type="text"
-//                 value={invoiceData.invoiceNumber}
-//                 onChange={(e) => setInvoiceData(prev => ({ ...prev, invoiceNumber: e.target.value }))}
-//                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-//               />
+//               <div className="relative">
+//                 <input
+//                   type="text"
+//                   value={invoiceData.invoiceNumber}
+//                   readOnly
+//                   className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-700 font-medium ${
+//                     loadingNextNumber ? 'pr-10' : ''
+//                   }`}
+//                 />
+//                 {loadingNextNumber && (
+//                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+//                     <Loader2 className="w-4 h-4 animate-spin text-[#E39A65]" />
+//                   </div>
+//                 )}
+//               </div>
+//               <p className="text-xs text-gray-400 mt-1">
+//                 Next sequential number in the series
+//               </p>
 //             </div>
 //             <div>
 //               <label className="block text-xs font-medium text-gray-500 mb-1">
@@ -2179,431 +2096,445 @@
 //         </div>
 
 //         {/* Summary and Additional Information */}
-// {/* Summary and Additional Information */}
-// <div className="space-y-6">
-//   {/* Top Row - Summary and Bank Details side by side */}
-//   <div className="grid grid-cols-2 gap-6 items-start">
-//      {/* Bank Details Form */}
-//     <div className="w-full">
-//       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
-//         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-//           <Landmark className="w-5 h-5 text-[#E39A65]" />
-//           Bank Details
-//         </h2>
-        
-//         <div className="space-y-4">
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">Bank Name</label>
-//             <input
-//               type="text"
-//               value={invoiceData.bankDetails?.bankName || ''}
-//               onChange={(e) => handleBankDetailsChange('bankName', e.target.value)}
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="Enter bank name"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">Account Name</label>
-//             <input
-//               type="text"
-//               value={invoiceData.bankDetails?.accountName || ''}
-//               onChange={(e) => handleBankDetailsChange('accountName', e.target.value)}
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="Enter account holder name"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">Account Number</label>
-//             <input
-//               type="text"
-//               value={invoiceData.bankDetails?.accountNumber || ''}
-//               onChange={(e) => handleBankDetailsChange('accountNumber', e.target.value)}
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="Enter account number"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">Account Type</label>
-//             <input
-//               type="text"
-//               value={invoiceData.bankDetails?.accountType || ''}
-//               onChange={(e) => handleBankDetailsChange('accountType', e.target.value)}
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="e.g., Savings, Checking, Business"
-//             />
-//           </div>
-
-//           <div className="grid grid-cols-2 gap-3">
-//             <div>
-//               <label className="block text-xs font-medium text-gray-500 mb-1">Routing Number</label>
-//               <input
-//                 type="text"
-//                 value={invoiceData.bankDetails?.routingNumber || ''}
-//                 onChange={(e) => handleBankDetailsChange('routingNumber', e.target.value)}
-//                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//                 placeholder="Routing #"
-//               />
-//             </div>
-
-//             <div>
-//               <label className="block text-xs font-medium text-gray-500 mb-1">SWIFT Code</label>
-//               <input
-//                 type="text"
-//                 value={invoiceData.bankDetails?.swiftCode || ''}
-//                 onChange={(e) => handleBankDetailsChange('swiftCode', e.target.value)}
-//                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//                 placeholder="SWIFT code"
-//               />
-//             </div>
-//           </div>
-
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">IBAN (Optional)</label>
-//             <input
-//               type="text"
-//               value={invoiceData.bankDetails?.iban || ''}
-//               onChange={(e) => handleBankDetailsChange('iban', e.target.value)}
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="IBAN"
-//             />
-//           </div>
-
-//           <div>
-//             <label className="block text-xs font-medium text-gray-500 mb-1">Bank Address</label>
-//             <textarea
-//               value={invoiceData.bankDetails?.bankAddress || ''}
-//               onChange={(e) => handleBankDetailsChange('bankAddress', e.target.value)}
-//               rows="2"
-//               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               placeholder="Enter bank address"
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//     {/* Summary Form */}
-//     <div className="w-full">
-//       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
-//         <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
-        
 //         <div className="space-y-6">
-//           {/* Calculations */}
-//           <div className="space-y-4">
-//             <h3 className="text-sm font-semibold text-gray-700">Calculations</h3>
-            
-//             <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-//               <div className="flex justify-between items-center">
-//                 <span className="text-sm text-gray-600">Subtotal</span>
-//                 <span className="text-lg font-bold text-gray-900">{formatPrice(subtotal)}</span>
-//               </div>
-//             </div>
-
-//             <div className="space-y-2">
-//               <div className="flex items-center gap-2">
-//                 <span className="text-sm text-gray-600">VAT (%)</span>
-//                 <input
-//                   type="number"
-//                   value={invoiceData.vatPercentage}
-//                   onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
-//                   onBlur={() => handleNumericBlur('vatPercentage')}
-//                   min="0"
-//                   max="100"
-//                   step="0.01"
-//                   className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//                 />
-//               </div>
-//               <div className="flex justify-between text-sm">
-//                 <span className="text-gray-500">VAT Amount</span>
-//                 <span className="font-medium text-blue-600">{formatPrice(vatAmount)}</span>
-//               </div>
-//             </div>
-
-//             <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-//               <div className="flex justify-between items-center">
-//                 <span className="text-sm text-blue-700">After VAT</span>
-//                 <span className="text-lg font-bold text-blue-700">{formatPrice(totalAfterVat)}</span>
-//               </div>
-//             </div>
-
-//             <div className="space-y-2">
-//               <div className="flex items-center gap-2">
-//                 <span className="text-sm text-gray-600">Discount (%)</span>
-//                 <input
-//                   type="number"
-//                   value={invoiceData.discountPercentage}
-//                   onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
-//                   onBlur={() => handleNumericBlur('discountPercentage')}
-//                   min="0"
-//                   max="100"
-//                   step="0.01"
-//                   className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//                 />
-//               </div>
-//               <div className="flex justify-between text-sm">
-//                 <span className="text-gray-500">Discount Amount</span>
-//                 <span className="font-medium text-red-600">-{formatPrice(discountAmount)}</span>
-//               </div>
-//             </div>
-
-//             <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-//               <div className="flex justify-between items-center">
-//                 <span className="text-sm text-yellow-700">After Discount</span>
-//                 <span className="text-lg font-bold text-yellow-700">{formatPrice(totalAfterDiscount)}</span>
-//               </div>
-//             </div>
-
-//             <div className="flex justify-between items-center">
-//               <span className="text-sm text-gray-600">Shipping Cost</span>
-//               <input
-//                 type="number"
-//                 value={invoiceData.shippingCost}
-//                 onChange={(e) => handleInputChange('shippingCost', e.target.value)}
-//                 onBlur={() => handleNumericBlur('shippingCost')}
-//                 min="0"
-//                 step="0.01"
-//                 className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//               />
-//             </div>
-
-//             <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-//               <div className="flex justify-between items-center">
-//                 <span className="text-sm font-semibold text-emerald-700">Final Total</span>
-//                 <span className="text-xl font-bold text-emerald-700">{formatPrice(finalTotal)}</span>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Payment Details */}
-// {/* Payment Details */}
-// <div className="space-y-4 pt-3 border-t border-gray-200">
-//   <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-//     <CreditCard className="w-4 h-4 text-[#E39A65]" />
-//     Payment Details
-//   </h3>
-  
-//   <div className="space-y-3">
-//     <div className="flex justify-between items-center">
-//       <span className="text-sm text-gray-600">Amount Paid</span>
-//       <input
-//         type="number"
-//         value={invoiceData.amountPaid}
-//         onChange={(e) => handleInputChange('amountPaid', e.target.value)}
-//         onBlur={() => handleNumericBlur('amountPaid')}
-//         min="0"
-//         max={finalTotal}
-//         step="0.01"
-//         className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-//       />
-//     </div>
-
-//     <div className="flex justify-between items-center">
-//       <span className="text-sm text-gray-600">Due Amount</span>
-//       <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
-//     </div>
-
-//     {/* Paid Section with Amount and Percentage */}
-//     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-//       <div className="flex justify-between items-center mb-2">
-//         <div className="flex items-center gap-2">
-//           <TrendingUp className="w-4 h-4 text-green-600" />
-//           <span className="text-sm font-medium text-green-700">Paid</span>
-//         </div>
-//         <span className="text-sm font-bold text-green-700">
-//           {formatPrice(paidAmount)}
-//         </span>
-//       </div>
-//       <div className="space-y-2">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-green-600">Percentage</span>
-//           <span className="font-medium text-green-700">
-//             {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
-//           </span>
-//         </div>
-//         <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
-//           <div 
-//             className="h-full bg-green-500 rounded-full transition-all duration-300"
-//             style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
-//           />
-//         </div>
-//       </div>
-//     </div>
-
-//     {/* Unpaid Section with Amount and Percentage */}
-//     <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-//       <div className="flex justify-between items-center mb-2">
-//         <div className="flex items-center gap-2">
-//           <TrendingDown className="w-4 h-4 text-red-600" />
-//           <span className="text-sm font-medium text-red-700">Unpaid</span>
-//         </div>
-//         <span className="text-sm font-bold text-red-700">
-//           {formatPrice(dueAmount)}
-//         </span>
-//       </div>
-//       <div className="space-y-2">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-red-600">Percentage</span>
-//           <span className="font-medium text-red-700">
-//             {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
-//           </span>
-//         </div>
-//         <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
-//           <div 
-//             className="h-full bg-red-500 rounded-full transition-all duration-300"
-//             style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
-//           />
-//         </div>
-//       </div>
-//     </div>
-
-//     <div className="flex justify-center mt-2">
-//       <StatusBadge status={status.text} />
-//     </div>
-
-//     <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-//       <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
-//       <div className="space-y-1.5">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Final Total:</span>
-//           <span className="font-medium">{formatPrice(finalTotal)}</span>
-//         </div>
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Paid:</span>
-//           <span className="font-medium text-green-600">
-//             {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-//           </span>
-//         </div>
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Unpaid:</span>
-//           <span className="font-medium text-red-500">
-//             {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-//           </span>
-//         </div>
-//         <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
-//           <span className={status.color}>Status:</span>
-//           <span className={status.color}>{status.text}</span>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// </div>
-//         </div>
-//       </div>
-//     </div>
-
-   
-//   </div>
-
-//   {/* Additional Information - Full Width Below */}
-//   <div className="w-full">
-//     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-//       <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
-      
-//       <div className="space-y-6">
-//         <div>
-//           <label className="block text-xs font-medium text-gray-500 mb-1">
-//             Notes
-//           </label>
-//           <textarea
-//             value={invoiceData.notes}
-//             onChange={(e) => setInvoiceData(prev => ({ ...prev, notes: e.target.value }))}
-//             rows="3"
-//             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-//             placeholder="Add any additional notes..."
-//           />
-//         </div>
-        
-//         <div>
-//           <label className="block text-xs font-medium text-gray-500 mb-1">
-//             Terms & Conditions
-//           </label>
-//           <textarea
-//             value={invoiceData.terms}
-//             onChange={(e) => setInvoiceData(prev => ({ ...prev, terms: e.target.value }))}
-//             rows="3"
-//             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-//           />
-//         </div>
-
-//         {/* Dynamic Fields Section */}
-//         <div className="border-t border-gray-200 pt-4">
-//           <div className="flex items-center justify-between mb-3">
-//             <h3 className="text-sm font-medium text-gray-700">Custom Fields</h3>
-//             <button
-//               onClick={handleAddField}
-//               className="flex items-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-//             >
-//               <Plus className="w-3.5 h-3.5" />
-//               Add Field
-//             </button>
-//           </div>
-
-//           {dynamicFields.length > 0 ? (
-//             <div className="space-y-3">
-//               {dynamicFields.map((field) => (
-//                 <div key={field.id} className="flex items-center gap-2">
-//                   <div className="flex-1">
+//           {/* Top Row - Summary and Bank Details side by side */}
+//           <div className="grid grid-cols-2 gap-6 items-start">
+//             {/* Bank Details Form */}
+//             <div className="w-full">
+//               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+//                   <Landmark className="w-5 h-5 text-[#E39A65]" />
+//                   Bank Details
+//                 </h2>
+                
+//                 <div className="space-y-4">
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">Bank Name</label>
 //                     <input
 //                       type="text"
-//                       value={field.fieldName}
-//                       onChange={(e) => handleFieldChange(field.id, 'fieldName', e.target.value)}
-//                       placeholder="Field name (e.g., PO Number)"
-//                       className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                       value={invoiceData.bankDetails?.bankName || ''}
+//                       onChange={(e) => handleBankDetailsChange('bankName', e.target.value)}
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="Enter bank name"
 //                     />
 //                   </div>
-//                   <div className="flex-1">
+
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">Account Name</label>
 //                     <input
 //                       type="text"
-//                       value={field.fieldValue}
-//                       onChange={(e) => handleFieldChange(field.id, 'fieldValue', e.target.value)}
-//                       placeholder="Value"
-//                       className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                       value={invoiceData.bankDetails?.accountName || ''}
+//                       onChange={(e) => handleBankDetailsChange('accountName', e.target.value)}
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="Enter account holder name"
 //                     />
 //                   </div>
-//                   <button
-//                     onClick={() => handleRemoveField(field.id)}
-//                     className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-//                     title="Remove field"
-//                   >
-//                     <Trash2 className="w-4 h-4" />
-//                   </button>
+
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">Account Number</label>
+//                     <input
+//                       type="text"
+//                       value={invoiceData.bankDetails?.accountNumber || ''}
+//                       onChange={(e) => handleBankDetailsChange('accountNumber', e.target.value)}
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="Enter account number"
+//                     />
+//                   </div>
+
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">Account Type</label>
+//                     <input
+//                       type="text"
+//                       value={invoiceData.bankDetails?.accountType || ''}
+//                       onChange={(e) => handleBankDetailsChange('accountType', e.target.value)}
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="e.g., Savings, Checking, Business"
+//                     />
+//                   </div>
+
+//                   <div className="grid grid-cols-2 gap-3">
+//                     <div>
+//                       <label className="block text-xs font-medium text-gray-500 mb-1">Routing Number</label>
+//                       <input
+//                         type="text"
+//                         value={invoiceData.bankDetails?.routingNumber || ''}
+//                         onChange={(e) => handleBankDetailsChange('routingNumber', e.target.value)}
+//                         className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                         placeholder="Routing #"
+//                       />
+//                     </div>
+
+//                     <div>
+//                       <label className="block text-xs font-medium text-gray-500 mb-1">SWIFT Code</label>
+//                       <input
+//                         type="text"
+//                         value={invoiceData.bankDetails?.swiftCode || ''}
+//                         onChange={(e) => handleBankDetailsChange('swiftCode', e.target.value)}
+//                         className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                         placeholder="SWIFT code"
+//                       />
+//                     </div>
+//                   </div>
+
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">IBAN (Optional)</label>
+//                     <input
+//                       type="text"
+//                       value={invoiceData.bankDetails?.iban || ''}
+//                       onChange={(e) => handleBankDetailsChange('iban', e.target.value)}
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="IBAN"
+//                     />
+//                   </div>
+
+//                   <div>
+//                     <label className="block text-xs font-medium text-gray-500 mb-1">Bank Address</label>
+//                     <textarea
+//                       value={invoiceData.bankDetails?.bankAddress || ''}
+//                       onChange={(e) => handleBankDetailsChange('bankAddress', e.target.value)}
+//                       rows="2"
+//                       className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                       placeholder="Enter bank address"
+//                     />
+//                   </div>
 //                 </div>
-//               ))}
+//               </div>
 //             </div>
-//           ) : (
-//             <p className="text-xs text-gray-400 italic text-center py-3 border border-dashed border-gray-200 rounded-lg">
-//               No custom fields added. Click "Add Field" to create custom fields.
-//             </p>
-//           )}
-//         </div>
+            
+//             {/* Summary Form */}
+//             <div className="w-full">
+//               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
+                
+//                 <div className="space-y-6">
+//                   {/* Calculations */}
+//                   <div className="space-y-4">
+//                     <h3 className="text-sm font-semibold text-gray-700">Calculations</h3>
+                    
+//                     <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-gray-600">Subtotal</span>
+//                         <span className="text-lg font-bold text-gray-900">{formatPrice(subtotal)}</span>
+//                       </div>
+//                     </div>
 
-//         {/* Submit Button */}
-//         <div className="pt-4 border-t border-gray-200">
-//           <div className="space-y-2">
-//             <button
-//               onClick={handleSendInvoice}
-//               disabled={saving}
-//               className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-//             >
-//               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-//               Create & Send Invoice
-//             </button>
-//           </div>
-
-//           <div className="mt-4 pt-4 border-t border-gray-100">
-//             <h3 className="text-xs font-semibold text-gray-700 mb-2">Inquiry Details</h3>
-//             <div className="space-y-1 text-xs text-gray-500">
-//               <p>Inquiry: {invoiceData.inquiryNumber}</p>
-//               <p>ID: {invoiceData.inquiryId}</p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
+//                     <div className="space-y-2">
+//                       {/* <div className="flex items-center gap-2">
+//                         <span className="text-sm text-gray-600">VAT (%)</span>
+//                         <input
+//                           type="number"
+//                           value={invoiceData.vatPercentage}
+//                           onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
+//                           onBlur={() => handleNumericBlur('vatPercentage')}
+//                           min="0"
+//                           max="100"
+//                           step="0.01"
+//                           className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                         />
+//                       </div> */}
+//                       <div className="flex items-center gap-2">
+//   <span className="text-sm text-gray-600">VAT (%)</span>
+//   <input
+//     type="number"
+//     value={invoiceData.vatPercentage}
+//     onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
+//     onBlur={() => handleNumericBlur('vatPercentage')}
+//      onWheel={(e) => e.target.blur()}
+//     min="0"
+//     max="100"
+//     step="0.01"
+//     className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] "
+//   />
 // </div>
+//                       <div className="flex justify-between text-sm">
+//                         <span className="text-gray-500">VAT Amount</span>
+//                         <span className="font-medium text-blue-600">{formatPrice(vatAmount)}</span>
+//                       </div>
+//                     </div>
+
+//                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-blue-700">After VAT</span>
+//                         <span className="text-lg font-bold text-blue-700">{formatPrice(totalAfterVat)}</span>
+//                       </div>
+//                     </div>
+
+//                     <div className="space-y-2">
+//                       <div className="flex items-center gap-2">
+//                         <span className="text-sm text-gray-600">Discount (%)</span>
+//                         <input
+//                           type="number"
+//                           value={invoiceData.discountPercentage}
+//                           onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
+//                           onBlur={() => handleNumericBlur('discountPercentage')}
+//                             onWheel={(e) => e.target.blur()}
+//                           min="0"
+//                           max="100"
+//                           step="0.01"
+//                           className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] "
+//                         />
+//                       </div>
+//                       <div className="flex justify-between text-sm">
+//                         <span className="text-gray-500">Discount Amount</span>
+//                         <span className="font-medium text-red-600">-{formatPrice(discountAmount)}</span>
+//                       </div>
+//                     </div>
+
+//                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-yellow-700">After Discount</span>
+//                         <span className="text-lg font-bold text-yellow-700">{formatPrice(totalAfterDiscount)}</span>
+//                       </div>
+//                     </div>
+
+//                     <div className="flex justify-between items-center">
+//                       <span className="text-sm text-gray-600">Shipping Cost</span>
+//                       <input
+//                         type="number"
+//                         value={invoiceData.shippingCost}
+//                         onChange={(e) => handleInputChange('shippingCost', e.target.value)}
+//                         onBlur={() => handleNumericBlur('shippingCost')}
+//                           onWheel={(e) => e.target.blur()}
+//                         min="0"
+//                         step="0.01"
+//                         className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] "
+//                       />
+//                     </div>
+
+//                     <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm font-semibold text-emerald-700">Final Total</span>
+//                         <span className="text-xl font-bold text-emerald-700">{formatPrice(finalTotal)}</span>
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   {/* Payment Details */}
+//                   <div className="space-y-4 pt-3 border-t border-gray-200">
+//                     <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+//                       <CreditCard className="w-4 h-4 text-[#E39A65]" />
+//                       Payment Details
+//                     </h3>
+                    
+//                     <div className="space-y-3">
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-gray-600">Amount Paid</span>
+//                         <input
+//                           type="number"
+//                           value={invoiceData.amountPaid}
+//                           onChange={(e) => handleInputChange('amountPaid', e.target.value)}
+//                           onBlur={() => handleNumericBlur('amountPaid')}
+//                             onWheel={(e) => e.target.blur()}
+//                           min="0"
+//                           max={finalTotal}
+//                           step="0.01"
+//                           className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] "
+//                         />
+//                       </div>
+
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-gray-600">Due Amount</span>
+//                         <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
+//                       </div>
+
+//                       {/* Paid Section with Amount and Percentage */}
+//                       <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+//                         <div className="flex justify-between items-center mb-2">
+//                           <div className="flex items-center gap-2">
+//                             <TrendingUp className="w-4 h-4 text-green-600" />
+//                             <span className="text-sm font-medium text-green-700">Paid</span>
+//                           </div>
+//                           <span className="text-sm font-bold text-green-700">
+//                             {formatPrice(paidAmount)}
+//                           </span>
+//                         </div>
+//                         <div className="space-y-2">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-green-600">Percentage</span>
+//                             <span className="font-medium text-green-700">
+//                               {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
+//                             </span>
+//                           </div>
+//                           <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+//                             <div 
+//                               className="h-full bg-green-500 rounded-full transition-all duration-300"
+//                               style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
+//                             />
+//                           </div>
+//                         </div>
+//                       </div>
+
+//                       {/* Unpaid Section with Amount and Percentage */}
+//                       <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+//                         <div className="flex justify-between items-center mb-2">
+//                           <div className="flex items-center gap-2">
+//                             <TrendingDown className="w-4 h-4 text-red-600" />
+//                             <span className="text-sm font-medium text-red-700">Unpaid</span>
+//                           </div>
+//                           <span className="text-sm font-bold text-red-700">
+//                             {formatPrice(dueAmount)}
+//                           </span>
+//                         </div>
+//                         <div className="space-y-2">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-red-600">Percentage</span>
+//                             <span className="font-medium text-red-700">
+//                               {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
+//                             </span>
+//                           </div>
+//                           <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+//                             <div 
+//                               className="h-full bg-red-500 rounded-full transition-all duration-300"
+//                               style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
+//                             />
+//                           </div>
+//                         </div>
+//                       </div>
+
+//                       <div className="flex justify-center mt-2">
+//                         <StatusBadge status={status.text} />
+//                       </div>
+
+//                       <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+//                         <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
+//                         <div className="space-y-1.5">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Final Total:</span>
+//                             <span className="font-medium">{formatPrice(finalTotal)}</span>
+//                           </div>
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Paid:</span>
+//                             <span className="font-medium text-green-600">
+//                               {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+//                             </span>
+//                           </div>
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Unpaid:</span>
+//                             <span className="font-medium text-red-500">
+//                               {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+//                             </span>
+//                           </div>
+//                           <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
+//                             <span className={status.color}>Status:</span>
+//                             <span className={status.color}>{status.text}</span>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Additional Information - Full Width Below */}
+//           <div className="w-full">
+//             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//               <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
+              
+//               <div className="space-y-6">
+//                 <div>
+//                   <label className="block text-xs font-medium text-gray-500 mb-1">
+//                     Notes
+//                   </label>
+//                   <textarea
+//                     value={invoiceData.notes}
+//                     onChange={(e) => setInvoiceData(prev => ({ ...prev, notes: e.target.value }))}
+//                     rows="3"
+//                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                     placeholder="Add any additional notes..."
+//                   />
+//                 </div>
+                
+//                 <div>
+//                   <label className="block text-xs font-medium text-gray-500 mb-1">
+//                     Terms & Conditions
+//                   </label>
+//                   <textarea
+//                     value={invoiceData.terms}
+//                     onChange={(e) => setInvoiceData(prev => ({ ...prev, terms: e.target.value }))}
+//                     rows="3"
+//                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                   />
+//                 </div>
+
+//                 {/* Dynamic Fields Section */}
+//                 <div className="border-t border-gray-200 pt-4">
+//                   <div className="flex items-center justify-between mb-3">
+//                     <h3 className="text-sm font-medium text-gray-700">Custom Fields</h3>
+//                     <button
+//                       onClick={handleAddField}
+//                       className="flex items-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                     >
+//                       <Plus className="w-3.5 h-3.5" />
+//                       Add Field
+//                     </button>
+//                   </div>
+
+//                   {dynamicFields.length > 0 ? (
+//                     <div className="space-y-3">
+//                       {dynamicFields.map((field) => (
+//                         <div key={field.id} className="flex items-center gap-2">
+//                           <div className="flex-1">
+//                             <input
+//                               type="text"
+//                               value={field.fieldName}
+//                               onChange={(e) => handleFieldChange(field.id, 'fieldName', e.target.value)}
+//                               placeholder="Field name (e.g., PO Number)"
+//                               className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                             />
+//                           </div>
+//                           <div className="flex-1">
+//                             <input
+//                               type="text"
+//                               value={field.fieldValue}
+//                               onChange={(e) => handleFieldChange(field.id, 'fieldValue', e.target.value)}
+//                               placeholder="Value"
+//                               className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+//                             />
+//                           </div>
+//                           <button
+//                             onClick={() => handleRemoveField(field.id)}
+//                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+//                             title="Remove field"
+//                           >
+//                             <Trash2 className="w-4 h-4" />
+//                           </button>
+//                         </div>
+//                       ))}
+//                     </div>
+//                   ) : (
+//                     <p className="text-xs text-gray-400 italic text-center py-3 border border-dashed border-gray-200 rounded-lg">
+//                       No custom fields added. Click "Add Field" to create custom fields.
+//                     </p>
+//                   )}
+//                 </div>
+
+//                 {/* Submit Button */}
+//                 <div className="pt-4 border-t border-gray-200">
+//                   <div className="space-y-2">
+//                     <button
+//                       onClick={handleSendInvoice}
+//                       disabled={saving}
+//                       className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                     >
+//                       {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+//                       Create & Send Invoice
+//                     </button>
+//                   </div>
+
+//                   <div className="mt-4 pt-4 border-t border-gray-100">
+//                     <h3 className="text-xs font-semibold text-gray-700 mb-2">Inquiry Details</h3>
+//                     <div className="space-y-1 text-xs text-gray-500">
+//                       <p>Inquiry: {invoiceData.inquiryNumber}</p>
+//                       <p>ID: {invoiceData.inquiryId}</p>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
 //       </div>
 
 //       {/* Search Product Modal */}
@@ -2624,7 +2555,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   FileText,
   ArrowLeft,
@@ -2632,33 +2562,24 @@ import {
   Send,
   Plus,
   Trash2,
-  Download,
   Loader2,
   AlertCircle,
   CheckCircle,
   DollarSign,
-  Calendar,
-  User,
-  Building2,
-  Mail,
-  Phone,
-  MapPin,
-  Package,
-  FileOutput,
-  XCircle,
+  TrendingUp,
+  TrendingDown,
+  X,
+  Search,
+  ShoppingBag,
+  Landmark,
+  CreditCard,
   Copy,
   Upload,
   Image as ImageIcon,
   ChevronDown,
   ChevronUp,
-  Search,
-  X,
-  ShoppingBag,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  Wallet,
-  Landmark
+  Package,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -2669,16 +2590,6 @@ const formatPrice = (price) => {
     currency: 'USD',
     minimumFractionDigits: 2
   }).format(price || 0);
-};
-
-// Helper function to format date
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
 };
 
 // Default logo URL
@@ -2705,14 +2616,14 @@ const StatusBadge = ({ status }) => {
   const Icon = config.icon;
 
   return (
-    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${config.bg} ${config.border} border`}>
-      <Icon className={`w-4 h-4 ${config.text}`} />
-      <span className={`text-xs font-medium ${config.text}`}>{status}</span>
+    <div className={`inline-flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${config.bg} ${config.border} border`}>
+      <Icon className={`w-3 h-3 sm:w-4 sm:h-4 ${config.text}`} />
+      <span className={`text-[10px] sm:text-xs font-medium ${config.text}`}>{status}</span>
     </div>
   );
 };
 
-// Size Badge Component with removable zero
+// Size Badge Component
 const SizeBadge = ({ size, quantity, onRemove, onQuantityChange }) => {
   const displayValue = quantity === 0 ? '' : quantity;
 
@@ -2736,8 +2647,8 @@ const SizeBadge = ({ size, quantity, onRemove, onQuantityChange }) => {
 
   return (
     <div className="inline-flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:border-[#E39A65] transition-all">
-      <div className="px-2 py-1.5 bg-gray-50 border-r border-gray-200">
-        <span className="text-xs font-medium text-gray-700">{size}</span>
+      <div className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-gray-50 border-r border-gray-200">
+        <span className="text-[10px] sm:text-xs font-medium text-gray-700">{size}</span>
       </div>
       <input
         type="number"
@@ -2745,21 +2656,56 @@ const SizeBadge = ({ size, quantity, onRemove, onQuantityChange }) => {
         value={displayValue}
         onChange={handleChange}
         onBlur={handleBlur}
-        className="w-14 px-1 py-1.5 text-xs text-center border-none focus:outline-none focus:ring-2 focus:ring-[#E39A65] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        onWheel={(e) => e.target.blur()}
+        className="w-10 sm:w-14 px-1 py-1 sm:py-1.5 text-[10px] sm:text-xs text-center border-none focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
         placeholder="0"
       />
       <button
         onClick={onRemove}
-        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors border-l border-gray-200"
+        className="p-1 sm:p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors border-l border-gray-200"
         title="Remove size"
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        <Trash2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
       </button>
     </div>
   );
 };
 
-// Product Item Card Component with Expand/Collapse
+// Banking Term Field Component
+const BankingTermField = ({ field, onUpdate, onRemove }) => {
+  return (
+    <div className="flex flex-col sm:flex-row items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="flex-1 w-full">
+        <input
+          type="text"
+          value={field.title}
+          onChange={(e) => onUpdate(field.id, 'title', e.target.value)}
+          placeholder="Term title (e.g., Payment Terms, Late Fee)"
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent mb-2"
+        />
+        <textarea
+          value={field.value}
+          onChange={(e) => onUpdate(field.id, 'value', e.target.value)}
+          placeholder="Term description or value (optional - can be left empty)"
+          rows="2"
+          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
+        />
+        <p className="text-xs text-gray-400 mt-1">
+          You can leave the value empty if this is just a heading or note
+        </p>
+      </div>
+      <button
+        onClick={() => onRemove(field.id)}
+        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+        title="Remove term"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  );
+};
+
+// Product Item Card Component
 const ProductItemCard = ({ 
   item, 
   itemIndex, 
@@ -2773,6 +2719,7 @@ const ProductItemCard = ({
   isExpanded,
   onToggleExpand
 }) => {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const availableColors = product?.colors || [];
   const availableSizes = product?.sizes || [];
 
@@ -2796,194 +2743,225 @@ const ProductItemCard = ({
     onAddSize(itemIndex, colorIndex, size);
   };
 
+  const handleConfirmRemove = () => {
+    onRemoveProduct(itemIndex);
+    setShowDeleteConfirm(false);
+  };
+
   const imageUrl = item.productImage || product?.images?.[0]?.url || 'https://via.placeholder.com/80x80?text=No+Image';
   const productTotalPrice = item.total || 0;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Header - Click to expand/collapse */}
-      <div 
-        className="bg-gradient-to-r from-gray-50 to-white px-5 py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100/50 transition-colors"
-        onClick={onToggleExpand}
-      >
-        <div className="flex items-start gap-4">
-          {/* Product Image */}
-          <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-            <img 
-              src={imageUrl} 
-              alt={item.productName}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
-              }}
-            />
-          </div>
-          
-          {/* Product Info */}
-          <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-              {/* Left side - Product name and stats */}
-              <div className="flex-1">
-                <h3 className="text-base font-semibold text-gray-900">{item.productName}</h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-                    {item.colors.length} Colors
-                  </span>
-                  <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">
-                    {item.totalQuantity} Total Pcs
-                  </span>
-                </div>
-              </div>
-              
-              {/* Right side - Pricing and actions */}
-              <div className="flex items-center gap-4">
-                {/* Unit Price */}
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Unit Price</p>
-                  <p className="text-base font-bold text-[#E39A65]">{formatPrice(item.unitPrice)}</p>
+    <>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+        <div 
+          className="bg-gradient-to-r from-gray-50 to-white px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100/50 transition-colors"
+          onClick={onToggleExpand}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+              <img 
+                src={imageUrl} 
+                alt={item.productName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
+                }}
+              />
+            </div>
+            
+            <div className="flex-1">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
+                <div className="flex-1">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900">{item.productName}</h3>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                    <span className="text-[10px] sm:text-xs bg-blue-50 text-blue-700 px-1.5 sm:px-2 py-0.5 rounded-full">
+                      {item.colors.length} Colors
+                    </span>
+                    <span className="text-[10px] sm:text-xs bg-purple-50 text-purple-700 px-1.5 sm:px-2 py-0.5 rounded-full">
+                      {item.totalQuantity} Total Pcs
+                    </span>
+                  </div>
                 </div>
                 
-                {/* Product Total */}
-                <div className="text-right min-w-[100px]">
-                  <p className="text-xs text-gray-500">Product Total</p>
-                  <p className="text-base font-bold text-[#E39A65]">{formatPrice(productTotalPrice)}</p>
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="flex items-center gap-1 ml-2">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRemoveProduct(itemIndex);
-                    }}
-                    className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
-                    title="Remove product"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleExpand();
-                    }}
-                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
-                  >
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-500" />
-                    )}
-                  </button>
+                <div className="flex flex-wrap items-center justify-between md:justify-end gap-3">
+                  <div className="text-left md:text-right">
+                    <p className="text-[10px] sm:text-xs text-gray-500">Unit Price</p>
+                    <p className="text-sm sm:text-base font-bold text-[#E39A65]">{formatPrice(item.unitPrice)}</p>
+                  </div>
+                  
+                  <div className="text-left md:text-right min-w-[80px] sm:min-w-[100px]">
+                    <p className="text-[10px] sm:text-xs text-gray-500">Product Total</p>
+                    <p className="text-sm sm:text-base font-bold text-[#E39A65]">{formatPrice(productTotalPrice)}</p>
+                  </div>
+                  
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
+                      title="Remove product"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleExpand();
+                      }}
+                      className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Expandable Content - Colors Section */}
-      {isExpanded && (
-        <div className="p-5 space-y-4">
-          {item.colors.map((color, colorIndex) => (
-            <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-4 border border-gray-100">
-              {/* Color Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-6 h-6 rounded-full border-2 border-white shadow-md" 
-                    style={{ backgroundColor: color.color.code }}
-                  />
-                  <span className="text-sm font-semibold text-gray-800">
-                    {color.color.name || color.color.code}
-                  </span>
-                  <span className="text-xs bg-white px-2 py-1 rounded-full border border-gray-200">
-                    {color.totalForColor} pcs
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleRemoveColor(colorIndex)}
-                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Remove color"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Size Grid */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {color.sizeQuantities.map((sq, sizeIndex) => (
-                  <SizeBadge
-                    key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
-                    size={sq.size}
-                    quantity={sq.quantity}
-                    onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
-                    onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
-                  />
-                ))}
-                
-                {/* Add Size Dropdown */}
-                {availableSizes.length > 0 && (
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleAddSize(colorIndex, e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
-                    value=""
+        {isExpanded && (
+          <div className="p-3 sm:p-5 space-y-4">
+            {item.colors.map((color, colorIndex) => (
+              <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md" 
+                      style={{ backgroundColor: color.color.code }}
+                    />
+                    <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                      {color.color.name || color.color.code}
+                    </span>
+                    <span className="text-[10px] sm:text-xs bg-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-gray-200">
+                      {color.totalForColor} pcs
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveColor(colorIndex)}
+                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
+                    title="Remove color"
                   >
-                    <option value="">+ Add Size</option>
-                    {availableSizes
-                      .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
-                      .map(size => (
-                        <option key={size} value={size}>{size}</option>
-                      ))
-                    }
-                  </select>
+                    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+                  {color.sizeQuantities.map((sq, sizeIndex) => (
+                    <SizeBadge
+                      key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
+                      size={sq.size}
+                      quantity={sq.quantity}
+                      onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
+                      onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
+                    />
+                  ))}
+                  
+                  {availableSizes.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleAddSize(colorIndex, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                      className="px-1.5 sm:px-2 py-1 sm:py-1.5 text-[10px] sm:text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
+                      value=""
+                    >
+                      <option value="">+ Add Size</option>
+                      {availableSizes
+                        .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
+                        .map(size => (
+                          <option key={size} value={size}>{size}</option>
+                        ))
+                      }
+                    </select>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {availableColors.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <label className="block text-xs font-medium text-gray-700 mb-2">
+                  Add New Color
+                </label>
+                
+                <div className="flex flex-wrap gap-2 sm:gap-3">
+                  {availableColors
+                    .filter(c => !item.colors.some(ic => ic.color.code === c.code))
+                    .map(color => (
+                      <button
+                        key={color.code}
+                        onClick={() => handleAddColor(color.code, color.name)}
+                        className="group relative focus:outline-none"
+                        title={color.code}
+                      >
+                        <div 
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-md hover:scale-110 transition-transform hover:ring-2 hover:ring-[#E39A65]"
+                          style={{ backgroundColor: color.code }}
+                        />
+                        <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] sm:text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                          {color.code}
+                        </span>
+                      </button>
+                    ))
+                  }
+                </div>
+                
+                {availableColors.filter(c => !item.colors.some(ic => ic.color.code === c.code)).length === 0 && (
+                  <p className="text-xs text-gray-400 italic">All colors have been added</p>
                 )}
               </div>
-            </div>
-          ))}
+            )}
+          </div>
+        )}
+      </div>
 
-          {/* Add New Color Section */}
-          {availableColors.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-gray-200">
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                Add New Color
-              </label>
-              
-              <div className="flex flex-wrap gap-3">
-                {availableColors
-                  .filter(c => !item.colors.some(ic => ic.color.code === c.code))
-                  .map(color => (
-                    <button
-                      key={color.code}
-                      onClick={() => handleAddColor(color.code, color.name)}
-                      className="group relative focus:outline-none"
-                      title={color.code}
-                    >
-                      <div 
-                        className="w-8 h-8 rounded-full border-2 border-white shadow-md hover:scale-110 transition-transform hover:ring-2 hover:ring-[#E39A65]"
-                        style={{ backgroundColor: color.code }}
-                      />
-                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                        {color.code}
-                      </span>
-                    </button>
-                  ))
-                }
+      {/* Delete Product Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 text-red-600 mb-3 sm:mb-4">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <h3 className="text-base sm:text-lg font-semibold">Remove Product</h3>
               </div>
               
-              {availableColors.filter(c => !item.colors.some(ic => ic.color.code === c.code)).length === 0 && (
-                <p className="text-xs text-gray-400 italic">All colors have been added</p>
-              )}
+              <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                Are you sure you want to remove <span className="font-semibold">"{item.productName}"</span> from this invoice?
+              </p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mb-4 sm:mb-6">
+                This action cannot be undone. All quantities and color selections for this product will be lost.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmRemove}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2"
+                >
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Remove Product
+                </button>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -3005,7 +2983,7 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
   const searchProducts = async () => {
     setSearching(true);
     try {
-      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=10`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
       const data = await response.json();
       if (data.success) {
         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -3036,11 +3014,11 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+        <div className="flex-shrink-0 p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Add Product to Invoice</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add Product to Invoice</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -3050,8 +3028,8 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="relative mb-4">
+        <div className="flex-shrink-0 p-4 sm:p-6 pb-0">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -3065,8 +3043,10 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
               <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-[#E39A65]" />
             )}
           </div>
+        </div>
 
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 pt-4">
+          <div className="space-y-2">
             {searchResults.length > 0 ? (
               searchResults.map((product) => (
                 <div
@@ -3078,46 +3058,57 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
                       : 'border-gray-200 hover:border-[#E39A65] hover:bg-gray-50'
                   }`}
                 >
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                     <img
                       src={product.images?.[0]?.url || 'https://via.placeholder.com/48'}
                       alt={product.productName}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-900">{product.productName}</h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.productName}</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
                       {product.colors?.length || 0} colors • {product.sizes?.length || 0} sizes
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-[#E39A65]">{formatPrice(product.pricePerUnit)}</p>
-                    <p className="text-xs text-gray-500">MOQ: {product.moq}</p>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs sm:text-sm font-bold text-[#E39A65]">{formatPrice(product.pricePerUnit)}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">MOQ: {product.moq}</p>
                   </div>
                 </div>
               ))
             ) : searchTerm.length > 2 && !searching ? (
-              <div className="text-center py-8">
-                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <div className="text-center py-8 sm:py-12">
+                <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">No products found</p>
+                <p className="text-xs text-gray-400 mt-1">Try searching with different keywords</p>
               </div>
-            ) : null}
+            ) : searchTerm.length > 0 && searchTerm.length <= 2 ? (
+              <div className="text-center py-8 sm:py-12">
+                <Search className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">Type at least 3 characters to search</p>
+              </div>
+            ) : (
+              <div className="text-center py-8 sm:py-12">
+                <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-sm text-gray-500">Start typing to search for products</p>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex-shrink-0 p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
           <div className="flex justify-end gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleAddProduct}
               disabled={!selectedProduct}
-              className="px-4 py-2 text-sm font-medium bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add Product
             </button>
@@ -3141,6 +3132,7 @@ export default function CreateInvoicePage() {
   const [showProductSearch, setShowProductSearch] = useState(false);
   const [amountPaid, setAmountPaid] = useState(0);
   const [dynamicFields, setDynamicFields] = useState([]);
+  const [bankingTerms, setBankingTerms] = useState([]);
   
   const [invoiceData, setInvoiceData] = useState({
     invoiceNumber: '',
@@ -3200,6 +3192,26 @@ export default function CreateInvoicePage() {
     status: 'draft'
   });
 
+  // Banking Terms Handlers
+  const handleAddBankingTerm = () => {
+    setBankingTerms(prev => [
+      ...prev,
+      { id: Date.now(), title: '', value: '' }
+    ]);
+  };
+
+  const handleBankingTermUpdate = (id, field, value) => {
+    setBankingTerms(prev =>
+      prev.map(term =>
+        term.id === id ? { ...term, [field]: value } : term
+      )
+    );
+  };
+
+  const handleRemoveBankingTerm = (id) => {
+    setBankingTerms(prev => prev.filter(term => term.id !== id));
+  };
+
   // Fetch the next invoice number when component mounts
   useEffect(() => {
     fetchNextInvoiceNumber();
@@ -3224,7 +3236,6 @@ export default function CreateInvoicePage() {
         console.log('Next invoice number:', data.data);
       } else {
         console.error('Failed to fetch next invoice number');
-        // Fallback to a temporary number if API fails
         const date = new Date();
         const year = date.getFullYear().toString().slice(-2);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -3235,7 +3246,6 @@ export default function CreateInvoicePage() {
       }
     } catch (error) {
       console.error('Error fetching next invoice number:', error);
-      // Fallback
       const date = new Date();
       const year = date.getFullYear().toString().slice(-2);
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -3287,7 +3297,6 @@ export default function CreateInvoicePage() {
       totalAmount 
     });
 
-    // Validate userIdParam - it should be a valid ObjectId string (24 characters hex)
     if (userIdParam && (userIdParam === '[object Object]' || userIdParam.includes('[object'))) {
       console.error('❌ Invalid userId format in URL params:', userIdParam);
       toast.error('Invalid user ID format in URL. Please check the inquiry data.');
@@ -3310,7 +3319,6 @@ export default function CreateInvoicePage() {
     };
 
     setInvoiceData(prev => {
-      // Ensure prev.customer exists
       const currentCustomer = prev.customer || {
         companyName: '',
         contactPerson: '',
@@ -3327,7 +3335,6 @@ export default function CreateInvoicePage() {
         shippingCountry: ''
       };
 
-      // Clean the userId - if it's "[object Object]", set to empty string
       let cleanUserId = userIdParam;
       if (cleanUserId === '[object Object]' || (cleanUserId && cleanUserId.includes('[object'))) {
         console.warn('⚠️ Cleaning invalid userId:', cleanUserId);
@@ -3355,7 +3362,6 @@ export default function CreateInvoicePage() {
         try {
           const parsedItems = JSON.parse(itemsParam);
           
-          // Debug parsed items to check for images
           console.log('📦 Raw parsed items:', parsedItems);
           console.log('📦 Items with image check:', parsedItems.map(item => ({
             productId: item.productId,
@@ -3370,7 +3376,7 @@ export default function CreateInvoicePage() {
             ...item,
             unitPrice: item.unitPrice || 0,
             total: (item.totalQuantity || 0) * (item.unitPrice || 0),
-            productImage: item.productImage || '', // Preserve product image
+            productImage: item.productImage || '',
             colors: (item.colors || []).map(color => ({
               ...color,
               sizeQuantities: (color.sizeQuantities || []).map(sq => ({
@@ -3382,7 +3388,6 @@ export default function CreateInvoicePage() {
 
           updatedData.subtotal = totalAmount;
           
-          // Log final items with images after mapping
           console.log('📦 Final items after mapping:', updatedData.items.map(item => ({
             productName: item.productName,
             hasImage: !!item.productImage,
@@ -3405,11 +3410,6 @@ export default function CreateInvoicePage() {
           console.error('❌ Items param that failed:', itemsParam);
           toast.error('Failed to load inquiry items');
         }
-      }
-
-      if (specialInstructions) {
-        updatedData.notes = specialInstructions;
-        console.log('📝 Special instructions added:', specialInstructions);
       }
 
       return updatedData;
@@ -3620,8 +3620,6 @@ export default function CreateInvoicePage() {
 
   // Remove a product from invoice
   const handleRemoveProduct = (itemIndex) => {
-    if (!confirm('Are you sure you want to remove this product from the invoice?')) return;
-    
     setInvoiceData(prev => {
       const updatedItems = JSON.parse(JSON.stringify(prev.items));
       updatedItems.splice(itemIndex, 1);
@@ -3836,400 +3834,210 @@ export default function CreateInvoicePage() {
     }
   };
 
-  // const handleSaveInvoice = async (invoiceStatus = 'draft') => {
-  //   setSaving(true);
-  //   try {
-  //     const token = localStorage.getItem('token');
-      
-  //     const validDynamicFields = dynamicFields.filter(
-  //       field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
-  //     );
-      
-  //     // Get the current admin user from localStorage
-  //     const userStr = localStorage.getItem('user');
-  //     let adminId = null;
-      
-  //     if (userStr) {
-  //       try {
-  //         const user = JSON.parse(userStr);
-  //         adminId = user.id;
-  //       } catch (e) {
-  //         console.error('Error parsing user data:', e);
-  //       }
-  //     }
-
-  //     // Get userId directly from URL params
-  //     let userIdFromUrl = searchParams.get('userId');
-      
-  //     if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
-  //       console.error('❌ Invalid userId in URL params:', userIdFromUrl);
-  //       toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
-  //       setSaving(false);
-  //       return;
-  //     }
-
-  //     const processedUserId = userIdFromUrl;
-  //     const paymentStatusText = status.text;
-      
-  //     // Calculate percentages
-  //     const paidPercentage = finalTotal > 0 ? (paidAmount / finalTotal) * 100 : 0;
-  //     const unpaidPercentage = finalTotal > 0 ? (dueAmount / finalTotal) * 100 : 0;
-
-  //     // Format the items
-  //     const formattedItems = invoiceData.items.map(item => {
-  //       return {
-  //         productId: item.productId,
-  //         productName: item.productName,
-  //         colors: item.colors.map(color => ({
-  //           color: {
-  //             code: color.color.code,
-  //             name: color.color.name || color.color.code
-  //           },
-  //           sizeQuantities: color.sizeQuantities.map(sq => ({
-  //             size: sq.size,
-  //             quantity: sq.quantity
-  //           })),
-  //           totalForColor: color.totalForColor
-  //         })),
-  //         totalQuantity: item.totalQuantity,
-  //         unitPrice: item.unitPrice,
-  //         moq: item.moq,
-  //         productImage: item.productImage || '',
-  //         total: item.total
-  //       };
-  //     });
-
-  //     // Create payload
-  //     const invoicePayload = {
-  //       invoiceNumber: invoiceData.invoiceNumber,
-  //       invoiceDate: invoiceData.invoiceDate,
-  //       dueDate: invoiceData.dueDate,
-  //       inquiryId: invoiceData.inquiryId,
-  //       inquiryNumber: invoiceData.inquiryNumber,
-        
-  //       // Customer info
-  //       customer: {
-  //         companyName: invoiceData.customer?.companyName || '',
-  //         contactPerson: invoiceData.customer?.contactPerson || '',
-  //         email: invoiceData.customer?.email || '',
-  //         phone: invoiceData.customer?.phone || '',
-  //         whatsapp: invoiceData.customer?.whatsapp || '',
-  //         billingAddress: invoiceData.customer?.billingAddress || '',
-  //         billingCity: invoiceData.customer?.billingCity || '',
-  //         billingZipCode: invoiceData.customer?.billingZipCode || '',
-  //         billingCountry: invoiceData.customer?.billingCountry || '',
-  //         shippingAddress: invoiceData.customer?.shippingAddress || '',
-  //         shippingCity: invoiceData.customer?.shippingCity || '',
-  //         shippingZipCode: invoiceData.customer?.shippingZipCode || '',
-  //         shippingCountry: invoiceData.customer?.shippingCountry || ''
-  //       },
-        
-  //       // Company info
-  //       company: {
-  //         logo: invoiceData.company?.logo || '',
-  //         logoPublicId: invoiceData.company?.logoPublicId || '',
-  //         companyName: invoiceData.company?.companyName || 'Asian Clothify',
-  //         contactPerson: invoiceData.company?.contactPerson || '',
-  //         email: invoiceData.company?.email || 'info@asianclothify.com',
-  //         phone: invoiceData.company?.phone || '+8801305-785685',
-  //         address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
-  //       },
-        
-  //       // Bank details
-  //       bankDetails: {
-  //         bankName: invoiceData.bankDetails?.bankName || '',
-  //         accountName: invoiceData.bankDetails?.accountName || '',
-  //         accountNumber: invoiceData.bankDetails?.accountNumber || '',
-  //         accountType: invoiceData.bankDetails?.accountType || '',
-  //         routingNumber: invoiceData.bankDetails?.routingNumber || '',
-  //         swiftCode: invoiceData.bankDetails?.swiftCode || '',
-  //         iban: invoiceData.bankDetails?.iban || '',
-  //         bankAddress: invoiceData.bankDetails?.bankAddress || ''
-  //       },
-        
-  //       // Items
-  //       items: formattedItems,
-        
-  //       // Calculations
-  //       subtotal: subtotal,
-  //       vatPercentage: vatPercentage,
-  //       vatAmount: vatAmount,
-  //       totalAfterVat: totalAfterVat,
-  //       discountPercentage: discountPercentage,
-  //       discountAmount: discountAmount,
-  //       totalAfterDiscount: totalAfterDiscount,
-  //       shippingCost: shippingCost,
-  //       finalTotal: finalTotal,
-  //       amountPaid: paidAmount,
-  //       dueAmount: dueAmount,
-        
-  //       // NEW: Percentage fields
-  //       paidPercentage: Math.round(paidPercentage * 100) / 100,
-  //       unpaidPercentage: Math.round(unpaidPercentage * 100) / 100,
-        
-  //       // Status fields
-  //       paymentStatus: paymentStatusText.toLowerCase(),
-  //       status: invoiceStatus === 'draft' ? 'draft' : 'sent',
-        
-  //       // Additional info
-  //       notes: invoiceData.notes || '',
-  //       terms: invoiceData.terms || '',
-  //       customFields: validDynamicFields,
-        
-  //       // Tracking
-  //       userId: processedUserId,
-  //       createdBy: adminId,
-        
-  //       createdAt: new Date().toISOString()
-  //     };
-
-  //     console.log('📤 Final invoice payload with percentages:', {
-  //       amountPaid: invoicePayload.amountPaid,
-  //       dueAmount: invoicePayload.dueAmount,
-  //       paidPercentage: invoicePayload.paidPercentage,
-  //       unpaidPercentage: invoicePayload.unpaidPercentage
-  //     });
-
-  //     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Authorization': `Bearer ${token}`,
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify(invoicePayload)
-  //     });
-
-  //     const responseText = await response.text();
-  //     let data;
-  //     try {
-  //       data = JSON.parse(responseText);
-  //     } catch (e) {
-  //       console.error('Failed to parse response:', responseText);
-  //       throw new Error('Invalid response from server');
-  //     }
-      
-  //     if (response.ok && data.success) {
-  //       toast.success(`Invoice ${data.data.invoiceNumber} ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
-  //       router.push('/admin/invoices');
-  //     } else {
-  //       toast.error(data.error || data.message || 'Failed to save invoice');
-  //     }
-  //   } catch (error) {
-  //     console.error('Save invoice error:', error);
-  //     toast.error('Failed to save invoice: ' + error.message);
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // };
-
-
   const handleSaveInvoice = async (invoiceStatus = 'draft') => {
-  setSaving(true);
-  try {
-    const token = localStorage.getItem('token');
-    
-    const validDynamicFields = dynamicFields.filter(
-      field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
-    );
-    
-    // Get the current admin user from localStorage
-    const userStr = localStorage.getItem('user');
-    let adminId = null;
-    
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        adminId = user.id;
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-      }
-    }
-
-    // Get userId directly from URL params
-    let userIdFromUrl = searchParams.get('userId');
-    
-    if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
-      console.error('❌ Invalid userId in URL params:', userIdFromUrl);
-      toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
-      setSaving(false);
-      return;
-    }
-
-    const processedUserId = userIdFromUrl;
-    const paymentStatusText = status.text;
-    
-    // Calculate percentages with proper rounding
-    const paidPercentage = finalTotal > 0 ? Number(((paidAmount / finalTotal) * 100).toFixed(2)) : 0;
-    const unpaidPercentage = finalTotal > 0 ? Number(((dueAmount / finalTotal) * 100).toFixed(2)) : 0;
-
-    // Format the items
-    const formattedItems = invoiceData.items.map(item => {
-      return {
-        productId: item.productId,
-        productName: item.productName,
-        colors: item.colors.map(color => ({
-          color: {
-            code: color.color.code,
-            name: color.color.name || color.color.code
-          },
-          sizeQuantities: color.sizeQuantities.map(sq => ({
-            size: sq.size,
-            quantity: sq.quantity
-          })),
-          totalForColor: color.totalForColor
-        })),
-        totalQuantity: item.totalQuantity,
-        unitPrice: Number(item.unitPrice.toFixed(2)),
-        moq: item.moq,
-        productImage: item.productImage || '',
-        total: Number(item.total.toFixed(2))
-      };
-    });
-
-    // Round all monetary values to 2 decimal places
-    const roundedSubtotal = Number(subtotal.toFixed(2));
-    const roundedVatAmount = Number(vatAmount.toFixed(2));
-    const roundedTotalAfterVat = Number(totalAfterVat.toFixed(2));
-    const roundedDiscountAmount = Number(discountAmount.toFixed(2));
-    const roundedTotalAfterDiscount = Number(totalAfterDiscount.toFixed(2));
-    const roundedShippingCost = Number(shippingCost.toFixed(2));
-    const roundedFinalTotal = Number(finalTotal.toFixed(2));
-    const roundedPaidAmount = Number(paidAmount.toFixed(2));
-    const roundedDueAmount = Number(dueAmount.toFixed(2));
-
-    // Create payload with rounded values
-    const invoicePayload = {
-      invoiceNumber: invoiceData.invoiceNumber,
-      invoiceDate: invoiceData.invoiceDate,
-      dueDate: invoiceData.dueDate,
-      inquiryId: invoiceData.inquiryId,
-      inquiryNumber: invoiceData.inquiryNumber,
-      
-      // Customer info
-      customer: {
-        companyName: invoiceData.customer?.companyName || '',
-        contactPerson: invoiceData.customer?.contactPerson || '',
-        email: invoiceData.customer?.email || '',
-        phone: invoiceData.customer?.phone || '',
-        whatsapp: invoiceData.customer?.whatsapp || '',
-        billingAddress: invoiceData.customer?.billingAddress || '',
-        billingCity: invoiceData.customer?.billingCity || '',
-        billingZipCode: invoiceData.customer?.billingZipCode || '',
-        billingCountry: invoiceData.customer?.billingCountry || '',
-        shippingAddress: invoiceData.customer?.shippingAddress || '',
-        shippingCity: invoiceData.customer?.shippingCity || '',
-        shippingZipCode: invoiceData.customer?.shippingZipCode || '',
-        shippingCountry: invoiceData.customer?.shippingCountry || ''
-      },
-      
-      // Company info
-      company: {
-        logo: invoiceData.company?.logo || '',
-        logoPublicId: invoiceData.company?.logoPublicId || '',
-        companyName: invoiceData.company?.companyName || 'Asian Clothify',
-        contactPerson: invoiceData.company?.contactPerson || '',
-        email: invoiceData.company?.email || 'info@asianclothify.com',
-        phone: invoiceData.company?.phone || '+8801305-785685',
-        address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
-      },
-      
-      // Bank details
-      bankDetails: {
-        bankName: invoiceData.bankDetails?.bankName || '',
-        accountName: invoiceData.bankDetails?.accountName || '',
-        accountNumber: invoiceData.bankDetails?.accountNumber || '',
-        accountType: invoiceData.bankDetails?.accountType || '',
-        routingNumber: invoiceData.bankDetails?.routingNumber || '',
-        swiftCode: invoiceData.bankDetails?.swiftCode || '',
-        iban: invoiceData.bankDetails?.iban || '',
-        bankAddress: invoiceData.bankDetails?.bankAddress || ''
-      },
-      
-      // Items
-      items: formattedItems,
-      
-      // Calculations - ALL ROUNDED
-      subtotal: roundedSubtotal,
-      vatPercentage: vatPercentage,
-      vatAmount: roundedVatAmount,
-      totalAfterVat: roundedTotalAfterVat,
-      discountPercentage: discountPercentage,
-      discountAmount: roundedDiscountAmount,
-      totalAfterDiscount: roundedTotalAfterDiscount,
-      shippingCost: roundedShippingCost,
-      finalTotal: roundedFinalTotal,
-      amountPaid: roundedPaidAmount,
-      dueAmount: roundedDueAmount,
-      
-      // Percentage fields
-      paidPercentage: paidPercentage,
-      unpaidPercentage: unpaidPercentage,
-      
-      // Status fields
-      paymentStatus: paymentStatusText.toLowerCase(),
-      status: invoiceStatus === 'draft' ? 'draft' : 'sent',
-      
-      // Additional info
-      notes: invoiceData.notes || '',
-      terms: invoiceData.terms || '',
-      customFields: validDynamicFields,
-      
-      // Tracking
-      userId: processedUserId,
-      createdBy: adminId,
-      
-      createdAt: new Date().toISOString()
-    };
-
-    console.log('📤 Final invoice payload with rounded values:', {
-      amountPaid: invoicePayload.amountPaid,
-      dueAmount: invoicePayload.dueAmount,
-      paidPercentage: invoicePayload.paidPercentage,
-      unpaidPercentage: invoicePayload.unpaidPercentage,
-      finalTotal: invoicePayload.finalTotal
-    });
-
-    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(invoicePayload)
-    });
-
-    const responseText = await response.text();
-    console.log('Response status:', response.status);
-    console.log('Response text:', responseText);
-    
-    let data;
+    setSaving(true);
     try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      console.error('Failed to parse response:', responseText);
-      throw new Error('Invalid response from server');
+      const token = localStorage.getItem('token');
+      
+      const validDynamicFields = dynamicFields.filter(
+        field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
+      );
+      
+      // Filter out empty banking terms (both title and value empty)
+      const validBankingTerms = bankingTerms.filter(
+        term => term.title.trim() !== '' || term.value.trim() !== ''
+      );
+      
+      const userStr = localStorage.getItem('user');
+      let adminId = null;
+      
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          adminId = user.id;
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
+      }
+
+      let userIdFromUrl = searchParams.get('userId');
+      
+      if (!userIdFromUrl || userIdFromUrl === '[object Object]' || userIdFromUrl.includes('[object')) {
+        console.error('❌ Invalid userId in URL params:', userIdFromUrl);
+        toast.error('Invalid user ID in URL. Please go back and select the inquiry again.');
+        setSaving(false);
+        return;
+      }
+
+      const processedUserId = userIdFromUrl;
+      const paymentStatusText = status.text;
+      
+      const paidPercentage = finalTotal > 0 ? Number(((paidAmount / finalTotal) * 100).toFixed(2)) : 0;
+      const unpaidPercentage = finalTotal > 0 ? Number(((dueAmount / finalTotal) * 100).toFixed(2)) : 0;
+
+      const formattedItems = invoiceData.items.map(item => {
+        return {
+          productId: item.productId,
+          productName: item.productName,
+          colors: item.colors.map(color => ({
+            color: {
+              code: color.color.code,
+              name: color.color.name || color.color.code
+            },
+            sizeQuantities: color.sizeQuantities.map(sq => ({
+              size: sq.size,
+              quantity: sq.quantity
+            })),
+            totalForColor: color.totalForColor
+          })),
+          totalQuantity: item.totalQuantity,
+          unitPrice: Number(item.unitPrice.toFixed(2)),
+          moq: item.moq,
+          productImage: item.productImage || '',
+          total: Number(item.total.toFixed(2))
+        };
+      });
+
+      const roundedSubtotal = Number(subtotal.toFixed(2));
+      const roundedVatAmount = Number(vatAmount.toFixed(2));
+      const roundedTotalAfterVat = Number(totalAfterVat.toFixed(2));
+      const roundedDiscountAmount = Number(discountAmount.toFixed(2));
+      const roundedTotalAfterDiscount = Number(totalAfterDiscount.toFixed(2));
+      const roundedShippingCost = Number(shippingCost.toFixed(2));
+      const roundedFinalTotal = Number(finalTotal.toFixed(2));
+      const roundedPaidAmount = Number(paidAmount.toFixed(2));
+      const roundedDueAmount = Number(dueAmount.toFixed(2));
+
+      const invoicePayload = {
+        invoiceNumber: invoiceData.invoiceNumber,
+        invoiceDate: invoiceData.invoiceDate,
+        dueDate: invoiceData.dueDate,
+        inquiryId: invoiceData.inquiryId,
+        inquiryNumber: invoiceData.inquiryNumber,
+        
+        customer: {
+          companyName: invoiceData.customer?.companyName || '',
+          contactPerson: invoiceData.customer?.contactPerson || '',
+          email: invoiceData.customer?.email || '',
+          phone: invoiceData.customer?.phone || '',
+          whatsapp: invoiceData.customer?.whatsapp || '',
+          billingAddress: invoiceData.customer?.billingAddress || '',
+          billingCity: invoiceData.customer?.billingCity || '',
+          billingZipCode: invoiceData.customer?.billingZipCode || '',
+          billingCountry: invoiceData.customer?.billingCountry || '',
+          shippingAddress: invoiceData.customer?.shippingAddress || '',
+          shippingCity: invoiceData.customer?.shippingCity || '',
+          shippingZipCode: invoiceData.customer?.shippingZipCode || '',
+          shippingCountry: invoiceData.customer?.shippingCountry || ''
+        },
+        
+        company: {
+          logo: invoiceData.company?.logo || '',
+          logoPublicId: invoiceData.company?.logoPublicId || '',
+          companyName: invoiceData.company?.companyName || 'Asian Clothify',
+          contactPerson: invoiceData.company?.contactPerson || '',
+          email: invoiceData.company?.email || 'info@asianclothify.com',
+          phone: invoiceData.company?.phone || '+8801305-785685',
+          address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
+        },
+        
+        bankDetails: {
+          bankName: invoiceData.bankDetails?.bankName || '',
+          accountName: invoiceData.bankDetails?.accountName || '',
+          accountNumber: invoiceData.bankDetails?.accountNumber || '',
+          accountType: invoiceData.bankDetails?.accountType || '',
+          routingNumber: invoiceData.bankDetails?.routingNumber || '',
+          swiftCode: invoiceData.bankDetails?.swiftCode || '',
+          iban: invoiceData.bankDetails?.iban || '',
+          bankAddress: invoiceData.bankDetails?.bankAddress || ''
+        },
+        
+        bankingTerms: validBankingTerms.map(term => ({
+          title: term.title.trim(),
+          value: term.value.trim()
+        })),
+        
+        items: formattedItems,
+        
+        subtotal: roundedSubtotal,
+        vatPercentage: vatPercentage,
+        vatAmount: roundedVatAmount,
+        totalAfterVat: roundedTotalAfterVat,
+        discountPercentage: discountPercentage,
+        discountAmount: roundedDiscountAmount,
+        totalAfterDiscount: roundedTotalAfterDiscount,
+        shippingCost: roundedShippingCost,
+        finalTotal: roundedFinalTotal,
+        amountPaid: roundedPaidAmount,
+        dueAmount: roundedDueAmount,
+        
+        paidPercentage: paidPercentage,
+        unpaidPercentage: unpaidPercentage,
+        
+        paymentStatus: paymentStatusText.toLowerCase(),
+        status: invoiceStatus === 'draft' ? 'draft' : 'sent',
+        
+        notes: invoiceData.notes || '',
+        terms: invoiceData.terms || '',
+        customFields: validDynamicFields,
+        
+        userId: processedUserId,
+        createdBy: adminId,
+        
+        createdAt: new Date().toISOString()
+      };
+
+      console.log('📤 Final invoice payload with banking terms:', {
+        bankingTerms: invoicePayload.bankingTerms,
+        amountPaid: invoicePayload.amountPaid,
+        dueAmount: invoicePayload.dueAmount,
+        paidPercentage: invoicePayload.paidPercentage,
+        unpaidPercentage: invoicePayload.unpaidPercentage,
+        finalTotal: invoicePayload.finalTotal
+      });
+
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(invoicePayload)
+      });
+
+      const responseText = await response.text();
+      console.log('Response status:', response.status);
+      console.log('Response text:', responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse response:', responseText);
+        throw new Error('Invalid response from server');
+      }
+      
+      if (response.ok && data.success) {
+        toast.success(`Invoice ${data.data.invoiceNumber} ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
+        router.push('/admin/invoices');
+      } else {
+        toast.error(data.error || data.message || 'Failed to save invoice');
+      }
+    } catch (error) {
+      console.error('Save invoice error:', error);
+      toast.error('Failed to save invoice: ' + error.message);
+    } finally {
+      setSaving(false);
     }
-    
-    if (response.ok && data.success) {
-      toast.success(`Invoice ${data.data.invoiceNumber} ${invoiceStatus === 'draft' ? 'saved as draft' : 'created and sent'} successfully`);
-      router.push('/admin/invoices');
-    } else {
-      toast.error(data.error || data.message || 'Failed to save invoice');
-    }
-  } catch (error) {
-    console.error('Save invoice error:', error);
-    toast.error('Failed to save invoice: ' + error.message);
-  } finally {
-    setSaving(false);
-  }
-};
+  };
+
   const handleSendInvoice = () => {
     handleSaveInvoice('sent');
   };
 
   if (!invoiceData.inquiryId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-gray-900 mb-2">No Inquiry Selected</h2>
@@ -4250,9 +4058,9 @@ export default function CreateInvoicePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-        <div className="container mx-auto px-4 max-w-7xl py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3 sm:gap-4">
               <Link
                 href="/admin/inquiries"
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -4260,28 +4068,21 @@ export default function CreateInvoicePage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Create Invoice</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Create Invoice</h1>
                 <p className="text-xs text-gray-500 mt-0.5">
                   From Inquiry: {invoiceData.inquiryNumber}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleSaveInvoice('draft')}
-                disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Save Draft
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+             
               <button
                 onClick={handleSendInvoice}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                Create & Send Invoice
+                Create & Send
               </button>
             </div>
           </div>
@@ -4290,9 +4091,9 @@ export default function CreateInvoicePage() {
 
       {/* Invoice Information */}
       <div className="container mx-auto px-4 max-w-7xl pt-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Invoice Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">
                 Invoice Number <span className="text-green-600 font-normal">(Auto-generated)</span>
@@ -4344,17 +4145,17 @@ export default function CreateInvoicePage() {
 
       {/* Company and Customer Information */}
       <div className="container mx-auto px-4 max-w-7xl pb-6">
-        <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Company Information */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
             
             <div className="mb-6">
               <label className="block text-xs font-medium text-gray-500 mb-2">
                 Company Logo
               </label>
-              <div className="flex items-start gap-4">
-                <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center overflow-hidden">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {invoiceData.company.logo ? (
                     <img 
                       src={invoiceData.company.logo} 
@@ -4370,7 +4171,7 @@ export default function CreateInvoicePage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <input
                       type="file"
                       id="logo-upload"
@@ -4396,19 +4197,19 @@ export default function CreateInvoicePage() {
                         className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                       >
                         <ImageIcon className="w-4 h-4" />
-                        Reset to Default
+                        Reset
                       </button>
                     )}
                   </div>
                   <p className="text-xs text-gray-400 mt-2">
-                    Default logo is shown. Upload your own image (JPEG, PNG, WEBP, max 2MB)
+                    Upload your own image (JPEG, PNG, WEBP, max 2MB)
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Company Name
                 </label>
@@ -4417,10 +4218,9 @@ export default function CreateInvoicePage() {
                   value={invoiceData.company?.companyName || 'Asian Clothify'}
                   onChange={(e) => handleCompanyChange('companyName', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Your company name"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Contact Person
                 </label>
@@ -4429,10 +4229,9 @@ export default function CreateInvoicePage() {
                   value={invoiceData.company?.contactPerson || ''}
                   onChange={(e) => handleCompanyChange('contactPerson', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Contact person"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Email
                 </label>
@@ -4441,10 +4240,9 @@ export default function CreateInvoicePage() {
                   value={invoiceData.company?.email || 'info@asianclothify.com'}
                   onChange={(e) => handleCompanyChange('email', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="company@example.com"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Phone
                 </label>
@@ -4453,10 +4251,9 @@ export default function CreateInvoicePage() {
                   value={invoiceData.company?.phone || '+8801305-785685'}
                   onChange={(e) => handleCompanyChange('phone', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Phone number"
                 />
               </div>
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Address
                 </label>
@@ -4465,17 +4262,16 @@ export default function CreateInvoicePage() {
                   value={invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'}
                   onChange={(e) => handleCompanyChange('address', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Full company address"
                 />
               </div>
             </div>
           </div>
 
           {/* Customer Information */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Company Name
@@ -4485,7 +4281,6 @@ export default function CreateInvoicePage() {
                   value={invoiceData.customer?.companyName || ''}
                   onChange={(e) => handleCustomerChange('companyName', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Company name"
                 />
               </div>
               <div>
@@ -4497,7 +4292,6 @@ export default function CreateInvoicePage() {
                   value={invoiceData.customer?.contactPerson || ''}
                   onChange={(e) => handleCustomerChange('contactPerson', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Contact person"
                 />
               </div>
               <div>
@@ -4509,7 +4303,6 @@ export default function CreateInvoicePage() {
                   value={invoiceData.customer?.email || ''}
                   onChange={(e) => handleCustomerChange('email', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Email address"
                 />
               </div>
               <div>
@@ -4521,7 +4314,6 @@ export default function CreateInvoicePage() {
                   value={invoiceData.customer?.phone || ''}
                   onChange={(e) => handleCustomerChange('phone', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="Phone number"
                 />
               </div>
               <div>
@@ -4533,7 +4325,6 @@ export default function CreateInvoicePage() {
                   value={invoiceData.customer?.whatsapp || ''}
                   onChange={(e) => handleCustomerChange('whatsapp', e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                  placeholder="WhatsApp number"
                 />
               </div>
             </div>
@@ -4541,8 +4332,8 @@ export default function CreateInvoicePage() {
             {/* Billing Address */}
             <div className="mb-6">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Billing Address</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-1">
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Street Address
                   </label>
@@ -4551,7 +4342,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.billingAddress || ''}
                     onChange={(e) => handleCustomerChange('billingAddress', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="Street address"
                   />
                 </div>
                 <div>
@@ -4563,7 +4353,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.billingCity || ''}
                     onChange={(e) => handleCustomerChange('billingCity', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="City"
                   />
                 </div>
                 <div>
@@ -4575,7 +4364,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.billingZipCode || ''}
                     onChange={(e) => handleCustomerChange('billingZipCode', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="ZIP/Postal code"
                   />
                 </div>
                 <div>
@@ -4587,7 +4375,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.billingCountry || ''}
                     onChange={(e) => handleCustomerChange('billingCountry', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="Country"
                   />
                 </div>
               </div>
@@ -4595,18 +4382,18 @@ export default function CreateInvoicePage() {
 
             {/* Shipping Address */}
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                 <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
                 <button
                   onClick={copyBillingToShipping}
-                  className="flex items-center gap-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center justify-center gap-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   <Copy className="w-3 h-3" />
                   Copy from Billing
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-1">
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Street Address
                   </label>
@@ -4615,7 +4402,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.shippingAddress || ''}
                     onChange={(e) => handleCustomerChange('shippingAddress', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="Street address"
                   />
                 </div>
                 <div>
@@ -4627,7 +4413,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.shippingCity || ''}
                     onChange={(e) => handleCustomerChange('shippingCity', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="City"
                   />
                 </div>
                 <div>
@@ -4639,7 +4424,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.shippingZipCode || ''}
                     onChange={(e) => handleCustomerChange('shippingZipCode', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="ZIP/Postal code"
                   />
                 </div>
                 <div>
@@ -4651,7 +4435,6 @@ export default function CreateInvoicePage() {
                     value={invoiceData.customer?.shippingCountry || ''}
                     onChange={(e) => handleCustomerChange('shippingCountry', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
-                    placeholder="Country"
                   />
                 </div>
               </div>
@@ -4661,12 +4444,12 @@ export default function CreateInvoicePage() {
 
         {/* Products Section */}
         <div className="mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Products</h2>
               <button
                 onClick={() => setShowProductSearch(true)}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Add Product
@@ -4698,7 +4481,7 @@ export default function CreateInvoicePage() {
                 })}
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+              <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
                 <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <h3 className="text-sm font-medium text-gray-900 mb-1">No products added</h3>
                 <p className="text-xs text-gray-500 mb-4">Click the "Add Product" button to add products to this invoice</p>
@@ -4717,10 +4500,10 @@ export default function CreateInvoicePage() {
         {/* Summary and Additional Information */}
         <div className="space-y-6">
           {/* Top Row - Summary and Bank Details side by side */}
-          <div className="grid grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             {/* Bank Details Form */}
             <div className="w-full">
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Landmark className="w-5 h-5 text-[#E39A65]" />
                   Bank Details
@@ -4771,7 +4554,7 @@ export default function CreateInvoicePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-500 mb-1">Routing Number</label>
                       <input
@@ -4822,7 +4605,7 @@ export default function CreateInvoicePage() {
             
             {/* Summary Form */}
             <div className="w-full">
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
                 
                 <div className="space-y-6">
@@ -4837,24 +4620,25 @@ export default function CreateInvoicePage() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">VAT (%)</span>
-                        <input
-                          type="number"
-                          value={invoiceData.vatPercentage}
-                          onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
-                          onBlur={() => handleNumericBlur('vatPercentage')}
-                          min="0"
-                          max="100"
-                          step="0.01"
-                          className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">VAT</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-600">%</span>
+                          <input
+                            type="number"
+                            value={invoiceData.vatPercentage}
+                            onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
+                            onBlur={() => handleNumericBlur('vatPercentage')}
+                            onWheel={(e) => e.target.blur()}
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">VAT Amount</span>
-                        <span className="font-medium text-blue-600">{formatPrice(vatAmount)}</span>
-                      </div>
+                      <span className="text-sm font-medium text-blue-600">{formatPrice(vatAmount)}</span>
                     </div>
 
                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -4864,24 +4648,25 @@ export default function CreateInvoicePage() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Discount (%)</span>
-                        <input
-                          type="number"
-                          value={invoiceData.discountPercentage}
-                          onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
-                          onBlur={() => handleNumericBlur('discountPercentage')}
-                          min="0"
-                          max="100"
-                          step="0.01"
-                          className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-                        />
+                        <span className="text-sm text-gray-600 whitespace-nowrap">Discount</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-600">%</span>
+                          <input
+                            type="number"
+                            value={invoiceData.discountPercentage}
+                            onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
+                            onBlur={() => handleNumericBlur('discountPercentage')}
+                            onWheel={(e) => e.target.blur()}
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            className="w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">Discount Amount</span>
-                        <span className="font-medium text-red-600">-{formatPrice(discountAmount)}</span>
-                      </div>
+                      <span className="text-sm font-medium text-red-600">-{formatPrice(discountAmount)}</span>
                     </div>
 
                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
@@ -4891,17 +4676,21 @@ export default function CreateInvoicePage() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Shipping Cost</span>
-                      <input
-                        type="number"
-                        value={invoiceData.shippingCost}
-                        onChange={(e) => handleInputChange('shippingCost', e.target.value)}
-                        onBlur={() => handleNumericBlur('shippingCost')}
-                        min="0"
-                        step="0.01"
-                        className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-                      />
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-gray-600 whitespace-nowrap">Shipping Cost</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">$</span>
+                        <input
+                          type="number"
+                          value={invoiceData.shippingCost}
+                          onChange={(e) => handleInputChange('shippingCost', e.target.value)}
+                          onBlur={() => handleNumericBlur('shippingCost')}
+                          onWheel={(e) => e.target.blur()}
+                          min="0"
+                          step="0.01"
+                          className="w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+                        />
+                      </div>
                     </div>
 
                     <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
@@ -4920,18 +4709,22 @@ export default function CreateInvoicePage() {
                     </h3>
                     
                     <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Amount Paid</span>
-                        <input
-                          type="number"
-                          value={invoiceData.amountPaid}
-                          onChange={(e) => handleInputChange('amountPaid', e.target.value)}
-                          onBlur={() => handleNumericBlur('amountPaid')}
-                          min="0"
-                          max={finalTotal}
-                          step="0.01"
-                          className="w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
-                        />
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-sm text-gray-600 whitespace-nowrap">Amount Paid</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">$</span>
+                          <input
+                            type="number"
+                            value={invoiceData.amountPaid}
+                            onChange={(e) => handleInputChange('amountPaid', e.target.value)}
+                            onBlur={() => handleNumericBlur('amountPaid')}
+                            onWheel={(e) => e.target.blur()}
+                            min="0"
+                            max={finalTotal}
+                            step="0.01"
+                            className="w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center">
@@ -4939,7 +4732,6 @@ export default function CreateInvoicePage() {
                         <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
                       </div>
 
-                      {/* Paid Section with Amount and Percentage */}
                       <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center gap-2">
@@ -4966,7 +4758,6 @@ export default function CreateInvoicePage() {
                         </div>
                       </div>
 
-                      {/* Unpaid Section with Amount and Percentage */}
                       <div className="bg-red-50 p-3 rounded-lg border border-red-200">
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex items-center gap-2">
@@ -5029,9 +4820,54 @@ export default function CreateInvoicePage() {
             </div>
           </div>
 
-          {/* Additional Information - Full Width Below */}
+          {/* Banking Terms Section */}
           <div className="w-full">
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-[#E39A65]" />
+                  Banking Terms (Optional)
+                </h2>
+                <button
+                  onClick={handleAddBankingTerm}
+                  className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Term
+                </button>
+              </div>
+              
+              <p className="text-xs text-gray-500 mb-4">
+                Add any banking terms, conditions, or instructions. Each term can have a title and an optional value/description.
+                Leave the value empty if you only want to display the title as a heading.
+              </p>
+
+              {bankingTerms.length > 0 ? (
+                <div className="space-y-3">
+                  {bankingTerms.map((term) => (
+                    <BankingTermField
+                      key={term.id}
+                      field={term}
+                      onUpdate={handleBankingTermUpdate}
+                      onRemove={handleRemoveBankingTerm}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">No banking terms added</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Click "Add Term" to add payment terms, banking instructions, or other conditions
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="w-full">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
               
               <div className="space-y-6">
@@ -5062,11 +4898,11 @@ export default function CreateInvoicePage() {
 
                 {/* Dynamic Fields Section */}
                 <div className="border-t border-gray-200 pt-4">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                     <h3 className="text-sm font-medium text-gray-700">Custom Fields</h3>
                     <button
                       onClick={handleAddField}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                      className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Add Field
@@ -5076,8 +4912,8 @@ export default function CreateInvoicePage() {
                   {dynamicFields.length > 0 ? (
                     <div className="space-y-3">
                       {dynamicFields.map((field) => (
-                        <div key={field.id} className="flex items-center gap-2">
-                          <div className="flex-1">
+                        <div key={field.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                          <div className="flex-1 w-full">
                             <input
                               type="text"
                               value={field.fieldName}
@@ -5086,7 +4922,7 @@ export default function CreateInvoicePage() {
                               className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent"
                             />
                           </div>
-                          <div className="flex-1">
+                          <div className="flex-1 w-full">
                             <input
                               type="text"
                               value={field.fieldValue}

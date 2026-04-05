@@ -1,4 +1,7 @@
 
+
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -61,6 +64,18 @@
 //     colorIndex: null,
 //     colorName: '',
 //     productName: ''
+//   });
+
+//   // State for product delete confirmation modal
+//   const [productDeleteModal, setProductDeleteModal] = useState({ 
+//     show: false, 
+//     itemId: null,
+//     productName: ''
+//   });
+
+//   // State for clear cart confirmation modal
+//   const [clearCartModal, setClearCartModal] = useState({ 
+//     show: false
 //   });
 
 //   // Fetch cart on mount
@@ -175,168 +190,271 @@
 //   };
 
 //   // Handle delete color
-// // Handle delete color
-// const handleDeleteColor = async () => {
-//   const { itemId, colorIndex } = deleteModal;
-  
-//   // Close modal immediately
-//   closeDeleteModal();
-  
-//   const key = `${itemId}-${colorIndex}`;
-//   setDeletingColor(prev => ({ ...prev, [key]: true }));
-  
-//   try {
-//     const token = localStorage.getItem('token');
+//   const handleDeleteColor = async () => {
+//     const { itemId, colorIndex } = deleteModal;
     
-//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
-//       method: 'DELETE',
-//       headers: {
-//         'Authorization': `Bearer ${token}`
-//       }
-//     });
-
-//     const data = await response.json();
+//     // Close modal immediately
+//     closeDeleteModal();
     
-//     if (data.success) {
-//       setCart(data.data);
+//     const key = `${itemId}-${colorIndex}`;
+//     setDeletingColor(prev => ({ ...prev, [key]: true }));
+    
+//     try {
+//       const token = localStorage.getItem('token');
       
-//       // Show success toast
-//       toast.success('Color removed successfully', {
-//         description: 'The color has been removed from your cart',
-//         duration: 3000,
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}/color/${colorIndex}`, {
+//         method: 'DELETE',
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
 //       });
+
+//       const data = await response.json();
       
-//       // Dispatch cart update event
-//       window.dispatchEvent(new Event('cart-update'));
-      
-//       // If the item still exists but with remaining colors, collapse the add section
-//       const updatedItem = data.data.items.find(item => item._id === itemId);
-//       if (updatedItem && updatedItem.colors && updatedItem.colors.length > 0) {
-//         // Keep expanded state as is or collapse if needed
-//         setExpandedItems(prev => ({
-//           ...prev,
-//           [itemId]: false
-//         }));
+//       if (data.success) {
+//         setCart(data.data);
+        
+//         // Show success toast
+//         toast.success('Color removed successfully', {
+//           description: 'The color has been removed from your cart',
+//           duration: 3000,
+//         });
+        
+//         // Dispatch cart update event
+//         window.dispatchEvent(new Event('cart-update'));
+        
+//         // If the item still exists but with remaining colors, collapse the add section
+//         const updatedItem = data.data.items.find(item => item._id === itemId);
+//         if (updatedItem && updatedItem.colors && updatedItem.colors.length > 0) {
+//           // Keep expanded state as is or collapse if needed
+//           setExpandedItems(prev => ({
+//             ...prev,
+//             [itemId]: false
+//           }));
+//         }
+        
+//       } else {
+//         // Show error toast
+//         toast.error('Failed to remove color', {
+//           description: data.error || 'Something went wrong',
+//           duration: 4000
+//         });
 //       }
       
-//     } else {
+//     } catch (error) {
+//       console.error('Error deleting color:', error);
+      
 //       // Show error toast
 //       toast.error('Failed to remove color', {
-//         description: data.error || 'Something went wrong',
+//         description: error.message || 'Network error occurred',
 //         duration: 4000
 //       });
+//     } finally {
+//       setDeletingColor(prev => ({ ...prev, [key]: false }));
 //     }
-    
-//   } catch (error) {
-//     console.error('Error deleting color:', error);
-    
-//     // Show error toast
-//     toast.error('Failed to remove color', {
-//       description: error.message || 'Network error occurred',
-//       duration: 4000
-//     });
-//   } finally {
-//     setDeletingColor(prev => ({ ...prev, [key]: false }));
-//   }
-// };
+//   };
 
 //   // Close modal
 //   const closeDeleteModal = () => {
 //     setDeleteModal({ show: false, itemId: null, colorIndex: null, colorName: '', productName: '' });
 //   };
 
-//   // Save edited quantities for a color
-// // Save edited quantities for a color
-// // Save edited quantities for a color
-// const handleSaveColorEdits = async (itemId, colorIndex) => {
-//   const key = `${itemId}-${colorIndex}`;
-//   const editedData = editedQuantities[key];
-  
-//   if (!editedData) return;
-  
-//   setSavingEdits(prev => ({ ...prev, [key]: true }));
-  
-//   try {
-//     const token = localStorage.getItem('token');
-//     const item = cart.items.find(i => i._id === itemId);
-//     if (!item) return;
-
-//     // Get all available sizes from the product
-//     const productDetail = productDetails[item.productId];
-//     const allSizes = productDetail?.sizes?.filter(s => s.trim()) || [];
-    
-//     // Create an array with ALL sizes, including zeros for the edited color
-//     const updatedSizeQuantities = allSizes.map(size => ({
-//       size,
-//       quantity: editedData[size] || 0
-//     }));
-
-//     // Update the specific color's quantities
-//     const updatedColors = [...item.colors];
-//     updatedColors[colorIndex] = {
-//       ...updatedColors[colorIndex],
-//       color: {
-//         code: updatedColors[colorIndex].color?.code || '#CCCCCC',
-//         name: updatedColors[colorIndex].color?.name || updatedColors[colorIndex].color?.code || 'Unknown Color'
-//       },
-//       sizeQuantities: updatedSizeQuantities,
-//       // Remove totalQuantity and totalForColor - let backend calculate
-//     };
-
-//     const cartItem = {
-//       productId: item.productId,
-//       productName: item.productName,
-//       colors: updatedColors,
-//       // REMOVE totalQuantity - let backend calculate
-//       unitPrice: item.unitPrice, // Send current price, backend will recalc
-//       moq: item.moq,
-//       productImage: item.productImage,
-//       specialInstructions: item.specialInstructions 
-//     };
-
-//     console.log('📤 Saving edited colors:', JSON.stringify(cartItem, null, 2));
-
-//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
-//       method: 'POST',
-//       headers: {
-//         'Authorization': `Bearer ${token}`,
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify(cartItem)
+//   // Show product delete modal instead of browser confirm
+//   const showProductDeleteModal = (itemId, productName) => {
+//     setProductDeleteModal({
+//       show: true,
+//       itemId,
+//       productName
 //     });
+//   };
 
-//     const data = await response.json();
-//     if (data.success) {
-//       setCart(data.data);
-      
-//       // Exit edit mode
-//       setEditingColors(prev => {
-//         const newState = { ...prev };
-//         delete newState[key];
-//         return newState;
+//   // Handle product delete confirmation
+//   const handleProductDeleteConfirm = async () => {
+//     const { itemId } = productDeleteModal;
+    
+//     // Close modal immediately
+//     setProductDeleteModal({ show: false, itemId: null, productName: '' });
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}`, {
+//         method: 'DELETE',
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
 //       });
-      
-//       setEditedQuantities(prev => {
-//         const newState = { ...prev };
-//         delete newState[key];
-//         return newState;
+
+//       const data = await response.json();
+//       if (data.success) {
+//         setCart(data.data);
+        
+//         toast.success('Product removed from cart', {
+//           description: 'The item has been removed successfully',
+//           duration: 3000,
+//         });
+        
+//         // Dispatch cart update event
+//         window.dispatchEvent(new Event('cart-update'));
+//       } else {
+//         toast.error('Failed to remove product', {
+//           description: data.error || 'Something went wrong',
+//           duration: 4000
+//         });
+//       }
+//     } catch (error) {
+//       console.error('Error removing item:', error);
+//       toast.error('Failed to remove product', {
+//         description: error.message || 'Network error occurred',
+//         duration: 4000
 //       });
-      
-//       toast.success('Quantities updated successfully');
-      
-//       // Dispatch cart update event
-//       window.dispatchEvent(new Event('cart-update'));
-//     } else {
-//       console.error('❌ Server response error:', data);
-//       toast.error(data.error || 'Failed to update quantities');
 //     }
-//   } catch (error) {
-//     console.error('❌ Error updating quantities:', error);
-//     toast.error('Failed to update quantities');
-//   } finally {
-//     setSavingEdits(prev => ({ ...prev, [key]: false }));
-//   }
-// };
+//   };
+
+//   // Close product delete modal
+//   const closeProductDeleteModal = () => {
+//     setProductDeleteModal({ show: false, itemId: null, productName: '' });
+//   };
+
+//   // Show clear cart modal instead of browser confirm
+//   const showClearCartModal = () => {
+//     setClearCartModal({ show: true });
+//   };
+
+//   // Handle clear cart confirmation
+//   const handleClearCartConfirm = async () => {
+//     // Close modal immediately
+//     setClearCartModal({ show: false });
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/clear', {
+//         method: 'DELETE',
+//         headers: {
+//           'Authorization': `Bearer ${token}`
+//         }
+//       });
+
+//       const data = await response.json();
+//       if (data.success) {
+//         setCart({ ...cart, items: [], totalItems: 0, totalQuantity: 0, estimatedTotal: 0 });
+        
+//         toast.success('Cart cleared successfully', {
+//           description: 'All items have been removed from your cart',
+//           duration: 3000,
+//         });
+        
+//         // Dispatch cart update event
+//         window.dispatchEvent(new Event('cart-update'));
+//       } else {
+//         toast.error('Failed to clear cart', {
+//           description: data.error || 'Something went wrong',
+//           duration: 4000
+//         });
+//       }
+//     } catch (error) {
+//       console.error('Error clearing cart:', error);
+//       toast.error('Failed to clear cart', {
+//         description: error.message || 'Network error occurred',
+//         duration: 4000
+//       });
+//     }
+//   };
+
+//   // Close clear cart modal
+//   const closeClearCartModal = () => {
+//     setClearCartModal({ show: false });
+//   };
+
+//   // Save edited quantities for a color
+//   const handleSaveColorEdits = async (itemId, colorIndex) => {
+//     const key = `${itemId}-${colorIndex}`;
+//     const editedData = editedQuantities[key];
+    
+//     if (!editedData) return;
+    
+//     setSavingEdits(prev => ({ ...prev, [key]: true }));
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const item = cart.items.find(i => i._id === itemId);
+//       if (!item) return;
+
+//       // Get all available sizes from the product
+//       const productDetail = productDetails[item.productId];
+//       const allSizes = productDetail?.sizes?.filter(s => s.trim()) || [];
+      
+//       // Create an array with ALL sizes, including zeros for the edited color
+//       const updatedSizeQuantities = allSizes.map(size => ({
+//         size,
+//         quantity: editedData[size] || 0
+//       }));
+
+//       // Update the specific color's quantities
+//       const updatedColors = [...item.colors];
+//       updatedColors[colorIndex] = {
+//         ...updatedColors[colorIndex],
+//         color: {
+//           code: updatedColors[colorIndex].color?.code || '#CCCCCC',
+//           name: updatedColors[colorIndex].color?.name || updatedColors[colorIndex].color?.code || 'Unknown Color'
+//         },
+//         sizeQuantities: updatedSizeQuantities,
+//         // Remove totalQuantity and totalForColor - let backend calculate
+//       };
+
+//       const cartItem = {
+//         productId: item.productId,
+//         productName: item.productName,
+//         colors: updatedColors,
+//         // REMOVE totalQuantity - let backend calculate
+//         unitPrice: item.unitPrice, // Send current price, backend will recalc
+//         moq: item.moq,
+//         productImage: item.productImage,
+//         specialInstructions: item.specialInstructions 
+//       };
+
+//       console.log('📤 Saving edited colors:', JSON.stringify(cartItem, null, 2));
+
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//         method: 'POST',
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(cartItem)
+//       });
+
+//       const data = await response.json();
+//       if (data.success) {
+//         setCart(data.data);
+        
+//         // Exit edit mode
+//         setEditingColors(prev => {
+//           const newState = { ...prev };
+//           delete newState[key];
+//           return newState;
+//         });
+        
+//         setEditedQuantities(prev => {
+//           const newState = { ...prev };
+//           delete newState[key];
+//           return newState;
+//         });
+        
+//         toast.success('Quantities updated successfully');
+        
+//         // Dispatch cart update event
+//         window.dispatchEvent(new Event('cart-update'));
+//       } else {
+//         console.error('❌ Server response error:', data);
+//         toast.error(data.error || 'Failed to update quantities');
+//       }
+//     } catch (error) {
+//       console.error('❌ Error updating quantities:', error);
+//       toast.error('Failed to update quantities');
+//     } finally {
+//       setSavingEdits(prev => ({ ...prev, [key]: false }));
+//     }
+//   };
 
 //   // Cancel edit mode
 //   const cancelEdit = (itemId, colorIndex) => {
@@ -380,305 +498,226 @@
 //   };
 
 //   // Handle adding a new color
-//  // Handle adding a new color
-// const handleAddColorToCart = async (item) => {
-//   const selectedColor = selectedColors[item._id];
-//   if (!selectedColor) {
-//     toast.error('Please select a color');
-//     return;
-//   }
-
-//   const quantities = colorQuantities[item._id] || {};
-//   const totalQty = Object.values(quantities).reduce((sum, qty) => sum + (qty || 0), 0);
-
-//   if (totalQty === 0) {
-//     toast.error('Please enter quantities for at least one size');
-//     return;
-//   }
-
-//   setAddingToCart(prev => ({ ...prev, [item._id]: true }));
-
-//   try {
-//     const token = localStorage.getItem('token');
-    
-//     // Get existing colors from current item
-//     const existingColors = item.colors || [];
-    
-//     // Check if this color already exists
-//     const colorExists = existingColors.some(
-//       c => c.color?.code === selectedColor.code
-//     );
-
-//     if (colorExists) {
-//       toast.error('This color is already in your cart');
-//       setAddingToCart(prev => ({ ...prev, [item._id]: false }));
+//   const handleAddColorToCart = async (item) => {
+//     const selectedColor = selectedColors[item._id];
+//     if (!selectedColor) {
+//       toast.error('Please select a color');
 //       return;
 //     }
 
-//     // Get all available sizes for this product
-//     const productDetail = productDetails[item.productId];
-//     const allSizes = productDetail?.sizes?.filter(s => s.trim()) || [];
+//     const quantities = colorQuantities[item._id] || {};
+//     const totalQty = Object.values(quantities).reduce((sum, qty) => sum + (qty || 0), 0);
 
-//     // Create array with ALL sizes, including zeros
-//     const sizeQuantitiesArray = allSizes.map(size => ({
-//       size,
-//       quantity: quantities[size] || 0
-//     }));
+//     if (totalQty === 0) {
+//       toast.error('Please enter quantities for at least one size');
+//       return;
+//     }
 
-//     // Prepare the new color data with proper structure
-//     const newColorData = {
-//       color: {
-//         code: selectedColor.code,
-//         name: selectedColor.name || selectedColor.code
-//       },
-//       sizeQuantities: sizeQuantitiesArray,
-//       totalQuantity: totalQty,
-//       totalForColor: totalQty
-//     };
+//     setAddingToCart(prev => ({ ...prev, [item._id]: true }));
 
-//     // Update the cart with the new color - MERGE with existing colors
-//     const updatedColors = [...existingColors, newColorData];
-//     const updatedTotalQuantity = updatedColors.reduce(
-//       (sum, color) => sum + (color.totalQuantity || 0), 
-//       0
-//     );
-
-//     // Determine the correct unit price based on the new total quantity
-//     let updatedUnitPrice = item.unitPrice;
-    
-//     // Check if product has bulk pricing tiers
-//     if (productDetail?.quantityBasedPricing && productDetail.quantityBasedPricing.length > 0) {
-//       const sortedTiers = [...productDetail.quantityBasedPricing].sort((a, b) => {
-//         const aMin = parseInt(a.range.split('-')[0] || a.range.replace('+', ''));
-//         const bMin = parseInt(b.range.split('-')[0] || b.range.replace('+', ''));
-//         return aMin - bMin;
-//       });
+//     try {
+//       const token = localStorage.getItem('token');
       
-//       // Find the applicable tier based on updatedTotalQuantity
-//       for (const tier of sortedTiers) {
-//         const range = tier.range;
-//         if (range.includes('-')) {
-//           const [min, max] = range.split('-').map(Number);
-//           if (updatedTotalQuantity >= min && updatedTotalQuantity <= max) {
-//             updatedUnitPrice = tier.price;
-//             break;
-//           }
-//         } else if (range.includes('+')) {
-//           const minQty = parseInt(range.replace('+', ''));
-//           if (updatedTotalQuantity >= minQty) {
-//             updatedUnitPrice = tier.price;
-//             break;
+//       // Get existing colors from current item
+//       const existingColors = item.colors || [];
+      
+//       // Check if this color already exists
+//       const colorExists = existingColors.some(
+//         c => c.color?.code === selectedColor.code
+//       );
+
+//       if (colorExists) {
+//         toast.error('This color is already in your cart');
+//         setAddingToCart(prev => ({ ...prev, [item._id]: false }));
+//         return;
+//       }
+
+//       // Get all available sizes for this product
+//       const productDetail = productDetails[item.productId];
+//       const allSizes = productDetail?.sizes?.filter(s => s.trim()) || [];
+
+//       // Create array with ALL sizes, including zeros
+//       const sizeQuantitiesArray = allSizes.map(size => ({
+//         size,
+//         quantity: quantities[size] || 0
+//       }));
+
+//       // Prepare the new color data with proper structure
+//       const newColorData = {
+//         color: {
+//           code: selectedColor.code,
+//           name: selectedColor.name || selectedColor.code
+//         },
+//         sizeQuantities: sizeQuantitiesArray,
+//         totalQuantity: totalQty,
+//         totalForColor: totalQty
+//       };
+
+//       // Update the cart with the new color - MERGE with existing colors
+//       const updatedColors = [...existingColors, newColorData];
+//       const updatedTotalQuantity = updatedColors.reduce(
+//         (sum, color) => sum + (color.totalQuantity || 0), 
+//         0
+//       );
+
+//       // Determine the correct unit price based on the new total quantity
+//       let updatedUnitPrice = item.unitPrice;
+      
+//       // Check if product has bulk pricing tiers
+//       if (productDetail?.quantityBasedPricing && productDetail.quantityBasedPricing.length > 0) {
+//         const sortedTiers = [...productDetail.quantityBasedPricing].sort((a, b) => {
+//           const aMin = parseInt(a.range.split('-')[0] || a.range.replace('+', ''));
+//           const bMin = parseInt(b.range.split('-')[0] || b.range.replace('+', ''));
+//           return aMin - bMin;
+//         });
+        
+//         // Find the applicable tier based on updatedTotalQuantity
+//         for (const tier of sortedTiers) {
+//           const range = tier.range;
+//           if (range.includes('-')) {
+//             const [min, max] = range.split('-').map(Number);
+//             if (updatedTotalQuantity >= min && updatedTotalQuantity <= max) {
+//               updatedUnitPrice = tier.price;
+//               break;
+//             }
+//           } else if (range.includes('+')) {
+//             const minQty = parseInt(range.replace('+', ''));
+//             if (updatedTotalQuantity >= minQty) {
+//               updatedUnitPrice = tier.price;
+//               break;
+//             }
 //           }
 //         }
 //       }
-//     }
 
-//     const cartItem = {
-//       productId: item.productId,
-//       productName: item.productName,
-//       colors: updatedColors,
-//       totalQuantity: updatedTotalQuantity,
-//       unitPrice: updatedUnitPrice,
-//       moq: item.moq,
-//       productImage: item.productImage
-//     };
+//       const cartItem = {
+//         productId: item.productId,
+//         productName: item.productName,
+//         colors: updatedColors,
+//         totalQuantity: updatedTotalQuantity,
+//         unitPrice: updatedUnitPrice,
+//         moq: item.moq,
+//         productImage: item.productImage
+//       };
 
-//     console.log('📤 Adding new color to existing product:', JSON.stringify(cartItem, null, 2));
+//       console.log('📤 Adding new color to existing product:', JSON.stringify(cartItem, null, 2));
 
-//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
-//       method: 'POST',
-//       headers: {
-//         'Authorization': `Bearer ${token}`,
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify(cartItem)
-//     });
-
-//     const data = await response.json();
-    
-//     if (data.success) {
-//       toast.success(`${selectedColor.code || 'Color'} added successfully!`);
-      
-//       // Reset selections for this item
-//       setSelectedColors(prev => {
-//         const newState = { ...prev };
-//         delete newState[item._id];
-//         return newState;
-//       });
-      
-//       setColorQuantities(prev => {
-//         const newState = { ...prev };
-//         delete newState[item._id];
-//         return newState;
-//       });
-
-//       // Update cart with the response data
-//       setCart(data.data);
-      
-//       // Dispatch cart update event
-//       window.dispatchEvent(new Event('cart-update'));
-      
-//       // Collapse the add color section
-//       setExpandedItems(prev => ({
-//         ...prev,
-//         [item._id]: false
-//       }));
-//     } else {
-//       console.error('❌ Server response error:', data);
-//       toast.error(data.error || 'Failed to add color');
-//     }
-//   } catch (error) {
-//     console.error('❌ Error adding color:', error);
-//     toast.error('Failed to add color');
-//   } finally {
-//     setAddingToCart(prev => ({ ...prev, [item._id]: false }));
-//   }
-// };
-
-//   const handleRemoveItem = async (itemId) => {
-//     if (!confirm('Are you sure you want to remove this product from your cart?')) return;
-    
-//     try {
-//       const token = localStorage.getItem('token');
-//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiry-cart/item/${itemId}`, {
-//         method: 'DELETE',
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/add', {
+//         method: 'POST',
 //         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(cartItem)
 //       });
 
 //       const data = await response.json();
+      
 //       if (data.success) {
+//         toast.success(`${selectedColor.code || 'Color'} added successfully!`);
+        
+//         // Reset selections for this item
+//         setSelectedColors(prev => {
+//           const newState = { ...prev };
+//           delete newState[item._id];
+//           return newState;
+//         });
+        
+//         setColorQuantities(prev => {
+//           const newState = { ...prev };
+//           delete newState[item._id];
+//           return newState;
+//         });
+
+//         // Update cart with the response data
 //         setCart(data.data);
         
-//         toast.success('Product removed from cart', {
-//           description: 'The item has been removed successfully',
-//           duration: 3000,
-//           icon: '🗑️'
-//         });
-        
 //         // Dispatch cart update event
 //         window.dispatchEvent(new Event('cart-update'));
+        
+//         // Collapse the add color section
+//         setExpandedItems(prev => ({
+//           ...prev,
+//           [item._id]: false
+//         }));
 //       } else {
-//         toast.error('Failed to remove product', {
-//           description: data.error || 'Something went wrong',
-//           duration: 4000
-//         });
+//         console.error('❌ Server response error:', data);
+//         toast.error(data.error || 'Failed to add color');
 //       }
 //     } catch (error) {
-//       console.error('Error removing item:', error);
-//       toast.error('Failed to remove product', {
-//         description: error.message || 'Network error occurred',
-//         duration: 4000
-//       });
+//       console.error('❌ Error adding color:', error);
+//       toast.error('Failed to add color');
+//     } finally {
+//       setAddingToCart(prev => ({ ...prev, [item._id]: false }));
 //     }
 //   };
 
-//   const handleClearCart = async () => {
-//     if (!confirm('Are you sure you want to clear your entire cart? This action cannot be undone.')) return;
+//   const handleFileUpload = async (e) => {
+//     const file = e.target.files[0];
+//     if (!file) return;
 
+//     console.log('📤 Frontend: File selected:', {
+//       name: file.name,
+//       type: file.type,
+//       size: file.size
+//     });
+
+//     // Validate file size on frontend
+//     if (file.size > 5 * 1024 * 1024) {
+//       toast.error('File too large', {
+//         description: 'Maximum file size is 5MB'
+//       });
+//       return;
+//     }
+
+//     // Validate file type on frontend - exact allowed types
+//     const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf'];
+//     if (!allowedTypes.includes(file.type)) {
+//       toast.error('Invalid file type', {
+//         description: 'Only PNG, JPEG images and PDF files are allowed'
+//       });
+//       return;
+//     }
+
+//     const formData = new FormData();
+//     formData.append('attachment', file);
+
+//     setUploading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/clear', {
-//         method: 'DELETE',
+      
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/upload', {
+//         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
-//         }
+//         },
+//         body: formData
 //       });
 
 //       const data = await response.json();
+      
 //       if (data.success) {
-//         setCart({ ...cart, items: [], totalItems: 0, totalQuantity: 0, estimatedTotal: 0 });
-        
-//         toast.success('Cart cleared successfully', {
-//           description: 'All items have been removed from your cart',
-//           duration: 3000,
-//           icon: '🧹'
+//         setAttachments([...attachments, data.data]);
+//         toast.success('File uploaded successfully', {
+//           description: data.data.fileName
 //         });
         
-//         // Dispatch cart update event
-//         window.dispatchEvent(new Event('cart-update'));
+//         // Clear the file input
+//         e.target.value = '';
 //       } else {
-//         toast.error('Failed to clear cart', {
-//           description: data.error || 'Something went wrong',
-//           duration: 4000
+//         toast.error('Upload failed', {
+//           description: data.error || 'Something went wrong'
 //         });
 //       }
 //     } catch (error) {
-//       console.error('Error clearing cart:', error);
-//       toast.error('Failed to clear cart', {
-//         description: error.message || 'Network error occurred',
-//         duration: 4000
+//       console.error('❌ Error uploading file:', error);
+//       toast.error('Upload failed', {
+//         description: error.message || 'Network error occurred'
 //       });
+//     } finally {
+//       setUploading(false);
 //     }
 //   };
-
-// const handleFileUpload = async (e) => {
-//   const file = e.target.files[0];
-//   if (!file) return;
-
-//   console.log('📤 Frontend: File selected:', {
-//     name: file.name,
-//     type: file.type,
-//     size: file.size
-//   });
-
-//   // Validate file size on frontend
-//   if (file.size > 5 * 1024 * 1024) {
-//     toast.error('File too large', {
-//       description: 'Maximum file size is 5MB'
-//     });
-//     return;
-//   }
-
-//   // Validate file type on frontend - exact allowed types
-//   const allowedTypes = ['image/png', 'image/jpeg', 'application/pdf'];
-//   if (!allowedTypes.includes(file.type)) {
-//     toast.error('Invalid file type', {
-//       description: 'Only PNG, JPEG images and PDF files are allowed'
-//     });
-//     return;
-//   }
-
-//   const formData = new FormData();
-//   formData.append('attachment', file);
-
-//   setUploading(true);
-//   try {
-//     const token = localStorage.getItem('token');
-    
-//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart/upload', {
-//       method: 'POST',
-//       headers: {
-//         'Authorization': `Bearer ${token}`
-//       },
-//       body: formData
-//     });
-
-//     const data = await response.json();
-    
-//     if (data.success) {
-//       setAttachments([...attachments, data.data]);
-//       toast.success('File uploaded successfully', {
-//         description: data.data.fileName
-//       });
-      
-//       // Clear the file input
-//       e.target.value = '';
-//     } else {
-//       toast.error('Upload failed', {
-//         description: data.error || 'Something went wrong'
-//       });
-//     }
-//   } catch (error) {
-//     console.error('❌ Error uploading file:', error);
-//     toast.error('Upload failed', {
-//       description: error.message || 'Network error occurred'
-//     });
-//   } finally {
-//     setUploading(false);
-//   }
-// };
 
 //   const removeAttachment = (index) => {
 //     setAttachments(attachments.filter((_, i) => i !== index));
@@ -708,7 +747,7 @@
 //       const data = await response.json();
 //       if (data.success) {
 //         toast.success('Inquiry submitted successfully!');
-//         router.push('/customer/dashboard');
+//         router.push('/customer/inquiries');
 //       } else {
 //         toast.error(data.error || 'Failed to submit inquiry');
 //       }
@@ -751,7 +790,7 @@
 //             </div>
 //             {cart?.items?.length > 0 && (
 //               <button
-//                 onClick={handleClearCart}
+//                 onClick={showClearCartModal}
 //                 className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
 //               >
 //                 <Trash2 className="w-4 h-4" />
@@ -798,29 +837,29 @@
 //                         </div>
 
 //                         {/* Product Details */}
-//               <div className="flex-1">
-//   <div className="flex justify-between items-start">
-//     <div>
-//       <Link 
-//         href={`/productDetails?id=${item.productId}`}
-//         className="block w-fit"
-//       >
-//         <h3 className="font-semibold text-gray-900 hover:text-[#E39A65] transition-colors cursor-pointer">
-//           {item.productName}
-//         </h3>
-//       </Link>
-//       <p className="text-sm text-gray-500 mt-1">
-//         Total Quantity: <span className="font-medium text-gray-900">{item.totalQuantity} pcs</span>
-//       </p>
-//     </div>
-//     <button
-//       onClick={() => handleRemoveItem(item._id)}
-//       className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-//       title="Remove product"
-//     >
-//       <Trash2 className="w-4 h-4 text-red-500" />
-//     </button>
-//   </div>
+//                         <div className="flex-1">
+//                           <div className="flex justify-between items-start">
+//                             <div>
+//                               <Link 
+//                                 href={`/productDetails?id=${item.productId}`}
+//                                 className="block w-fit"
+//                               >
+//                                 <h3 className="font-semibold text-gray-900 hover:text-[#E39A65] transition-colors cursor-pointer">
+//                                   {item.productName}
+//                                 </h3>
+//                               </Link>
+//                               <p className="text-sm text-gray-500 mt-1">
+//                                 Total Quantity: <span className="font-medium text-gray-900">{item.totalQuantity} pcs</span>
+//                               </p>
+//                             </div>
+//                             <button
+//                               onClick={() => showProductDeleteModal(item._id, item.productName)}
+//                               className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+//                               title="Remove product"
+//                             >
+//                               <Trash2 className="w-4 h-4 text-red-500" />
+//                             </button>
+//                           </div>
 
 //                           {/* Colors and Sizes Section */}
 //                           <div className="mt-4 space-y-3">
@@ -948,7 +987,8 @@
 //                                                 size, 
 //                                                 e.target.value
 //                                               )}
-//                                               className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+//                                               onWheel={(e) => e.target.blur()}
+//                                               className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none "
 //                                               placeholder="0"
 //                                             />
 //                                           ) : (
@@ -973,18 +1013,18 @@
 //                               );
 //                             })}
 
-//                                         {/* Display special instructions if they exist */}
-//                       {item.specialInstructions && (
-//                         <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-[#E39A65]">
-//                           <div className="flex items-start gap-2">
-//                             <FileText className="w-4 h-4 text-[#E39A65] flex-shrink-0 mt-0.5" />
-//                             <div>
-//                               <p className="text-xs font-medium text-[#E39A65]">Special Instructions:</p>
-//                               <p className="text-xs font-semibold text-gray-700 mt-1">{item.specialInstructions}</p>
-//                             </div>
-//                           </div>
-//                         </div>
-//                       )}
+//                             {/* Display special instructions if they exist */}
+//                             {item.specialInstructions && (
+//                               <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-[#E39A65]">
+//                                 <div className="flex items-start gap-2">
+//                                   <FileText className="w-4 h-4 text-[#E39A65] flex-shrink-0 mt-0.5" />
+//                                   <div>
+//                                     <p className="text-xs font-medium text-[#E39A65]">Special Instructions:</p>
+//                                     <p className="text-xs font-semibold text-gray-700 mt-1">{item.specialInstructions}</p>
+//                                   </div>
+//                                 </div>
+//                               </div>
+//                             )}
 
 //                             {/* Add New Color Section - Only shown when expanded */}
 //                             {isExpanded && (
@@ -1215,7 +1255,7 @@
 //         </div>
 //       </div>
 
-//       {/* Delete Confirmation Modal - Styled like Admin page */}
+//       {/* Delete Color Confirmation Modal */}
 //       {deleteModal.show && (
 //         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
 //           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
@@ -1252,12 +1292,82 @@
 //         </div>
 //       )}
 
+//       {/* Product Delete Confirmation Modal */}
+//       {productDeleteModal.show && (
+//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+//           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+//             <div className="p-6">
+//               <div className="flex items-center gap-3 text-red-600 mb-4">
+//                 <AlertCircle className="w-6 h-6" />
+//                 <h3 className="text-lg font-semibold">Remove Product</h3>
+//               </div>
+              
+//               <p className="text-gray-600 mb-2">
+//                 Are you sure you want to remove <span className="font-semibold">"{productDeleteModal.productName}"</span> from your cart?
+//               </p>
+//               <p className="text-sm text-gray-500 mb-6">
+//                 This action cannot be undone. The product and all its colors will be removed from your cart.
+//               </p>
+
+//               <div className="flex items-center justify-end gap-3">
+//                 <button
+//                   onClick={closeProductDeleteModal}
+//                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={handleProductDeleteConfirm}
+//                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+//                 >
+//                   Remove Product
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Clear Cart Confirmation Modal */}
+//       {clearCartModal.show && (
+//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+//           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+//             <div className="p-6">
+//               <div className="flex items-center gap-3 text-red-600 mb-4">
+//                 <AlertCircle className="w-6 h-6" />
+//                 <h3 className="text-lg font-semibold">Clear Entire Cart</h3>
+//               </div>
+              
+//               <p className="text-gray-600 mb-2">
+//                 Are you sure you want to clear your entire cart?
+//               </p>
+//               <p className="text-sm text-gray-500 mb-6">
+//                 This action cannot be undone. All products and their colors will be removed from your cart.
+//               </p>
+
+//               <div className="flex items-center justify-end gap-3">
+//                 <button
+//                   onClick={closeClearCartModal}
+//                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={handleClearCartConfirm}
+//                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+//                 >
+//                   Clear Cart
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
 //       <Footer />
 //     </>
 //   );
 // }
-
-
 
 'use client';
 
@@ -2020,7 +2130,7 @@ export default function InquiryCartPage() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center mt-20">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center mt-16 sm:mt-20 px-4">
           <Loader2 className="w-8 h-8 animate-spin text-[#E39A65]" />
         </div>
         <Footer />
@@ -2031,24 +2141,24 @@ export default function InquiryCartPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 mt-20">
-        <div className="container mx-auto px-4 max-w-7xl py-8">
+      <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-4 max-w-7xl py-6 sm:py-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <Link href="/products" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#E39A65] mb-2">
+              <Link href="/products" className="inline-flex items-center gap-2 text-sm sm:text-base text-gray-600 hover:text-[#E39A65] mb-2 transition-colors">
                 <ArrowLeft className="w-4 h-4" />
                 Continue Shopping
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Inquiry Cart</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inquiry Cart</h1>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 Review and modify your inquiry items
               </p>
             </div>
             {cart?.items?.length > 0 && (
               <button
                 onClick={showClearCartModal}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-sm sm:text-base text-red-600 hover:bg-red-50 rounded-lg transition-colors w-full sm:w-auto"
               >
                 <Trash2 className="w-4 h-4" />
                 Clear Cart
@@ -2057,21 +2167,21 @@ export default function InquiryCartPage() {
           </div>
 
           {!cart?.items?.length ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-              <ShoppingCart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-              <p className="text-gray-500 mb-6">Start adding products to create your inquiry</p>
+            <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
+              <ShoppingCart className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
+              <p className="text-sm sm:text-base text-gray-500 mb-6">Start adding products to create your inquiry</p>
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors w-full sm:w-auto"
               >
                 Browse Products
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Cart Items */}
-              <div className="lg:col-span-2 space-y-4">
+              <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                 {cart.items.map((item) => {
                   const productDetail = productDetails[item.productId];
                   const availableColors = productDetail?.colors || [];
@@ -2082,36 +2192,54 @@ export default function InquiryCartPage() {
                   const isAdding = addingToCart[item._id];
 
                   return (
-                    <div key={item._id} className="bg-white rounded-xl border border-gray-200 p-4">
-                      <div className="flex gap-4">
-                        {/* Product Image */}
-                        <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    <div key={item._id} className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+                      {/* <div className="flex flex-col sm:flex-row gap-3 sm:gap-4"> */}
+                      
+                        {/* <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
                           <img
                             src={item.productImage || 'https://via.placeholder.com/96'}
                             alt={item.productName}
                             className="w-full h-full object-cover"
                           />
-                        </div>
+                        </div> */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+  {/* Product Image - Mobile Version (visible only on small screens) */}
+  <div className="w-full h-48 sm:hidden bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 mx-auto">
+    <img
+      src={item.productImage || 'https://via.placeholder.com/96'}
+      alt={item.productName}
+      className="w-full h-full object-cover"
+    />
+  </div>
+  
+  {/* Product Image - Desktop Version (visible only on large screens) */}
+  <div className="hidden sm:block w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+    <img
+      src={item.productImage || 'https://via.placeholder.com/96'}
+      alt={item.productName}
+      className="w-full h-full object-cover"
+    />
+  </div>
 
                         {/* Product Details */}
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
+                        <div className="flex-1 w-full">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                            <div className="text-center sm:text-left">
                               <Link 
                                 href={`/productDetails?id=${item.productId}`}
-                                className="block w-fit"
+                                className="block w-full sm:w-fit"
                               >
-                                <h3 className="font-semibold text-gray-900 hover:text-[#E39A65] transition-colors cursor-pointer">
+                                <h3 className="text-sm sm:text-base font-semibold text-gray-900 hover:text-[#E39A65] transition-colors cursor-pointer">
                                   {item.productName}
                                 </h3>
                               </Link>
-                              <p className="text-sm text-gray-500 mt-1">
+                              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                                 Total Quantity: <span className="font-medium text-gray-900">{item.totalQuantity} pcs</span>
                               </p>
                             </div>
                             <button
                               onClick={() => showProductDeleteModal(item._id, item.productName)}
-                              className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-1.5 hover:bg-red-50 rounded-lg transition-colors self-end sm:self-start"
                               title="Remove product"
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -2119,13 +2247,13 @@ export default function InquiryCartPage() {
                           </div>
 
                           {/* Colors and Sizes Section */}
-                          <div className="mt-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-sm font-medium text-gray-700">Selected Colors & Sizes:</h4>
+                          <div className="mt-3 sm:mt-4 space-y-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <h4 className="text-xs sm:text-sm font-medium text-gray-700">Selected Colors & Sizes:</h4>
                               {availableColors.length > 0 && (
                                 <button
                                   onClick={() => toggleExpand(item._id)}
-                                  className="flex items-center gap-1 text-xs text-[#E39A65] hover:text-[#d48b54] transition-colors"
+                                  className="flex items-center justify-center sm:justify-start gap-1 text-xs text-[#E39A65] hover:text-[#d48b54] transition-colors"
                                 >
                                   {isExpanded ? (
                                     <>Hide Add Color <ChevronUp className="w-3 h-3" /></>
@@ -2155,18 +2283,18 @@ export default function InquiryCartPage() {
                               
                               return (
                                 <div key={colorIndex} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                  <div className="flex items-center justify-between mb-2">
+                                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                                     <div className="flex items-center gap-2">
                                       <div 
-                                        className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                                        className="w-5 h-5 rounded-full border-2 border-white shadow-sm flex-shrink-0"
                                         style={{ backgroundColor: colorItem.color?.code || '#CCCCCC' }}
                                       />
-                                      <span className="text-sm font-medium text-gray-800">
+                                      <span className="text-xs sm:text-sm font-medium text-gray-800">
                                         {colorItem.color?.name || colorItem.color?.code || `Color ${colorIndex + 1}`}
                                       </span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xs bg-[#E39A65] text-white px-2 py-1 rounded-full">
+                                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                                      <span className="text-xs bg-[#E39A65] text-white px-2 py-1 rounded-full whitespace-nowrap">
                                         {colorItem.totalQuantity} pcs
                                       </span>
                                       
@@ -2183,9 +2311,9 @@ export default function InquiryCartPage() {
                                         title="Remove this color"
                                       >
                                         {isDeleting ? (
-                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                                         ) : (
-                                          <Trash2 className="w-4 h-4" />
+                                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                         )}
                                       </button>
                                       
@@ -2195,7 +2323,7 @@ export default function InquiryCartPage() {
                                           className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                           title="Edit quantities"
                                         >
-                                          <Plus className="w-4 h-4" />
+                                          <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                                         </button>
                                       ) : (
                                         <div className="flex gap-1">
@@ -2206,9 +2334,9 @@ export default function InquiryCartPage() {
                                             title="Save changes"
                                           >
                                             {isSaving ? (
-                                              <Loader2 className="w-4 h-4 animate-spin" />
+                                              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                                             ) : (
-                                              <Save className="w-4 h-4" />
+                                              <Save className="w-3 h-3 sm:w-4 sm:h-4" />
                                             )}
                                           </button>
                                           <button
@@ -2216,7 +2344,7 @@ export default function InquiryCartPage() {
                                             className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                                             title="Cancel"
                                           >
-                                            <X className="w-4 h-4" />
+                                            <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                           </button>
                                         </div>
                                       )}
@@ -2232,7 +2360,7 @@ export default function InquiryCartPage() {
                                       
                                       return (
                                         <div key={idx} className="flex items-center">
-                                          <span className="text-xs text-gray-500 w-8">{size}:</span>
+                                          <span className="text-xs text-gray-500 w-6 sm:w-8">{size}:</span>
                                           {isEditing ? (
                                             <input
                                               type="number"
@@ -2244,11 +2372,12 @@ export default function InquiryCartPage() {
                                                 size, 
                                                 e.target.value
                                               )}
-                                              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+                                              onWheel={(e) => e.target.blur()}
+                                              className="w-12 sm:w-16 px-1 sm:px-2 py-0.5 sm:py-1 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
                                               placeholder="0"
                                             />
                                           ) : (
-                                            <span className={`ml-1 text-sm font-medium ${
+                                            <span className={`ml-1 text-xs sm:text-sm font-medium ${
                                               currentQty > 0 ? 'text-gray-900' : 'text-gray-400'
                                             }`}>
                                               {currentQty > 0 ? currentQty : '-'}
@@ -2284,8 +2413,8 @@ export default function InquiryCartPage() {
 
                             {/* Add New Color Section - Only shown when expanded */}
                             {isExpanded && (
-                              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h5 className="text-sm font-medium text-blue-800 mb-3">Add Another Color</h5>
+                              <div className="mt-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h5 className="text-xs sm:text-sm font-medium text-blue-800 mb-3">Add Another Color</h5>
                                 
                                 {/* Color Selection */}
                                 {availableColors.length > 0 && (
@@ -2313,11 +2442,11 @@ export default function InquiryCartPage() {
                                             title={colorExists ? 'Already in cart' : color.code}
                                           >
                                             <div
-                                              className="w-8 h-8 rounded-full border-2 border-white shadow-md"
+                                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white shadow-md"
                                               style={{ backgroundColor: color.code }}
                                             />
                                             {colorExists && (
-                                              <CheckCircle className="absolute -top-1 -right-1 w-4 h-4 text-green-600 bg-white rounded-full" />
+                                              <CheckCircle className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-green-600 bg-white rounded-full" />
                                             )}
                                           </button>
                                         );
@@ -2340,7 +2469,7 @@ export default function InquiryCartPage() {
                                               min="0"
                                               value={quantities[size] || ''}
                                               onChange={(e) => handleQuantityChange(item._id, size, e.target.value)}
-                                              className="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                              className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                               placeholder="Qty"
                                             />
                                           </div>
@@ -2352,16 +2481,16 @@ export default function InquiryCartPage() {
                                     <button
                                       onClick={() => handleAddColorToCart(item)}
                                       disabled={isAdding}
-                                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      className="w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                       {isAdding ? (
                                         <>
-                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                                           Adding...
                                         </>
                                       ) : (
                                         <>
-                                          <Plus className="w-4 h-4" />
+                                          <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                                           Add This Color
                                         </>
                                       )}
@@ -2373,14 +2502,14 @@ export default function InquiryCartPage() {
                           </div>
 
                           {/* Price and Total */}
-                          <div className="mt-4 flex justify-between items-center pt-3 border-t border-gray-200">
-                            <div>
-                              <span className="text-sm text-gray-500">Unit Price:</span>
-                              <span className="ml-2 font-medium text-[#E39A65]">{formatPrice(item.unitPrice)}</span>
+                          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-3 border-t border-gray-200">
+                            <div className="flex justify-between sm:justify-start">
+                              <span className="text-xs sm:text-sm text-gray-500">Unit Price:</span>
+                              <span className="ml-2 text-xs sm:text-sm font-medium text-[#E39A65]">{formatPrice(item.unitPrice)}</span>
                             </div>
-                            <div>
-                              <span className="text-sm text-gray-500">Product Total:</span>
-                              <span className="ml-2 font-bold text-gray-900">
+                            <div className="flex justify-between sm:justify-start">
+                              <span className="text-xs sm:text-sm text-gray-500">Product Total:</span>
+                              <span className="ml-2 text-sm sm:text-base font-bold text-gray-900">
                                 {formatPrice(item.totalQuantity * item.unitPrice)}
                               </span>
                             </div>
@@ -2394,19 +2523,19 @@ export default function InquiryCartPage() {
 
               {/* Order Summary */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-24">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Inquiry Summary</h2>
+                <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 sticky top-20 sm:top-24">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Inquiry Summary</h2>
                   
                   <div className="space-y-3 mb-4">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-gray-600">Total Items:</span>
                       <span className="font-medium text-gray-900">{cart.totalItems}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-gray-600">Total Quantity:</span>
                       <span className="font-medium text-gray-900">{cart.totalQuantity} pcs</span>
                     </div>
-                    <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
+                    <div className="flex justify-between text-base sm:text-lg font-semibold pt-2 border-t border-gray-200">
                       <span>Estimated Total:</span>
                       <span className="text-[#E39A65]">{formatPrice(cart.estimatedTotal)}</span>
                     </div>
@@ -2414,35 +2543,35 @@ export default function InquiryCartPage() {
 
                   {/* Special Instructions */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                       Special Instructions
                     </label>
                     <textarea
                       value={specialInstructions}
                       onChange={(e) => setSpecialInstructions(e.target.value)}
                       rows="3"
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
+                      className="w-full px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none resize-none"
                       placeholder="Add any special requirements or notes..."
                     />
                   </div>
 
                   {/* File Attachments */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                       Attachments (Optional)
                     </label>
                     <div className="space-y-2">
                       {attachments.map((file, index) => (
                         <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-gray-500" />
-                            <span className="text-xs text-gray-600 truncate max-w-[150px]">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                            <span className="text-xs text-gray-600 truncate max-w-[120px] sm:max-w-[150px]">
                               {file.fileName}
                             </span>
                           </div>
                           <button
                             onClick={() => removeAttachment(index)}
-                            className="p-1 hover:bg-gray-200 rounded"
+                            className="p-1 hover:bg-gray-200 rounded flex-shrink-0"
                           >
                             <X className="w-3 h-3 text-gray-500" />
                           </button>
@@ -2457,13 +2586,13 @@ export default function InquiryCartPage() {
                           className="hidden"
                           disabled={uploading}
                         />
-                        <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#E39A65] transition-colors">
+                        <div className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#E39A65] transition-colors">
                           {uploading ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-[#E39A65]" />
+                            <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin text-[#E39A65]" />
                           ) : (
-                            <Upload className="w-4 h-4 text-gray-500" />
+                            <Upload className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
                           )}
-                          <span className="text-sm text-gray-600">
+                          <span className="text-xs sm:text-sm text-gray-600">
                             {uploading ? 'Uploading...' : 'Upload File'}
                           </span>
                         </div>
@@ -2478,16 +2607,16 @@ export default function InquiryCartPage() {
                   <button
                     onClick={handleSubmitInquiry}
                     disabled={submitting || !cart.items.length}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#E39A65] text-white font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                         Submitting...
                       </>
                     ) : (
                       <>
-                        <Send className="w-4 h-4" />
+                        <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                         Submit Inquiry
                       </>
                     )}
@@ -2497,7 +2626,7 @@ export default function InquiryCartPage() {
                   {cart.items.some(item => item.totalQuantity < item.moq) && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <div className="flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
                         <p className="text-xs text-yellow-700">
                           Some items don't meet the minimum order quantity. Please adjust quantities.
                         </p>
@@ -2513,32 +2642,32 @@ export default function InquiryCartPage() {
 
       {/* Delete Color Confirmation Modal */}
       {deleteModal.show && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 text-red-600 mb-4">
-                <AlertCircle className="w-6 h-6" />
-                <h3 className="text-lg font-semibold">Remove Color</h3>
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <h3 className="text-base sm:text-lg font-semibold">Remove Color</h3>
               </div>
               
-              <p className="text-gray-600 mb-2">
+              <p className="text-sm sm:text-base text-gray-600 mb-2">
                 Are you sure you want to remove <span className="font-semibold">"{deleteModal.colorName}"</span> from{' '}
                 <span className="font-semibold">"{deleteModal.productName}"</span>?
               </p>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-xs sm:text-sm text-gray-500 mb-6">
                 This action cannot be undone. The color and its quantities will be removed from your cart.
               </p>
 
-              <div className="flex items-center justify-end gap-3">
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-3">
                 <button
                   onClick={closeDeleteModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteColor}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors order-1 sm:order-2"
                 >
                   Remove Color
                 </button>
@@ -2550,31 +2679,31 @@ export default function InquiryCartPage() {
 
       {/* Product Delete Confirmation Modal */}
       {productDeleteModal.show && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 text-red-600 mb-4">
-                <AlertCircle className="w-6 h-6" />
-                <h3 className="text-lg font-semibold">Remove Product</h3>
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <h3 className="text-base sm:text-lg font-semibold">Remove Product</h3>
               </div>
               
-              <p className="text-gray-600 mb-2">
+              <p className="text-sm sm:text-base text-gray-600 mb-2">
                 Are you sure you want to remove <span className="font-semibold">"{productDeleteModal.productName}"</span> from your cart?
               </p>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-xs sm:text-sm text-gray-500 mb-6">
                 This action cannot be undone. The product and all its colors will be removed from your cart.
               </p>
 
-              <div className="flex items-center justify-end gap-3">
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-3">
                 <button
                   onClick={closeProductDeleteModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleProductDeleteConfirm}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors order-1 sm:order-2"
                 >
                   Remove Product
                 </button>
@@ -2586,31 +2715,31 @@ export default function InquiryCartPage() {
 
       {/* Clear Cart Confirmation Modal */}
       {clearCartModal.show && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 text-red-600 mb-4">
-                <AlertCircle className="w-6 h-6" />
-                <h3 className="text-lg font-semibold">Clear Entire Cart</h3>
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <h3 className="text-base sm:text-lg font-semibold">Clear Entire Cart</h3>
               </div>
               
-              <p className="text-gray-600 mb-2">
+              <p className="text-sm sm:text-base text-gray-600 mb-2">
                 Are you sure you want to clear your entire cart?
               </p>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-xs sm:text-sm text-gray-500 mb-6">
                 This action cannot be undone. All products and their colors will be removed from your cart.
               </p>
 
-              <div className="flex items-center justify-end gap-3">
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-3">
                 <button
                   onClick={closeClearCartModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleClearCartConfirm}
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors order-1 sm:order-2"
                 >
                   Clear Cart
                 </button>

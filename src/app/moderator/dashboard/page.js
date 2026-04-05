@@ -715,132 +715,140 @@ const handleEditProduct = (product) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
-        <div className="container mx-auto px-4 max-w-7xl py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Moderator Dashboard</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Manage products and view inquiries
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Filter Type Selector */}
-              <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => handleFilterTypeChange('all')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'all' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => handleFilterTypeChange('year')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'year' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Year
-                </button>
-                <button
-                  onClick={() => handleFilterTypeChange('month')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'month' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Month
-                </button>
-              </div>
-
-              {/* Month/Year Navigation */}
-              {filterType === 'month' && (
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => handleMonthChange(-1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Previous month"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
-                    {getMonthName(selectedMonth)} {selectedYear}
-                  </span>
-                  <button
-                    onClick={() => handleMonthChange(1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Next month"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {filterType === 'year' && (
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => handleYearChange(-1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Previous year"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
-                    {selectedYear}
-                  </span>
-                  <button
-                    onClick={() => handleYearChange(1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Next year"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-              <button
-                onClick={() => router.push('/moderator/settings')}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-            <CalendarRange className="w-3 h-3" />
-            Showing data for: <span className="font-medium text-[#E39A65]">{getFilterDisplayText()}</span>
-          </p>
-        </div>
+     <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
+  <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
+    {/* Mobile: Stacked layout, Desktop: Row layout */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+      {/* Title Section */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Moderator Dashboard</h1>
+        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-0.5">
+          Manage products and view inquiries
+        </p>
       </div>
+      
+      {/* Actions Section - Wrap on mobile */}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        {/* Filter Type Selector - Smaller on mobile */}
+        <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => handleFilterTypeChange('all')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'all' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => handleFilterTypeChange('year')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'year' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Year
+          </button>
+          <button
+            onClick={() => handleFilterTypeChange('month')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'month' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Month
+          </button>
+        </div>
+
+        {/* Month/Year Navigation - Smaller on mobile */}
+        {filterType === 'month' && (
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleMonthChange(-1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous month"
+            >
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200 whitespace-nowrap">
+              {getMonthName(selectedMonth)} {selectedYear}
+            </span>
+            <button
+              onClick={() => handleMonthChange(1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next month"
+            >
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+
+        {filterType === 'year' && (
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleYearChange(-1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous year"
+            >
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {selectedYear}
+            </span>
+            <button
+              onClick={() => handleYearChange(1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next year"
+            >
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Refresh Button - Smaller on mobile */}
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          <span className="hidden xs:inline">Refresh</span>
+        </button>
+        
+        {/* Settings Button - Smaller on mobile */}
+        <button
+          onClick={() => router.push('/moderator/settings')}
+          className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          title="Settings"
+        >
+          <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        </button>
+      </div>
+    </div>
+
+    {/* Date Filter Info - Responsive */}
+    <p className="text-[10px] sm:text-xs text-gray-500 mt-2 sm:mt-2 flex items-center gap-1">
+      <CalendarRange className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+      Showing data for: <span className="font-medium text-[#E39A65] truncate">{getFilterDisplayText()}</span>
+    </p>
+  </div>
+</div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 max-w-7xl py-4">
         {/* Stats Cards */}
        {/* Stats Cards */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+<div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
   <StatCard
     title="Total Products"
     value={stats.totalProducts}
     icon={Package}
     color="blue"
     subtitle="In catalog"
-    link="/moderator/products"
+    link="/moderator/all-products"
   />
   <StatCard
     title="Total Inquiries"
@@ -852,7 +860,7 @@ const handleEditProduct = (product) => {
   />
   <StatCard
     title="Pending Quotations"
-    value={stats.pendingQuotations}  // This is submitted count
+    value={stats.pendingQuotations}
     icon={Clock}
     color="amber"
     subtitle="Awaiting quote"
@@ -868,7 +876,7 @@ const handleEditProduct = (product) => {
   />
   <StatCard
     title="Pending Invoices"
-    value={stats.pendingInvoices}  // This is accepted count
+    value={stats.pendingInvoices}
     icon={CreditCard}
     color="rose"
     subtitle="Ready to invoice"
@@ -894,7 +902,7 @@ const handleEditProduct = (product) => {
               Recent Products
             </h2>
             <Link 
-              href="/moderator/allProducts" 
+              href="/moderator/all-products" 
               className="text-xs text-[#E39A65] hover:text-[#d48b54] font-medium flex items-center gap-1"
             >
               View all
@@ -968,14 +976,14 @@ const handleEditProduct = (product) => {
               title="Add New Product"
               description="Create product listing"
               icon={PlusCircle}
-              href="/moderator/createProducts"
+              href="/moderator/create-products"
               color="blue"
             />
             <QuickActionCard
               title="Manage Products"
               description="Edit or update products"
               icon={Package}
-              href="/moderator/allProducts"
+              href="/moderator/all-products"
               color="emerald"
             />
             <QuickActionCard
@@ -989,7 +997,7 @@ const handleEditProduct = (product) => {
               title="Create Blog"
               description= "create blogs "
               icon={Clock}
-              href="/moderator/createBlog"
+              href="/moderator/create-blog"
               color="purple"
             />
           </div>

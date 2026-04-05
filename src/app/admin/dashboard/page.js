@@ -284,7 +284,7 @@ const StatCard = ({
 
   return (
     <CardWrapper>
-      <div className={`relative overflow-hidden rounded-2xl border ${theme.border} ${theme.bg} p-5 hover:shadow-lg transition-all duration-300 group h-full flex flex-col ${(link || onClick) ? 'hover:scale-[1.02]' : ''}`}>
+      <div className={`relative overflow-hidden rounded-2xl border ${theme.border} ${theme.bg} p-3 hover:shadow-lg transition-all duration-300 group h-full flex flex-col ${(link || onClick) ? 'hover:scale-[1.02]' : ''}`}>
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
         <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8 group-hover:scale-110 transition-transform duration-500"></div>
@@ -320,7 +320,7 @@ const StatCard = ({
             </div>
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+              <p className="text-xl font-bold text-gray-900 mb-1">{value}</p>
               <p className={`text-xs font-medium ${theme.text} uppercase tracking-wider`}>{title}</p>
               {subtitle && <p className="text-[10px] text-gray-400 mt-2">{subtitle}</p>}
             </>
@@ -373,7 +373,7 @@ const RecentInquiryRow = ({ inquiry }) => {
 
   return (
     <div 
-      onClick={() => router.push(`/admin/inquiries/${inquiry._id}`)}
+      
       className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer group"
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -398,11 +398,13 @@ const RecentInquiryRow = ({ inquiry }) => {
         <span className="text-sm font-semibold text-[#E39A65]">
           {formatPrice(inquiry.subtotal || 0)}
         </span>
-        <Eye className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+       
       </div>
     </div>
   );
 };
+
+// ==================== RECENT INVOICE ROW ====================
 
 // ==================== RECENT INVOICE ROW ====================
 
@@ -412,7 +414,7 @@ const RecentInvoiceRow = ({ invoice }) => {
 
   return (
     <div 
-      onClick={() => router.push(`/admin/invoices/${invoice._id}`)}
+      onClick={() => router.push(`/admin/viewInvoice?invoiceId=${invoice._id}`)}
       className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer group"
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -625,114 +627,121 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
-        <div className="container mx-auto px-4 max-w-7xl py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                <CalendarRange className="w-3 h-3" />
-                Showing data for: <span className="font-medium text-[#E39A65]">{getFilterDisplayText()}</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Filter Type Selector */}
-              <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => handleFilterTypeChange('all')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'all' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => handleFilterTypeChange('year')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'year' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Year
-                </button>
-                <button
-                  onClick={() => handleFilterTypeChange('month')}
-                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                    filterType === 'month' 
-                      ? 'bg-[#E39A65] text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  Month
-                </button>
-              </div>
-
-              {/* Month/Year Navigation */}
-              {filterType === 'month' && (
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => handleMonthChange(-1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Previous month"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
-                    {getMonthName(selectedMonth)} {selectedYear}
-                  </span>
-                  <button
-                    onClick={() => handleMonthChange(1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Next month"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {filterType === 'year' && (
-                <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => handleYearChange(-1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Previous year"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
-                    {selectedYear}
-                  </span>
-                  <button
-                    onClick={() => handleYearChange(1)}
-                    className="px-2 py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Next year"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-              <button
-                onClick={() => router.push('/admin/settings')}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+  <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
+    {/* Mobile: Stacked layout, Desktop: Row layout */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+      {/* Title Section */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+          <CalendarRange className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+          Showing data for: <span className="font-medium text-[#E39A65] truncate">{getFilterDisplayText()}</span>
+        </p>
       </div>
+      
+      {/* Actions Section - Wrap on mobile */}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        {/* Filter Type Selector - Smaller on mobile */}
+        <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => handleFilterTypeChange('all')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'all' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => handleFilterTypeChange('year')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'year' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Year
+          </button>
+          <button
+            onClick={() => handleFilterTypeChange('month')}
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium transition-colors ${
+              filterType === 'month' 
+                ? 'bg-[#E39A65] text-white' 
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Month
+          </button>
+        </div>
+
+        {/* Month/Year Navigation - Smaller on mobile */}
+        {filterType === 'month' && (
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleMonthChange(-1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous month"
+            >
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200 whitespace-nowrap">
+              {getMonthName(selectedMonth)} {selectedYear}
+            </span>
+            <button
+              onClick={() => handleMonthChange(1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next month"
+            >
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+
+        {filterType === 'year' && (
+          <div className="flex items-center gap-0.5 sm:gap-1 border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => handleYearChange(-1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Previous year"
+            >
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-medium bg-white text-gray-700 border-x border-gray-200">
+              {selectedYear}
+            </span>
+            <button
+              onClick={() => handleYearChange(1)}
+              className="px-1.5 sm:px-2 py-1 sm:py-1.5 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Next year"
+            >
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Refresh Button - Smaller on mobile */}
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          <span className="hidden xs:inline">Refresh</span>
+        </button>
+        
+        {/* Settings Button - Smaller on mobile */}
+        <button
+          onClick={() => router.push('/admin/settings')}
+          className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          title="Settings"
+        >
+          <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 max-w-7xl py-4">
@@ -742,46 +751,49 @@ export default function AdminDashboardPage() {
             <Activity className="w-4 h-4 text-[#E39A65]" />
             Key Metrics {filterType !== 'all' && <span className="text-xs font-normal text-gray-400">(Filtered)</span>}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <StatCard
-              title="Total Inquiries"
-              value={dashboardData.overview.totalInquiries}
-              icon={ShoppingBag}
-              color="blue"
-              link="/admin/inquiries"
-            />
-            <StatCard
-              title="Pending Quotations"
-              value={dashboardData.overview.pendingQuotations}
-              icon={Clock}
-              color="amber"
-              subtitle="Awaiting response"
-              link="/admin/inquiries?filter=submitted"
-            />
-            <StatCard
-              title="Unpaid Invoices"
-              value={dashboardData.overview.unpaidInvoices}
-              icon={AlertCircle}
-              color="rose"
-              subtitle={`${dashboardData.overview.partialInvoices} partial`}
-              link="/admin/invoices?filter=unpaid"
-            />
-            <StatCard
-              title="Expired Invoices"
-              value={stats.expired}
-              icon={Clock}
-              color="orange"
-              subtitle="Payment overdue"
-              link="/admin/invoices?filter=expired"
-            />
-            <StatCard
-              title="Revenue"
-              value={formatPrice(dashboardData.overview.monthlyRevenue)}
-              icon={DollarSign}
-              color="emerald"
-              link="/admin/invoices?filter=paid"
-            />
-          </div>
+     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+  <StatCard
+    title="Total Inquiries"
+    value={dashboardData.overview.totalInquiries}
+    icon={ShoppingBag}
+    color="blue"
+    link="/admin/inquiries"
+  />
+  <StatCard
+    title="Pending Quotations"
+    value={dashboardData.overview.pendingQuotations}
+    icon={Clock}
+    color="amber"
+    subtitle="Awaiting response"
+    link="/admin/inquiries?filter=submitted"
+  />
+  <StatCard
+    title="Unpaid Invoices"
+    value={dashboardData.overview.unpaidInvoices}
+    icon={AlertCircle}
+    color="rose"
+    subtitle={`${dashboardData.overview.partialInvoices} partial`}
+    link="/admin/invoices?filter=unpaid"
+  />
+  <StatCard
+    title="Expired Invoices"
+    value={stats.expired}
+    icon={Clock}
+    color="orange"
+    subtitle="Payment overdue"
+    link="/admin/invoices?filter=expired"
+  />
+  {/* Revenue Card - Takes 2 columns on mobile/small devices */}
+  <div className="col-span-2 sm:col-span-2 lg:col-span-1">
+    <StatCard
+      title="Revenue"
+      value={formatPrice(dashboardData.overview.monthlyRevenue)}
+      icon={DollarSign}
+      color="emerald"
+      link="/admin/invoices?filter=paid"
+    />
+  </div>
+</div>
         </div>
 
         {/* Status Breakdown & Charts */}
@@ -1148,7 +1160,7 @@ export default function AdminDashboardPage() {
               title="Add Product"
               description="Add new products to catalog"
               icon={Package}
-              href="/admin/createProducts"
+              href="/admin/create-products"
               color="blue"
             />
             <QuickActionCard

@@ -1,3 +1,5 @@
+
+
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -18,14 +20,14 @@
 //   Home,
 //   ChevronRight,
 //   HelpCircle,
-//   Inbox,
-//   Clock
+//   Star
 // } from 'lucide-react';
 
 // export default function CustomerLayout({ children }) {
 //   const [sidebarOpen, setSidebarOpen] = useState(false);
 //   const [userMenuOpen, setUserMenuOpen] = useState(false);
 //   const [user, setUser] = useState(null);
+//   const [isLoading, setIsLoading] = useState(true);
 //   const pathname = usePathname();
 //   const router = useRouter();
 
@@ -39,17 +41,27 @@
 //     const userData = localStorage.getItem('user');
     
 //     if (!token || !userData) {
-//       router.push('/login');
+//       logout();
 //       return;
 //     }
 
-//     const parsedUser = JSON.parse(userData);
-//     if (parsedUser.role !== 'customer') {
-//       router.push('/unauthorized');
-//       return;
-//     }
+//     try {
+//       const parsedUser = JSON.parse(userData);
+      
+//       // IMMEDIATE LOGOUT if role is not customer
+//       if (parsedUser.role !== 'customer') {
+//         console.log('Unauthorized customer access attempt by:', parsedUser.role);
+//         logout();
+//         return;
+//       }
 
-//     setUser(parsedUser);
+//       setUser(parsedUser);
+//     } catch (error) {
+//       console.error('Error parsing user data:', error);
+//       logout();
+//     } finally {
+//       setIsLoading(false);
+//     }
 //   }, [router]);
 
 //   const navigation = [
@@ -63,41 +75,26 @@
 //       name: 'My Inquiries',
 //       href: '/customer/inquiries',
 //       icon: MessageSquare,
-//       current: pathname.startsWith('/customer/inquiries'),
-//       subItems: [
-//         { name: 'All Inquiries', href: '/customer/inquiries' },
-//         { name: 'New Inquiry', href: '/customer/inquiries/new' },
-//         { name: 'Drafts', href: '/customer/inquiries/drafts' }
-//       ]
+//      current: pathname === '/customer/inquiries'
 //     },
 //     {
 //       name: 'My Invoices',
 //       href: '/customer/invoices',
 //       icon: FileText,
-//       current: pathname.startsWith('/customer/invoices'),
-//       subItems: [
-//         { name: 'All Invoices', href: '/customer/invoices' },
-//         { name: 'Pending', href: '/customer/invoices/pending' },
-//         { name: 'Paid', href: '/customer/invoices/paid' }
-//       ]
+//       current: pathname === '/customer/invoices',
 //     },
-//     {
-//       name: 'Payments',
-//       href: '/customer/payments',
-//       icon: CreditCard,
-//       current: pathname.startsWith('/customer/payments')
-//     },
+  
 //     {
 //       name: 'Browse Products',
 //       href: '/products',
 //       icon: ShoppingBag,
 //       current: pathname === '/products' || pathname.startsWith('/products/')
 //     },
-//     {
-//       name: 'Support',
-//       href: '/customer/support',
-//       icon: HelpCircle,
-//       current: pathname.startsWith('/customer/support')
+//       {
+//       name: 'My Reviews',
+//       href: '/customer/myReviews',
+//       icon: Star,
+//       current: pathname === '/customer/myReviews',
 //     },
 //     {
 //       name: 'Settings',
@@ -112,6 +109,18 @@
 //     localStorage.removeItem('user');
 //     router.push('/login');
 //   };
+
+//   // Show loading spinner while checking authentication
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f8f8f8' }}>
+//         <div className="text-center">
+//           <div className="w-16 h-16 border-4 border-[#E39A65] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+//           <p className="text-gray-600">Loading...</p>
+//         </div>
+//       </div>
+//     );
+//   }
 
 //   return (
 //     <>
@@ -140,32 +149,26 @@
 //         <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
 //           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
 //         }`}>
-//           {/* Sidebar header with logo - Using #E39A65 color */}
-//           <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: '#E39A65' }}>
+//           {/* Sidebar header with logo */}
+//                     <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
 //             <div className="flex items-center justify-center w-full">
-//               <img 
-//                 src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
-//                 alt="Asian Clothify Logo" 
-//                 className="h-20 w-auto object-contain drop-shadow-md"
-//                 onError={(e) => {
-//                   e.target.onerror = null;
-//                   e.target.style.display = 'none';
-//                   const parent = e.target.parentElement;
-//                   parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
-//                 }}
-//               />
+//               <Link href="/">
+//                 <img 
+//                   src="https://i.ibb.co.com/fzkq5JRV/favicon.png" 
+//                   alt="Asian Clothify Logo" 
+//                   className="h-20 w-auto object-contain drop-shadow-md cursor-pointer hover:opacity-90 transition-opacity"
+//                   onError={(e) => {
+//                     e.target.onerror = null;
+//                     e.target.style.display = 'none';
+//                     const parent = e.target.parentElement;
+//                     parent.innerHTML = '<span class="text-5xl text-white drop-shadow-md">👕</span>';
+//                   }}
+//                 />
+//               </Link>
 //             </div>
-            
-//             {/* Mobile close button */}
-//             <button 
-//               onClick={() => setSidebarOpen(false)}
-//               className="absolute right-4 lg:hidden text-white/80 hover:text-white"
-//             >
-//               <X className="w-5 h-5" />
-//             </button>
 //           </div>
 
-//           {/* User info - In sidebar below header */}
+//           {/* User info */}
 //           {user && (
 //             <div className="px-4 py-4 border-b border-gray-200" style={{ backgroundColor: '#faf1e9' }}>
 //               <div className="flex items-center gap-3">
@@ -182,7 +185,7 @@
 //                   <div className="flex items-center gap-1.5 mt-1.5">
 //                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
 //                     <span className="text-xs font-medium" style={{ color: '#E39A65' }}>
-//                       B2B Customer
+//                        Customer
 //                     </span>
 //                   </div>
 //                 </div>
@@ -191,7 +194,7 @@
 //           )}
 
 //           {/* Navigation */}
-//           <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto">
+//           <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto pb-20">
 //             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">CUSTOMER MENU</p>
 //             <div className="space-y-1">
 //               {navigation.map((item) => (
@@ -238,8 +241,9 @@
 //             </div>
 //           </nav>
 
+        
 
-//           {/* Logout button at bottom */}
+//           {/* Logout button */}
 //           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
 //             <button
 //               onClick={logout}
@@ -268,7 +272,7 @@
 //           <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm" style={{ margin: 0, borderBottomColor: '#E39A65' }}>
 //             <div className="px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
 //               <div className="flex items-center justify-between h-20" style={{ margin: 0 }}>
-//                 {/* Left section - Welcome message and mobile menu */}
+//                 {/* Left section */}
 //                 <div className="flex items-center gap-3">
 //                   <button
 //                     onClick={() => setSidebarOpen(true)}
@@ -279,17 +283,19 @@
 //                   </button>
                   
 //                   {/* Welcome Message */}
-//                   {user && (
-//                     <div>
-//                       <span className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>Welcome back,</span>
-//                       <span className="text-2xl font-bold ml-2" style={{ color: '#E39A65' }}>{user.companyName || user.contactPerson || 'Customer'}</span>
-//                     </div>
-//                   )}
+//                 {user && (
+//   <div className="hidden sm:block">
+//     <span className="text-lg md:text-xl lg:text-2xl font-bold" style={{ color: '#2A2A2A' }}>Welcome back,</span>
+//     <span className="text-lg md:text-xl lg:text-2xl font-bold ml-1 md:ml-2" style={{ color: '#E39A65' }}>
+//       {(user.companyName || user.contactPerson || 'Customer').slice(0, 15)}
+//       {(user.companyName || user.contactPerson || 'Customer').length > 15 ? '...' : ''}
+//     </span>
+//   </div>
+// )}
 //                 </div>
 
-//                 {/* Right section - all icons */}
+//                 {/* Right section */}
 //                 <div className="flex items-center gap-3">
-//                   {/* Homepage Button */}
 //                   <Link 
 //                     href="/" 
 //                     className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -299,21 +305,8 @@
 //                     <Home className="w-5 h-5" />
 //                   </Link>
 
-//                   {/* Support */}
-//                   <Link 
-//                     href="/customer/support" 
-//                     className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-//                     style={{ color: '#2A2A2A' }}
-//                     title="Support"
-//                   >
-//                     <HelpCircle className="w-5 h-5" />
-//                   </Link>
+                
 
-//                   {/* Notifications */}
-//                   <button className="relative w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-//                     <Bell className="w-5 h-5" style={{ color: '#2A2A2A' }} />
-//                     <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#E39A65' }}></span>
-//                   </button>
 
 //                   {/* User Dropdown */}
 //                   {user && (
@@ -340,7 +333,6 @@
 //                             onClick={() => setUserMenuOpen(false)}
 //                           />
 //                           <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
-//                             {/* User Info in Dropdown */}
 //                             <div className="px-4 py-3 border-b border-gray-200">
 //                               <p className="text-sm font-semibold" style={{ color: '#2A2A2A' }}>{user.companyName || user.contactPerson || 'Customer'}</p>
 //                               <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
@@ -351,23 +343,13 @@
 //                                     backgroundColor: '#faf1e9',
 //                                     color: '#E39A65'
 //                                   }}>
-//                                   B2B Customer
+//                                   Customer
 //                                 </span>
 //                               </div>
 //                             </div>
                             
-//                             {/* New Inquiry Option */}
-//                             <Link
-//                               href="/customer/inquiries/new"
-//                               className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
-//                               style={{ color: '#2A2A2A' }}
-//                               onClick={() => setUserMenuOpen(false)}
-//                             >
-//                               <MessageSquare className="w-4 h-4" style={{ color: '#E39A65' }} />
-//                               <span>New Inquiry</span>
-//                             </Link>
+                          
                             
-//                             {/* Settings Option */}
 //                             <Link
 //                               href="/customer/settings"
 //                               className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
@@ -378,20 +360,8 @@
 //                               <span>Settings</span>
 //                             </Link>
                             
-//                             {/* WhatsApp Support */}
-//                             <a
-//                               href="https://wa.me/1234567890?text=Hello%2C%20I%20need%20assistance%20with%20my%20account"
-//                               target="_blank"
-//                               rel="noopener noreferrer"
-//                               className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
-//                               style={{ color: '#2A2A2A' }}
-//                               onClick={() => setUserMenuOpen(false)}
-//                             >
-//                               <MessageSquare className="w-4 h-4" style={{ color: '#25D366' }} />
-//                               <span>WhatsApp Support</span>
-//                             </a>
+                          
                             
-//                             {/* Logout Option */}
 //                             <button
 //                               onClick={() => {
 //                                 setUserMenuOpen(false);
@@ -414,26 +384,14 @@
 //           </header>
 
 //           {/* Page content */}
-//           <main className="py-6 px-4 sm:px-6 lg:px-8" style={{ margin: 0 }}>
-//             {/* Page title */}
-//             <div className="mb-6">
-//               <h1 className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>
-//                 {pathname.split('/').pop() === 'customer' || pathname.split('/').pop() === 'dashboard' 
-//                   ? 'Customer Dashboard' 
-//                   : pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').charAt(0).toUpperCase() + 
-//                     pathname.split('/').pop()?.split(/(?=[A-Z])/).join(' ').slice(1) || 'Dashboard'}
-//               </h1>
-//             </div>
-
-//             {/* Child content */}
-//             {children}
-//           </main>
+//          <main className="" style={{ margin: 0, padding: 0 }}>
+//         {children}
+//         </main>
 //         </div>
 //       </div>
 //     </>
 //   );
 // }
-
 
 
 
@@ -447,16 +405,12 @@ import {
   ShoppingBag, 
   FileText,
   MessageSquare,
-  CreditCard,
   Settings, 
   LogOut,
   Menu,
-  X,
-  Bell,
   ChevronDown,
   Home,
   ChevronRight,
-  HelpCircle,
   Star
 } from 'lucide-react';
 
@@ -467,6 +421,56 @@ export default function CustomerLayout({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Helper function to normalize pathname (remove trailing slash)
+  const normalizePath = (path) => {
+    if (path && path !== '/' && path.endsWith('/')) {
+      return path.slice(0, -1);
+    }
+    return path;
+  };
+
+  // Helper function to check if a route is active
+  const isActive = (href) => {
+    const currentPath = normalizePath(pathname);
+    
+    // Dashboard
+    if (href === '/customer/dashboard') {
+      return currentPath === '/customer/dashboard';
+    }
+    
+    // My Inquiries
+    if (href === '/customer/inquiries') {
+      return currentPath === '/customer/inquiries' || 
+             currentPath.startsWith('/customer/inquiries/');
+    }
+    
+    // My Invoices
+    if (href === '/customer/invoices') {
+      return currentPath === '/customer/invoices' || 
+             currentPath.startsWith('/customer/invoices/');
+    }
+    
+    // Browse Products
+    if (href === '/products') {
+      return currentPath === '/products' || 
+             currentPath.startsWith('/products/');
+    }
+    
+    // My Reviews
+    if (href === '/customer/my-reviews') {
+      return currentPath === '/customer/my-reviews' || 
+             currentPath.startsWith('/customer/my-reviews/');
+    }
+    
+    // Settings
+    if (href === '/customer/settings') {
+      return currentPath === '/customer/settings' || 
+             currentPath.startsWith('/customer/settings/');
+    }
+    
+    return false;
+  };
 
   useEffect(() => {
     // Add global style to remove any body padding/margin
@@ -506,38 +510,31 @@ export default function CustomerLayout({ children }) {
       name: 'Dashboard',
       href: '/customer/dashboard',
       icon: LayoutDashboard,
-      current: pathname === '/customer/dashboard'
     },
     {
       name: 'My Inquiries',
       href: '/customer/inquiries',
       icon: MessageSquare,
-     current: pathname === '/customer/inquiries'
     },
     {
       name: 'My Invoices',
       href: '/customer/invoices',
       icon: FileText,
-      current: pathname === '/customer/invoices',
     },
-  
     {
       name: 'Browse Products',
       href: '/products',
       icon: ShoppingBag,
-      current: pathname === '/products' || pathname.startsWith('/products/')
     },
-      {
+    {
       name: 'My Reviews',
-      href: '/customer/myReviews',
+      href: '/customer/my-reviews',
       icon: Star,
-      current: pathname === '/customer/myReviews',
     },
     {
       name: 'Settings',
       href: '/customer/settings',
       icon: Settings,
-      current: pathname.startsWith('/customer/settings')
     }
   ];
 
@@ -587,7 +584,7 @@ export default function CustomerLayout({ children }) {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
           {/* Sidebar header with logo */}
-                    <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
+          <div className="h-20 flex items-center justify-center px-6 border-b border-gray-200 relative" style={{ background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)' }}>
             <div className="flex items-center justify-center w-full">
               <Link href="/">
                 <img 
@@ -622,7 +619,7 @@ export default function CustomerLayout({ children }) {
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
                     <span className="text-xs font-medium" style={{ color: '#E39A65' }}>
-                      B2B Customer
+                      Customer
                     </span>
                   </div>
                 </div>
@@ -634,51 +631,31 @@ export default function CustomerLayout({ children }) {
           <nav className="px-3 py-4 h-[calc(100vh-13rem)] overflow-y-auto pb-20">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-3">CUSTOMER MENU</p>
             <div className="space-y-1">
-              {navigation.map((item) => (
-                <div key={item.name}>
+              {navigation.map((item) => {
+                const active = isActive(item.href);
+                return (
                   <Link
+                    key={item.name}
                     href={item.href}
                     className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                      item.current
+                      active
                         ? 'text-white shadow-md'
-                        : 'hover:bg-orange-50' 
+                        : 'text-gray-700 hover:bg-orange-50'
                     }`}
-                    style={item.current ? { background: '#E39A65' } : { color: '#2A2A2A' }}
+                    style={active ? { background: '#E39A65' } : {}}
                   >
                     <div className="flex items-center gap-3">
                       <item.icon className={`w-5 h-5 ${
-                        item.current ? 'text-white' : 'text-gray-400'
+                        active ? 'text-white' : 'text-gray-400'
                       }`} />
                       <span>{item.name}</span>
                     </div>
-                    {item.current && <ChevronRight className="w-4 h-4 text-white" />}
+                    {active && <ChevronRight className="w-4 h-4 text-white" />}
                   </Link>
-                  
-                  {/* Sub-items for Inquiries and Invoices */}
-                  {(item.name === 'My Inquiries' || item.name === 'My Invoices') && item.current && (
-                    <div className="ml-11 mt-1 space-y-1">
-                      {item.subItems?.map((subItem) => (
-                        <Link
-                          key={subItem.name}
-                          href={subItem.href}
-                          className={`block px-4 py-2 text-sm rounded-lg ${
-                            pathname === subItem.href
-                              ? 'font-medium'
-                              : 'text-gray-600 hover:text-orange-600'
-                          }`}
-                          style={pathname === subItem.href ? { color: '#E39A65' } : {}}
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </nav>
-
-        
 
           {/* Logout button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
@@ -721,9 +698,12 @@ export default function CustomerLayout({ children }) {
                   
                   {/* Welcome Message */}
                   {user && (
-                    <div>
-                      <span className="text-2xl font-bold" style={{ color: '#2A2A2A' }}>Welcome back,</span>
-                      <span className="text-2xl font-bold ml-2" style={{ color: '#E39A65' }}>{user.companyName || user.contactPerson || 'Customer'}</span>
+                    <div className="hidden sm:block">
+                      <span className="text-lg md:text-xl lg:text-2xl font-bold" style={{ color: '#2A2A2A' }}>Welcome back,</span>
+                      <span className="text-lg md:text-xl lg:text-2xl font-bold ml-1 md:ml-2" style={{ color: '#E39A65' }}>
+                        {(user.companyName || user.contactPerson || 'Customer').slice(0, 15)}
+                        {(user.companyName || user.contactPerson || 'Customer').length > 15 ? '...' : ''}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -738,9 +718,6 @@ export default function CustomerLayout({ children }) {
                   >
                     <Home className="w-5 h-5" />
                   </Link>
-
-                
-
 
                   {/* User Dropdown */}
                   {user && (
@@ -777,20 +754,10 @@ export default function CustomerLayout({ children }) {
                                     backgroundColor: '#faf1e9',
                                     color: '#E39A65'
                                   }}>
-                                  B2B Customer
+                                  Customer
                                 </span>
                               </div>
                             </div>
-                            
-                            <Link
-                              href="/customer/inquiries/new"
-                              className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-orange-50 transition-colors"
-                              style={{ color: '#2A2A2A' }}
-                              onClick={() => setUserMenuOpen(false)}
-                            >
-                              <MessageSquare className="w-4 h-4" style={{ color: '#E39A65' }} />
-                              <span>New Inquiry</span>
-                            </Link>
                             
                             <Link
                               href="/customer/settings"
@@ -801,8 +768,6 @@ export default function CustomerLayout({ children }) {
                               <Settings className="w-4 h-4" style={{ color: '#E39A65' }} />
                               <span>Settings</span>
                             </Link>
-                            
-                          
                             
                             <button
                               onClick={() => {
@@ -826,9 +791,9 @@ export default function CustomerLayout({ children }) {
           </header>
 
           {/* Page content */}
-         <main className="" style={{ margin: 0, padding: 0 }}>
-        {children}
-        </main>
+          <main className="" style={{ margin: 0, padding: 0 }}>
+            {children}
+          </main>
         </div>
       </div>
     </>

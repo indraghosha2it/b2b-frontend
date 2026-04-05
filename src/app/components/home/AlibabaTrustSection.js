@@ -73,7 +73,7 @@ export default function AlibabaTrustSection() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-white overflow-x-hidden">
+    <section ref={sectionRef} className="pt-10 pb-0 bg-white overflow-x-hidden">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className={`text-center mb-12 transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
@@ -94,7 +94,7 @@ export default function AlibabaTrustSection() {
         </div>
 
         {/* Stats Grid */}
-        <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        {/* <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12 transition-all duration-700 delay-200 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -114,7 +114,7 @@ export default function AlibabaTrustSection() {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Main Content Grid */}
         <div className="grid lg:grid-cols-2 gap-6">
@@ -134,7 +134,7 @@ export default function AlibabaTrustSection() {
                         Gold Supplier
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-0.5 truncate">Asian Cloth Ltd.</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-0.5 truncate">Asian Clothify.</h3>
                     <p className="text-xs text-gray-600 truncate">Wholesale Apparel Manufacturer</p>
                   </div>
                   <div className="text-right flex-shrink-0 ml-2">
@@ -155,7 +155,7 @@ export default function AlibabaTrustSection() {
                 {[
                   { label: 'Products', value: '280+' },
                   { label: 'Response Rate', value: '98%' },
-                  { label: 'Response Time', value: '&lt;2h' }
+                  { label: 'Response Time', value: '2h' }
                 ].map((stat, index) => (
                   <div key={index} className="text-center py-3">
                     <div className="font-bold text-gray-900 text-sm">{stat.value}</div>
@@ -175,7 +175,7 @@ export default function AlibabaTrustSection() {
                   Visit Our Alibaba Store →
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/contact#inquiry-form"
                   className="block w-full text-center bg-gray-100 text-gray-700 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all duration-300"
                 >
                   Request Sample Order
@@ -237,7 +237,7 @@ export default function AlibabaTrustSection() {
         </div>
 
         {/* Bottom CTA */}
-        <div className={`mt-12 text-center p-6 bg-gray-50 rounded-xl border border-gray-200 transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className={`mt-8 text-center p-6 bg-gray-50 rounded-xl border border-gray-200 transition-all duration-700 delay-800 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <h3 className="text-lg font-bold text-gray-900 mb-2">
             Ready to start your wholesale order?
           </h3>

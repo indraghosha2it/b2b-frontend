@@ -8,19 +8,27 @@ import Categories from './Categories.js'
 import AlibabaTrustSection from './AlibabaTrustSection.js'
 import Navbar from '../layout/Navbar.js'
 import Footer from '../layout/Footer.js'
+
 import ReviewsSection from './ReviewsSection.js'
+import StatsSection from './StatsSection.js'
 
 export default function HomePage() {
   return (
      <>
      <Navbar />
       <HeroBanner />
+
       <ScrollingLogos />
-      <WhyChooseUs />
       <Categories />
       <FeaturedProducts />
-      <ReviewsSection />
+      <WhyChooseUs />
+      
+      
+     
            <AlibabaTrustSection /> 
+           <StatsSection/>
+        
+            <ReviewsSection />
            <Footer />
   
     </>

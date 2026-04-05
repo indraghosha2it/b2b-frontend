@@ -398,6 +398,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import ForgotPasswordModal from '../components/auth/ForgotPasswordModal';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -571,7 +572,7 @@ export default function LoginPage() {
           >
             <h1 className="text-2xl md:text-5xl font-bold text-gray-900 md:mb-3 mb-1">
               Welcome to{' '}
-              <span style={{ color: '#d9884e' }}>B2B Marketplace</span>
+              <span style={{ color: '#d9884e' }}>Asian Clothify</span>
             </h1>
             <p className="text-gray-600  md:text-xl max-w-2xl mx-auto text-sm">
               Your one-stop destination for wholesale fashion and accessories
@@ -739,15 +740,30 @@ export default function LoginPage() {
                             Signing in...
                           </>
                         ) : (
-                          'Sign In to B2B Account'
+                          'Sign In to Asian Clothify'
                         )}
                       </button>
+
+                      <div className="mt-6">
+  <div className="relative">
+    <div className="absolute inset-0 flex items-center">
+      <div className="w-full border-t border-gray-300" />
+    </div>
+    <div className="relative flex justify-center text-sm">
+      <span className="px-2 bg-white text-gray-500">Or continue with</span>
+    </div>
+  </div>
+
+  <div className="mt-6">
+    <GoogleLoginButton mode="login" />
+  </div>
+</div>
                     </div>
 
                     {/* Register Link */}
                     <div className="text-center mt-6">
                       <p className="text-gray-600">
-                        New to our B2B marketplace?{' '}
+                        New to Asian Clothify?{' '}
                         <Link href="/register" className="font-medium hover:underline" style={{ color: '#d9884e' }}>
                           Create account
                         </Link>
@@ -780,7 +796,7 @@ export default function LoginPage() {
                   <p className="text-sm text-gray-500">
                     Need help with your account?{' '}
                     <Link href="/contact" className="hover:underline font-medium" style={{ color: '#d9884e' }}>
-                      Contact B2B Support
+                      Contact Asian Clothify Support
                     </Link>
                   </p>
                 </motion.div>

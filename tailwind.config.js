@@ -9,12 +9,13 @@ module.exports = {
     require('daisyui'),
   ],
   daisyui: {
-    themes: ["light", "cupcake", "business", "corporate"],
+    themes: ["light", "cupcake",  "corporate"],
     darkTheme: "light",
     base: true,
     styled: true,
     utils: true,
     prefix: "",
     logs: true,
+     themeRoot: ":root",
   },
 }

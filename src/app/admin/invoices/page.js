@@ -1825,55 +1825,57 @@ const fetchInvoices = async () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
-        <div className="container mx-auto px-4 max-w-7xl py-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Invoice Management</h1>
-              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                Total {stats.total} invoices
-                {filterType !== 'all' && (
-                  <span className="ml-2 text-[#E39A65] font-medium">
-                    • Showing: {getFilterDisplayText()}
-                  </span>
-                )}
-                {showExpiredOnly && (
-                  <span className="ml-2 text-orange-600 font-medium">
-                    • Overdue only
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-              <Link
-                href="/admin/inquiries?filter=accepted"
-                className="flex items-center gap-1.5 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                Create Invoice from Inquiry
-              </Link>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-6 gap-2">
-            <StatCard title="Total" value={stats.total} icon={FileText} color="blue" />
-            <StatCard title="Paid" value={stats.paid} icon={CheckCircle} color="emerald" />
-            <StatCard title="Partial" value={stats.partial} icon={TrendingUp} color="amber" />
-            <StatCard title="Unpaid" value={stats.unpaid} icon={AlertCircle} color="rose" />
-            <StatCard title="Overdue" value={stats.expired} icon={Clock} color="orange" />
-            <StatCard title="Cancelled" value={stats.cancelled} icon={XCircle} color="gray" />
-          </div>
-        </div>
+     <div className="bg-white border-b border-gray-200 sticky top-20 z-10">
+  <div className="container mx-auto px-3 sm:px-4 max-w-7xl py-3 sm:py-4">
+    {/* Header - Stack on mobile */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-3 sm:mb-4">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Invoice Management</h1>
+        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-1">
+          Total {stats.total} invoices
+          {filterType !== 'all' && (
+            <span className="text-[#E39A65] font-medium">
+              • Showing: {getFilterDisplayText()}
+            </span>
+          )}
+          {showExpiredOnly && (
+            <span className="text-orange-600 font-medium">
+              • Overdue only
+            </span>
+          )}
+        </p>
       </div>
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+          <span className="hidden xs:inline">Refresh</span>
+        </button>
+        <Link
+          href="/admin/create-manual-invoice"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-2 text-[10px] sm:text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+        >
+          <PlusCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+          <span className=" xs:inline">Create Invoice </span>
+       
+        </Link>
+      </div>
+    </div>
+
+    {/* Stats Cards - Responsive Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      <StatCard title="Total" value={stats.total} icon={FileText} color="blue" />
+      <StatCard title="Paid" value={stats.paid} icon={CheckCircle} color="emerald" />
+      <StatCard title="Partial" value={stats.partial} icon={TrendingUp} color="amber" />
+      <StatCard title="Unpaid" value={stats.unpaid} icon={AlertCircle} color="rose" />
+      <StatCard title="Overdue" value={stats.expired} icon={Clock} color="orange" />
+      <StatCard title="Cancelled" value={stats.cancelled} icon={XCircle} color="gray" />
+    </div>
+  </div>
+</div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 max-w-7xl py-4">
@@ -2069,12 +2071,75 @@ const fetchInvoices = async () => {
                             )}
                           </td>
                           
-                          <td className="px-4 py-3">
-                            <PaymentStatusBadge 
-                              status={invoice.paymentStatus} 
-                              isExpired={isExpired} 
-                            />
-                          </td>
+                         <td className="px-4 py-3">
+  <div className="relative">
+    <button
+      onClick={() => {
+        const statusOptions = getStatusOptions(invoice);
+        if (statusOptions.length > 0) {
+          setStatusDropdownOpen(statusDropdownOpen === invoice._id ? null : invoice._id);
+        }
+      }}
+      disabled={getStatusOptions(invoice).length === 0 || updatingStatus === invoice._id}
+      className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-lg border transition-all ${
+        isExpired 
+          ? 'bg-orange-100 border-orange-300 text-orange-800'
+          : invoice.paymentStatus === 'paid' 
+            ? 'bg-emerald-100 border-emerald-300 text-emerald-800'
+            : invoice.paymentStatus === 'partial'
+              ? 'bg-blue-100 border-blue-300 text-blue-800'
+              : invoice.paymentStatus === 'unpaid'
+                ? 'bg-amber-100 border-amber-300 text-amber-800'
+                : invoice.paymentStatus === 'overpaid'
+                  ? 'bg-purple-100 border-purple-300 text-purple-800'
+                  : invoice.paymentStatus === 'cancelled'
+                    ? 'bg-rose-100 border-rose-300 text-rose-800'
+                    : 'bg-gray-100 border-gray-300 text-gray-800'
+      } ${getStatusOptions(invoice).length === 0 ? 'cursor-default' : 'cursor-pointer hover:shadow-sm'}`}
+    >
+      <div className="flex items-center gap-2">
+        {isExpired ? (
+          <Clock className="w-3.5 h-3.5 text-orange-600" />
+        ) : invoice.paymentStatus === 'paid' ? (
+          <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+        ) : invoice.paymentStatus === 'partial' ? (
+          <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+        ) : invoice.paymentStatus === 'unpaid' ? (
+          <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+        ) : invoice.paymentStatus === 'overpaid' ? (
+          <TrendingDown className="w-3.5 h-3.5 text-purple-600" />
+        ) : invoice.paymentStatus === 'cancelled' ? (
+          <XCircle className="w-3.5 h-3.5 text-rose-600" />
+        ) : null}
+        <span className="text-xs font-medium capitalize">
+          {isExpired ? 'Expired' : invoice.paymentStatus || 'Unpaid'}
+        </span>
+      </div>
+      {getStatusOptions(invoice).length > 0 && (
+        <ChevronDown className="w-3 h-3" />
+      )}
+      {updatingStatus === invoice._id && (
+        <Loader2 className="w-3 h-3 animate-spin" />
+      )}
+    </button>
+    
+    {/* Status Dropdown */}
+    {statusDropdownOpen === invoice._id && getStatusOptions(invoice).length > 0 && (
+      <div className="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+        {getStatusOptions(invoice).map((option) => (
+          <button
+            key={option.value}
+            onClick={() => handleStatusUpdate(invoice._id, option.value)}
+            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50 flex items-center gap-2"
+          >
+            <option.icon className="w-4 h-4" />
+            {option.label}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+</td>
                           
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">

@@ -6,6 +6,7 @@ const nextConfig = {
     domains: ['i.ibb.co.com', 'i.ibb.co', 'images.unsplash.com'],
      unoptimized: true,
   },
+   trailingSlash: true,
 };
 
 export default nextConfig;

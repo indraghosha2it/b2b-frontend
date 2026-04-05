@@ -1280,6 +1280,7 @@ import OTPVerification from '../auth/OTPVerification';
 import ForgotPassword from '../auth/ForgotPassword';
 import ResetOTPVerification from '../auth/ResetOTPVerification';
 import ModalResetPassword from '../auth/ModalResetPassword';
+import GoogleLoginButtonPopUp from '../GoogleLoginButtonPopUp';
 
 export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, productId, productName }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -1330,7 +1331,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     zipCode: '',
     password: '',
     confirmPassword: '',
-    businessType: 'Retailer',
+
     agreeToTerms: false
   });
 
@@ -1345,10 +1346,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     { icon: <Star className="w-4 h-4" />, text: 'Earn reviewer badges' },
   ];
 
-  const businessTypes = [
-    'Retailer', 'Wholesaler', 'Distributor', 'Manufacturer', 
-    'E-commerce Store', 'Boutique', 'Fashion Brand'
-  ];
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -1461,6 +1459,35 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
+  // Google Auth Success Handler
+const handleGoogleSuccess = (data) => {
+  const { token, user, requiresAdditionalInfo } = data;
+  
+  // Store user data
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
+  
+  // Update state
+  setIsAuthenticated(true);
+  setUser(user);
+  
+  toast.success('Google sign in successful!', {
+    description: `Welcome ${user.contactPerson || user.companyName}!`,
+  });
+  
+  // Dispatch auth change event
+  window.dispatchEvent(new Event('auth-change'));
+  
+  // Reset auth step
+  setAuthStep('form');
+  setActiveTab('login');
+};
+
+// Google Auth Error Handler
+const handleGoogleError = (error) => {
+  toast.error(error);
+};
 
   // Forgot Password Handlers
   const handleForgotPassword = () => {
@@ -1623,7 +1650,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
           city: registerData.city,
           zipCode: registerData.zipCode,
           password: registerData.password,
-          businessType: registerData.businessType,
+         
           role: 'customer'
         }),
       });
@@ -1695,7 +1722,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
       zipCode: '',
       password: '',
       confirmPassword: '',
-      businessType: 'Retailer',
+     
       agreeToTerms: false
     });
   };
@@ -1848,7 +1875,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
 
               <div className="flex flex-col md:flex-row">
                 {/* Left Side - Branding & Benefits */}
-                <div className="md:w-2/5 bg-gradient-to-br from-[#E39A65] to-[#d48b54] p-8 text-white relative overflow-hidden">
+                <div className="hidden md:block md:w-2/5 bg-gradient-to-br from-[#E39A65] to-[#d48b54] p-8 text-white relative overflow-hidden">
                   {/* Decorative Pattern */}
                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
                   <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24"></div>
@@ -1970,6 +1997,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
 
                           {/* Login Form */}
                           {activeTab === 'login' ? (
+                            <>
                             <motion.form
                               key="login"
                               initial={{ opacity: 0, x: 20 }}
@@ -2059,8 +2087,26 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                                 )}
                               </button>
                             </motion.form>
+                               {/* Add Google Login Button - NEW */}
+                            <div className="mt-4">
+                              <div className="relative my-4">
+                                <div className="absolute inset-0 flex items-center">
+                                  <div className="w-full border-t border-gray-300" />
+                                </div>
+                                <div className="relative flex justify-center text-xs">
+                                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                                </div>
+                              </div>
+                              <GoogleLoginButtonPopUp 
+                                mode="login"
+                                onSuccess={handleGoogleSuccess}
+                                onError={handleGoogleError}
+                              />
+                            </div>
+                             </>
                           ) : (
-                            /* Register Form */
+                            <>
+                          
                             <motion.form
                               key="register"
                               initial={{ opacity: 0, x: 20 }}
@@ -2070,7 +2116,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                               className="space-y-4"
                             >
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="col-span-2">
+                                <div className="col-span-1">
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Company Name <span className="text-[#E39A65]">*</span>
                                   </label>
@@ -2088,7 +2134,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                                   </div>
                                 </div>
 
-                                <div className="col-span-2 md:col-span-1">
+                                <div className="col-span-1 md:col-span-1">
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Contact Person <span className="text-[#E39A65]">*</span>
                                   </label>
@@ -2106,21 +2152,6 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                                   </div>
                                 </div>
 
-                                <div className="col-span-2 md:col-span-1">
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Business Type
-                                  </label>
-                                  <select
-                                    name="businessType"
-                                    value={registerData.businessType}
-                                    onChange={handleRegisterChange}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E39A65] focus:border-transparent bg-gray-50 focus:bg-white"
-                                  >
-                                    {businessTypes.map(type => (
-                                      <option key={type} value={type}>{type}</option>
-                                    ))}
-                                  </select>
-                                </div>
 
                                 <div className="col-span-2">
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2160,7 +2191,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
 
                                 <div className="col-span-2 md:col-span-1">
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    WhatsApp <span className="text-gray-400 text-xs">(Optional)</span>
+                                    WhatsApp <span className="text-[#E39A65]">*</span>
                                   </label>
                                   <div className="relative group">
                                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#E39A65] transition-colors" />
@@ -2169,6 +2200,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                                       name="whatsapp"
                                       value={registerData.whatsapp}
                                       onChange={handleRegisterChange}
+                                      required
                                       className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#E39A65] focus:border-transparent bg-gray-50 focus:bg-white"
                                       placeholder="+1 234 567 8900"
                                     />
@@ -2322,7 +2354,31 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
                                 )}
                               </button>
                             </motion.form>
-                          )}
+                                 {/* Google Sign Up Button */}
+                        <div className="mt-4">
+                          <div className="relative my-4">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-gray-300" />
+                            </div>
+                            <div className="relative flex justify-center text-xs">
+                              <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                            </div>
+                          </div>
+                          <GoogleLoginButtonPopUp 
+                            mode="signup"
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                          />
+                        </div>
+          
+                            </>
+
+                            
+                            
+                          )
+                          
+                          }
+                        
                         </>
                       )}
 
