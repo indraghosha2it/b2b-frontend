@@ -2452,13 +2452,29 @@ const StatCard = ({ title, value, icon: Icon, color, trend, subtitle }) => {
   );
 };
 
-// Customer Inquiry Card with Expandable Details - Responsive
+
+
+// Update the InquiryCard component inside your customer inquiries page
+
+// Update the InquiryCard component in your customer inquiries page with this:
+
 const InquiryCard = ({ inquiry, onRefresh }) => {
   const [cancelling, setCancelling] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const router = useRouter();
+
+  // Helper function to check if any item is unavailable
+  const hasUnavailableItems = () => {
+    if (inquiry.status !== 'quoted') return false;
+    return inquiry.items.some(product => 
+      product.isAvailable === false || 
+      product.colors.some(color => color.isAvailable === false ||
+        color.sizeQuantities.some(size => size.isAvailable === false)
+      )
+    );
+  };
 
   const handleCancel = async () => {
     if (!confirm('Are you sure you want to cancel this inquiry? This action cannot be undone.')) {
@@ -2520,7 +2536,6 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
     try {
       const token = localStorage.getItem('token');
       
-      // Fetch customer's invoices
       const response = await fetch(`http://localhost:5000/api/invoices/my-invoices`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2530,13 +2545,11 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
       const data = await response.json();
       
       if (data.success && data.data) {
-        // Find the invoice that matches this inquiry ID
         const matchingInvoice = data.data.find(inv => 
           inv.inquiryId === inquiry._id || inv.inquiryId?.toString() === inquiry._id
         );
         
         if (matchingInvoice) {
-          // Navigate to the customer view invoice page with the correct invoice ID
           router.push(`/customer/viewInvoice?invoiceId=${matchingInvoice._id}`);
         } else {
           toast.error('No invoice found for this inquiry');
@@ -2556,7 +2569,30 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
     setShowDetails(!showDetails);
   };
 
-  // Render status-based action in top right
+  // Calculate total using per-color pricing (only counting available items)
+  const calculateTotalWithPerColorPricing = () => {
+    let total = 0;
+    inquiry.items.forEach(product => {
+      // Skip if product is unavailable
+      if (product.isAvailable === false) return;
+      
+      product.colors.forEach(color => {
+        // Skip if color is unavailable
+        if (color.isAvailable === false) return;
+        
+        let colorTotal = 0;
+        color.sizeQuantities.forEach(sq => {
+          // Only count available sizes
+          if (sq.isAvailable !== false) {
+            colorTotal += sq.quantity || 0;
+          }
+        });
+        total += colorTotal * (color.unitPrice || 0);
+      });
+    });
+    return total;
+  };
+
   const renderTopRightAction = () => {
     switch(inquiry.status) {
       case 'submitted':
@@ -2570,19 +2606,26 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
       
       case 'quoted':
         return (
-          <button
-            onClick={handleAcceptQuote}
-            disabled={accepting}
-            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs bg-emerald-50 text-emerald-700 rounded-md sm:rounded-lg hover:bg-emerald-100 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {accepting ? (
-              <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
-            ) : (
-              <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleAcceptQuote}
+              disabled={accepting}
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs bg-emerald-50 text-emerald-700 rounded-md sm:rounded-lg hover:bg-emerald-100 transition-colors font-medium whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {accepting ? (
+                <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
+              ) : (
+                <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              )}
+              <span className="hidden sm:inline">Accept Quote</span>
+              <span className="sm:hidden">Accept</span>
+            </button>
+            {hasUnavailableItems() && (
+              <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                Some items unavailable
+              </span>
             )}
-            <span className="hidden sm:inline">Accept Quote</span>
-            <span className="sm:hidden">Accept</span>
-          </button>
+          </div>
         );
       
       case 'accepted':
@@ -2649,6 +2692,11 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
                   {inquiry.inquiryNumber}
                 </h3>
                 <StatusBadge status={inquiry.status} />
+                {inquiry.status === 'quoted' && hasUnavailableItems() && (
+                  <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                    Some items unavailable
+                  </span>
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-1 sm:gap-3 text-[8px] sm:text-xs text-gray-500 mt-0.5">
                 <span className="whitespace-nowrap">{formatDate(inquiry.createdAt)}</span>
@@ -2661,7 +2709,6 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
           </div>
           
           <div className="flex items-center gap-1 sm:gap-2 ml-auto sm:ml-0">
-            {/* View Details Button - Toggles expansion */}
             <button
               onClick={toggleDetails}
               className="flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs bg-blue-50 text-blue-700 rounded-md sm:rounded-lg hover:bg-blue-100 transition-colors font-medium whitespace-nowrap"
@@ -2671,10 +2718,8 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
               <span className="sm:hidden">{showDetails ? 'Hide' : 'View'}</span>
             </button>
 
-            {/* Status-based action in top right */}
             {renderTopRightAction()}
 
-            {/* Cancel Button - Show for submitted/quoted status */}
             {(inquiry.status === 'submitted' || inquiry.status === 'quoted') && (
               <button
                 onClick={handleCancel}
@@ -2693,64 +2738,128 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
         </div>
       </div>
 
-      {/* Expandable Details Section */}
+      {/* Expandable Details Section - Updated with availability display */}
       {showDetails && (
         <div className="p-3 sm:p-4 border-b border-gray-100 bg-gray-50/30">
           <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-2 sm:mb-3">Products</h4>
           <div className="space-y-3 sm:space-y-4">
-            {inquiry.items.map((product, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-2 sm:p-3 border border-gray-100">
-                <div className="flex items-start gap-2 mb-2 sm:mb-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                    <img 
-                      src={product.productImage || 'https://via.placeholder.com/40'} 
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.productName}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-500">
-                      Total: {product.totalQuantity} pcs • {formatPrice(product.totalQuantity * product.unitPrice)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Product-level special instructions */}
-                {product.specialInstructions && (
-                  <div className="mb-2 sm:mb-3 p-2 bg-blue-50 rounded-lg border border-blue-100">
-                    <p className="text-[10px] sm:text-xs text-blue-700">
-                      <span className="font-medium">Product Note:</span> {product.specialInstructions}
-                    </p>
-                  </div>
-                )}
-
-                {/* Colors and sizes */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                  {product.colors.map((color, cIdx) => (
-                    <div key={cIdx} className="flex flex-wrap items-center gap-1 border-l-2 border-[#E39A65] pl-2 py-1">
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <div 
-                          className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-300 shadow-sm flex-shrink-0" 
-                          style={{ backgroundColor: color.color.code }} 
-                          title={`${color.totalForColor} pcs`}
-                        />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {color.sizeQuantities.map((sq, sIdx) => (
-                          <span key={sIdx} className="text-[8px] sm:text-[10px] bg-gray-100 px-1 sm:px-1.5 py-0.5 rounded whitespace-nowrap">
-                            {sq.size}:{sq.quantity}
-                          </span>
-                        ))}
-                      </div>
-                      <span className="text-[10px] sm:text-xs font-medium text-gray-700 ml-1">
-                        - {color.totalForColor}pcs
-                      </span>
+            {inquiry.items.map((product, idx) => {
+              const isProductAvailable = product.isAvailable !== false;
+              const productTotalFromColors = product.colors.reduce((sum, color) => {
+                if (color.isAvailable === false) return sum;
+                let colorTotal = 0;
+                color.sizeQuantities.forEach(sq => {
+                  if (sq.isAvailable !== false) {
+                    colorTotal += sq.quantity || 0;
+                  }
+                });
+                return sum + (colorTotal * (color.unitPrice || 0));
+              }, 0);
+              
+              return (
+                <div key={idx} className={`bg-white rounded-lg p-2 sm:p-3 border ${isProductAvailable ? 'border-gray-100' : 'border-red-200 bg-red-50/20'}`}>
+                  <div className="flex items-start gap-2 mb-2 sm:mb-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                      <img 
+                        src={product.productImage || 'https://via.placeholder.com/40'} 
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <p className={`text-xs sm:text-sm font-medium ${isProductAvailable ? 'text-gray-900' : 'text-red-600 line-through'}`}>
+                          {product.productName}
+                        </p>
+                        {!isProductAvailable && (
+                          <span className="text-[8px] bg-red-100 text-red-700 px-1 py-0.5 rounded-full">
+                            Unavailable
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-[10px] sm:text-xs ${isProductAvailable ? 'text-gray-500' : 'text-red-400'}`}>
+                        Total: {product.totalQuantity} pcs • {formatPrice(productTotalFromColors)}
+                      </p>
+                      {product.adminNote && inquiry.status === 'quoted' && (
+                        <p className="text-[8px] sm:text-[9px] text-blue-600 mt-0.5">
+                          📝 Seller note: {product.adminNote}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Product-level special instructions */}
+                  {product.specialInstructions && (
+                    <div className="mb-2 sm:mb-3 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                      <p className="text-[10px] sm:text-xs text-blue-700">
+                        <span className="font-medium">Product Note:</span> {product.specialInstructions}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Colors and sizes - WITH AVAILABILITY DISPLAY */}
+                  <div className="grid grid-cols-1 gap-2 sm:gap-3">
+                    {product.colors.map((color, cIdx) => {
+                      const isColorAvailable = color.isAvailable !== false;
+                      let colorTotal = 0;
+                      color.sizeQuantities.forEach(sq => {
+                        if (sq.isAvailable !== false) {
+                          colorTotal += sq.quantity || 0;
+                        }
+                      });
+                      const colorSubtotal = colorTotal * (color.unitPrice || 0);
+                      const colorUnitPrice = color.unitPrice || 0;
+                      
+                      return (
+                        <div key={cIdx} className={`border-l-2 pl-2 py-1 ${isColorAvailable ? 'border-[#E39A65]' : 'border-red-400'}`}>
+                          <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                            <div className="flex items-center gap-1">
+                              <div 
+                                className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border shadow-sm flex-shrink-0 ${!isColorAvailable ? 'opacity-50' : ''}`}
+                                style={{ backgroundColor: color.color.code }} 
+                                title={color.color.name || color.color.code}
+                              />
+                              <span className={`text-[10px] sm:text-xs font-medium ${isColorAvailable ? 'text-gray-700' : 'text-red-600 line-through'}`}>
+                                {color.color.name || color.color.code}
+                              </span>
+                              {!isColorAvailable && (
+                                <span className="text-[7px] bg-red-100 text-red-700 px-1 py-0.5 rounded-full">Unavailable</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className={`text-[9px] sm:text-[10px] ${isColorAvailable ? 'text-gray-500' : 'text-red-400 line-through'}`}>
+                                {colorTotal} pcs × {formatPrice(colorUnitPrice)}/pc
+                              </span>
+                              <span className={`text-[10px] sm:text-xs font-semibold ${isColorAvailable ? 'text-[#E39A65]' : 'text-red-500'}`}>
+                                = {formatPrice(colorSubtotal)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {color.sizeQuantities.map((sq, sIdx) => {
+                              const isSizeAvailable = sq.isAvailable !== false;
+                              return (
+                                <span 
+                                  key={sIdx} 
+                                  className={`text-[8px] sm:text-[10px] px-1 sm:px-1.5 py-0.5 rounded whitespace-nowrap ${
+                                    isSizeAvailable 
+                                      ? 'bg-gray-100 text-gray-600' 
+                                      : 'bg-red-100 text-red-600 line-through'
+                                  }`}
+                                >
+                                  {sq.size}:{sq.quantity}
+                                  {!isSizeAvailable && ' (Unavailable)'}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Global Special Instructions */}
@@ -2762,6 +2871,28 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
               </div>
             </div>
           )}
+
+          {/* Admin Note (if quoted) */}
+         {/* Message from Seller - Show for all statuses after quoted */}
+{inquiry.adminNote && (inquiry.status === 'quoted' || inquiry.status === 'accepted' || inquiry.status === 'invoiced' ) && (
+  <div className="mt-3 sm:mt-4">
+    <h4 className="text-[10px] sm:text-xs font-semibold text-gray-700 mb-1 sm:mb-2">
+      Message from Seller
+    </h4>
+    <div className={`rounded-lg p-2 sm:p-3 border ${
+      inquiry.status === 'quoted' 
+        ? 'bg-blue-50 border-blue-100 text-blue-700'
+        : 'bg-emerald-50 border-emerald-100 text-emerald-700'
+    }`}>
+      <p className="text-[10px] sm:text-xs whitespace-pre-wrap">{inquiry.adminNote}</p>
+    </div>
+    {inquiry.status !== 'quoted' && (
+      <p className="text-[8px] text-gray-400 mt-1">
+        This message was included in your quotation
+      </p>
+    )}
+  </div>
+)}
 
           {/* Attachments */}
           {inquiry.attachments && inquiry.attachments.length > 0 && (
@@ -2794,29 +2925,42 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
         </div>
       )}
 
-      {/* Footer - Only WhatsApp Button */}
+      {/* Footer - Total with per-color pricing */}
       <div className="px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between bg-gray-50/30">
         <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
           <span className="text-gray-500">Total:</span>
-          <span className="font-semibold text-[#E39A65]">{formatPrice(inquiry.subtotal)}</span>
+          <span className="font-semibold text-[#E39A65]">
+            {formatPrice(calculateTotalWithPerColorPricing())}
+          </span>
+          {inquiry.status === 'quoted' && hasUnavailableItems() && (
+            <span className="text-red-500 text-[8px]">(Some items excluded from total)</span>
+          )}
         </div>
         
-        {/* WhatsApp Button only in footer */}
+        {/* WhatsApp Button */}
         <button
           onClick={() => {
             let message = `*Inquiry #${inquiry.inquiryNumber}*\n\n`;
             
             inquiry.items.forEach((product, idx) => {
-              message += `*Product ${idx + 1}: ${product.productName}*\n`;
+              const productStatus = product.isAvailable === false ? ' [PRODUCT UNAVAILABLE]' : '';
+              message += `*Product ${idx + 1}: ${product.productName}${productStatus}*\n`;
               product.colors.forEach(color => {
-                message += `  • Color\n`;
+                const colorStatus = color.isAvailable === false ? ' [COLOR UNAVAILABLE]' : '';
+                let colorTotal = 0;
                 color.sizeQuantities.forEach(sq => {
-                  message += `    - Size ${sq.size}: ${sq.quantity} pcs\n`;
+                  if (sq.isAvailable !== false) {
+                    colorTotal += sq.quantity || 0;
+                  }
                 });
-                message += `    Total: ${color.totalForColor} pcs\n`;
-                if (color.specialInstructions) {
-                  message += `    📝 Note: ${color.specialInstructions}\n`;
-                }
+                const colorSubtotal = colorTotal * (color.unitPrice || 0);
+                message += `  • ${color.color.name || color.color.code}${colorStatus}\n`;
+                message += `    Price: ${formatPrice(color.unitPrice || 0)}/pc\n`;
+                color.sizeQuantities.forEach(sq => {
+                  const sizeStatus = sq.isAvailable === false ? ' (UNAVAILABLE)' : '';
+                  message += `    - Size ${sq.size}: ${sq.quantity} pcs${sizeStatus}\n`;
+                });
+                message += `    Color Total: ${colorTotal} pcs = ${formatPrice(colorSubtotal)}\n`;
               });
               if (product.specialInstructions) {
                 message += `  📝 Product Note: ${product.specialInstructions}\n`;
@@ -2824,11 +2968,14 @@ const InquiryCard = ({ inquiry, onRefresh }) => {
             });
             
             message += `\n*Summary*\n`;
-            message += `Total Value: ${formatPrice(inquiry.subtotal)}\n`;
+            message += `Total Value: ${formatPrice(calculateTotalWithPerColorPricing())}\n`;
             message += `Status: ${inquiry.status}\n`;
             
             if (inquiry.specialInstructions) {
               message += `\n*Global Notes:*\n${inquiry.specialInstructions}\n`;
+            }
+            if (inquiry.adminNote && inquiry.status === 'quoted') {
+              message += `\n*Seller Message:*\n${inquiry.adminNote}\n`;
             }
 
             window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '8801305785685'}?text=${encodeURIComponent(message)}`, '_blank');

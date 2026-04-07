@@ -631,7 +631,7 @@ const ProductGridCard = ({ product }) => {
   const handleImageLeave = () => {
     setActiveIndex(0);
   };
-  
+
   useEffect(() => {
   const checkMobile = () => {
     setIsMobile(window.innerWidth < 768); // 768px is typical md breakpoint

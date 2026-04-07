@@ -1,10 +1,9 @@
 
-// // app/productDetails/page.jsx
+// // app/productDetails/ProductDetailsClient.js
 // 'use client';
 
-// import { Suspense, useRef } from 'react';
-// import { useState, useEffect } from 'react';
 // import { useRouter, useSearchParams } from 'next/navigation';
+// import { useState, useEffect, useRef } from 'react';
 // import Link from 'next/link';
 // import { 
 //   ChevronLeft, 
@@ -14,29 +13,22 @@
 //   Loader2,
 //   Package,
 //   Users,
-//   Ruler,
-//   Palette,
-//   Info,
 //   FileText,
 //   Truck,
-//   Shield,
 //   Clock,
-//   Share2,
-//   Heart,
 //   Maximize2,
-//   Minus,
-//   Plus,
-//   CheckCircle,
 //   X,
 //   Trash2,
 //   ChevronRight,
-//   Star,
 //   Eye,
-//   AlertCircle,
 //   DollarSign,
 //   TrendingUp,
 //   Sparkles,
-//   BookOpen // Added for instruction tab
+//   BookOpen,
+//   Plus,
+//   ChevronDown,
+//   ChevronUp,
+//   CheckCircle
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 // import Footer from '../components/layout/Footer';
@@ -44,6 +36,9 @@
 // import AuthModal from '../components/AuthModal';
 // import { motion } from 'framer-motion';
 // import ProductReviews from '../components/product/ProductReviews';
+// import MetadataUpdater from './MetadataUpdater'; // Import the MetadataUpdater
+// import FullscreenModal from '../components/FullscreenModal'; // Adjust path as needed
+
 
 // // Helper function to format currency
 // const formatPrice = (price) => {
@@ -85,130 +80,356 @@
 //   );
 // };
 
-// // Loading Skeleton Component - Responsive
-// const ProductDetailsSkeleton = () => (
-//   <div className="min-h-screen bg-gray-50">
-//     <Navbar />
-//     <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 md:py-8 mt-16 sm:mt-20">
-//       <div className="h-4 bg-gray-200 rounded w-32 sm:w-48 mb-4 sm:mb-6 animate-pulse"></div>
-      
-//       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
-//         <div className="lg:col-span-5">
-//           <div className="flex flex-col sm:flex-row gap-4">
-//             <div className="flex sm:flex-col gap-2 order-2 sm:order-1">
-//               {[1, 2, 3, 4].map(i => (
-//                 <div key={i} className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-200 rounded-lg animate-pulse"></div>
-//               ))}
-//             </div>
-//             <div className="flex-1 bg-gray-200 rounded-xl sm:rounded-2xl h-[300px] sm:h-[400px] lg:h-[500px] animate-pulse order-1 sm:order-2"></div>
-//           </div>
-//         </div>
-//         <div className="lg:col-span-7 space-y-4 sm:space-y-6">
-//           <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-//           <div className="h-4 sm:h-5 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-//           <div className="h-16 sm:h-20 bg-gray-200 rounded animate-pulse"></div>
-//           <div className="h-48 sm:h-56 lg:h-64 bg-gray-200 rounded animate-pulse"></div>
-//           <div className="h-40 sm:h-44 lg:h-48 bg-gray-200 rounded animate-pulse"></div>
-//         </div>
-//       </div>
-//     </div>
-//     <Footer />
-//   </div>
-// );
+// // Image Gallery Component
+// // const ImageGallery = ({ images = [], productName }) => {
+// //   const [mainImage, setMainImage] = useState(0);
+// //   const [isFullscreen, setIsFullscreen] = useState(false);
+// //   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+// //   const [imageLoaded, setImageLoaded] = useState({});
+// //   const [isTransitioning, setIsTransitioning] = useState(false);
 
-// // Image Gallery Component - Responsive
+// //   const handleMouseMove = (e) => {
+// //     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+// //     const x = ((e.clientX - left) / width) * 100;
+// //     const y = ((e.clientY - top) / height) * 100;
+// //     setZoomPosition({ x, y });
+// //   };
+
+// //   // Preload images on hover
+// //   const preloadImage = (src) => {
+// //     const img = new Image();
+// //     img.src = src;
+// //   };
+
+// //   // Preload adjacent images
+// //   useEffect(() => {
+// //     if (images.length > 0) {
+// //       // Preload next and previous images
+// //       const nextIndex = (mainImage + 1) % images.length;
+// //       const prevIndex = (mainImage - 1 + images.length) % images.length;
+      
+// //       if (images[nextIndex]?.url) preloadImage(images[nextIndex].url);
+// //       if (images[prevIndex]?.url) preloadImage(images[prevIndex].url);
+// //     }
+// //   }, [mainImage, images]);
+
+// //   const handleImageChange = (idx) => {
+// //     if (idx === mainImage) return;
+    
+// //     setIsTransitioning(true);
+// //     setMainImage(idx);
+    
+// //     // Mark new image as not loaded
+// //     setImageLoaded(prev => ({ ...prev, [idx]: false }));
+// //   };
+
+// //   const handleImageLoad = (idx) => {
+// //     setImageLoaded(prev => ({ ...prev, [idx]: true }));
+// //     setTimeout(() => {
+// //       setIsTransitioning(false);
+// //     }, 100);
+// //   };
+
+// //   // Calculate thumbnail size based on number of images
+// //   const getThumbnailSize = () => {
+// //     const count = images.length;
+// //     if (count <= 4) return 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
+// //     if (count <= 6) return 'w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16';
+// //     return 'w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14';
+// //   };
+
+// //   return (
+// //     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+// //       {/* Thumbnails - No scrollbar, all images visible */}
+// //       <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+// //         <div className="flex sm:flex-row lg:flex-col gap-2">
+// //           {images.map((image, idx) => (
+// //             <button
+// //               key={idx}
+// //               onClick={() => handleImageChange(idx)}
+// //               onMouseEnter={() => {
+// //                 // Preload on hover for smoother experience
+// //                 preloadImage(image.url);
+// //                 handleImageChange(idx);
+// //               }}
+// //               className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
+// //                 mainImage === idx 
+// //                   ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
+// //                   : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+// //               }`}
+// //             >
+// //               <img
+// //                 src={image.url}
+// //                 alt={`${productName} - Thumbnail ${idx + 1}`}
+// //                 className="w-full h-full object-cover"
+// //                 loading="lazy"
+// //                 onError={(e) => {
+// //                   e.target.onerror = null;
+// //                   e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+// //                 }}
+// //               />
+// //               {mainImage === idx && (
+// //                 <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
+// //                   <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
+// //                 </div>
+// //               )}
+// //             </button>
+// //           ))}
+// //         </div>
+// //       </div>
+
+// //       {/* Main Image - Centered with flexbox */}
+// //       <div 
+// //         className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
+// //         onMouseMove={handleMouseMove}
+// //       >
+// //         {/* Loading skeleton - shows while transitioning */}
+// //         {(isTransitioning || !imageLoaded[mainImage]) && (
+// //           <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
+// //             <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+// //           </div>
+// //         )}
+        
+// //         <div className="relative w-full h-full flex items-center justify-center">
+// //           <img
+// //             key={mainImage}
+// //             src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
+// //             alt={`${productName} - Main view`}
+// //             className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
+// //               imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+// //             }`}
+// //             style={{
+// //               objectPosition: 'center',
+// //             }}
+// //             onLoad={() => handleImageLoad(mainImage)}
+// //             loading={mainImage === 0 ? "eager" : "lazy"}
+// //             fetchPriority={mainImage === 0 ? "high" : "auto"}
+// //             decoding="async"
+// //             onError={(e) => {
+// //               e.target.onerror = null;
+// //               e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
+// //               handleImageLoad(mainImage);
+// //             }}
+// //           />
+// //         </div>
+        
+// //         {/* Zoom overlay effect */}
+// //         <div 
+// //           className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none z-20"
+// //         />
+        
+// //         <button
+// //           onClick={() => setIsFullscreen(true)}
+// //           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
+// //           aria-label="View fullscreen"
+// //         >
+// //           <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+// //         </button>
+
+// //         {/* Image counter badge */}
+// //         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
+// //           {mainImage + 1} / {images.length}
+// //         </div>
+// //       </div>
+
+// //       {/* Fullscreen Modal */}
+// //       {isFullscreen && (
+// //         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+// //           <button
+// //             onClick={() => setIsFullscreen(false)}
+// //             className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors z-10"
+// //           >
+// //             <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
+// //           </button>
+          
+// //           {/* Fullscreen navigation */}
+// //           {images.length > 1 && (
+// //             <>
+// //               <button
+// //                 onClick={() => {
+// //                   const newIndex = mainImage > 0 ? mainImage - 1 : images.length - 1;
+// //                   handleImageChange(newIndex);
+// //                 }}
+// //                 className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+// //               >
+// //                 <ChevronLeft className="w-6 h-6 text-white" />
+// //               </button>
+              
+// //               <button
+// //                 onClick={() => {
+// //                   const newIndex = mainImage < images.length - 1 ? mainImage + 1 : 0;
+// //                   handleImageChange(newIndex);
+// //                 }}
+// //                 className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
+// //               >
+// //                 <ChevronRight className="w-6 h-6 text-white" />
+// //               </button>
+// //             </>
+// //           )}
+          
+// //           <img
+// //             src={images[mainImage]?.url || images[0]?.url}
+// //             alt={productName}
+// //             className="max-w-[95vw] max-h-[85vh] object-contain"
+// //             loading="lazy"
+// //           />
+          
+// //           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-sm px-3 py-1 rounded-full">
+// //             {mainImage + 1} / {images.length}
+// //           </div>
+// //         </div>
+// //       )}
+// //     </div>
+// //   );
+// // };
+
+// // Image Gallery Component - With Portal Modal
+
+// // Image Gallery Component - Without Zoom Effect
 // const ImageGallery = ({ images = [], productName }) => {
 //   const [mainImage, setMainImage] = useState(0);
 //   const [isFullscreen, setIsFullscreen] = useState(false);
-//   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
-//   const [showZoom, setShowZoom] = useState(false);
+//   const [imageLoaded, setImageLoaded] = useState({});
+//   const [isTransitioning, setIsTransitioning] = useState(false);
 
-//   const handleMouseMove = (e) => {
-//     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-//     const x = ((e.clientX - left) / width) * 100;
-//     const y = ((e.clientY - top) / height) * 100;
-//     setZoomPosition({ x, y });
+//   const preloadImage = (src) => {
+//     const img = new Image();
+//     img.src = src;
+//   };
+
+//   useEffect(() => {
+//     if (images.length > 0) {
+//       const nextIndex = (mainImage + 1) % images.length;
+//       const prevIndex = (mainImage - 1 + images.length) % images.length;
+      
+//       if (images[nextIndex]?.url) preloadImage(images[nextIndex].url);
+//       if (images[prevIndex]?.url) preloadImage(images[prevIndex].url);
+//     }
+//   }, [mainImage, images]);
+
+//   const handleImageChange = (idx) => {
+//     if (idx === mainImage) return;
+    
+//     setIsTransitioning(true);
+//     setMainImage(idx);
+//     setImageLoaded(prev => ({ ...prev, [idx]: false }));
+//   };
+
+//   const handleImageLoad = (idx) => {
+//     setImageLoaded(prev => ({ ...prev, [idx]: true }));
+//     setTimeout(() => {
+//       setIsTransitioning(false);
+//     }, 100);
+//   };
+
+//   const getThumbnailSize = () => {
+//     const count = images.length;
+//     if (count <= 4) return 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
+//     if (count <= 6) return 'w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16';
+//     return 'w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14';
 //   };
 
 //   return (
-//     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-//       {/* Thumbnails - Horizontal on mobile, vertical on desktop */}
-//       <div className="flex sm:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
-//         {images.slice(0, 4).map((image, idx) => (
-//           <button
-//             key={idx}
-//             onClick={() => setMainImage(idx)}
-//             onMouseEnter={() => setMainImage(idx)}
-//             className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border-2 transition-all ${
-//               mainImage === idx 
-//                 ? 'border-[#E39A65] shadow-md' 
-//                 : 'border-gray-200 hover:border-gray-300'
-//             }`}
-//           >
-//             <img
-//               src={image.url}
-//               alt={`${productName} - Thumbnail ${idx + 1}`}
-//               className="w-full h-full object-cover"
-//             />
-//             {mainImage === idx && (
-//               <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
-//                 <Check className="w-4 h-4 text-[#E39A65]" />
-//               </div>
-//             )}
-//           </button>
-//         ))}
-//         {images.length > 4 && (
-//           <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-lg bg-gray-100 flex items-center justify-center text-xs sm:text-sm text-gray-500">
-//             +{images.length - 4}
+//     <>
+//       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+//         {/* Thumbnails */}
+//         <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
+//           <div className="flex sm:flex-row lg:flex-col gap-2">
+//             {images.map((image, idx) => (
+//               <button
+//                 key={idx}
+//                 onClick={() => handleImageChange(idx)}
+//                 onMouseEnter={() => {
+//                   preloadImage(image.url);
+//                   handleImageChange(idx);
+//                 }}
+//                 className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
+//                   mainImage === idx 
+//                     ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
+//                     : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+//                 }`}
+//               >
+//                 <img
+//                   src={image.url}
+//                   alt={`${productName} - Thumbnail ${idx + 1}`}
+//                   className="w-full h-full object-cover"
+//                   loading="lazy"
+//                   onError={(e) => {
+//                     e.target.onerror = null;
+//                     e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+//                   }}
+//                 />
+//                 {mainImage === idx && (
+//                   <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
+//                     <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
+//                   </div>
+//                 )}
+//               </button>
+//             ))}
 //           </div>
-//         )}
-//       </div>
-
-//       {/* Main Image */}
-//       <div 
-//         className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2"
-//         onMouseEnter={() => setShowZoom(true)}
-//         onMouseLeave={() => setShowZoom(false)}
-//         onMouseMove={handleMouseMove}
-//       >
-//         <img
-//           src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
-//           alt={`${productName} - Main view`}
-//           className="w-full h-[300px] sm:h-[320px] lg:h-[420px] object-cover transition-transform duration-500 group-hover:scale-150"
-//           style={{
-//             transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
-//           }}
-//         />
-        
-//         <button
-//           onClick={() => setIsFullscreen(true)}
-//           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-//         >
-//           <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-//         </button>
-//       </div>
-
-//       {/* Fullscreen Modal */}
-//       {isFullscreen && (
-//         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center mt-16">
-//           <button
-//             onClick={() => setIsFullscreen(false)}
-//             className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-//           >
-//             <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-//           </button>
-//           <img
-//             src={images[mainImage]?.url || images[0]?.url}
-//             alt={productName}
-//             className="max-w-[95vw] max-h-[85vh] object-contain"
-//           />
 //         </div>
-//       )}
-//     </div>
+
+//         {/* Main Image - No zoom effect */}
+//         <div 
+//           className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-default order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
+//         >
+//           {(isTransitioning || !imageLoaded[mainImage]) && (
+//             <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
+//               <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
+//             </div>
+//           )}
+          
+//           <div className="relative w-full h-full flex items-center justify-center">
+//             <img
+//               key={mainImage}
+//               src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
+//               alt={`${productName} - Main view`}
+//               className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
+//                 imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+//               }`}
+//               style={{
+//                 objectPosition: 'center',
+//               }}
+//               onLoad={() => handleImageLoad(mainImage)}
+//               loading={mainImage === 0 ? "eager" : "lazy"}
+//               fetchPriority={mainImage === 0 ? "high" : "auto"}
+//               decoding="async"
+//               onError={(e) => {
+//                 e.target.onerror = null;
+//                 e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
+//                 handleImageLoad(mainImage);
+//               }}
+//             />
+//           </div>
+          
+//           <button
+//             onClick={() => setIsFullscreen(true)}
+//             className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
+//             aria-label="View fullscreen"
+//           >
+//             <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+//           </button>
+
+//           <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
+//             {mainImage + 1} / {images.length}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Fullscreen Modal using Portal */}
+//       <FullscreenModal
+//         isOpen={isFullscreen}
+//         onClose={() => setIsFullscreen(false)}
+//         images={images}
+//         currentIndex={mainImage}
+//         onImageChange={handleImageChange}
+//         productName={productName}
+//       />
+//     </>
 //   );
 // };
 
-// // Color Selector Component - Shows ALL color circles with selection indication
+// // Color Selector Component
 // const ColorSelector = ({ colors, selectedColor, onChange }) => {
 //   return (
 //     <div className="flex flex-wrap gap-2">
@@ -236,10 +457,16 @@
 //   );
 // };
 
+// // Bulk Pricing Table Component
 // const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
+//   const [showAllTiers, setShowAllTiers] = useState(false);
+  
 //   const pricingData = pricing.length > 0 ? pricing : [{ range: `${moq}+`, price: unitPrice }];
+  
+//   // Show only first 3 tiers initially
+//   const displayedTiers = showAllTiers ? pricingData : pricingData.slice(0, 3);
+//   const hasMoreTiers = pricingData.length > 3;
 
-//   // Helper function to calculate savings percentage
 //   const calculateSavings = (prevPrice, currentPrice) => {
 //     if (!prevPrice || !currentPrice) return null;
 //     const savingsPercent = ((prevPrice - currentPrice) / prevPrice * 100).toFixed(1);
@@ -253,9 +480,7 @@
 //       transition={{ duration: 0.5 }}
 //       className="bg-white rounded-lg sm:rounded-xl border border-[#E39A65]/20 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
 //     >
-//       {/* Header with premium gradient using main color */}
 //       <div className="relative overflow-hidden">
-//         {/* Animated background effect */}
 //         <motion.div 
 //           className="absolute inset-0 bg-gradient-to-r from-[#E39A65] to-[#d48b54]"
 //           initial={{ x: '-100%' }}
@@ -264,7 +489,6 @@
 //           style={{ opacity: 0.15 }}
 //         />
         
-//         {/* Main header content */}
 //         <div className="relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-[#E39A65] to-[#d48b54]">
 //           <div className="flex items-center justify-between flex-wrap gap-2">
 //             <div className="flex items-center gap-3">
@@ -301,7 +525,7 @@
 //               </tr>
 //             </thead>
 //             <tbody className="divide-y divide-[#E39A65]/10">
-//               {pricingData.map((tier, index) => {
+//               {displayedTiers.map((tier, index) => {
 //                 const tierPrice = tier.price || unitPrice;
 //                 const prevPrice = index > 0 ? pricingData[index - 1].price : null;
 //                 const savings = prevPrice ? calculateSavings(prevPrice, tierPrice) : null;
@@ -361,11 +585,31 @@
 //           </table>
 //         </div>
         
-//         {/* Professional border accent */}
+//         {/* Show More/Less Button */}
+//         {hasMoreTiers && (
+//           <div className="mt-4 pt-3 text-center">
+//             <button
+//               onClick={() => setShowAllTiers(!showAllTiers)}
+//               className="inline-flex items-center gap-2 text-sm text-[#E39A65] hover:text-[#d48b54] font-medium transition-colors duration-200"
+//             >
+//               {showAllTiers ? (
+//                 <>
+//                   <ChevronUp className="w-4 h-4" />
+//                   Show Less
+//                 </>
+//               ) : (
+//                 <>
+//                   <ChevronDown className="w-4 h-4" />
+//                   Show More ({pricingData.length - 3} more)
+//                 </>
+//               )}
+//             </button>
+//           </div>
+//         )}
+        
 //         <div className="mt-4 pt-3 border-t border-[#E39A65]/20 relative">
 //           <div className="absolute -top-[2px] left-0 w-20 h-[2px] bg-gradient-to-r from-[#E39A65] to-transparent"></div>
           
-//           {/* Footer with trust indicators */}
 //           <motion.div 
 //             initial={{ opacity: 0, y: 10 }}
 //             animate={{ opacity: 1, y: 0 }}
@@ -391,7 +635,7 @@
 //   );
 // };
 
-// // Key Attributes Component - Responsive with grid
+// // Key Attributes Component
 // const KeyAttributes = ({ product }) => {
 //   const attributes = [
 //     { label: 'MOQ', value: `${product.moq} pieces` },
@@ -440,7 +684,7 @@
 //   );
 // };
 
-// // NEW: Instructions Component
+// // Instructions Component
 // const Instructions = ({ product }) => {
 //   if (!product.instruction) {
 //     return (
@@ -473,7 +717,7 @@
 //   );
 // };
 
-// // Shipping Info Component - Responsive
+// // Shipping Info Component
 // const ShippingInfo = () => {
 //   return (
 //     <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
@@ -516,7 +760,7 @@
 //   );
 // };
 
-// // Inquiry Item Component - Responsive
+// // Inquiry Item Component
 // const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) => {
 //   const [sizeQuantities, setSizeQuantities] = useState(item.sizeQuantities || {});
 
@@ -540,7 +784,6 @@
 //     return Object.values(sizeQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
 //   };
 
-//   // Get ALL sizes (no limit)
 //   const allSizes = product.sizes?.filter(s => s.trim()) || [];
 
 //   return (
@@ -566,7 +809,6 @@
 //         )}
 //       </div>
 
-//       {/* Size Quantities Grid - Show ALL sizes */}
 //       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
 //         {allSizes.map((size, idx) => (
 //           <div key={idx} className="flex flex-col">
@@ -576,15 +818,14 @@
 //               min="0"
 //               value={sizeQuantities[size] || ''}
 //               onChange={(e) => handleSizeQuantityChange(size, parseInt(e.target.value) || 0)}
-//                onWheel={(e) => e.target.blur()}
-//               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none "
+//               onWheel={(e) => e.target.blur()}
+//               className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
 //               placeholder="Qty"
 //             />
 //           </div>
 //         ))}
 //       </div>
 
-//       {/* Item Total */}
 //       <div className="mt-2 sm:mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
 //         <span className="text-xs sm:text-sm text-gray-600">Item Total:</span>
 //         <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
@@ -593,13 +834,45 @@
 //   );
 // };
 
-// // Related Product Card Component - Responsive
+// // Add these helper functions BEFORE the RelatedProductCard component
+
+// // Helper for tag styling
+// const getTagStyles = (tag) => {
+//   const styles = {
+//     'Top Ranking': 'bg-gradient-to-r from-amber-500 to-orange-500',
+//     'New Arrival': 'bg-gradient-to-r from-blue-500 to-cyan-500',
+//     'Top Deal': 'bg-gradient-to-r from-green-500 to-emerald-500',
+//     'Best Seller': 'bg-gradient-to-r from-purple-500 to-pink-500',
+//     'Summer Collection': 'bg-gradient-to-r from-yellow-500 to-orange-400',
+//     'Winter Collection': 'bg-gradient-to-r from-indigo-500 to-blue-400',
+//     'Limited Edition': 'bg-gradient-to-r from-red-500 to-rose-500',
+//     'Trending': 'bg-gradient-to-r from-pink-500 to-rose-500',
+//   };
+//   return styles[tag] || 'bg-gradient-to-r from-gray-500 to-gray-600';
+// };
+
+// // Helper for targeted audience badge styling
+// const getTargetedAudienceStyle = (audience) => {
+//   const styles = {
+//     'ladies': 'bg-gradient-to-r from-pink-400 to-rose-400 text-white',
+//     'gents': 'bg-gradient-to-r from-blue-400 to-indigo-400 text-white',
+//     'kids': 'bg-gradient-to-r from-green-400 to-emerald-400 text-white',
+//     'unisex': 'bg-gradient-to-r from-purple-400 to-violet-400 text-white',
+//   };
+//   return styles[audience] || 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
+// };
+
+
+
+
+// // Now define the RelatedProductCard component
 // const RelatedProductCard = ({ product }) => {
 //   const productImages = product.images || [];
 //   const [activeIndex, setActiveIndex] = useState(0);
 //   const hasMultipleImages = productImages.length > 1;
 //   const firstTier = product.quantityBasedPricing?.[0];
 //   const primaryTag = product.tags?.[0];
+//   const audienceStyle = product.targetedCustomer ? getTargetedAudienceStyle(product.targetedCustomer) : '';
 
 //   const handleImageHover = (index) => {
 //     setActiveIndex(index);
@@ -607,21 +880,6 @@
 
 //   const handleImageLeave = () => {
 //     setActiveIndex(0);
-//   };
-
-//   // Helper function for tag styling
-//   const getTagStyles = (tag) => {
-//     const styles = {
-//       'Top Ranking': 'bg-gradient-to-r from-amber-500 to-orange-500',
-//       'New Arrival': 'bg-gradient-to-r from-blue-500 to-cyan-500',
-//       'Top Deal': 'bg-gradient-to-r from-green-500 to-emerald-500',
-//       'Best Seller': 'bg-gradient-to-r from-purple-500 to-pink-500',
-//       'Summer Collection': 'bg-gradient-to-r from-yellow-500 to-orange-400',
-//       'Winter Collection': 'bg-gradient-to-r from-indigo-500 to-blue-400',
-//       'Limited Edition': 'bg-gradient-to-r from-red-500 to-rose-500',
-//       'Trending': 'bg-gradient-to-r from-pink-500 to-rose-500',
-//     };
-//     return styles[tag] || 'bg-gradient-to-r from-gray-500 to-gray-600';
 //   };
 
 //   return (
@@ -639,10 +897,10 @@
 //         transition: { type: "spring", stiffness: 300, damping: 15 }
 //       }}
 //       onClick={() => window.location.href = `/productDetails?id=${product._id}`}
-//       className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer"
+//       className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
 //     >
-//       {/* Image Container */}
-//       <div className="relative h-48 sm:h-52 lg:h-56 overflow-hidden bg-gray-100">
+//       {/* Image Container - Only Tag badge on image */}
+//       <div className="relative h-48 overflow-hidden bg-gray-100">
 //         <motion.div 
 //           className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
 //           whileHover={{ opacity: 1 }}
@@ -651,19 +909,20 @@
 //         <motion.img
 //           src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500'}
 //           alt={product.productName || 'Product image'}
-//           className="w-full h-full object-cover"
-//           whileHover={{ scale: 1.1 }}
+//           className="w-full h-full object-contain bg-gray-50 p-2"
+//           whileHover={{ scale: 1.05 }}
 //           transition={{ duration: 0.5 }}
 //           onError={(e) => {
 //             e.target.onerror = null;
 //             e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500';
 //           }}
+//           loading="lazy"
 //         />
         
 //         {/* Desktop Hover Icons */}
 //         <motion.div 
 //           className="absolute inset-0 bg-black/40 items-center justify-center gap-3 
-//                      hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
+//                      hidden md:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30"
 //           initial={{ opacity: 0 }}
 //           whileHover={{ opacity: 1 }}
 //         >
@@ -698,14 +957,14 @@
 //           </div>
 //         </motion.div>
 
-//         {/* Mobile Icons - Always visible */}
-//         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-3 sm:hidden z-30">
+//         {/* Mobile Icons */}
+//         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:hidden z-30">
 //           <button
 //             onClick={(e) => {
 //               e.stopPropagation();
 //               window.location.href = `/productDetails?id=${product._id}`;
 //             }}
-//             className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+//             className="bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-all duration-200 hover:bg-white"
 //           >
 //             <Eye className="w-4 h-4 text-gray-700" />
 //           </button>
@@ -714,53 +973,21 @@
 //               e.stopPropagation();
 //               window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
 //             }}
-//             className="bg-[#E39A65]/90 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-transform"
+//             className="bg-[#E39A65]/95 backdrop-blur-sm rounded-full p-2 shadow-lg active:scale-95 transition-all duration-200 hover:bg-[#E39A65]"
 //           >
 //             <ShoppingCart className="w-4 h-4 text-white" />
 //           </button>
 //         </div>
         
-//         {/* Category Badge */}
-//         <motion.span 
-//           initial={{ x: -20, opacity: 0 }}
-//           animate={{ x: 0, opacity: 1 }}
-//           transition={{ delay: 0.2 }}
-//           className="absolute top-3 left-3 bg-[#E39A65] text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20"
-//         >
-//           {product.category?.name || 'Uncategorized'}
-//         </motion.span>
-        
-//         {/* Tag Badge (if any) */}
+//         {/* ONLY TAG BADGE - Remains on image */}
 //         {primaryTag && (
 //           <motion.span 
 //             initial={{ x: 20, opacity: 0 }}
 //             animate={{ x: 0, opacity: 1 }}
 //             transition={{ delay: 0.3 }}
-//             className={`absolute top-3 right-3 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium shadow-lg z-20 ${getTagStyles(primaryTag)}`}
+//             className={`absolute top-2 right-2 ${getTagStyles(primaryTag)} text-white text-[8px] md:text-[10px] px-1.5 py-0.5 rounded-full font-medium shadow-lg z-20 flex items-center gap-0.5 max-w-[90px]`}
 //           >
-//             {primaryTag}
-//           </motion.span>
-//         )}
-        
-//         {/* MOQ Badge */}
-//         <motion.span 
-//           initial={{ x: 20, opacity: 0 }}
-//           animate={{ x: 0, opacity: 1 }}
-//           transition={{ delay: 0.5 }}
-//           className="absolute bottom-3 right-3 bg-gray-900/90 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium backdrop-blur-sm shadow-lg z-20"
-//         >
-//           MOQ: {product.moq || 0}
-//         </motion.span>
-
-//         {/* Targeted Customer Badge */}
-//         {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
-//           <motion.span 
-//             initial={{ x: -20, opacity: 0 }}
-//             animate={{ x: 0, opacity: 1 }}
-//             transition={{ delay: 0.4 }}
-//             className="absolute bottom-3 left-3 bg-black/50 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full backdrop-blur-sm z-20"
-//           >
-//             {capitalizeFirst(product.targetedCustomer)}
+//             <span className="truncate">{primaryTag}</span>
 //           </motion.span>
 //         )}
 //       </div>
@@ -771,7 +998,7 @@
 //           initial={{ opacity: 0 }}
 //           animate={{ opacity: 1 }}
 //           transition={{ delay: 0.6 }}
-//           className="flex justify-center gap-1 py-2 px-2 bg-gray-50 border-t border-gray-100"
+//           className="flex justify-center gap-1 py-1.5 px-1 bg-gray-50/80 border-t border-gray-100"
 //           onMouseLeave={handleImageLeave}
 //         >
 //           {productImages.slice(0, 4).map((image, index) => (
@@ -779,9 +1006,9 @@
 //               key={index}
 //               whileHover={{ scale: 1.1 }}
 //               whileTap={{ scale: 0.95 }}
-//               className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-md overflow-hidden transition-all duration-300 ${
+//               className={`relative w-5 h-5 md:w-7 md:h-7 rounded-md overflow-hidden transition-all duration-300 ${
 //                 activeIndex === index 
-//                   ? 'ring-2 ring-[#E39A65] ring-offset-2 scale-110 shadow-md' 
+//                   ? 'ring-1 ring-[#E39A65] ring-offset-1 scale-110 shadow-md' 
 //                   : 'opacity-60 hover:opacity-100'
 //               }`}
 //               onMouseEnter={() => handleImageHover(index)}
@@ -794,15 +1021,11 @@
 //                 src={image.url}
 //                 alt=""
 //                 className="w-full h-full object-cover"
-//                 onError={(e) => {
-//                   e.target.onerror = null;
-//                   e.target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100';
-//                 }}
 //               />
 //             </motion.button>
 //           ))}
 //           {productImages.length > 4 && (
-//             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-gray-200 flex items-center justify-center text-[10px] sm:text-xs text-gray-600 font-medium">
+//             <div className="w-5 h-5 md:w-7 md:h-7 rounded-md bg-gray-200 flex items-center justify-center text-[8px] md:text-[10px] text-gray-600 font-medium">
 //               +{productImages.length - 4}
 //             </div>
 //           )}
@@ -814,34 +1037,63 @@
 //         initial={{ opacity: 0 }}
 //         animate={{ opacity: 1 }}
 //         transition={{ delay: 0.7 }}
-//         className="p-4"
+//         className="p-2 md:p-3"
 //       >
 //         {/* Title and Price */}
-//         <div className="flex items-start justify-between gap-2 mb-2">
-//           <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
-//             {truncateText(product.productName, 25)}
+//         <div className="flex items-start justify-between gap-1 mb-2">
+//           <h3 className="text-xs md:text-sm font-semibold text-gray-900 line-clamp-2 flex-1" title={product.productName}>
+//             {truncateText(product.productName, 20)}
 //           </h3>
 //           <div className="flex-shrink-0 text-right">
-//             <span className="text-base font-bold text-[#E39A65]">
+//             <span className="text-xs md:text-base font-bold text-[#E39A65]">
 //               ${formatPriceNumber(product.pricePerUnit)}
 //             </span>
-//             <span className="text-gray-500 text-[8px] ml-1">/pc</span>
+//             <span className="text-gray-500 text-[8px] md:text-[10px] ml-0.5">/pc</span>
+//           </div>
+//         </div>
+
+//         {/* Category, Targeted Audience & MOQ - All in one row */}
+//         <div className="flex items-center justify-start gap-1 mb-2 flex-wrap sm:flex-nowrap">
+//           {/* Category */}
+//           <div className="flex items-center gap-1 bg-gray-100 rounded-md px-1.5 py-0.5 flex-shrink-0">
+//             <Package className="w-2.5 h-2.5 text-gray-500" />
+//             <span className="text-[8px] md:text-[10px] text-gray-700 font-medium whitespace-nowrap">
+//               {truncateText(product.category?.name || 'Uncategorized', 8)}
+//             </span>
+//           </div>
+
+//           {/* Targeted Audience */}
+//           {product.targetedCustomer && (
+//             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md flex-shrink-0 ${audienceStyle}`}>
+//               <Users className="w-2.5 h-2.5" />
+//               <span className="text-[8px] md:text-[10px] capitalize font-medium whitespace-nowrap">
+//                 {product.targetedCustomer === 'ladies' ? 'Ladies' : 
+//                  product.targetedCustomer === 'gents' ? 'Gents' :
+//                  product.targetedCustomer === 'kids' ? 'Kids' : product.targetedCustomer}
+//               </span>
+//             </div>
+//           )}
+
+//           {/* MOQ */}
+//           <div className="flex items-center gap-1 bg-gray-100 rounded-md px-1.5 py-0.5 flex-shrink-0">
+//             <span className="text-[8px] md:text-[10px] text-gray-600 whitespace-nowrap">MOQ:</span>
+//             <span className="text-[8px] md:text-[10px] font-semibold text-gray-800 whitespace-nowrap">{product.moq || 0}</span>
 //           </div>
 //         </div>
 
 //         {/* Color Dots */}
 //         {product.colors && product.colors.length > 0 && (
-//           <div className="flex items-center gap-1 mb-2">
+//           <div className="flex items-center gap-0.5 md:gap-1 mb-2">
 //             {product.colors.slice(0, 4).map((color, i) => (
 //               <div
 //                 key={i}
-//                 className="w-4 h-4 rounded-full border border-white shadow-sm"
+//                 className="w-3 h-3 md:w-4 md:h-4 rounded-full border border-white shadow-sm"
 //                 style={{ backgroundColor: color.code }}
 //                 title={color.name || color.code}
 //               />
 //             ))}
 //             {product.colors.length > 4 && (
-//               <span className="text-[8px] text-gray-400">+{product.colors.length - 4}</span>
+//               <span className="text-[6px] md:text-[8px] text-gray-400">+{product.colors.length - 4}</span>
 //             )}
 //           </div>
 //         )}
@@ -850,10 +1102,9 @@
 //         {firstTier && (
 //           <motion.div 
 //             whileHover={{ scale: 1.02 }}
-//             className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg p-2 mb-3 border border-orange-100/80"
-//             onClick={(e) => e.stopPropagation()}
+//             className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-md p-1 md:p-1.5 mb-2 border border-orange-100/80"
 //           >
-//             <div className="flex justify-between items-center text-[10px]">
+//             <div className="flex justify-between items-center text-[9px] md:text-xs">
 //               <span className="text-gray-600 font-medium">{firstTier.range || 'Bulk'}</span>
 //               <span className="font-bold text-[#E39A65]">${formatPriceNumber(firstTier.price)}/pc</span>
 //             </div>
@@ -869,27 +1120,21 @@
 //             window.location.href = `/productDetails?id=${product._id}#inquiry-form`;
 //           }}
 //         >
-//           <div className="flex items-center justify-center gap-2 w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md relative overflow-hidden cursor-pointer">
-//             <ShoppingCart className="w-3 h-3" />
-//             <span>Inquiry Now</span>
+//           <div className="flex items-center justify-center gap-1 w-full text-center bg-gradient-to-r from-[#E39A65] to-[#d7691b] text-white py-1.5 md:py-2 rounded-lg text-[9px] md:text-xs font-medium hover:opacity-90 transition-all duration-300 hover:shadow-md cursor-pointer">
+//             <ShoppingCart className="w-2.5 h-2.5 md:w-3 md:h-3" />
+//             <span>Add to Inquiry</span>
 //           </div>
 //         </motion.div>
 //       </motion.div>
 //     </motion.div>
 //   );
 // };
-
 // // Main Product Content Component
-// function ProductContent() {
+// export default function ProductDetailsClient() {
 //   const router = useRouter();
 //   const searchParams = useSearchParams();
 //   const productId = searchParams.get('id');
 
-//   const [currentIndex, setCurrentIndex] = useState(0);
-//   const [isHovered, setIsHovered] = useState(false);
-//   const carouselRef = useRef(null);
-//   const autoPlayRef = useRef(null);
-  
 //   const [product, setProduct] = useState(null);
 //   const [relatedProducts, setRelatedProducts] = useState([]);
 //   const [loading, setLoading] = useState(true);
@@ -899,6 +1144,8 @@
 //   const [totalPrice, setTotalPrice] = useState(0);
 //   const [specialInstructions, setSpecialInstructions] = useState('');
 //   const [activeTab, setActiveTab] = useState('attributes');
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [isHovered, setIsHovered] = useState(false);
   
 //   // Auth state
 //   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -910,43 +1157,68 @@
 //   const [isInCart, setIsInCart] = useState(false);
 //   const [cartItemDetails, setCartItemDetails] = useState(null);
 
-//   // Auto-play functionality
-//   useEffect(() => {
-//     if (relatedProducts.length <= 4) return;
-    
-//     const startAutoPlay = () => {
-//       if (!isHovered) {
-//         autoPlayRef.current = setInterval(() => {
-//           setCurrentIndex((prev) => 
-//             prev + 4 >= relatedProducts.length ? 0 : prev + 4
-//           );
-//         }, 5000);
-//       }
-//     };
 
-//     startAutoPlay();
+//   // Helper function to get items per view based on screen size
+// const getItemsPerView = () => {
+//   if (typeof window !== 'undefined') {
+//     if (window.innerWidth < 640) return 2; // Mobile: 2 items
+//     if (window.innerWidth < 1024) return 3; // Tablet: 3 items (optional)
+//     return 4; // Desktop: 4 items
+//   }
+//   return 4; // Default to desktop
+// };
 
-//     return () => {
-//       if (autoPlayRef.current) {
-//         clearInterval(autoPlayRef.current);
-//       }
-//     };
-//   }, [isHovered, relatedProducts.length]);
-
-//   const handleNext = () => {
-//     setCurrentIndex((prev) => 
-//       prev + 4 >= relatedProducts.length ? 0 : prev + 4
-//     );
+// // Auto-play functionality for related products
+// useEffect(() => {
+//   if (relatedProducts.length <= getItemsPerView()) return;
+  
+//   const startAutoPlay = () => {
+//     if (!isHovered) {
+//       const autoPlayRef = setInterval(() => {
+//         const itemsPerView = getItemsPerView();
+//         setCurrentIndex((prev) => 
+//           prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
+//         );
+//       }, 5000);
+//       return autoPlayRef;
+//     }
+//     return null;
 //   };
 
-//   const handlePrev = () => {
-//     setCurrentIndex((prev) => 
-//       prev - 4 < 0 ? Math.max(relatedProducts.length - 4, 0) : prev - 4
-//     );
+//   const autoPlayRef = startAutoPlay();
+//   return () => {
+//     if (autoPlayRef) clearInterval(autoPlayRef);
 //   };
+// }, [isHovered, relatedProducts.length]);
 
-//   const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + 4);
+// const handleNext = () => {
+//   const itemsPerView = getItemsPerView();
+//   setCurrentIndex((prev) => 
+//     prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
+//   );
+// };
 
+// const handlePrev = () => {
+//   const itemsPerView = getItemsPerView();
+//   setCurrentIndex((prev) => 
+//     prev - itemsPerView < 0 ? Math.max(relatedProducts.length - itemsPerView, 0) : prev - itemsPerView
+//   );
+// };
+
+// const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + getItemsPerView());
+
+// // Add resize listener to update carousel when screen size changes
+// useEffect(() => {
+//   const handleResize = () => {
+//     // Reset current index when screen size changes to avoid empty slides
+//     if (currentIndex + getItemsPerView() > relatedProducts.length) {
+//       setCurrentIndex(0);
+//     }
+//   };
+  
+//   window.addEventListener('resize', handleResize);
+//   return () => window.removeEventListener('resize', handleResize);
+// }, [currentIndex, relatedProducts.length]);
 //   // Scroll to inquiry form if hash present
 //   useEffect(() => {
 //     if (window.location.hash === '#inquiry-form') {
@@ -1007,32 +1279,7 @@
 //     });
 //   };
 
-//   useEffect(() => {
-//     if (productId) {
-//       fetchProduct();
-//     }
-//   }, [productId]);
-
-//   useEffect(() => {
-//     if (product && isAuthenticated) {
-//       checkIfInCart();
-//     } else {
-//       setIsInCart(false);
-//       setCartItemDetails(null);
-//     }
-//   }, [product, isAuthenticated]);
-
-//   useEffect(() => {
-//     const handleCartUpdate = () => {
-//       if (product && isAuthenticated) {
-//         checkIfInCart();
-//       }
-//     };
-    
-//     window.addEventListener('cart-update', handleCartUpdate);
-//     return () => window.removeEventListener('cart-update', handleCartUpdate);
-//   }, [product, isAuthenticated]);
-
+//   // Fetch product
 //   const fetchProduct = async () => {
 //     setLoading(true);
 //     try {
@@ -1106,6 +1353,32 @@
 //       console.error('Error checking cart:', error);
 //     }
 //   };
+
+//   useEffect(() => {
+//     if (productId) {
+//       fetchProduct();
+//     }
+//   }, [productId]);
+
+//   useEffect(() => {
+//     if (product && isAuthenticated) {
+//       checkIfInCart();
+//     } else {
+//       setIsInCart(false);
+//       setCartItemDetails(null);
+//     }
+//   }, [product, isAuthenticated]);
+
+//   useEffect(() => {
+//     const handleCartUpdate = () => {
+//       if (product && isAuthenticated) {
+//         checkIfInCart();
+//       }
+//     };
+    
+//     window.addEventListener('cart-update', handleCartUpdate);
+//     return () => window.removeEventListener('cart-update', handleCartUpdate);
+//   }, [product, isAuthenticated]);
 
 //   useEffect(() => {
 //     if (!product) return;
@@ -1411,12 +1684,34 @@
 //   };
 
 //   if (loading) {
-//     return <ProductDetailsSkeleton />;
+//     return (
+//       <div className="min-h-screen bg-gray-50">
+//         <Navbar />
+//         <div className="container mx-auto px-4 max-w-7xl py-8 mt-16">
+//           <div className="animate-pulse">
+//             <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+//             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+//               <div className="lg:col-span-5">
+//                 <div className="bg-gray-200 rounded-xl h-[500px]"></div>
+//               </div>
+//               <div className="lg:col-span-7 space-y-4">
+//                 <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+//                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+//                 <div className="h-20 bg-gray-200 rounded"></div>
+//                 <div className="h-40 bg-gray-200 rounded"></div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//         <Footer />
+//       </div>
+//     );
 //   }
 
 //   if (!product) {
 //     return (
 //       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+//         <Navbar />
 //         <div className="text-center">
 //           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Product Not Found</h2>
 //           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">The product you're looking for doesn't exist or has been removed.</p>
@@ -1428,19 +1723,22 @@
 //             Back to Products
 //           </Link>
 //         </div>
+//         <Footer />
 //       </div>
 //     );
 //   }
 
 //   return (
 //     <>
+//       {/* MetadataUpdater component - updates page metadata dynamically */}
+//       <MetadataUpdater product={product} />
+      
 //       <Navbar />
 //       <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
 //         {/* Breadcrumb - Responsive */}
 //         <div className="bg-white border-b border-gray-200">
 //           <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
 //             <div className="flex items-center gap-2 sm:gap-3">
-//               {/* Back Button */}
 //               <button
 //                 onClick={() => router.back()}
 //                 className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
@@ -1449,7 +1747,6 @@
 //                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
 //               </button>
               
-//               {/* Breadcrumb */}
 //               <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap pb-0.5 flex-1">
 //                 <Link href="/" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Home</Link>
 //                 <span className="flex-shrink-0">/</span>
@@ -1473,71 +1770,64 @@
 
 //             {/* Right Column - Product Info & Inquiry Form */}
 //             <div className="lg:col-span-7 space-y-4 sm:space-y-6">
-//              {/* Product Info Card */}
-// <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
-//   <div className="mb-3 sm:mb-4">
-//     {/* Modern Category & Target Row */}
-//     <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 pb-3 border-b border-gray-100">
-//       {/* Category with modern styling */}
-//       <div className="flex items-center gap-2">
-//         <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
-//           <Package className="w-3.5 h-3.5 text-[#E39A65]" />
-//         </div>
-//         <div>
-//           <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Category</span>
-//           <span className="text-xs font-semibold text-gray-900">
-//             {product.category?.name || 'Uncategorized'}
-//           </span>
-//         </div>
-//       </div>
+//               {/* Product Info Card */}
+//               <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+//                 <div className="mb-3 sm:mb-4">
+//                   <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 pb-3 border-b border-gray-100">
+//                     <div className="flex items-center gap-2">
+//                       <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+//                         <Package className="w-3.5 h-3.5 text-[#E39A65]" />
+//                       </div>
+//                       <div>
+//                         <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Category</span>
+//                         <span className="text-xs font-semibold text-gray-900">
+//                           {product.category?.name || 'Uncategorized'}
+//                         </span>
+//                       </div>
+//                     </div>
 
-//       {/* Divider */}
-//       <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+//                     <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
 
-//       {/* Target Audience with modern styling */}
-//       <div className="flex items-center gap-2">
-//         <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
-//           <Users className="w-3.5 h-3.5 text-[#E39A65]" />
-//         </div>
-//         <div>
-//           <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Target</span>
-//           <span className="text-xs font-semibold text-gray-900">
-//             {product.targetedCustomer && product.targetedCustomer !== 'unisex' 
-//               ? capitalizeFirst(product.targetedCustomer) 
-//               : 'Unisex (All)'}
-//           </span>
-//         </div>
-//       </div>
+//                     <div className="flex items-center gap-2">
+//                       <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+//                         <Users className="w-3.5 h-3.5 text-[#E39A65]" />
+//                       </div>
+//                       <div>
+//                         <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Target</span>
+//                         <span className="text-xs font-semibold text-gray-900">
+//                           {product.targetedCustomer && product.targetedCustomer !== 'unisex' 
+//                             ? capitalizeFirst(product.targetedCustomer) 
+//                             : 'Unisex (All)'}
+//                         </span>
+//                       </div>
+//                     </div>
 
-//       {/* Optional: MOQ as third item */}
-//       <div className="flex items-center gap-2 ml-auto">
-//         <div className="flex items-center justify-center w-7 h-7 bg-green-50 rounded-lg">
-//           <Package className="w-3.5 h-3.5 text-green-600" />
-//         </div>
-//         <div>
-//           <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ</span>
-//           <span className="text-xs font-semibold text-gray-900">{product.moq} pcs</span>
-//         </div>
-//       </div>
-//     </div>
-    
-//     <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{product.productName}</h1>
-    
-//     {/* Product Description Preview */}
-//     {product.description && (
-//       <div 
-//         className="text-xs sm:text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none rich-text-preview"
-//         dangerouslySetInnerHTML={{ 
-//           __html: product.description.length > 200 
-//             ? product.description.substring(0, 200) + '...' 
-//             : product.description
-//         }}
-//       />
-//     )}
-//   </div>
-//                 {/* Price and MOQ - Now side by side with bulk table below on large screens */}
+//                     <div className="flex items-center gap-2 ml-auto">
+//                       <div className="flex items-center justify-center w-7 h-7 bg-green-50 rounded-lg">
+//                         <Package className="w-3.5 h-3.5 text-green-600" />
+//                       </div>
+//                       <div>
+//                         <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ</span>
+//                         <span className="text-xs font-semibold text-gray-900">{product.moq} pcs</span>
+//                       </div>
+//                     </div>
+//                   </div>
+                  
+//                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{product.productName}</h1>
+                  
+//                   {product.description && (
+//                     <div 
+//                       className="text-xs sm:text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none rich-text-preview"
+//                       dangerouslySetInnerHTML={{ 
+//                         __html: product.description.length > 200 
+//                           ? product.description.substring(0, 200) + '...' 
+//                           : product.description
+//                       }}
+//                     />
+//                   )}
+//                 </div>
+                
 //                 <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
-//                   {/* Price and MOQ - Left side on large screens */}
 //                   <div className="lg:w-1/2">
 //                     <div className="flex items-baseline justify-between p-3 sm:p-4 bg-orange-50 rounded-lg mb-4">
 //                       <div>
@@ -1552,7 +1842,6 @@
 //                       </div>
 //                     </div>
 
-//                     {/* Fabric Detail */}
 //                     {product.fabric && (
 //                       <div className="mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
 //                         <span className="text-xs sm:text-sm font-medium text-gray-700">Fabric: </span>
@@ -1560,7 +1849,6 @@
 //                       </div>
 //                     )}
 
-//                     {/* Available Colors - Show all in rows of 5 */}
 //                     {product.colors && product.colors.length > 0 && (
 //                       <div className="mb-4">
 //                         <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Colors</h3>
@@ -1574,13 +1862,9 @@
 //                             />
 //                           ))}
 //                         </div>
-//                         {product.colors.length > 15 && (
-//                           <p className="text-xs text-gray-500 mt-2">{product.colors.length} colors available</p>
-//                         )}
 //                       </div>
 //                     )}
 
-//                     {/* Available Sizes - Show all in rows of 5 */}
 //                     {product.sizes?.filter(s => s.trim()).length > 0 && (
 //                       <div className="mb-4">
 //                         <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Sizes</h3>
@@ -1594,14 +1878,10 @@
 //                             </span>
 //                           ))}
 //                         </div>
-//                         {product.sizes.filter(s => s.trim()).length > 15 && (
-//                           <p className="text-xs text-gray-500 mt-2">{product.sizes.filter(s => s.trim()).length} sizes available</p>
-//                         )}
 //                       </div>
 //                     )}
 //                   </div>
 
-//                   {/* Bulk Pricing Table - Right side on large screens */}
 //                   <div className="lg:w-1/2 mt-4 lg:mt-0">
 //                     <BulkPricingTable 
 //                       pricing={product.quantityBasedPricing} 
@@ -1621,7 +1901,6 @@
 //                   )}
 //                 </div>
                 
-//                 {/* Color Selection */}
 //                 {product.colors && product.colors.length > 0 && (
 //                   <div className="mb-3 sm:mb-4">
 //                     <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
@@ -1635,7 +1914,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* Add Button */}
 //                 <button
 //                   onClick={handleAddItem}
 //                   disabled={!selectedColor || isInCart}
@@ -1645,7 +1923,6 @@
 //                   Add Selected Color
 //                 </button>
 
-//                 {/* Already in cart notice */}
 //                 {isInCart && (
 //                   <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg">
 //                     <div className="flex items-start gap-2">
@@ -1662,7 +1939,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* Quick size guide - Show ALL sizes */}
 //                 {product.sizes?.filter(s => s.trim()).length > 0 && !isInCart && (
 //                   <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 rounded-lg">
 //                     <p className="text-[10px] sm:text-xs text-blue-700">
@@ -1674,7 +1950,6 @@
 //                   </div>
 //                 )}
 
-//                 {/* Inquiry Items List */}
 //                 {!isInCart && inquiryItems.length > 0 && (
 //                   <>
 //                     <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-2 sm:mb-3">Your Items</h3>
@@ -1692,7 +1967,6 @@
 //                       ))}
 //                     </div>
 
-//                     {/* Summary Cards */}
 //                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
 //                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
 //                         <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Total Qty</p>
@@ -1708,7 +1982,6 @@
 //                       </div>
 //                     </div>
 
-//                     {/* MOQ Warning */}
 //                     {totalQuantity < product.moq && totalQuantity > 0 && (
 //                       <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
 //                         <p className="text-xs sm:text-sm text-yellow-800">
@@ -1717,7 +1990,6 @@
 //                       </div>
 //                     )}
 
-//                     {/* Special Instructions */}
 //                     <div className="mb-3 sm:mb-4">
 //                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
 //                         Special Instructions
@@ -1733,7 +2005,6 @@
 //                   </>
 //                 )}
 
-//                 {/* Action Buttons */}
 //                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
 //                   {isInCart ? (
 //                     <>
@@ -1775,7 +2046,6 @@
 //                   )}
 //                 </div>
 
-//                 {/* Empty State Message */}
 //                 {!isInCart && inquiryItems.length === 0 && (
 //                   <div className="text-center py-3 sm:py-4 mt-2">
 //                     <p className="text-xs sm:text-sm text-gray-500">
@@ -1787,7 +2057,7 @@
 //             </div>
 //           </div>
 
-//           {/* Product Details Tabs - Responsive */}
+//           {/* Product Details Tabs */}
 //           <div className="mt-6 sm:mt-8">
 //             <div className="border-b border-gray-200 overflow-x-auto">
 //               <nav className="flex gap-4 sm:gap-6 lg:gap-8 min-w-max px-1">
@@ -1831,103 +2101,100 @@
 //           </div>
 
 //           {/* Related Products Section */}
-//           {relatedProducts.length > 0 && (
-//             <div className="mt-8 sm:mt-10 lg:mt-12">
-//               {/* Header with Browse All button */}
-//               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-//                 <div>
-//                   <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
-//                     <Sparkles className="w-4 h-4 text-[#E39A65]" />
-//                     <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
-//                   </div>
-//                   <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-//                     Related Products
-//                   </h2>
-//                 </div>
-                
-//                 {/* Simple Browse All Button */}
-//                 <Link 
-//                   href="/products" 
-//                   className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
-//                 >
-//                   <span>Browse all products</span>
-//                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-//                 </Link>
-//               </div>
+//          {/* Related Products Section */}
+// {relatedProducts.length > 0 && (
+//   <div className="mt-8 sm:mt-10 lg:mt-12">
+//     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+//       <div>
+//         <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
+//           <Sparkles className="w-4 h-4 text-[#E39A65]" />
+//           <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
+//         </div>
+//         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+//           Related Products
+//         </h2>
+//       </div>
+      
+//       <Link 
+//         href="/products" 
+//         className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
+//       >
+//         <span>Browse all products</span>
+//         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+//       </Link>
+//     </div>
 
-//               {/* Carousel Container with padding for buttons */}
-//               <div className="relative px-4 sm:px-8 md:px-10">
-//                 {/* Left Navigation Button */}
-//                 {relatedProducts.length > 4 && (
-//                   <button
-//                     onClick={handlePrev}
-//                     onMouseEnter={() => setIsHovered(true)}
-//                     onMouseLeave={() => setIsHovered(false)}
-//                     className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
-//                     style={{ transform: 'translateY(-50%)' }}
-//                     aria-label="Previous products"
-//                   >
-//                     <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-//                   </button>
-//                 )}
+//     <div className="relative px-4 sm:px-8 md:px-10">
+//       {/* Previous Button */}
+//       {relatedProducts.length > getItemsPerView() && (
+//         <button
+//           onClick={handlePrev}
+//           onMouseEnter={() => setIsHovered(true)}
+//           onMouseLeave={() => setIsHovered(false)}
+//           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+//           style={{ transform: 'translateY(-50%)' }}
+//           aria-label="Previous products"
+//         >
+//           <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//         </button>
+//       )}
 
-//                 {/* Right Navigation Button */}
-//                 {relatedProducts.length > 4 && (
-//                   <button
-//                     onClick={handleNext}
-//                     onMouseEnter={() => setIsHovered(true)}
-//                     onMouseLeave={() => setIsHovered(false)}
-//                     className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100 focus:opacity-100 "
-//                     style={{ transform: 'translateY(-50%)' }}
-//                     aria-label="Next products"
-//                   >
-//                     <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-//                   </button>
-//                 )}
+//       {/* Next Button */}
+//       {relatedProducts.length > getItemsPerView() && (
+//         <button
+//           onClick={handleNext}
+//           onMouseEnter={() => setIsHovered(true)}
+//           onMouseLeave={() => setIsHovered(false)}
+//           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+//           style={{ transform: 'translateY(-50%)' }}
+//           aria-label="Next products"
+//         >
+//           <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//         </button>
+//       )}
 
-//                 {/* Products Grid with Animation */}
-//                 <div className="overflow-hidden">
-//                   <motion.div 
-//                     key={currentIndex}
-//                     initial={{ opacity: 0, x: 20 }}
-//                     animate={{ opacity: 1, x: 0 }}
-//                     exit={{ opacity: 0, x: -20 }}
-//                     transition={{ duration: 0.5 }}
-//                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6"
-//                   >
-//                     {visibleProducts.map((product) => (
-//                       <RelatedProductCard key={product._id} product={product} />
-//                     ))}
-//                   </motion.div>
-//                 </div>
+//       <div className="overflow-hidden">
+//         <motion.div 
+//           key={currentIndex}
+//           initial={{ opacity: 0, x: 20 }}
+//           animate={{ opacity: 1, x: 0 }}
+//           exit={{ opacity: 0, x: -20 }}
+//           transition={{ duration: 0.5 }}
+//           className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+//         >
+//           {visibleProducts.map((product) => (
+//             <RelatedProductCard key={product._id} product={product} />
+//           ))}
+//         </motion.div>
+//       </div>
 
-//                 {/* Dots Indicator */}
-//                 {relatedProducts.length > 4 && (
-//                   <div className="flex items-center justify-center gap-2 mt-6">
-//                     {Array.from({ length: Math.ceil(relatedProducts.length / 4) }).map((_, index) => (
-//                       <button
-//                         key={index}
-//                         onClick={() => {
-//                           setCurrentIndex(index * 4);
-//                           setIsHovered(true);
-//                           setTimeout(() => setIsHovered(false), 3000);
-//                         }}
-//                         className={`h-2 rounded-full transition-all duration-300 ${
-//                           Math.floor(currentIndex / 4) === index
-//                             ? 'w-8 bg-[#E39A65]'
-//                             : 'w-2 bg-gray-300 hover:bg-gray-400'
-//                         }`}
-//                         aria-label={`Go to slide ${index + 1}`}
-//                       />
-//                     ))}
-//                   </div>
-//                 )}
-//               </div>
-//             </div>
-//           )}
+//       {/* Pagination Dots */}
+//       {relatedProducts.length > getItemsPerView() && (
+//         <div className="flex items-center justify-center gap-2 mt-6">
+//           {Array.from({ length: Math.ceil(relatedProducts.length / getItemsPerView()) }).map((_, index) => (
+//             <button
+//               key={index}
+//               onClick={() => {
+//                 setCurrentIndex(index * getItemsPerView());
+//                 setIsHovered(true);
+//                 setTimeout(() => setIsHovered(false), 3000);
+//               }}
+//               className={`h-2 rounded-full transition-all duration-300 ${
+//                 Math.floor(currentIndex / getItemsPerView()) === index
+//                   ? 'w-8 bg-[#E39A65]'
+//                   : 'w-2 bg-gray-300 hover:bg-gray-400'
+//               }`}
+//               aria-label={`Go to slide ${index + 1}`}
+//             />
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   </div>
+// )}
 //         </div>
 
-//         {/* WhatsApp Floating Button - Responsive */}
+//         {/* WhatsApp Floating Button */}
 //         <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
 //           <button
 //             onClick={handleWhatsAppInquiry}
@@ -1948,7 +2215,7 @@
 //       </div>
 //       <Footer />
 
-//       {/* Add global styles for rich text content */}
+//       {/* Global styles for rich text content */}
 //       <style jsx global>{`
 //         .rich-text-content {
 //           color: #374151;
@@ -2064,17 +2331,6 @@
 //   );
 // }
 
-// // Main page component with Suspense
-// export default function ProductDetailsPage() {
-//   return (
-//     <Suspense fallback={<ProductDetailsSkeleton />}>
-//       <ProductContent />
-//     </Suspense>
-//   );
-// }
-
-
-
 
 // app/productDetails/ProductDetailsClient.js
 'use client';
@@ -2113,9 +2369,8 @@ import Navbar from '../components/layout/Navbar';
 import AuthModal from '../components/AuthModal';
 import { motion } from 'framer-motion';
 import ProductReviews from '../components/product/ProductReviews';
-import MetadataUpdater from './MetadataUpdater'; // Import the MetadataUpdater
-import FullscreenModal from '../components/FullscreenModal'; // Adjust path as needed
-
+import MetadataUpdater from './MetadataUpdater';
+import FullscreenModal from '../components/FullscreenModal';
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -2156,211 +2411,6 @@ const RichTextContent = ({ content, className = '' }) => {
     />
   );
 };
-
-// Image Gallery Component
-// const ImageGallery = ({ images = [], productName }) => {
-//   const [mainImage, setMainImage] = useState(0);
-//   const [isFullscreen, setIsFullscreen] = useState(false);
-//   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
-//   const [imageLoaded, setImageLoaded] = useState({});
-//   const [isTransitioning, setIsTransitioning] = useState(false);
-
-//   const handleMouseMove = (e) => {
-//     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
-//     const x = ((e.clientX - left) / width) * 100;
-//     const y = ((e.clientY - top) / height) * 100;
-//     setZoomPosition({ x, y });
-//   };
-
-//   // Preload images on hover
-//   const preloadImage = (src) => {
-//     const img = new Image();
-//     img.src = src;
-//   };
-
-//   // Preload adjacent images
-//   useEffect(() => {
-//     if (images.length > 0) {
-//       // Preload next and previous images
-//       const nextIndex = (mainImage + 1) % images.length;
-//       const prevIndex = (mainImage - 1 + images.length) % images.length;
-      
-//       if (images[nextIndex]?.url) preloadImage(images[nextIndex].url);
-//       if (images[prevIndex]?.url) preloadImage(images[prevIndex].url);
-//     }
-//   }, [mainImage, images]);
-
-//   const handleImageChange = (idx) => {
-//     if (idx === mainImage) return;
-    
-//     setIsTransitioning(true);
-//     setMainImage(idx);
-    
-//     // Mark new image as not loaded
-//     setImageLoaded(prev => ({ ...prev, [idx]: false }));
-//   };
-
-//   const handleImageLoad = (idx) => {
-//     setImageLoaded(prev => ({ ...prev, [idx]: true }));
-//     setTimeout(() => {
-//       setIsTransitioning(false);
-//     }, 100);
-//   };
-
-//   // Calculate thumbnail size based on number of images
-//   const getThumbnailSize = () => {
-//     const count = images.length;
-//     if (count <= 4) return 'w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20';
-//     if (count <= 6) return 'w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16';
-//     return 'w-8 h-8 sm:w-12 sm:h-12 lg:w-14 lg:h-14';
-//   };
-
-//   return (
-//     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-//       {/* Thumbnails - No scrollbar, all images visible */}
-//       <div className="flex sm:flex-row lg:flex-col gap-2 order-2 sm:order-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0">
-//         <div className="flex sm:flex-row lg:flex-col gap-2">
-//           {images.map((image, idx) => (
-//             <button
-//               key={idx}
-//               onClick={() => handleImageChange(idx)}
-//               onMouseEnter={() => {
-//                 // Preload on hover for smoother experience
-//                 preloadImage(image.url);
-//                 handleImageChange(idx);
-//               }}
-//               className={`relative flex-shrink-0 ${getThumbnailSize()} rounded-lg overflow-hidden border-2 transition-all ${
-//                 mainImage === idx 
-//                   ? 'border-[#E39A65] shadow-md ring-2 ring-[#E39A65]/20' 
-//                   : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-//               }`}
-//             >
-//               <img
-//                 src={image.url}
-//                 alt={`${productName} - Thumbnail ${idx + 1}`}
-//                 className="w-full h-full object-cover"
-//                 loading="lazy"
-//                 onError={(e) => {
-//                   e.target.onerror = null;
-//                   e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
-//                 }}
-//               />
-//               {mainImage === idx && (
-//                 <div className="absolute inset-0 bg-[#E39A65]/10 flex items-center justify-center">
-//                   <Check className="w-3 h-3 sm:w-4 sm:h-4 text-[#E39A65]" />
-//                 </div>
-//               )}
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Main Image - Centered with flexbox */}
-//       <div 
-//         className="flex-1 relative bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden group cursor-zoom-in order-1 sm:order-2 flex items-center justify-center min-h-[320px] sm:min-h-[380px] lg:min-h-[460px]"
-//         onMouseMove={handleMouseMove}
-//       >
-//         {/* Loading skeleton - shows while transitioning */}
-//         {(isTransitioning || !imageLoaded[mainImage]) && (
-//           <div className="absolute inset-0 bg-gray-200 animate-pulse z-10">
-//             <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
-//           </div>
-//         )}
-        
-//         <div className="relative w-full h-full flex items-center justify-center">
-//           <img
-//             key={mainImage}
-//             src={images[mainImage]?.url || images[0]?.url || 'https://via.placeholder.com/800x800?text=No+Image'}
-//             alt={`${productName} - Main view`}
-//             className={`w-full h-auto max-h-[320px] sm:max-h-[380px] lg:max-h-[460px] object-contain transition-all duration-300 ${
-//               imageLoaded[mainImage] ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-//             }`}
-//             style={{
-//               objectPosition: 'center',
-//             }}
-//             onLoad={() => handleImageLoad(mainImage)}
-//             loading={mainImage === 0 ? "eager" : "lazy"}
-//             fetchPriority={mainImage === 0 ? "high" : "auto"}
-//             decoding="async"
-//             onError={(e) => {
-//               e.target.onerror = null;
-//               e.target.src = 'https://via.placeholder.com/800x800?text=Image+Not+Available';
-//               handleImageLoad(mainImage);
-//             }}
-//           />
-//         </div>
-        
-//         {/* Zoom overlay effect */}
-//         <div 
-//           className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 pointer-events-none z-20"
-//         />
-        
-//         <button
-//           onClick={() => setIsFullscreen(true)}
-//           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-white transition-colors opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 z-30"
-//           aria-label="View fullscreen"
-//         >
-//           <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-//         </button>
-
-//         {/* Image counter badge */}
-//         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full z-30">
-//           {mainImage + 1} / {images.length}
-//         </div>
-//       </div>
-
-//       {/* Fullscreen Modal */}
-//       {isFullscreen && (
-//         <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-//           <button
-//             onClick={() => setIsFullscreen(false)}
-//             className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors z-10"
-//           >
-//             <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-900" />
-//           </button>
-          
-//           {/* Fullscreen navigation */}
-//           {images.length > 1 && (
-//             <>
-//               <button
-//                 onClick={() => {
-//                   const newIndex = mainImage > 0 ? mainImage - 1 : images.length - 1;
-//                   handleImageChange(newIndex);
-//                 }}
-//                 className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
-//               >
-//                 <ChevronLeft className="w-6 h-6 text-white" />
-//               </button>
-              
-//               <button
-//                 onClick={() => {
-//                   const newIndex = mainImage < images.length - 1 ? mainImage + 1 : 0;
-//                   handleImageChange(newIndex);
-//                 }}
-//                 className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 hover:bg-white/40 rounded-full transition-colors"
-//               >
-//                 <ChevronRight className="w-6 h-6 text-white" />
-//               </button>
-//             </>
-//           )}
-          
-//           <img
-//             src={images[mainImage]?.url || images[0]?.url}
-//             alt={productName}
-//             className="max-w-[95vw] max-h-[85vh] object-contain"
-//             loading="lazy"
-//           />
-          
-//           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-sm px-3 py-1 rounded-full">
-//             {mainImage + 1} / {images.length}
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// Image Gallery Component - With Portal Modal
 
 // Image Gallery Component - Without Zoom Effect
 const ImageGallery = ({ images = [], productName }) => {
@@ -2534,13 +2584,12 @@ const ColorSelector = ({ colors, selectedColor, onChange }) => {
   );
 };
 
-// Bulk Pricing Table Component
+// Bulk Pricing Table Component - Updated to show per color pricing
 const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
   const [showAllTiers, setShowAllTiers] = useState(false);
   
   const pricingData = pricing.length > 0 ? pricing : [{ range: `${moq}+`, price: unitPrice }];
   
-  // Show only first 3 tiers initially
   const displayedTiers = showAllTiers ? pricingData : pricingData.slice(0, 3);
   const hasMoreTiers = pricingData.length > 3;
 
@@ -2573,9 +2622,9 @@ const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
                   <Package className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  Bulk Pricing
+                  Bulk Pricing (Per Color)
                 </h3>
-                <p className="text-xs text-white/80 mt-0.5">Volume discounts · Best wholesale rates</p>
+                <p className="text-xs text-white/80 mt-0.5">Volume discounts apply per color · Each color must meet minimum quantity</p>
               </div>
             </div>
           </div>
@@ -2590,7 +2639,7 @@ const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
                 <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   <div className="flex items-center gap-2">
                     <Package className="w-4 h-4 text-[#E39A65]" />
-                    <span>Quantity</span>
+                    <span>Quantity Per Color</span>
                   </div>
                 </th>
                 <th className="text-left py-3 px-2 sm:px-3 text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -2662,7 +2711,6 @@ const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
           </table>
         </div>
         
-        {/* Show More/Less Button */}
         {hasMoreTiers && (
           <div className="mt-4 pt-3 text-center">
             <button
@@ -2715,7 +2763,7 @@ const BulkPricingTable = ({ pricing = [], unitPrice, moq }) => {
 // Key Attributes Component
 const KeyAttributes = ({ product }) => {
   const attributes = [
-    { label: 'MOQ', value: `${product.moq} pieces` },
+    { label: 'MOQ (Per Color)', value: `${product.moq} pieces` },
     { label: 'Fabric', value: product.fabric || 'Standard' },
     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
     { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).slice(0, 5).join(', ') + (product.sizes?.length > 5 ? ` +${product.sizes.length - 5} more` : '') || 'Standard' },
@@ -2837,34 +2885,97 @@ const ShippingInfo = () => {
   );
 };
 
-// Inquiry Item Component
-const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) => {
+// Inquiry Item Component - Updated with per-color pricing and validation
+const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove, onColorQuantityChange }) => {
   const [sizeQuantities, setSizeQuantities] = useState(item.sizeQuantities || {});
+  const [colorTotal, setColorTotal] = useState(item.quantity || 0);
+  const [colorUnitPrice, setColorUnitPrice] = useState(item.unitPrice || product.pricePerUnit);
 
   useEffect(() => {
     if (item.sizeQuantities) {
       setSizeQuantities(item.sizeQuantities);
     }
-  }, [item.sizeQuantities]);
+    if (item.quantity !== undefined) {
+      setColorTotal(item.quantity);
+    }
+    if (item.unitPrice) {
+      setColorUnitPrice(item.unitPrice);
+    }
+  }, [item.sizeQuantities, item.quantity, item.unitPrice]);
+
+  // Get price based on quantity for this specific color
+  const getPriceForQuantity = (quantity) => {
+    if (!product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
+      return product.pricePerUnit;
+    }
+    
+    const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
+      const aMin = parseInt(a.range.split('-')[0]);
+      const bMin = parseInt(b.range.split('-')[0]);
+      return aMin - bMin;
+    });
+    
+    let matchedTier = null;
+    
+    for (const tier of sortedTiers) {
+      const range = tier.range;
+      
+      if (range.includes('-')) {
+        const [min, max] = range.split('-').map(Number);
+        if (quantity >= min && quantity <= max) {
+          matchedTier = tier;
+          break;
+        }
+      }
+      else if (range.includes('+')) {
+        const minQty = parseInt(range.replace('+', ''));
+        if (quantity >= minQty) {
+          matchedTier = tier;
+          break;
+        }
+      }
+    }
+    
+    if (matchedTier) {
+      return matchedTier.price;
+    }
+    
+    // If no tier matched, check if quantity exceeds the highest tier's max
+    const highestTier = sortedTiers[sortedTiers.length - 1];
+    if (highestTier && highestTier.range.includes('-') && quantity > parseInt(highestTier.range.split('-')[1])) {
+      return highestTier.price;
+    }
+    
+    return product.pricePerUnit;
+  };
 
   const handleSizeQuantityChange = (size, quantity) => {
     const newQuantities = { ...sizeQuantities, [size]: quantity };
     setSizeQuantities(newQuantities);
     
     const totalQty = Object.values(newQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
+    setColorTotal(totalQty);
+    
+    // Get the applicable unit price based on this color's total quantity
+    const applicablePrice = getPriceForQuantity(totalQty);
+    setColorUnitPrice(applicablePrice);
     
     onUpdate(item.id, 'sizeQuantities', newQuantities);
     onUpdate(item.id, 'quantity', totalQty);
-  };
-
-  const getTotalForItem = () => {
-    return Object.values(sizeQuantities).reduce((sum, qty) => sum + (qty || 0), 0);
+    onUpdate(item.id, 'unitPrice', applicablePrice);
+    
+    // Notify parent about color quantity change for overall validation
+    if (onColorQuantityChange) {
+      onColorQuantityChange(item.id, totalQty, applicablePrice);
+    }
   };
 
   const allSizes = product.sizes?.filter(s => s.trim()) || [];
+  const meetsMOQ = colorTotal >= product.moq;
+  const colorPrice = colorUnitPrice;
 
   return (
-    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+    <div className={`bg-gray-50 rounded-lg p-3 sm:p-4 border transition-all ${meetsMOQ ? 'border-green-200' : 'border-yellow-200'}`}>
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center gap-2">
           <div 
@@ -2875,15 +2986,22 @@ const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) =
             {item.color?.code || 'Selected Color'} - Item {index + 1}
           </h4>
         </div>
-        {showRemove && (
-          <button
-            onClick={() => onRemove(item.id)}
-            className="p-1 hover:bg-red-100 rounded-lg transition-colors group"
-            title="Remove item"
-          >
-            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 group-hover:text-red-600" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {!meetsMOQ && colorTotal > 0 && (
+            <span className="text-[10px] text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded-full">
+              Need {product.moq - colorTotal} more
+            </span>
+          )}
+          {showRemove && (
+            <button
+              onClick={() => onRemove(item.id)}
+              className="p-1 hover:bg-red-100 rounded-lg transition-colors group"
+              title="Remove item"
+            >
+              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 group-hover:text-red-600" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
@@ -2904,14 +3022,22 @@ const InquiryItem = ({ item, index, product, onUpdate, onRemove, showRemove }) =
       </div>
 
       <div className="mt-2 sm:mt-3 pt-2 border-t border-gray-200 flex justify-between items-center">
-        <span className="text-xs sm:text-sm text-gray-600">Item Total:</span>
-        <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{getTotalForItem()} pcs</span>
+        <div className="flex flex-col">
+          <span className="text-xs sm:text-sm text-gray-600">Color Total:</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{colorTotal} pcs</span>
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-xs sm:text-sm text-gray-600">Unit Price:</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#E39A65]">{formatPrice(colorPrice)}</span>
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-xs sm:text-sm text-gray-600">Color Total Price:</span>
+          <span className="text-xs sm:text-sm font-bold text-[#E39A65]">{formatPrice(colorPrice * colorTotal)}</span>
+        </div>
       </div>
     </div>
   );
 };
-
-// Add these helper functions BEFORE the RelatedProductCard component
 
 // Helper for tag styling
 const getTagStyles = (tag) => {
@@ -2939,10 +3065,7 @@ const getTargetedAudienceStyle = (audience) => {
   return styles[audience] || 'bg-gradient-to-r from-gray-400 to-gray-500 text-white';
 };
 
-
-
-
-// Now define the RelatedProductCard component
+// RelatedProductCard Component
 const RelatedProductCard = ({ product }) => {
   const productImages = product.images || [];
   const [activeIndex, setActiveIndex] = useState(0);
@@ -2976,7 +3099,7 @@ const RelatedProductCard = ({ product }) => {
       onClick={() => window.location.href = `/productDetails?id=${product._id}`}
       className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100/80 hover:border-[#E39A65]/20 cursor-pointer"
     >
-      {/* Image Container - Only Tag badge on image */}
+      {/* Image Container */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
@@ -3056,7 +3179,7 @@ const RelatedProductCard = ({ product }) => {
           </button>
         </div>
         
-        {/* ONLY TAG BADGE - Remains on image */}
+        {/* ONLY TAG BADGE */}
         {primaryTag && (
           <motion.span 
             initial={{ x: 20, opacity: 0 }}
@@ -3129,9 +3252,8 @@ const RelatedProductCard = ({ product }) => {
           </div>
         </div>
 
-        {/* Category, Targeted Audience & MOQ - All in one row */}
+        {/* Category, Targeted Audience & MOQ */}
         <div className="flex items-center justify-start gap-1 mb-2 flex-wrap sm:flex-nowrap">
-          {/* Category */}
           <div className="flex items-center gap-1 bg-gray-100 rounded-md px-1.5 py-0.5 flex-shrink-0">
             <Package className="w-2.5 h-2.5 text-gray-500" />
             <span className="text-[8px] md:text-[10px] text-gray-700 font-medium whitespace-nowrap">
@@ -3139,7 +3261,6 @@ const RelatedProductCard = ({ product }) => {
             </span>
           </div>
 
-          {/* Targeted Audience */}
           {product.targetedCustomer && (
             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md flex-shrink-0 ${audienceStyle}`}>
               <Users className="w-2.5 h-2.5" />
@@ -3151,7 +3272,6 @@ const RelatedProductCard = ({ product }) => {
             </div>
           )}
 
-          {/* MOQ */}
           <div className="flex items-center gap-1 bg-gray-100 rounded-md px-1.5 py-0.5 flex-shrink-0">
             <span className="text-[8px] md:text-[10px] text-gray-600 whitespace-nowrap">MOQ:</span>
             <span className="text-[8px] md:text-[10px] font-semibold text-gray-800 whitespace-nowrap">{product.moq || 0}</span>
@@ -3206,6 +3326,7 @@ const RelatedProductCard = ({ product }) => {
     </motion.div>
   );
 };
+
 // Main Product Content Component
 export default function ProductDetailsClient() {
   const router = useRouter();
@@ -3234,68 +3355,67 @@ export default function ProductDetailsClient() {
   const [isInCart, setIsInCart] = useState(false);
   const [cartItemDetails, setCartItemDetails] = useState(null);
 
-
   // Helper function to get items per view based on screen size
-const getItemsPerView = () => {
-  if (typeof window !== 'undefined') {
-    if (window.innerWidth < 640) return 2; // Mobile: 2 items
-    if (window.innerWidth < 1024) return 3; // Tablet: 3 items (optional)
-    return 4; // Desktop: 4 items
-  }
-  return 4; // Default to desktop
-};
-
-// Auto-play functionality for related products
-useEffect(() => {
-  if (relatedProducts.length <= getItemsPerView()) return;
-  
-  const startAutoPlay = () => {
-    if (!isHovered) {
-      const autoPlayRef = setInterval(() => {
-        const itemsPerView = getItemsPerView();
-        setCurrentIndex((prev) => 
-          prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
-        );
-      }, 5000);
-      return autoPlayRef;
+  const getItemsPerView = () => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 640) return 2;
+      if (window.innerWidth < 1024) return 3;
+      return 4;
     }
-    return null;
+    return 4;
   };
 
-  const autoPlayRef = startAutoPlay();
-  return () => {
-    if (autoPlayRef) clearInterval(autoPlayRef);
+  // Auto-play functionality for related products
+  useEffect(() => {
+    if (relatedProducts.length <= getItemsPerView()) return;
+    
+    const startAutoPlay = () => {
+      if (!isHovered) {
+        const autoPlayRef = setInterval(() => {
+          const itemsPerView = getItemsPerView();
+          setCurrentIndex((prev) => 
+            prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
+          );
+        }, 5000);
+        return autoPlayRef;
+      }
+      return null;
+    };
+
+    const autoPlayRef = startAutoPlay();
+    return () => {
+      if (autoPlayRef) clearInterval(autoPlayRef);
+    };
+  }, [isHovered, relatedProducts.length]);
+
+  const handleNext = () => {
+    const itemsPerView = getItemsPerView();
+    setCurrentIndex((prev) => 
+      prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
+    );
   };
-}, [isHovered, relatedProducts.length]);
 
-const handleNext = () => {
-  const itemsPerView = getItemsPerView();
-  setCurrentIndex((prev) => 
-    prev + itemsPerView >= relatedProducts.length ? 0 : prev + itemsPerView
-  );
-};
-
-const handlePrev = () => {
-  const itemsPerView = getItemsPerView();
-  setCurrentIndex((prev) => 
-    prev - itemsPerView < 0 ? Math.max(relatedProducts.length - itemsPerView, 0) : prev - itemsPerView
-  );
-};
-
-const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + getItemsPerView());
-
-// Add resize listener to update carousel when screen size changes
-useEffect(() => {
-  const handleResize = () => {
-    // Reset current index when screen size changes to avoid empty slides
-    if (currentIndex + getItemsPerView() > relatedProducts.length) {
-      setCurrentIndex(0);
-    }
+  const handlePrev = () => {
+    const itemsPerView = getItemsPerView();
+    setCurrentIndex((prev) => 
+      prev - itemsPerView < 0 ? Math.max(relatedProducts.length - itemsPerView, 0) : prev - itemsPerView
+    );
   };
+
+  const visibleProducts = relatedProducts.slice(currentIndex, currentIndex + getItemsPerView());
+
+  // Add resize listener to update carousel when screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      if (currentIndex + getItemsPerView() > relatedProducts.length) {
+        setCurrentIndex(0);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentIndex, relatedProducts.length]);
   
-  window.addEventListener('resize', handleResize);
-  return () => window.removeEventListener('resize', handleResize);
-}, [currentIndex, relatedProducts.length]);
   // Scroll to inquiry form if hash present
   useEffect(() => {
     if (window.location.hash === '#inquiry-form') {
@@ -3457,113 +3577,78 @@ useEffect(() => {
     return () => window.removeEventListener('cart-update', handleCartUpdate);
   }, [product, isAuthenticated]);
 
+  // Calculate totals - Now based on per-color pricing
   useEffect(() => {
     if (!product) return;
+    
+    // Calculate total quantity across all colors
     const totalQty = inquiryItems.reduce((sum, item) => sum + (item.quantity || 0), 0);
     setTotalQuantity(totalQty);
+    
+    // Calculate total price based on each color's unit price and quantity
+    const total = inquiryItems.reduce((sum, item) => {
+      const itemPrice = (item.unitPrice || product.pricePerUnit) * (item.quantity || 0);
+      return sum + itemPrice;
+    }, 0);
+    setTotalPrice(total);
   }, [inquiryItems, product]);
 
-  useEffect(() => {
-    if (!product || totalQuantity === 0) {
-      setTotalPrice(0);
-      return;
+  // Function to get price for a specific quantity (per color)
+  const getPriceForQuantity = (quantity) => {
+    if (!product || !product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
+      return product?.pricePerUnit || 0;
     }
-
-    let unitPrice = product.pricePerUnit;
     
-    if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
-        const aMin = parseInt(a.range.split('-')[0]);
-        const bMin = parseInt(b.range.split('-')[0]);
-        return aMin - bMin;
-      });
+    const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
+      const aMin = parseInt(a.range.split('-')[0]);
+      const bMin = parseInt(b.range.split('-')[0]);
+      return aMin - bMin;
+    });
+    
+    let matchedTier = null;
+    
+    for (const tier of sortedTiers) {
+      const range = tier.range;
       
-      let matchedTier = null;
-      
-      for (const tier of sortedTiers) {
-        const range = tier.range;
-        
-        if (range.includes('-')) {
-          const [min, max] = range.split('-').map(Number);
-          if (totalQuantity >= min && totalQuantity <= max) {
-            matchedTier = tier;
-            break;
-          }
-        }
-        else if (range.includes('+')) {
-          const minQty = parseInt(range.replace('+', ''));
-          if (totalQuantity >= minQty) {
-            matchedTier = tier;
-            break;
-          }
+      if (range.includes('-')) {
+        const [min, max] = range.split('-').map(Number);
+        if (quantity >= min && quantity <= max) {
+          matchedTier = tier;
+          break;
         }
       }
-      
-      if (matchedTier) {
-        unitPrice = matchedTier.price;
-      } else {
-        const highestTier = sortedTiers[sortedTiers.length - 1];
-        if (highestTier.range.includes('-') && totalQuantity > parseInt(highestTier.range.split('-')[1])) {
-          unitPrice = highestTier.price;
-        }
-      }
-    }
-
-    const total = unitPrice * totalQuantity;
-    setTotalPrice(total);
-  }, [totalQuantity, product]);
-
-  const getApplicableUnitPrice = () => {
-    if (!product || totalQuantity === 0) return product?.pricePerUnit || 0;
-    
-    let unitPrice = product.pricePerUnit;
-    
-    if (product.quantityBasedPricing && product.quantityBasedPricing.length > 0) {
-      const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
-        const aMin = parseInt(a.range.split('-')[0]);
-        const bMin = parseInt(b.range.split('-')[0]);
-        return aMin - bMin;
-      });
-      
-      let matchedTier = null;
-      
-      for (const tier of sortedTiers) {
-        const range = tier.range;
-        
-        if (range.includes('-')) {
-          const [min, max] = range.split('-').map(Number);
-          if (totalQuantity >= min && totalQuantity <= max) {
-            matchedTier = tier;
-            unitPrice = tier.price;
-            break;
-          }
-        }
-        else if (range.includes('+')) {
-          const minQty = parseInt(range.replace('+', ''));
-          if (totalQuantity >= minQty) {
-            matchedTier = tier;
-            unitPrice = tier.price;
-            break;
-          }
-        }
-      }
-      
-      if (!matchedTier) {
-        const highestTier = sortedTiers[sortedTiers.length - 1];
-        if (highestTier.range.includes('-') && totalQuantity > parseInt(highestTier.range.split('-')[1])) {
-          unitPrice = highestTier.price;
+      else if (range.includes('+')) {
+        const minQty = parseInt(range.replace('+', ''));
+        if (quantity >= minQty) {
+          matchedTier = tier;
+          break;
         }
       }
     }
     
-    return unitPrice;
+    if (matchedTier) {
+      return matchedTier.price;
+    }
+    
+    // If no tier matched, check if quantity exceeds the highest tier's max
+    const highestTier = sortedTiers[sortedTiers.length - 1];
+    if (highestTier && highestTier.range.includes('-') && quantity > parseInt(highestTier.range.split('-')[1])) {
+      return highestTier.price;
+    }
+    
+    return product.pricePerUnit;
   };
-
-  const applicableUnitPrice = getApplicableUnitPrice();
 
   const handleAddItem = () => {
     if (!selectedColor) {
       toast.error('Please select a color');
+      return;
+    }
+
+    // Check if this color is already added
+    const colorExists = inquiryItems.some(item => item.color?.code === selectedColor.code);
+    if (colorExists) {
+      toast.error(`${selectedColor.code} is already added. Please modify quantities in the existing item.`);
       return;
     }
 
@@ -3576,10 +3661,11 @@ useEffect(() => {
       id: Date.now(),
       color: selectedColor,
       sizeQuantities: initialSizeQuantities,
-      quantity: 0
+      quantity: 0,
+      unitPrice: product.pricePerUnit
     }]);
 
-    toast.success('Color added. Enter quantities for each size.');
+    toast.success(`${selectedColor.code} added. Enter quantities for each size.`);
   };
 
   const handleUpdateItem = (id, field, value) => {
@@ -3589,103 +3675,214 @@ useEffect(() => {
   };
 
   const handleRemoveItem = (id) => {
-    if (inquiryItems.length > 1) {
-      setInquiryItems(prev => prev.filter(item => item.id !== id));
-      toast.success('Item removed');
-    } else if (inquiryItems.length === 1) {
-      setInquiryItems([]);
-      toast.success('Item removed');
-    }
+    setInquiryItems(prev => prev.filter(item => item.id !== id));
+    toast.success('Item removed');
   };
+
+  // Handle color quantity change to update unit price based on that color's quantity
+  const handleColorQuantityChange = (id, quantity, newUnitPrice) => {
+    setInquiryItems(prev => prev.map(item => 
+      item.id === id ? { ...item, quantity: quantity, unitPrice: newUnitPrice } : item
+    ));
+  };
+
+  // const handleSubmitInquiry = async () => {
+  //   if (!isAuthenticated) {
+  //     setAuthModalTab('login');
+  //     setShowAuthModal(true);
+  //     toast.info('Please login to submit an inquiry');
+  //     return;
+  //   }
+
+  //   if (inquiryItems.length === 0) {
+  //     toast.error('Please add at least one color');
+  //     return;
+  //   }
+
+  //   // Check each color meets MOQ individually
+  //   const invalidColors = inquiryItems.filter(item => {
+  //     const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+  //     return colorTotal > 0 && colorTotal < product.moq;
+  //   });
+
+  //   if (invalidColors.length > 0) {
+  //     const colorNames = invalidColors.map(item => item.color?.code).join(', ');
+  //     toast.error(`Each color must meet the minimum MOQ of ${product.moq} pieces. Colors below MOQ: ${colorNames}`);
+  //     return;
+  //   }
+
+  //   // Check if any quantities are entered
+  //   const hasQuantities = inquiryItems.some(item => {
+  //     const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+  //     return total > 0;
+  //   });
+
+  //   if (!hasQuantities) {
+  //     toast.error('Please enter quantities for at least one size');
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem('token');
+      
+  //     const colorsData = inquiryItems.map(item => {
+  //       const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+        
+  //       // Get the applicable unit price for this color based on its quantity
+  //       const applicablePrice = getPriceForQuantity(colorTotal);
+        
+  //       return {
+  //         color: item.color,
+  //         sizeQuantities: item.sizeQuantities,
+  //         totalQuantity: colorTotal,
+  //         unitPrice: applicablePrice
+  //       };
+  //     }).filter(item => item.totalQuantity > 0);
+
+  //     const cartItem = {
+  //       productId: product._id,
+  //       productName: product.productName,
+  //       colors: colorsData,
+  //       totalQuantity: colorsData.reduce((sum, c) => sum + c.totalQuantity, 0),
+  //       unitPrice: product.pricePerUnit, // Base price for reference
+  //       moq: product.moq,
+  //       productImage: product.images?.[0]?.url,
+  //       specialInstructions: specialInstructions
+  //     };
+
+  //     const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify(cartItem)
+  //     });
+
+  //     const data = await response.json();
+      
+  //     if (data.success) {
+  //       toast.success(`${colorsData.length} color(s) added for ${product.productName}!`);
+        
+  //       setInquiryItems([]);
+  //       setSpecialInstructions('');
+        
+  //       setIsInCart(true);
+  //       checkIfInCart();
+        
+  //       window.dispatchEvent(new Event('cart-update'));
+  //     } else {
+  //       toast.error(data.error || 'Failed to add to cart');
+  //     }
+      
+  //   } catch (error) {
+  //     console.error('Error adding to cart:', error);
+  //     toast.error('Failed to add items to cart');
+  //   }
+  // };
+
 
   const handleSubmitInquiry = async () => {
-    if (!isAuthenticated) {
-      setAuthModalTab('login');
-      setShowAuthModal(true);
-      toast.info('Please login to submit an inquiry');
-      return;
-    }
+  if (!isAuthenticated) {
+    setAuthModalTab('login');
+    setShowAuthModal(true);
+    toast.info('Please login to submit an inquiry');
+    return;
+  }
 
-    if (inquiryItems.length === 0) {
-      toast.error('Please add at least one color');
-      return;
-    }
+  if (inquiryItems.length === 0) {
+    toast.error('Please add at least one color');
+    return;
+  }
 
-    const hasQuantities = inquiryItems.some(item => {
-      const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-      return total > 0;
+  // Check each color meets MOQ individually
+  const invalidColors = inquiryItems.filter(item => {
+    const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+    return colorTotal > 0 && colorTotal < product.moq;
+  });
+
+  if (invalidColors.length > 0) {
+    const colorNames = invalidColors.map(item => item.color?.code).join(', ');
+    toast.error(`Each color must meet the minimum MOQ of ${product.moq} pieces. Colors below MOQ: ${colorNames}`);
+    return;
+  }
+
+  // Check if any quantities are entered
+  const hasQuantities = inquiryItems.some(item => {
+    const total = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+    return total > 0;
+  });
+
+  if (!hasQuantities) {
+    toast.error('Please enter quantities for at least one size');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    
+    const colorsData = inquiryItems.map(item => {
+      const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+      
+      // Get the applicable unit price for this color based on its quantity
+      const applicablePrice = getPriceForQuantity(colorTotal);
+      
+      // IMPORTANT: Keep sizeQuantities as OBJECT (not array)
+      // This is correct and backend will handle it
+      return {
+        color: {
+          code: item.color.code,
+          name: item.color.name || item.color.code  // Include color name
+        },
+        sizeQuantities: item.sizeQuantities,  // This is an OBJECT like { "S": 10, "M": 40 }
+        totalQuantity: colorTotal,
+        unitPrice: applicablePrice
+      };
+    }).filter(item => item.totalQuantity > 0);
+
+    const cartItem = {
+      productId: product._id,
+      productName: product.productName,
+      colors: colorsData,
+      totalQuantity: colorsData.reduce((sum, c) => sum + c.totalQuantity, 0),
+      unitPrice: product.pricePerUnit,
+      moq: product.moq,
+      productImage: product.images?.[0]?.url,
+      specialInstructions: specialInstructions
+    };
+
+    console.log('📤 Sending to cart:', JSON.stringify(cartItem, null, 2)); // Debug log
+
+    const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cartItem)
     });
 
-    if (!hasQuantities) {
-      toast.error('Please enter quantities for at least one size');
-      return;
-    }
-
-    const calculatedTotalQuantity = inquiryItems.reduce((total, item) => {
-      const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-      return total + itemTotal;
-    }, 0);
-
-    if (calculatedTotalQuantity < product.moq) {
-      toast.error(`Total quantity must be at least ${product.moq} pieces (currently ${calculatedTotalQuantity})`);
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
+    const data = await response.json();
+    
+    if (data.success) {
+      toast.success(`${colorsData.length} color(s) added for ${product.productName}!`);
       
-      const colorsData = inquiryItems.map(item => {
-        const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-        
-        return {
-          color: item.color,
-          sizeQuantities: item.sizeQuantities,
-          totalQuantity: colorTotal
-        };
-      }).filter(item => item.totalQuantity > 0);
-
-      const cartItem = {
-        productId: product._id,
-        productName: product.productName,
-        colors: colorsData,
-        totalQuantity: calculatedTotalQuantity,
-        unitPrice: applicableUnitPrice,
-        moq: product.moq,
-        productImage: product.images?.[0]?.url,
-        specialInstructions: specialInstructions
-      };
-
-      const response = await fetch('http://localhost:5000/api/inquiry-cart/add', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(cartItem)
-      });
-
-      const data = await response.json();
+      setInquiryItems([]);
+      setSpecialInstructions('');
       
-      if (data.success) {
-        toast.success(`${colorsData.length} color(s) added for ${product.productName}! Total: ${calculatedTotalQuantity} pcs`);
-        
-        setInquiryItems([]);
-        setSpecialInstructions('');
-        
-        setIsInCart(true);
-        checkIfInCart();
-        
-        window.dispatchEvent(new Event('cart-update'));
-      } else {
-        toast.error(data.error || 'Failed to add to cart');
-      }
+      setIsInCart(true);
+      checkIfInCart();
       
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error('Failed to add items to cart');
+      window.dispatchEvent(new Event('cart-update'));
+    } else {
+      toast.error(data.error || 'Failed to add to cart');
     }
-  };
-
+    
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    toast.error('Failed to add items to cart');
+  }
+};
   const handleWhatsAppInquiry = () => {
     if (!isAuthenticated) {
       setAuthModalTab('login');
@@ -3714,11 +3911,14 @@ useEffect(() => {
     message += `• Category: ${product.category?.name || 'Uncategorized'}\n`;
     message += `• Fabric: ${product.fabric || 'Standard'}\n`;
     message += `• Target: ${capitalizeFirst(product.targetedCustomer || 'Unisex')}\n`;
-    message += `• MOQ: ${product.moq} pieces\n\n`;
+    message += `• MOQ (Per Color): ${product.moq} pieces\n\n`;
     
-    message += `*🛒 INQUIRY ITEMS*\n`;
+    message += `*🛒 INQUIRY ITEMS (Per Color Pricing)*\n`;
     
     inquiryItems.forEach((item, index) => {
+      const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+      const colorUnitPrice = getPriceForQuantity(colorTotal);
+      
       message += `\n*Item ${index + 1} - Color: ${item.color?.code || 'N/A'}*\n`;
       
       let hasSizes = false;
@@ -3733,14 +3933,20 @@ useEffect(() => {
         message += `  • No sizes specified\n`;
       }
       
-      const itemTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
-      message += `  *Item Total:* ${itemTotal} pcs\n`;
+      message += `  *Color Total:* ${colorTotal} pcs\n`;
+      message += `  *Unit Price:* ${formatPrice(colorUnitPrice)}/pc\n`;
+      message += `  *Color Subtotal:* ${formatPrice(colorUnitPrice * colorTotal)}\n`;
     });
+    
+    const totalPriceCalculated = inquiryItems.reduce((sum, item) => {
+      const colorTotal = Object.values(item.sizeQuantities || {}).reduce((s, qty) => s + (qty || 0), 0);
+      const colorUnitPrice = getPriceForQuantity(colorTotal);
+      return sum + (colorUnitPrice * colorTotal);
+    }, 0);
     
     message += `\n*📊 ORDER SUMMARY*\n`;
     message += `• Total Quantity: ${totalQuantity} pieces\n`;
-    message += `• Unit Price: ${formatPrice(applicableUnitPrice)}\n`;
-    message += `• Estimated Total: ${formatPrice(totalPrice)}\n`;
+    message += `• Estimated Total: ${formatPrice(totalPriceCalculated)}\n`;
     
     if (specialInstructions) {
       message += `\n*📝 SPECIAL INSTRUCTIONS*\n`;
@@ -3759,6 +3965,19 @@ useEffect(() => {
       description: 'Your inquiry has been prepared and ready to send.',
     });
   };
+
+  // Check if all colors meet MOQ
+  const allColorsMeetMOQ = inquiryItems.every(item => {
+    const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+    return colorTotal === 0 || colorTotal >= product?.moq;
+  });
+
+  const hasAnyQuantity = inquiryItems.some(item => {
+    const colorTotal = Object.values(item.sizeQuantities || {}).reduce((sum, qty) => sum + (qty || 0), 0);
+    return colorTotal > 0;
+  });
+
+  const canSubmit = hasAnyQuantity && allColorsMeetMOQ;
 
   if (loading) {
     return (
@@ -3807,12 +4026,11 @@ useEffect(() => {
 
   return (
     <>
-      {/* MetadataUpdater component - updates page metadata dynamically */}
       <MetadataUpdater product={product} />
       
       <Navbar />
       <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
-        {/* Breadcrumb - Responsive */}
+        {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -3884,7 +4102,7 @@ useEffect(() => {
                         <Package className="w-3.5 h-3.5 text-green-600" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ</span>
+                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ (Per Color)</span>
                         <span className="text-xs font-semibold text-gray-900">{product.moq} pcs</span>
                       </div>
                     </div>
@@ -3914,7 +4132,7 @@ useEffect(() => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs sm:text-sm text-gray-600">MOQ</span>
+                        <span className="text-xs sm:text-sm text-gray-600">MOQ (Per Color)</span>
                         <div className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">{product.moq} pieces</div>
                       </div>
                     </div>
@@ -4029,7 +4247,7 @@ useEffect(() => {
 
                 {!isInCart && inquiryItems.length > 0 && (
                   <>
-                    <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-2 sm:mb-3">Your Items</h3>
+                    <h3 className="text-sm sm:text-md font-semibold text-gray-900 mb-2 sm:mb-3">Your Items (Each color must meet MOQ of {product.moq} pcs)</h3>
                     <div className="space-y-2 sm:space-y-3 max-h-[350px] sm:max-h-[400px] overflow-y-auto pr-1 sm:pr-2 mb-3 sm:mb-4">
                       {inquiryItems.map((item, index) => (
                         <InquiryItem
@@ -4040,29 +4258,26 @@ useEffect(() => {
                           onUpdate={handleUpdateItem}
                           onRemove={handleRemoveItem}
                           showRemove={true}
+                          onColorQuantityChange={handleColorQuantityChange}
                         />
                       ))}
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Total Qty</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Total Qty (All Colors)</p>
                         <p className="text-base sm:text-lg font-bold text-gray-900">{totalQuantity} pcs</p>
                       </div>
                       <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                        <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Unit Price</p>
-                        <p className="text-base sm:text-lg font-bold text-[#E39A65]">{formatPrice(applicableUnitPrice)}</p>
-                      </div>
-                      <div className="p-2 sm:p-3 bg-gray-50 rounded-lg col-span-2">
                         <p className="text-[10px] sm:text-xs text-gray-500 mb-1">Estimated Total</p>
-                        <p className="text-lg sm:text-xl font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
+                        <p className="text-base sm:text-lg font-bold text-[#E39A65]">{formatPrice(totalPrice)}</p>
                       </div>
                     </div>
 
-                    {totalQuantity < product.moq && totalQuantity > 0 && (
+                    {!allColorsMeetMOQ && hasAnyQuantity && (
                       <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-xs sm:text-sm text-yellow-800">
-                          ⚠️ Need {product.moq - totalQuantity} more pieces to meet MOQ
+                          ⚠️ Each color must meet the minimum MOQ of {product.moq} pieces. Please adjust quantities for colors below the MOQ.
                         </p>
                       </div>
                     )}
@@ -4105,7 +4320,7 @@ useEffect(() => {
                     <>
                       <button
                         onClick={handleSubmitInquiry}
-                        disabled={totalQuantity < product.moq || inquiryItems.length === 0}
+                        disabled={!canSubmit}
                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#E39A65] text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -4178,97 +4393,96 @@ useEffect(() => {
           </div>
 
           {/* Related Products Section */}
-         {/* Related Products Section */}
-{relatedProducts.length > 0 && (
-  <div className="mt-8 sm:mt-10 lg:mt-12">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-      <div>
-        <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
-          <Sparkles className="w-4 h-4 text-[#E39A65]" />
-          <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
-        </div>
-        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-          Related Products
-        </h2>
-      </div>
-      
-      <Link 
-        href="/products" 
-        className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
-      >
-        <span>Browse all products</span>
-        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-      </Link>
-    </div>
+          {relatedProducts.length > 0 && (
+            <div className="mt-8 sm:mt-10 lg:mt-12">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-[#E39A65]/10 px-3 py-1 rounded-full mb-3">
+                    <Sparkles className="w-4 h-4 text-[#E39A65]" />
+                    <span className="text-xs font-medium text-[#E39A65]">You might also like</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                    Related Products
+                  </h2>
+                </div>
+                
+                <Link 
+                  href="/products" 
+                  className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#E39A65] transition-colors group bg-gray-50 px-4 py-2 rounded-lg hover:bg-gray-100"
+                >
+                  <span>Browse all products</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
 
-    <div className="relative px-4 sm:px-8 md:px-10">
-      {/* Previous Button */}
-      {relatedProducts.length > getItemsPerView() && (
-        <button
-          onClick={handlePrev}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
-          style={{ transform: 'translateY(-50%)' }}
-          aria-label="Previous products"
-        >
-          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-        </button>
-      )}
+              <div className="relative px-4 sm:px-8 md:px-10">
+                {/* Previous Button */}
+                {relatedProducts.length > getItemsPerView() && (
+                  <button
+                    onClick={handlePrev}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+                    style={{ transform: 'translateY(-50%)' }}
+                    aria-label="Previous products"
+                  >
+                    <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                  </button>
+                )}
 
-      {/* Next Button */}
-      {relatedProducts.length > getItemsPerView() && (
-        <button
-          onClick={handleNext}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
-          style={{ transform: 'translateY(-50%)' }}
-          aria-label="Next products"
-        >
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-        </button>
-      )}
+                {/* Next Button */}
+                {relatedProducts.length > getItemsPerView() && (
+                  <button
+                    onClick={handleNext}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white border border-gray-200 shadow-lg hover:bg-[#E39A65] hover:text-white hover:border-[#E39A65] transition-all duration-300 flex items-center justify-center opacity-60 hover:opacity-100"
+                    style={{ transform: 'translateY(-50%)' }}
+                    aria-label="Next products"
+                  >
+                    <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                  </button>
+                )}
 
-      <div className="overflow-hidden">
-        <motion.div 
-          key={currentIndex}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
-        >
-          {visibleProducts.map((product) => (
-            <RelatedProductCard key={product._id} product={product} />
-          ))}
-        </motion.div>
-      </div>
+                <div className="overflow-hidden">
+                  <motion.div 
+                    key={currentIndex}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.5 }}
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+                  >
+                    {visibleProducts.map((product) => (
+                      <RelatedProductCard key={product._id} product={product} />
+                    ))}
+                  </motion.div>
+                </div>
 
-      {/* Pagination Dots */}
-      {relatedProducts.length > getItemsPerView() && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          {Array.from({ length: Math.ceil(relatedProducts.length / getItemsPerView()) }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentIndex(index * getItemsPerView());
-                setIsHovered(true);
-                setTimeout(() => setIsHovered(false), 3000);
-              }}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                Math.floor(currentIndex / getItemsPerView()) === index
-                  ? 'w-8 bg-[#E39A65]'
-                  : 'w-2 bg-gray-300 hover:bg-gray-400'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  </div>
-)}
+                {/* Pagination Dots */}
+                {relatedProducts.length > getItemsPerView() && (
+                  <div className="flex items-center justify-center gap-2 mt-6">
+                    {Array.from({ length: Math.ceil(relatedProducts.length / getItemsPerView()) }).map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setCurrentIndex(index * getItemsPerView());
+                          setIsHovered(true);
+                          setTimeout(() => setIsHovered(false), 3000);
+                        }}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          Math.floor(currentIndex / getItemsPerView()) === index
+                            ? 'w-8 bg-[#E39A65]'
+                            : 'w-2 bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* WhatsApp Floating Button */}
