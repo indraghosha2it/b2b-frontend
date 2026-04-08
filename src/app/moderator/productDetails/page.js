@@ -989,7 +989,8 @@ import {
   TrendingUp,
   Sparkles,
   Tag,
-  BookOpen // Added for instruction tab
+  BookOpen, // Added for instruction tab
+  FolderTree
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -1523,18 +1524,64 @@ const StatusBadge = ({ isActive }) => (
 );
 
 // Key Attributes Component
+// const KeyAttributes = ({ product }) => {
+//   const attributes = [
+//     { label: 'MOQ', value: `${product.moq} pieces` },
+//     { label: 'Fabric', value: product.fabric || 'Standard' },
+//     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
+//     { label: 'Category', value: product.category?.name || 'Uncategorized' },
+  
+//     ...(product.additionalInfo || []).map(info => ({
+//       label: info.fieldName,
+//       value: info.fieldValue
+//     }))
+//   ];
+
+//   // Add featured to attributes if true
+//   if (product.isFeatured) {
+//     attributes.push({ label: 'Featured', value: 'Yes' });
+//   }
+
+//   return (
+//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+//         <h3 className="text-lg font-semibold text-gray-900">Key Attributes</h3>
+//       </div>
+//       <div className="p-6">
+//         <div className="grid grid-cols-2 gap-4">
+//           {attributes.map((attr, index) => (
+//             <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
+//               <p className="text-sm text-gray-500 mb-1">{attr.label}</p>
+//               <p className="text-sm font-medium text-gray-900">{attr.value}</p>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 const KeyAttributes = ({ product }) => {
   const attributes = [
     { label: 'MOQ', value: `${product.moq} pieces` },
     { label: 'Fabric', value: product.fabric || 'Standard' },
     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
     { label: 'Category', value: product.category?.name || 'Uncategorized' },
-    { label: 'Views', value: product.views || 0 },
-    ...(product.additionalInfo || []).map(info => ({
-      label: info.fieldName,
-      value: info.fieldValue
-    }))
   ];
+
+  // Add subcategory if exists
+  if (product.subcategoryName) {
+    attributes.push({ label: 'Subcategory', value: product.subcategoryName });
+  }
+
+  // Add additional info attributes
+  if (product.additionalInfo && product.additionalInfo.length > 0) {
+    product.additionalInfo.forEach(info => {
+      attributes.push({
+        label: info.fieldName,
+        value: info.fieldValue
+      });
+    });
+  }
 
   // Add featured to attributes if true
   if (product.isFeatured) {
@@ -1839,6 +1886,14 @@ export default function ModeratorProductDetails() {
                   <span className="px-3 py-1 bg-[#E39A65] text-white text-sm rounded-full">
                     {product.category?.name || 'Uncategorized'}
                   </span>
+                  {/* NEW: Subcategory Badge - Show if product has subcategory */}
+      {product.subcategoryName && (
+        <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full flex items-center gap-1">
+          <FolderTree className="w-3.5 h-3.5" />
+          {product.subcategoryName}
+        </span>
+      )}
+      
                   {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
                       {capitalizeFirst(product.targetedCustomer)}
@@ -1885,16 +1940,7 @@ export default function ModeratorProductDetails() {
                 </div>
               )}
 
-              {/* Views and Inquiry Count */}
-              <div className="mt-4 grid grid-cols-1 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                    <Eye className="w-3.5 h-3.5" />
-                    Views
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">{product.views || 0}</p>
-                </div>
-              </div>
+             
 
               {/* Timestamps */}
               <div className="mt-4 grid grid-cols-2 gap-4">

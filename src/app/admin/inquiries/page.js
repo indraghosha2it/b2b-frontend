@@ -656,6 +656,8 @@ const handleCreateInvoice = () => {
     }
   };
 
+
+
   const renderActionButtons = () => {
     switch(inquiry.status) {
       case 'submitted':

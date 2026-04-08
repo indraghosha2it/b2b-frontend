@@ -2674,7 +2674,7 @@ export default function InquiryCartPage() {
     
     <div className="space-y-3 mb-4">
       <div className="flex justify-between text-xs sm:text-sm">
-        <span className="text-gray-600">Total Items:</span>
+        <span className="text-gray-600">Total products:</span>
         <span className="font-medium text-gray-900">{cart.totalItems}</span>
       </div>
       <div className="flex justify-between text-xs sm:text-sm">

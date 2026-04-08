@@ -1,6 +1,4 @@
 
-
-
 // 'use client';
 
 // import { useState, useEffect } from 'react';
@@ -41,7 +39,7 @@
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
-// // Filter Bar Component - Moved OUTSIDE of main component
+// // Filter Bar Component - Responsive for mobile
 // const FilterBar = ({ 
 //   filters, 
 //   handleFilterChange,
@@ -55,31 +53,30 @@
 //   getActiveFilterCount,
 //   clearFilters
 // }) => (
-//   <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-//     <div className="flex items-center justify-between mb-3">
-//       <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-//         <Filter className="w-4 h-4 text-[#E39A65]" />
+//   <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6">
+//     <div className="flex items-center justify-between mb-2 sm:mb-3">
+//       <h3 className="text-xs sm:text-sm font-semibold text-gray-900 flex items-center gap-1.5 sm:gap-2">
+//         <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#E39A65]" />
 //         Filters
 //       </h3>
 //       {getActiveFilterCount() > 0 && (
 //         <button
 //           onClick={clearFilters}
-//           className="text-xs text-[#E39A65] hover:text-[#d48b54] font-medium"
+//           className="text-[10px] sm:text-xs text-[#E39A65] hover:text-[#d48b54] font-medium"
 //         >
 //           Clear All ({getActiveFilterCount()})
 //         </button>
 //       )}
 //     </div>
   
-
-//     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
+//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 mb-3">
 //       {/* Category Filter */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Category</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Category</label>
 //         <select
 //           value={filters.category}
 //           onChange={(e) => handleFilterChange('category', e.target.value)}
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
 //         >
 //           <option value="">All Categories</option>
 //           {categories.map(cat => (
@@ -90,11 +87,11 @@
 
 //       {/* Target Audience Filter */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Target Audience</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Target Audience</label>
 //         <select
 //           value={filters.targetedCustomer}
 //           onChange={(e) => handleFilterChange('targetedCustomer', e.target.value)}
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
 //         >
 //           <option value="">All</option>
 //           <option value="ladies">Ladies</option>
@@ -106,11 +103,11 @@
 
 //       {/* Status Filter */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Status</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Status</label>
 //         <select
 //           value={filters.status}
 //           onChange={(e) => handleFilterChange('status', e.target.value)}
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
 //         >
 //           <option value="all">All</option>
 //           <option value="active">Active Only</option>
@@ -120,25 +117,24 @@
 
 //       {/* Featured Filter */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Featured</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Featured</label>
 //         <select
 //           value={filters.isFeatured}
 //           onChange={(e) => handleFilterChange('isFeatured', e.target.value)}
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
 //         >
 //           <option value="">All Products</option>
 //           <option value="featured">Featured Only</option>
 //         </select>
 //       </div>
 
-
 //       {/* Sort */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Sort By</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Sort By</label>
 //         <select
 //           value={filters.sortBy}
 //           onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
 //         >
 //           <option value="newest">Newest First</option>
 //           <option value="price_low">Price: Low to High</option>
@@ -148,10 +144,11 @@
 //         </select>
 //       </div>
 //     </div>
-//       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
-//       {/* Min Price Input - FIXED */}
+    
+//     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+//       {/* Min Price Input */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Min Price ($)</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Min Price ($)</label>
 //         <input
 //           type="text"
 //           inputMode="decimal"
@@ -163,13 +160,13 @@
 //             }
 //           }}
 //           placeholder="0.00"
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
 //         />
 //       </div>
 
-//       {/* Max Price Input - FIXED */}
+//       {/* Max Price Input */}
 //       <div>
-//         <label className="block text-xs text-gray-500 mb-1">Max Price ($)</label>
+//         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Max Price ($)</label>
 //         <input
 //           type="text"
 //           inputMode="decimal"
@@ -181,7 +178,7 @@
 //             }
 //           }}
 //           placeholder="Any"
-//           className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
 //         />
 //       </div>
 
@@ -190,21 +187,21 @@
 //         <button
 //           onClick={applyPriceRange}
 //           disabled={!minPriceInput && !maxPriceInput}
-//           className="w-full px-3 py-2 bg-[#E39A65] text-white text-xs font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//           className="w-full px-2 sm:px-3 py-1.5 sm:py-2 bg-[#E39A65] text-white text-[10px] sm:text-xs font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //         >
 //           Apply Price
 //         </button>
 //       </div>
-//       </div>
+//     </div>
 
 //     {/* Show applied price range */}
 //     {(filters.minPrice || filters.maxPrice) && (
-//       <div className="mt-3 flex items-center justify-between bg-orange-50 p-2 rounded-lg">
-//         <span className="text-xs text-gray-700">
+//       <div className="mt-2 sm:mt-3 flex items-center justify-between bg-orange-50 p-1.5 sm:p-2 rounded-lg">
+//         <span className="text-[9px] sm:text-xs text-gray-700">
 //           Price: ${filters.minPrice || '0'} - ${filters.maxPrice || '∞'}
 //         </span>
 //         <button onClick={clearPriceRange} className="text-gray-400 hover:text-gray-600">
-//           <X className="w-3 h-3" />
+//           <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
 //         </button>
 //       </div>
 //     )}
@@ -290,11 +287,11 @@
 
 //   // Get tag icon based on tag name
 //   const getTagIcon = (tag) => {
-//     if (tag === 'Top Ranking') return <TrendingUp className="w-3 h-3 mr-1" />;
-//     if (tag === 'Best Seller') return <Award className="w-3 h-3 mr-1" />;
-//     if (tag === 'New Arrival') return <Sparkles className="w-3 h-3 mr-1" />;
-//     if (tag === 'Trending') return <Flame className="w-3 h-3 mr-1" />;
-//     return <Tag className="w-3 h-3 mr-1" />;
+//     if (tag === 'Top Ranking') return <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />;
+//     if (tag === 'Best Seller') return <Award className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />;
+//     if (tag === 'New Arrival') return <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />;
+//     if (tag === 'Trending') return <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />;
+//     return <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />;
 //   };
 
 //   // Fetch categories on mount
@@ -341,10 +338,8 @@
 //         queryParams.append('isFeatured', 'true');
 //       }
       
-//       // IMPORTANT: Always include inactive products for admin
 //       queryParams.append('includeInactive', 'true');
       
-//       // Filter by status
 //       if (filters.status === 'active') {
 //         queryParams.append('isActive', 'true');
 //       } else if (filters.status === 'inactive') {
@@ -402,7 +397,6 @@
 //     setCurrentPage(1);
 //   };
 
-//   // Apply price range function
 //   const applyPriceRange = () => {
 //     setFilters(prev => ({
 //       ...prev,
@@ -412,7 +406,6 @@
 //     setCurrentPage(1);
 //   };
 
-//   // Clear price range function
 //   const clearPriceRange = () => {
 //     setMinPriceInput('');
 //     setMaxPriceInput('');
@@ -515,21 +508,24 @@
 //     return count;
 //   };
 
-//   // Compact List View Component
-//   const CompactProductList = ({ product }) => {
-//     const productImages = product.images || [];
-//     const activeIndex = activeImageIndex[product._id] || 0;
-//     const firstTier = getFirstPricingTier(product.quantityBasedPricing);
-//     const hasTags = product.tags && product.tags.length > 0;
+//   // Compact List View Component - Responsive
+// // Compact List View Component - Responsive
+// const CompactProductList = ({ product }) => {
+//   const productImages = product.images || [];
+//   const activeIndex = activeImageIndex[product._id] || 0;
+//   const firstTier = getFirstPricingTier(product.quantityBasedPricing);
+//   const hasTags = product.tags && product.tags.length > 0;
 
-//     return (
-//       <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border ${
-//         product.isActive ? 'border-gray-200' : 'border-red-200 bg-red-50/30'
-//       }`}>
-//         <div className="flex items-center gap-4 p-3">
-//           {/* Product Image */}
+//   return (
+//     <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border ${
+//       product.isActive ? 'border-gray-200' : 'border-red-200 bg-red-50/30'
+//     }`}>
+//       <div className="p-3">
+//         {/* First Row: Image and Product Details - 2 columns */}
+//         <div className="flex gap-3">
+//           {/* Left Column - Image */}
 //           <div 
-//             className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer"
+//             className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer"
 //             onMouseEnter={() => productImages.length > 1 && handleImageHover(product._id, (activeIndex + 1) % productImages.length)}
 //             onMouseLeave={() => handleImageLeave(product._id)}
 //             onClick={() => handleView(product._id)}
@@ -540,29 +536,27 @@
 //               className="w-full h-full object-cover"
 //             />
 //             {productImages.length > 1 && (
-//               <div className="absolute bottom-0 right-0 bg-black/50 text-white text-[10px] px-1 rounded-tl">
+//               <div className="absolute bottom-0 right-0 bg-black/50 text-white text-[8px] px-1 rounded-tl">
 //                 {activeIndex + 1}/{productImages.length}
 //               </div>
 //             )}
 //           </div>
 
-//           {/* Product Details - Compact */}
+//           {/* Right Column - Product Details */}
 //           <div className="flex-1 min-w-0">
-//             <div className="flex items-center gap-2 mb-1">
+//             <div className="flex flex-wrap items-center gap-1 mb-1">
 //               <h3 className="text-sm font-semibold text-gray-900 truncate" title={product.productName}>
 //                 {product.productName}
 //               </h3>
               
-//               {/* Status Badge */}
-//               <span className={`flex-shrink-0 text-[10px] px-1.5 py-0.5 rounded-full ${
+//               <span className={`flex-shrink-0 text-[8px] px-1.5 py-0.5 rounded-full ${
 //                 product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
 //               }`}>
 //                 {product.isActive ? 'Active' : 'Inactive'}
 //               </span>
 
-//               {/* Featured Badge */}
 //               {product.isFeatured && (
-//                 <span className="flex-shrink-0 text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full flex items-center gap-0.5">
+//                 <span className="flex-shrink-0 text-[8px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full flex items-center gap-0.5">
 //                   <Star className="w-2.5 h-2.5" />
 //                   Featured
 //                 </span>
@@ -571,90 +565,90 @@
 
 //             {/* Tags */}
 //             {hasTags && (
-//               <div className="flex flex-wrap gap-1 mb-1">
+//               <div className="flex flex-wrap gap-1 mb-2">
 //                 {product.tags.slice(0, 2).map((tag, idx) => (
 //                   <span
 //                     key={idx}
-//                     className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium ${getTagColor(tag)}`}
+//                     className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium ${getTagColor(tag)}`}
 //                   >
 //                     {getTagIcon(tag)}
 //                     {tag}
 //                   </span>
 //                 ))}
 //                 {product.tags.length > 2 && (
-//                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-gray-100 text-gray-600">
+//                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium bg-gray-100 text-gray-600">
 //                     +{product.tags.length - 2}
 //                   </span>
 //                 )}
 //               </div>
 //             )}
 
-//             {/* Key Details Grid */}
-//             <div className="grid grid-cols-5 gap-2 text-xs">
-//               {/* Price */}
-//               <div className="flex items-center gap-1">
-//                 <DollarSign className="w-3 h-3 text-[#E39A65]" />
-//                 <span className="font-medium text-[#E39A65]">${formatPrice(product.pricePerUnit)}</span>
-//                 <span className="text-gray-400 text-[10px]">/pc</span>
-//               </div>
-
-//               {/* MOQ */}
-//               <div className="flex items-center gap-1">
-//                 <Package className="w-3 h-3 text-gray-400" />
-//                 <span className="text-gray-600">MOQ: {product.moq}</span>
-//               </div>
-
-//               {/* Category */}
-//               <div className="flex items-center gap-1">
-//                 <Tag className="w-3 h-3 text-gray-400" />
-//                 <span className="text-gray-600 truncate">{product.category?.name || 'N/A'}</span>
-//               </div>
-
-//               {/* Colors */}
-//               {product.colors && product.colors.length > 0 && (
-//                 <div className="flex items-center gap-1">
-//                   <Palette className="w-3 h-3 text-gray-400" />
-//                   <div className="flex gap-0.5">
-//                     {product.colors.slice(0, 3).map((color, idx) => (
-//                       <div
-//                         key={idx}
-//                         className="w-3 h-3 rounded-full border border-gray-200"
-//                         style={{ backgroundColor: color.code }}
-//                         title={color.name}
-//                       />
-//                     ))}
-//                     {product.colors.length > 3 && (
-//                       <span className="text-[10px] text-gray-500">+{product.colors.length - 3}</span>
-//                     )}
-//                   </div>
-//                 </div>
-//               )}
-
-//               {/* Bulk Price */}
+//             {/* Price */}
+//             <div className="flex items-center gap-1 mb-1">
+//               <DollarSign className="w-3 h-3 text-[#E39A65]" />
+//               <span className="font-medium text-[#E39A65] text-xs">${formatPrice(product.pricePerUnit)}</span>
+//               <span className="text-gray-400 text-[10px]">/pc</span>
 //               {firstTier && (
-//                 <div className="flex items-center gap-1">
-//                   <Layers className="w-3 h-3 text-orange-400" />
-//                   <span className="text-orange-600 text-[10px]">{firstTier.range}pcs: ${formatPrice(firstTier.price)}</span>
-//                 </div>
+//                 <span className="text-orange-600 text-[9px] ml-1">
+//                   • {firstTier.range}pcs: ${formatPrice(firstTier.price)}
+//                 </span>
 //               )}
 //             </div>
+
+//             {/* Category */}
+//             <div className="flex items-center gap-1">
+//               <Tag className="w-2.5 h-2.5 text-gray-400" />
+//               <span className="text-[10px] text-gray-600 truncate">{product.category?.name || 'N/A'}</span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Second Row: MOQ & Colors (Left) and Action Buttons (Right) */}
+//         <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+//           {/* Left Side - MOQ and Colors */}
+//           <div className="flex items-center gap-3">
+//             {/* MOQ */}
+//             <div className="flex items-center gap-1">
+//               <Package className="w-3 h-3 text-gray-400" />
+//               <span className="text-[10px] text-gray-600">MOQ: {product.moq}</span>
+//             </div>
+
+//             {/* Colors */}
+//             {product.colors && product.colors.length > 0 && (
+//               <div className="flex items-center gap-1">
+//                 <Palette className="w-3 h-3 text-gray-400" />
+//                 <div className="flex gap-0.5">
+//                   {product.colors.slice(0, 3).map((color, idx) => (
+//                     <div
+//                       key={idx}
+//                       className="w-2.5 h-2.5 rounded-full border border-gray-200"
+//                       style={{ backgroundColor: color.code }}
+//                       title={color.name}
+//                     />
+//                   ))}
+//                   {product.colors.length > 3 && (
+//                     <span className="text-[8px] text-gray-500">+{product.colors.length - 3}</span>
+//                   )}
+//                 </div>
+//               </div>
+//             )}
 //           </div>
 
-//           {/* Action Buttons - Compact */}
-//           <div className="flex items-center gap-1 flex-shrink-0">
+//           {/* Right Side - Action Buttons */}
+//           <div className="flex items-center gap-1.5 flex-shrink-0">
 //             <button
 //               onClick={() => handleView(product._id)}
 //               className="p-1.5 bg-[#E39A65] text-white rounded hover:bg-[#d48b54] transition-colors"
 //               title="View Details"
 //             >
-//               <Eye className="w-4 h-4" />
+//               <Eye className="w-3.5 h-3.5" />
 //             </button>
 //             <button
 //               onClick={() => handleEdit(product._id)}
 //               className="p-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
 //               title="Edit"
 //             >
-//               <Edit className="w-4 h-4" />
+//               <Edit className="w-3.5 h-3.5" />
 //             </button>
 //             <button
 //               onClick={() => handleToggleStatus(product._id, product.isActive)}
@@ -665,88 +659,110 @@
 //               }`}
 //               title={product.isActive ? 'Deactivate' : 'Activate'}
 //             >
-//               {product.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+//               {product.isActive ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
 //             </button>
 //             <button
 //               onClick={() => handleDeleteClick(product._id, product.productName)}
 //               className="p-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
 //               title="Delete"
 //             >
-//               <Trash2 className="w-4 h-4" />
+//               <Trash2 className="w-3.5 h-3.5" />
 //             </button>
 //           </div>
 //         </div>
 //       </div>
-//     );
-//   };
+//     </div>
+//   );
+// };
 
 //   return (
 //     <div className="min-h-screen bg-gray-50">
-//       {/* Header */}
-//       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-//         <div className="px-6 py-4">
-//           <div className="flex items-center justify-between">
-//             <div className="flex items-center gap-4">
-//               <Link href="/admin/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-//                 <ArrowLeft className="w-5 h-5 text-gray-600" />
-//               </Link>
-//               <div>
-//                 <div className="flex items-center gap-2">
-//                   <h1 className="text-2xl font-bold text-gray-900">All Products</h1>
-//                   <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">
-//                     Admin
-//                   </span>
-//                 </div>
-//                 <p className="text-sm text-gray-500 mt-1">
-//                   Manage your product catalog • {totalProducts} total products
-//                 </p>
-//               </div>
-//             </div>
-//             <div className="flex items-center gap-3">
-//               <button
-//                 onClick={fetchProducts}
-//                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-//                 title="Refresh"
-//               >
-//                 <RefreshCw className="w-5 h-5" />
-//               </button>
-//               <Link
-//                 href="/admin/create-products"
-//                 className="flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-//               >
-//                 <Plus className="w-4 h-4" />
-//                 <span>Add Product</span>
-//               </Link>
-//             </div>
+//       {/* Header - Responsive */}
+//     <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+//   <div className="px-3 sm:px-6 py-3 sm:py-4">
+//     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+//       {/* Left Side - Title Section */}
+//       <div className="flex items-center gap-2 sm:gap-4">
+//         <Link href="/admin/dashboard" className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
+//           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//         </Link>
+//         <div>
+//           <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+//             <h1 className="text-lg sm:text-2xl font-bold text-gray-900">All Products</h1>
+//             <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-red-100 text-red-600 text-[9px] sm:text-xs font-medium rounded-full">
+//               Admin
+//             </span>
 //           </div>
+//           <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+//             Manage your product catalog • {totalProducts} total products
+//           </p>
 //         </div>
 //       </div>
 
+//       {/* Right Side - Action Buttons (Desktop) */}
+//       <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">
+//         <button
+//           onClick={fetchProducts}
+//           className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+//           title="Refresh"
+//         >
+//           <RefreshCw className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+//         </button>
+//         <Link
+//           href="/admin/create-products"
+//           className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-[10px] sm:text-sm"
+//         >
+//           <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+//           <span>Add Product</span>
+//         </Link>
+//       </div>
+//     </div>
+
+//     {/* Action Buttons - Below Title (Mobile Only) */}
+//     <div className="flex sm:hidden items-center justify-end gap-2 mt-3 pt-2 border-t border-gray-100">
+//       <button
+//         onClick={fetchProducts}
+//         className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+//         title="Refresh"
+//       >
+//         <RefreshCw className="w-4 h-4" />
+//       </button>
+//       <Link
+//         href="/admin/create-products"
+//         className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-xs"
+//       >
+//         <Plus className="w-3.5 h-3.5" />
+//         <span>Add Product</span>
+//       </Link>
+//     </div>
+//   </div>
+// </div>
+
 //       {/* Main Content */}
-//       <div className="p-6">
+//       <div className="p-3 sm:p-6">
 //         {/* Search Bar */}
-//         <div className="mb-4">
+//         <div className="mb-3 sm:mb-4">
 //           <div className="relative">
-//             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+//             <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
 //             <input
 //               type="text"
 //               placeholder="Search products by name, fabric, or category..."
 //               value={filters.search}
 //               onChange={(e) => handleFilterChange('search', e.target.value)}
-//               className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+//               className="w-full pl-8 sm:pl-9 pr-8 sm:pr-9 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //             />
 //             {filters.search && (
 //               <button
 //                 onClick={() => handleFilterChange('search', '')}
-//                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                 className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
 //               >
-//                 <X className="w-3 h-3" />
+//                 <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
 //               </button>
 //             )}
 //           </div>
 //         </div>
 
-//         {/* Filter Bar - Using the external component */}
+//         {/* Filter Bar */}
 //         <FilterBar 
 //           filters={filters}
 //           handleFilterChange={handleFilterChange}
@@ -762,8 +778,8 @@
 //         />
 
 //         {/* Results Count */}
-//         <div className="mb-4 flex items-center justify-between">
-//           <p className="text-sm text-gray-600">
+//         <div className="mb-3 sm:mb-4 flex items-center justify-between">
+//           <p className="text-[10px] sm:text-sm text-gray-600">
 //             Showing <span className="font-semibold text-gray-900">{products.length}</span> of{' '}
 //             <span className="font-semibold text-gray-900">{totalProducts}</span> products
 //           </p>
@@ -771,21 +787,21 @@
 
 //         {/* Loading State */}
 //         {loading && (
-//           <div className="flex justify-center items-center py-20">
-//             <Loader2 className="w-8 h-8 animate-spin text-[#E39A65]" />
+//           <div className="flex justify-center items-center py-10 sm:py-20">
+//             <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-[#E39A65]" />
 //           </div>
 //         )}
 
-//         {/* Products Display - COMPACT LIST ONLY */}
+//         {/* Products Display */}
 //         {!loading && (
 //           <>
 //             {products.length === 0 ? (
-//               <div className="text-center py-20 bg-white rounded-lg border border-gray-200">
-//                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-//                 <p className="text-gray-500 mb-4">No products found matching your criteria</p>
+//               <div className="text-center py-10 sm:py-20 bg-white rounded-lg border border-gray-200">
+//                 <Package className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
+//                 <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">No products found matching your criteria</p>
 //                 <button
 //                   onClick={clearFilters}
-//                   className="px-4 py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                   className="px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-[10px] sm:text-sm rounded-lg hover:bg-[#d48b54] transition-colors"
 //                 >
 //                   Clear Filters
 //                 </button>
@@ -800,13 +816,13 @@
 
 //                 {/* Pagination */}
 //                 {totalPages > 1 && (
-//                   <div className="flex justify-center items-center gap-2 mt-8">
+//                   <div className="flex justify-center items-center gap-1 sm:gap-2 mt-4 sm:mt-8">
 //                     <button
 //                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
 //                       disabled={currentPage === 1}
-//                       className="p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white"
+//                       className="p-1 sm:p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white"
 //                     >
-//                       <ChevronLeft className="w-4 h-4" />
+//                       <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
 //                     </button>
                     
 //                     {[...Array(totalPages)].map((_, i) => {
@@ -820,7 +836,7 @@
 //                           <button
 //                             key={i}
 //                             onClick={() => setCurrentPage(pageNum)}
-//                             className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+//                             className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg text-[10px] sm:text-sm font-medium transition-colors ${
 //                               currentPage === pageNum
 //                                 ? 'bg-[#E39A65] text-white'
 //                                 : 'bg-white border border-gray-300 hover:bg-gray-50'
@@ -830,7 +846,7 @@
 //                           </button>
 //                         );
 //                       } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-//                         return <span key={i} className="text-gray-400">...</span>;
+//                         return <span key={i} className="text-gray-400 text-[10px] sm:text-sm">...</span>;
 //                       }
 //                       return null;
 //                     })}
@@ -838,9 +854,9 @@
 //                     <button
 //                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
 //                       disabled={currentPage === totalPages}
-//                       className="p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white"
+//                       className="p-1 sm:p-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors bg-white"
 //                     >
-//                       <ChevronRight className="w-4 h-4" />
+//                       <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
 //                     </button>
 //                   </div>
 //                 )}
@@ -850,33 +866,33 @@
 //         )}
 //       </div>
 
-//       {/* Delete Confirmation Modal */}
+//       {/* Delete Confirmation Modal - Responsive */}
 //       {deleteModal.show && (
-//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 //           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
-//             <div className="p-6">
-//               <div className="flex items-center gap-3 text-red-600 mb-4">
-//                 <AlertCircle className="w-6 h-6" />
-//                 <h3 className="text-lg font-semibold">Delete Product</h3>
+//             <div className="p-4 sm:p-6">
+//               <div className="flex items-center gap-2 sm:gap-3 text-red-600 mb-3 sm:mb-4">
+//                 <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+//                 <h3 className="text-base sm:text-lg font-semibold">Delete Product</h3>
 //               </div>
               
-//               <p className="text-gray-600 mb-2">
+//               <p className="text-xs sm:text-sm text-gray-600 mb-2">
 //                 Are you sure you want to delete <span className="font-semibold">"{deleteModal.name}"</span>?
 //               </p>
-//               <p className="text-sm text-gray-500 mb-6">
+//               <p className="text-[10px] sm:text-xs text-gray-500 mb-4 sm:mb-6">
 //                 This action cannot be undone. The product and its images will be permanently removed.
 //               </p>
 
-//               <div className="flex items-center justify-end gap-3">
+//               <div className="flex items-center justify-end gap-2 sm:gap-3">
 //                 <button
 //                   onClick={() => setDeleteModal({ show: false, id: null, name: '' })}
-//                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+//                   className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
 //                 >
 //                   Cancel
 //                 </button>
 //                 <button
 //                   onClick={handleDeleteConfirm}
-//                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+//                   className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
 //                 >
 //                   Delete Product
 //                 </button>
@@ -926,15 +942,18 @@ import {
   Flame,
   Palette,
   Ruler,
-  Layers
+  Layers,
+  FolderTree
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Filter Bar Component - Responsive for mobile
+// Filter Bar Component - Responsive for mobile with Subcategory
 const FilterBar = ({ 
   filters, 
   handleFilterChange,
   categories,
+  subcategories,
+  selectedCategory,
   minPriceInput,
   maxPriceInput,
   setMinPriceInput,
@@ -960,7 +979,7 @@ const FilterBar = ({
       )}
     </div>
   
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 mb-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 sm:gap-3 mb-3">
       {/* Category Filter */}
       <div>
         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Category</label>
@@ -975,6 +994,23 @@ const FilterBar = ({
           ))}
         </select>
       </div>
+
+      {/* Subcategory Filter - Only show when a category is selected */}
+      {selectedCategory && subcategories.length > 0 && (
+        <div>
+          <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Subcategory</label>
+          <select
+            value={filters.subcategory}
+            onChange={(e) => handleFilterChange('subcategory', e.target.value)}
+            className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+          >
+            <option value="">All Subcategories</option>
+            {subcategories.map(sub => (
+              <option key={sub._id} value={sub._id}>{sub.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Target Audience Filter */}
       <div>
@@ -1109,6 +1145,7 @@ export default function AdminAllProducts() {
   const [filters, setFilters] = useState({
     search: '',
     category: '',
+    subcategory: '', // NEW: Subcategory filter
     targetedCustomer: '',
     minPrice: '',
     maxPrice: '',
@@ -1123,6 +1160,8 @@ export default function AdminAllProducts() {
 
   // Available filter options
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]); // NEW: Subcategories state
+  const [selectedCategory, setSelectedCategory] = useState(null); // NEW: Track selected category
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -1140,6 +1179,22 @@ export default function AdminAllProducts() {
       router.push('/login');
     }
   }, [router]);
+
+  // Fetch subcategories when category changes
+  useEffect(() => {
+    if (filters.category) {
+      const categoryId = filters.category;
+      setSelectedCategory(categoryId);
+      fetchSubcategories(categoryId);
+    } else {
+      setSubcategories([]);
+      setSelectedCategory(null);
+      // Clear subcategory filter when no category selected
+      if (filters.subcategory) {
+        setFilters(prev => ({ ...prev, subcategory: '' }));
+      }
+    }
+  }, [filters.category]);
 
   // Helper functions
   const capitalizeFirst = (str) => {
@@ -1211,6 +1266,25 @@ export default function AdminAllProducts() {
     }
   };
 
+  // NEW: Fetch subcategories for a category
+  const fetchSubcategories = async (categoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSubcategories(data.data.subcategories);
+      } else {
+        setSubcategories([]);
+      }
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      setSubcategories([]);
+    }
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -1221,6 +1295,7 @@ export default function AdminAllProducts() {
       
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.category) queryParams.append('category', filters.category);
+      if (filters.subcategory) queryParams.append('subcategory', filters.subcategory); // NEW: Add subcategory to query
       if (filters.targetedCustomer) queryParams.append('targetedCustomer', filters.targetedCustomer);
       if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
       if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
@@ -1308,6 +1383,7 @@ export default function AdminAllProducts() {
     setFilters({
       search: '',
       category: '',
+      subcategory: '', // NEW: Clear subcategory
       targetedCustomer: '',
       minPrice: '',
       maxPrice: '',
@@ -1392,6 +1468,7 @@ export default function AdminAllProducts() {
   const getActiveFilterCount = () => {
     let count = 0;
     if (filters.category) count++;
+    if (filters.subcategory) count++; // NEW: Count subcategory filter
     if (filters.targetedCustomer) count++;
     if (filters.minPrice || filters.maxPrice) count++;
     if (filters.status !== 'all') count++;
@@ -1399,235 +1476,242 @@ export default function AdminAllProducts() {
     return count;
   };
 
-  // Compact List View Component - Responsive
-// Compact List View Component - Responsive
-const CompactProductList = ({ product }) => {
-  const productImages = product.images || [];
-  const activeIndex = activeImageIndex[product._id] || 0;
-  const firstTier = getFirstPricingTier(product.quantityBasedPricing);
-  const hasTags = product.tags && product.tags.length > 0;
+  // Compact List View Component - Responsive with Subcategory Display
+  const CompactProductList = ({ product }) => {
+    const productImages = product.images || [];
+    const activeIndex = activeImageIndex[product._id] || 0;
+    const firstTier = getFirstPricingTier(product.quantityBasedPricing);
+    const hasTags = product.tags && product.tags.length > 0;
 
-  return (
-    <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border ${
-      product.isActive ? 'border-gray-200' : 'border-red-200 bg-red-50/30'
-    }`}>
-      <div className="p-3">
-        {/* First Row: Image and Product Details - 2 columns */}
-        <div className="flex gap-3">
-          {/* Left Column - Image */}
-          <div 
-            className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer"
-            onMouseEnter={() => productImages.length > 1 && handleImageHover(product._id, (activeIndex + 1) % productImages.length)}
-            onMouseLeave={() => handleImageLeave(product._id)}
-            onClick={() => handleView(product._id)}
-          >
-            <img
-              src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100'}
-              alt={product.productName}
-              className="w-full h-full object-cover"
-            />
-            {productImages.length > 1 && (
-              <div className="absolute bottom-0 right-0 bg-black/50 text-white text-[8px] px-1 rounded-tl">
-                {activeIndex + 1}/{productImages.length}
-              </div>
-            )}
-          </div>
-
-          {/* Right Column - Product Details */}
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-1 mb-1">
-              <h3 className="text-sm font-semibold text-gray-900 truncate" title={product.productName}>
-                {product.productName}
-              </h3>
-              
-              <span className={`flex-shrink-0 text-[8px] px-1.5 py-0.5 rounded-full ${
-                product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-              }`}>
-                {product.isActive ? 'Active' : 'Inactive'}
-              </span>
-
-              {product.isFeatured && (
-                <span className="flex-shrink-0 text-[8px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full flex items-center gap-0.5">
-                  <Star className="w-2.5 h-2.5" />
-                  Featured
-                </span>
+    return (
+      <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border ${
+        product.isActive ? 'border-gray-200' : 'border-red-200 bg-red-50/30'
+      }`}>
+        <div className="p-3">
+          {/* First Row: Image and Product Details - 2 columns */}
+          <div className="flex gap-3">
+            {/* Left Column - Image */}
+            <div 
+              className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 cursor-pointer"
+              onMouseEnter={() => productImages.length > 1 && handleImageHover(product._id, (activeIndex + 1) % productImages.length)}
+              onMouseLeave={() => handleImageLeave(product._id)}
+              onClick={() => handleView(product._id)}
+            >
+              <img
+                src={productImages[activeIndex]?.url || productImages[0]?.url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=100'}
+                alt={product.productName}
+                className="w-full h-full object-cover"
+              />
+              {productImages.length > 1 && (
+                <div className="absolute bottom-0 right-0 bg-black/50 text-white text-[8px] px-1 rounded-tl">
+                  {activeIndex + 1}/{productImages.length}
+                </div>
               )}
             </div>
 
-            {/* Tags */}
-            {hasTags && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {product.tags.slice(0, 2).map((tag, idx) => (
-                  <span
-                    key={idx}
-                    className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium ${getTagColor(tag)}`}
-                  >
-                    {getTagIcon(tag)}
-                    {tag}
-                  </span>
-                ))}
-                {product.tags.length > 2 && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium bg-gray-100 text-gray-600">
-                    +{product.tags.length - 2}
+            {/* Right Column - Product Details */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-1 mb-1">
+                <h3 className="text-sm font-semibold text-gray-900 truncate" title={product.productName}>
+                  {product.productName}
+                </h3>
+                
+                <span className={`flex-shrink-0 text-[8px] px-1.5 py-0.5 rounded-full ${
+                  product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                  {product.isActive ? 'Active' : 'Inactive'}
+                </span>
+
+                {product.isFeatured && (
+                  <span className="flex-shrink-0 text-[8px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5" />
+                    Featured
                   </span>
                 )}
               </div>
-            )}
 
-            {/* Price */}
-            <div className="flex items-center gap-1 mb-1">
-              <DollarSign className="w-3 h-3 text-[#E39A65]" />
-              <span className="font-medium text-[#E39A65] text-xs">${formatPrice(product.pricePerUnit)}</span>
-              <span className="text-gray-400 text-[10px]">/pc</span>
-              {firstTier && (
-                <span className="text-orange-600 text-[9px] ml-1">
-                  • {firstTier.range}pcs: ${formatPrice(firstTier.price)}
-                </span>
+              {/* Tags */}
+              {hasTags && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {product.tags.slice(0, 2).map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium ${getTagColor(tag)}`}
+                    >
+                      {getTagIcon(tag)}
+                      {tag}
+                    </span>
+                  ))}
+                  {product.tags.length > 2 && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-medium bg-gray-100 text-gray-600">
+                      +{product.tags.length - 2}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Subcategory Display */}
+              {product.subcategoryName && (
+                <div className="flex items-center gap-1 mb-1">
+                  <FolderTree className="w-2.5 h-2.5 text-gray-400" />
+                  <span className="text-[9px] text-gray-500">Sub: {product.subcategoryName}</span>
+                </div>
+              )}
+
+              {/* Price */}
+              <div className="flex items-center gap-1 mb-1">
+                <DollarSign className="w-3 h-3 text-[#E39A65]" />
+                <span className="font-medium text-[#E39A65] text-xs">${formatPrice(product.pricePerUnit)}</span>
+                <span className="text-gray-400 text-[10px]">/pc</span>
+                {firstTier && (
+                  <span className="text-orange-600 text-[9px] ml-1">
+                    • {firstTier.range}pcs: ${formatPrice(firstTier.price)}
+                  </span>
+                )}
+              </div>
+
+              {/* Category */}
+              <div className="flex items-center gap-1">
+                <Tag className="w-2.5 h-2.5 text-gray-400" />
+                <span className="text-[10px] text-gray-600 truncate">{product.category?.name || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Second Row: MOQ & Colors (Left) and Action Buttons (Right) */}
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+            {/* Left Side - MOQ and Colors */}
+            <div className="flex items-center gap-3">
+              {/* MOQ */}
+              <div className="flex items-center gap-1">
+                <Package className="w-3 h-3 text-gray-400" />
+                <span className="text-[10px] text-gray-600">MOQ: {product.moq}</span>
+              </div>
+
+              {/* Colors */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <Palette className="w-3 h-3 text-gray-400" />
+                  <div className="flex gap-0.5">
+                    {product.colors.slice(0, 3).map((color, idx) => (
+                      <div
+                        key={idx}
+                        className="w-2.5 h-2.5 rounded-full border border-gray-200"
+                        style={{ backgroundColor: color.code }}
+                        title={color.name}
+                      />
+                    ))}
+                    {product.colors.length > 3 && (
+                      <span className="text-[8px] text-gray-500">+{product.colors.length - 3}</span>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Category */}
-            <div className="flex items-center gap-1">
-              <Tag className="w-2.5 h-2.5 text-gray-400" />
-              <span className="text-[10px] text-gray-600 truncate">{product.category?.name || 'N/A'}</span>
+            {/* Right Side - Action Buttons */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                onClick={() => handleView(product._id)}
+                className="p-1.5 bg-[#E39A65] text-white rounded hover:bg-[#d48b54] transition-colors"
+                title="View Details"
+              >
+                <Eye className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => handleEdit(product._id)}
+                className="p-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                title="Edit"
+              >
+                <Edit className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => handleToggleStatus(product._id, product.isActive)}
+                className={`p-1.5 rounded transition-colors ${
+                  product.isActive 
+                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                }`}
+                title={product.isActive ? 'Deactivate' : 'Activate'}
+              >
+                {product.isActive ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+              </button>
+              <button
+                onClick={() => handleDeleteClick(product._id, product.productName)}
+                className="p-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                title="Delete"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
-        </div>
-
-        {/* Second Row: MOQ & Colors (Left) and Action Buttons (Right) */}
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-          {/* Left Side - MOQ and Colors */}
-          <div className="flex items-center gap-3">
-            {/* MOQ */}
-            <div className="flex items-center gap-1">
-              <Package className="w-3 h-3 text-gray-400" />
-              <span className="text-[10px] text-gray-600">MOQ: {product.moq}</span>
-            </div>
-
-            {/* Colors */}
-            {product.colors && product.colors.length > 0 && (
-              <div className="flex items-center gap-1">
-                <Palette className="w-3 h-3 text-gray-400" />
-                <div className="flex gap-0.5">
-                  {product.colors.slice(0, 3).map((color, idx) => (
-                    <div
-                      key={idx}
-                      className="w-2.5 h-2.5 rounded-full border border-gray-200"
-                      style={{ backgroundColor: color.code }}
-                      title={color.name}
-                    />
-                  ))}
-                  {product.colors.length > 3 && (
-                    <span className="text-[8px] text-gray-500">+{product.colors.length - 3}</span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right Side - Action Buttons */}
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <button
-              onClick={() => handleView(product._id)}
-              className="p-1.5 bg-[#E39A65] text-white rounded hover:bg-[#d48b54] transition-colors"
-              title="View Details"
-            >
-              <Eye className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => handleEdit(product._id)}
-              className="p-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              title="Edit"
-            >
-              <Edit className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => handleToggleStatus(product._id, product.isActive)}
-              className={`p-1.5 rounded transition-colors ${
-                product.isActive 
-                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }`}
-              title={product.isActive ? 'Deactivate' : 'Activate'}
-            >
-              {product.isActive ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
-            </button>
-            <button
-              onClick={() => handleDeleteClick(product._id, product.productName)}
-              className="p-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-              title="Delete"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Responsive */}
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-  <div className="px-3 sm:px-6 py-3 sm:py-4">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-      {/* Left Side - Title Section */}
-      <div className="flex items-center gap-2 sm:gap-4">
-        <Link href="/admin/dashboard" className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-        </Link>
-        <div>
-          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-            <h1 className="text-lg sm:text-2xl font-bold text-gray-900">All Products</h1>
-            <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-red-100 text-red-600 text-[9px] sm:text-xs font-medium rounded-full">
-              Admin
-            </span>
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+            {/* Left Side - Title Section */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link href="/admin/dashboard" className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              </Link>
+              <div>
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                  <h1 className="text-lg sm:text-2xl font-bold text-gray-900">All Products</h1>
+                  <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-red-100 text-red-600 text-[9px] sm:text-xs font-medium rounded-full">
+                    Admin
+                  </span>
+                </div>
+                <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+                  Manage your product catalog • {totalProducts} total products
+                </p>
+              </div>
+            </div>
+
+            {/* Right Side - Action Buttons (Desktop) */}
+            <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">
+              <button
+                onClick={fetchProducts}
+                className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Refresh"
+              >
+                <RefreshCw className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+              </button>
+              <Link
+                href="/admin/create-products"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-[10px] sm:text-sm"
+              >
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Add Product</span>
+              </Link>
+            </div>
           </div>
-          <p className="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-            Manage your product catalog • {totalProducts} total products
-          </p>
+
+          {/* Action Buttons - Below Title (Mobile Only) */}
+          <div className="flex sm:hidden items-center justify-end gap-2 mt-3 pt-2 border-t border-gray-100">
+            <button
+              onClick={fetchProducts}
+              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+            <Link
+              href="/admin/create-products"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Product</span>
+            </Link>
+          </div>
         </div>
       </div>
-
-      {/* Right Side - Action Buttons (Desktop) */}
-      <div className="hidden sm:flex items-center gap-1.5 sm:gap-3">
-        <button
-          onClick={fetchProducts}
-          className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          title="Refresh"
-        >
-          <RefreshCw className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-        </button>
-        <Link
-          href="/admin/create-products"
-          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-[10px] sm:text-sm"
-        >
-          <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-          <span>Add Product</span>
-        </Link>
-      </div>
-    </div>
-
-    {/* Action Buttons - Below Title (Mobile Only) */}
-    <div className="flex sm:hidden items-center justify-end gap-2 mt-3 pt-2 border-t border-gray-100">
-      <button
-        onClick={fetchProducts}
-        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-        title="Refresh"
-      >
-        <RefreshCw className="w-4 h-4" />
-      </button>
-      <Link
-        href="/admin/create-products"
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors text-xs"
-      >
-        <Plus className="w-3.5 h-3.5" />
-        <span>Add Product</span>
-      </Link>
-    </div>
-  </div>
-</div>
 
       {/* Main Content */}
       <div className="p-3 sm:p-6">
@@ -1637,7 +1721,7 @@ const CompactProductList = ({ product }) => {
             <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products by name, fabric, or category..."
+              placeholder="Search products by name.."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               className="w-full pl-8 sm:pl-9 pr-8 sm:pr-9 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
@@ -1658,6 +1742,8 @@ const CompactProductList = ({ product }) => {
           filters={filters}
           handleFilterChange={handleFilterChange}
           categories={categories}
+          subcategories={subcategories}
+          selectedCategory={selectedCategory}
           minPriceInput={minPriceInput}
           maxPriceInput={maxPriceInput}
           setMinPriceInput={setMinPriceInput}
@@ -1673,6 +1759,9 @@ const CompactProductList = ({ product }) => {
           <p className="text-[10px] sm:text-sm text-gray-600">
             Showing <span className="font-semibold text-gray-900">{products.length}</span> of{' '}
             <span className="font-semibold text-gray-900">{totalProducts}</span> products
+            {filters.subcategory && subcategories.find(s => s._id === filters.subcategory) && (
+              <span> in subcategory "<span className="font-medium">{subcategories.find(s => s._id === filters.subcategory)?.name}</span>"</span>
+            )}
           </p>
         </div>
 
