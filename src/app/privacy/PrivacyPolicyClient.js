@@ -47,6 +47,7 @@ import { BsShieldLock, BsShieldShaded, BsFileText } from 'react-icons/bs';
 import { RiFileShieldLine, RiGovernmentLine } from 'react-icons/ri';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function PrivacyPolicyPage() {
   const [activeSection, setActiveSection] = useState('introduction');
@@ -904,6 +905,7 @@ const scrollToSection = (sectionId) => {
         )}
       </div>
       <Footer />
+        <WhatsAppButton />
     </>
   );
 }

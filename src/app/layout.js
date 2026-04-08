@@ -154,7 +154,7 @@ export default function RootLayout({ children }) {
           duration={4000}
           theme="light"
         />
-        <WhatsAppButton />
+        {/* <WhatsAppButton /> */}
         <ScrollToTop />
       </body>
     </html>

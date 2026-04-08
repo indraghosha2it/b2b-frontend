@@ -1425,6 +1425,7 @@ import {
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 const formatPrice = (price) => {
   return new Intl.NumberFormat('en-US', {
@@ -2948,6 +2949,7 @@ export default function InquiryCartPage() {
       )}
 
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }

@@ -2361,7 +2361,8 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
-  CheckCircle
+  CheckCircle,
+  FolderTree
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Footer from '../components/layout/Footer';
@@ -2371,6 +2372,7 @@ import { motion } from 'framer-motion';
 import ProductReviews from '../components/product/ProductReviews';
 import MetadataUpdater from './MetadataUpdater';
 import FullscreenModal from '../components/FullscreenModal';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 // Helper function to format currency
 const formatPrice = (price) => {
@@ -3194,43 +3196,40 @@ const RelatedProductCard = ({ product }) => {
 
       {/* Thumbnail Gallery */}
       {hasMultipleImages && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="flex justify-center gap-1 py-1.5 px-1 bg-gray-50/80 border-t border-gray-100"
-          onMouseLeave={handleImageLeave}
-        >
-          {productImages.slice(0, 4).map((image, index) => (
-            <motion.button
-              key={index}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={`relative w-5 h-5 md:w-7 md:h-7 rounded-md overflow-hidden transition-all duration-300 ${
-                activeIndex === index 
-                  ? 'ring-1 ring-[#E39A65] ring-offset-1 scale-110 shadow-md' 
-                  : 'opacity-60 hover:opacity-100'
-              }`}
-              onMouseEnter={() => handleImageHover(index)}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleImageHover(index);
-              }}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex justify-center gap-1 py-1.5 px-1 bg-gray-50/80 border-t border-gray-100"
+              onMouseLeave={handleImageLeave}
             >
-              <img
-                src={image.url}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </motion.button>
-          ))}
-          {productImages.length > 4 && (
-            <div className="w-5 h-5 md:w-7 md:h-7 rounded-md bg-gray-200 flex items-center justify-center text-[8px] md:text-[10px] text-gray-600 font-medium">
-              +{productImages.length - 4}
-            </div>
+            {productImages.slice(0, 4).map((image, index) => (
+      <motion.button
+        key={index}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        className={`relative w-5 h-5 md:w-7 md:h-7 rounded-md overflow-hidden transition-all duration-300 ${
+          activeIndex === index 
+            ? 'ring-1 ring-[#E39A65] ring-offset-1 scale-110 shadow-md' 
+            : 'opacity-60 hover:opacity-100'
+        }`}
+        onMouseEnter={() => handleImageHover(index)}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleImageHover(index);
+        }}
+      >
+        <img
+          src={image.url}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+      </motion.button>
+    ))}
+    {/* Removed the +X indicator completely */}
+            </motion.div>
           )}
-        </motion.div>
-      )}
+    
 
       {/* Content */}
       <motion.div 
@@ -4031,27 +4030,47 @@ export default function ProductDetailsClient() {
       <Navbar />
       <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => router.back()}
-                className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
-                aria-label="Go back"
-              >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-              </button>
-              
-              <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap pb-0.5 flex-1">
-                <Link href="/" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Home</Link>
-                <span className="flex-shrink-0">/</span>
-                <Link href="/products" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Products</Link>
-                <span className="flex-shrink-0">/</span>
-                <span className="text-gray-900 font-medium truncate">{product.productName}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+       {/* Breadcrumb */}
+<div className="bg-white border-b border-gray-200">
+  <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
+    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+        aria-label="Go back"
+      >
+        <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+      </button>
+      
+      <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 overflow-x-auto whitespace-nowrap pb-0.5 flex-1">
+        <Link href="/" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Home</Link>
+        <span className="flex-shrink-0">/</span>
+        <Link href="/products" className="hover:text-[#E39A65] transition-colors flex-shrink-0">Products</Link>
+        <span className="flex-shrink-0">/</span>
+        <Link 
+          href={`/products?category=${product.category?._id}`} 
+          className="hover:text-[#E39A65] transition-colors flex-shrink-0"
+        >
+          {product.category?.name || 'Category'}
+        </Link>
+        {/* NEW: Add subcategory to breadcrumb */}
+        {product.subcategoryName && (
+          <>
+            <span className="flex-shrink-0">/</span>
+            <Link 
+              href={`/products?category=${product.category?._id}&subcategory=${product.subcategoryName}`} 
+              className="hover:text-[#E39A65] transition-colors flex-shrink-0"
+            >
+              {product.subcategoryName}
+            </Link>
+          </>
+        )}
+        <span className="flex-shrink-0">/</span>
+        <span className="text-gray-900 font-medium truncate">{product.productName}</span>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div className="container mx-auto px-4 max-w-7xl py-4 sm:py-6 lg:py-8">
           {/* Two Column Layout */}
@@ -4066,7 +4085,7 @@ export default function ProductDetailsClient() {
             {/* Right Column - Product Info & Inquiry Form */}
             <div className="lg:col-span-7 space-y-4 sm:space-y-6">
               {/* Product Info Card */}
-              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+              {/* <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
                 <div className="mb-3 sm:mb-4">
                   <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 pb-3 border-b border-gray-100">
                     <div className="flex items-center gap-2">
@@ -4185,7 +4204,148 @@ export default function ProductDetailsClient() {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
+
+              {/* Product Info Card */}
+<div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
+  <div className="mb-3 sm:mb-4">
+    <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4 pb-3 border-b border-gray-100">
+      {/* Category Display */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+          <Package className="w-3.5 h-3.5 text-[#E39A65]" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Category</span>
+          <span className="text-xs font-semibold text-gray-900">
+            {product.category?.name || 'Uncategorized'}
+          </span>
+        </div>
+      </div>
+
+      {/* Subcategory Display */}
+      {product.subcategoryName && (
+        <>
+          <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+              <FolderTree className="w-3.5 h-3.5 text-[#E39A65]" />
+            </div>
+            <div>
+              <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Subcategory</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {product.subcategoryName}
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+          <Users className="w-3.5 h-3.5 text-[#E39A65]" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Target</span>
+          <span className="text-xs font-semibold text-gray-900">
+            {product.targetedCustomer && product.targetedCustomer !== 'unisex' 
+              ? capitalizeFirst(product.targetedCustomer) 
+              : 'Unisex (All)'}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center justify-center w-7 h-7 bg-green-50 rounded-lg">
+          <Package className="w-3.5 h-3.5 text-green-600" />
+        </div>
+        <div>
+          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">MOQ (Per Color)</span>
+          <span className="text-xs font-semibold text-gray-900">{product.moq} pcs</span>
+        </div>
+      </div>
+    </div>
+    
+    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{product.productName}</h1>
+    
+    {product.description && (
+      <div 
+        className="text-xs sm:text-sm text-gray-600 line-clamp-2 prose prose-sm max-w-none rich-text-preview"
+        dangerouslySetInnerHTML={{ 
+          __html: product.description.length > 200 
+            ? product.description.substring(0, 200) + '...' 
+            : product.description
+        }}
+      />
+    )}
+  </div>
+  
+  <div className="flex flex-col lg:flex-row lg:items-start lg:gap-6">
+    <div className="lg:w-1/2">
+      <div className="flex items-baseline justify-between p-3 sm:p-4 bg-orange-50 rounded-lg mb-4">
+        <div>
+          <span className="text-xs sm:text-sm text-gray-600">Starting from</span>
+          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#E39A65]">
+            {formatPrice(product.pricePerUnit)}
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="text-xs sm:text-sm text-gray-600">MOQ (Per Color)</span>
+          <div className="text-base sm:text-lg lg:text-xl font-semibold text-gray-900">{product.moq} pieces</div>
+        </div>
+      </div>
+
+      {product.fabric && (
+        <div className="mb-4 p-2 sm:p-3 bg-gray-50 rounded-lg">
+          <span className="text-xs sm:text-sm font-medium text-gray-700">Fabric: </span>
+          <span className="text-xs sm:text-sm text-gray-600">{product.fabric}</span>
+        </div>
+      )}
+
+      {product.colors && product.colors.length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Colors</h3>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            {product.colors.map((color, index) => (
+              <div
+                key={index}
+                className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 border-white shadow-md"
+                style={{ backgroundColor: color.code }}
+                title={color.code}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {product.sizes?.filter(s => s.trim()).length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Available Sizes</h3>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            {product.sizes.filter(s => s.trim()).map((size, index) => (
+              <span
+                key={index}
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium bg-gray-100 text-gray-700 rounded-lg"
+              >
+                {size}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div className="lg:w-1/2 mt-4 lg:mt-0">
+      <BulkPricingTable 
+        pricing={product.quantityBasedPricing} 
+        unitPrice={product.pricePerUnit}
+        moq={product.moq}
+      />
+    </div>
+  </div>
+</div>
 
               {/* Inquiry Form Card */}
               <div id="inquiry-form" className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6">
@@ -4505,6 +4665,7 @@ export default function ProductDetailsClient() {
         />
       </div>
       <Footer />
+      <WhatsAppButton />
 
       {/* Global styles for rich text content */}
       <style jsx global>{`

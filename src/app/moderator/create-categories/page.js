@@ -1,3 +1,6 @@
+
+
+
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -21,7 +24,10 @@
 //   FileText,
 //   Hash,
 //   Clock,
-//   Upload
+//   Upload,
+//   Package,
+//   Info,
+//   RefreshCw
 // } from 'lucide-react';
 // import Link from 'next/link';
 // import { toast } from 'sonner';
@@ -46,7 +52,7 @@
 //   const editFileInputRef = useRef(null);
 
 //   // Modals
-//   const [deleteModal, setDeleteModal] = useState({ show: false, id: null, name: '' });
+//   const [deleteModal, setDeleteModal] = useState({ show: false, id: null, name: '', productCount: 0 });
 //   const [viewModal, setViewModal] = useState({ show: false, category: null });
 //   const [editModal, setEditModal] = useState({ show: false, category: null, imageFile: null, imagePreview: null, imageError: '' });
 
@@ -55,7 +61,7 @@
 //   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 //   const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-//   // Fetch existing categories
+//   // Fetch existing categories with product counts
 //   useEffect(() => {
 //     fetchCategories();
 //   }, []);
@@ -71,27 +77,49 @@
 //     }
 //   }, []);
 
-//   const fetchCategories = async () => {
-//     setIsLoading(true);
-//     try {
-//       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
-//         headers: {
-//           'Authorization': `Bearer ${token}`
+//  const fetchCategories = async () => {
+//   setIsLoading(true);
+//   try {
+//     const token = localStorage.getItem('token');
+    
+//     // Fetch categories
+//     const response = await fetch('http://localhost:5000/api/categories', {
+//       headers: {
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+    
+//     const data = await response.json();
+    
+//     if (data.success) {
+//       // Method 1: If categories already have embedded products (from your earlier implementation)
+//       const categoriesWithCounts = data.data.map(category => {
+//         let productCount = 0;
+        
+//         // Check if category has embedded products array
+//         if (category.products && Array.isArray(category.products)) {
+//           productCount = category.products.length;
+//         } 
+//         // Check if category has productCount field directly
+//         else if (category.productCount !== undefined) {
+//           productCount = category.productCount;
 //         }
+        
+//         return {
+//           ...category,
+//           productCount
+//         };
 //       });
       
-//       const data = await response.json();
-//       if (data.success) {
-//         setCategories(data.data);
-//       }
-//     } catch (error) {
-//       console.error('Error fetching categories:', error);
-//       toast.error('Failed to fetch categories');
-//     } finally {
-//       setIsLoading(false);
+//       setCategories(categoriesWithCounts);
 //     }
-//   };
+//   } catch (error) {
+//     console.error('Error fetching categories:', error);
+//     toast.error('Failed to fetch categories');
+//   } finally {
+//     setIsLoading(false);
+//   }
+// };
 
 //   // View Modal Handlers
 //   const handleViewClick = (category) => {
@@ -248,8 +276,13 @@
 //   };
 
 //   // Delete Modal Handlers
-//   const handleDeleteClick = (id, name) => {
-//     setDeleteModal({ show: true, id, name });
+//   const handleDeleteClick = (id, name, productCount) => {
+//     // Only allow delete if no products
+//     if (productCount > 0) {
+//       toast.error('Cannot delete category with existing products');
+//       return;
+//     }
+//     setDeleteModal({ show: true, id, name, productCount });
 //   };
 
 //   const handleDeleteConfirm = async () => {
@@ -274,7 +307,7 @@
 //       console.error('Error deleting category:', error);
 //       toast.error('Network error. Please try again.');
 //     } finally {
-//       setDeleteModal({ show: false, id: null, name: '' });
+//       setDeleteModal({ show: false, id: null, name: '', productCount: 0 });
 //     }
 //   };
 
@@ -420,24 +453,66 @@
 //   return (
 //     <div className="min-h-screen bg-gray-50">
 //       {/* Header */}
-//       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-//         <div className="px-6 py-4">
-//           <div className="flex items-center justify-between">
-//             <div className="flex items-center gap-4">
-//               <Link href="/moderator/dashboard" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-//                 <ArrowLeft className="w-5 h-5 text-gray-600" />
-//               </Link>
-//               <div>
-//                 <div className="flex items-center gap-2">
-//                   <h1 className="text-2xl font-bold text-gray-900">Category Management</h1>
-//                   <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full">Moderator</span>
-//                 </div>
-//                 <p className="text-sm text-gray-500 mt-1">Create and manage product categories</p>
-//               </div>
-//             </div>
+//     <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+//   <div className="px-4 sm:px-6 py-3 sm:py-4">
+//     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+//       {/* Left Section - Back Button and Title */}
+//       <div className="flex items-center gap-2 sm:gap-4">
+//         <Link 
+//           href="/moderator/dashboard" 
+//           className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+//         >
+//           <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+//         </Link>
+//         <div className="min-w-0 flex-1">
+//           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+//             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 truncate">
+//               Category Management
+//             </h1>
+//             <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap">
+//               Moderator
+//             </span>
 //           </div>
+//           <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 truncate">
+//             Create and manage product categories
+//           </p>
 //         </div>
 //       </div>
+
+//       {/* Right Section - Stats, Refresh, and Create Product */}
+//       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+//         {/* Stats - Always visible */}
+//         <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
+//           <div className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+//             Total: <span className="font-semibold text-[#E39A65]">{categories.length}</span> categories
+//           </div>
+//         </div>
+
+//         {/* Action Buttons Group */}
+//         <div className="flex items-center gap-2">
+//           {/* Refresh Button */}
+//           <button
+//             onClick={fetchCategories}
+//             className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+//             title="Refresh"
+//           >
+//             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+//             <span className="sm:hidden">Refresh</span>
+//           </button>
+
+//           {/* Create Category Button */}
+//           <button
+//             onClick={() => setIsModalOpen(true)}
+//             className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[#d48b54] transition-colors shadow-sm"
+//           >
+//             <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+//             <span>Create Category</span>
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+// </div>
 
 //       {/* Main Content */}
 //       <div className="p-6">
@@ -580,13 +655,15 @@
 
 //           {/* Right Column - Categories Table */}
 //           <div className="lg:col-span-2">
-//             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+//             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 //               {/* Table Header with Search */}
 //               <div className="p-5 border-b border-gray-200">
 //                 <div className="flex items-center justify-between">
 //                   <h2 className="text-lg font-semibold text-gray-900">
 //                     All Categories ({filteredCategories.length})
 //                   </h2>
+                  
+//                   {/* Search */}
 //                   <div className="relative w-64">
 //                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
 //                     <input
@@ -608,7 +685,12 @@
 //                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
 //                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
 //                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-//                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+//                         <div className="flex items-center gap-1">
+//                           <Package className="w-3.5 h-3.5" />
+//                           Products
+//                         </div>
+//                       </th>
 //                       <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 //                     </tr>
 //                   </thead>
@@ -651,9 +733,13 @@
 //                             </div>
 //                           </td>
 //                           <td className="px-5 py-3">
-//                             <div className="text-sm text-gray-600">
-//                               {formatDate(category.createdAt)}
-//                             </div>
+//                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+//                               category.productCount > 0 
+//                                 ? 'bg-green-100 text-green-700' 
+//                                 : 'bg-gray-100 text-gray-600'
+//                             }`}>
+//                               {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
+//                             </span>
 //                           </td>
 //                           <td className="px-5 py-3">
 //                             <div className="flex items-center justify-end gap-2">
@@ -671,13 +757,38 @@
 //                               >
 //                                 <Edit className="w-4 h-4" />
 //                               </button>
-//                               <button
-//                                 onClick={() => handleDeleteClick(category._id, category.name)}
-//                                 className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                                 title="Delete"
-//                               >
-//                                 <Trash2 className="w-4 h-4" />
-//                               </button>
+                              
+//                               {/* Delete Button with Conditional Disable */}
+//                               <div className="relative group">
+//                                 <button
+//                                   onClick={() => {
+//                                     if (category.productCount === 0) {
+//                                       handleDeleteClick(category._id, category.name, category.productCount);
+//                                     }
+//                                   }}
+//                                   disabled={category.productCount > 0}
+//                                   className={`p-1.5 rounded-lg transition-colors ${
+//                                     category.productCount > 0
+//                                       ? 'text-gray-300 cursor-not-allowed'
+//                                       : 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+//                                   }`}
+//                                 >
+//                                   <Trash2 className="w-4 h-4" />
+//                                 </button>
+                                
+//                                 {/* Custom tooltip for disabled button - positioned to the left */}
+//                                 {category.productCount > 0 && (
+//                                   <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-48 text-center shadow-lg">
+//                                     <div className="flex items-start gap-1.5">
+//                                       <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-orange-300" />
+//                                       <span className="leading-tight break-words text-left">
+//                                         Cannot delete - This category has {category.productCount} product{category.productCount !== 1 ? 's' : ''}
+//                                       </span>
+//                                     </div>
+//                                     <div className="absolute top-full right-2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+//                                   </div>
+//                                 )}
+//                               </div>
 //                             </div>
 //                           </td>
 //                         </tr>
@@ -736,6 +847,23 @@
 //                     <span className="text-xs font-medium text-gray-500">Category ID</span>
 //                   </div>
 //                   <p className="text-xs font-mono text-gray-900 break-all">{viewModal.category?._id}</p>
+//                 </div>
+
+//                 {/* Product Count */}
+//                 <div className="bg-gray-50 rounded-lg p-3">
+//                   <div className="flex items-center gap-2 mb-1">
+//                     <Package className="w-3.5 h-3.5 text-[#E39A65]" />
+//                     <span className="text-xs font-medium text-gray-500">Total Products</span>
+//                   </div>
+//                   <p className="text-xs font-medium text-gray-900">
+//                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+//                       viewModal.category?.productCount > 0 
+//                         ? 'bg-green-100 text-green-700' 
+//                         : 'bg-gray-100 text-gray-600'
+//                     }`}>
+//                       {viewModal.category?.productCount || 0} {viewModal.category?.productCount === 1 ? 'product' : 'products'}
+//                     </span>
+//                   </p>
 //                 </div>
 
 //                 {/* Created Date */}
@@ -977,12 +1105,12 @@
 //                 Are you sure you want to delete <span className="font-semibold">"{deleteModal.name}"</span>?
 //               </p>
 //               <p className="text-sm text-gray-500 mb-6">
-//                 This action cannot be undone. Products in this category may need to be reassigned.
+//                 This action cannot be undone. The category and its image will be permanently removed.
 //               </p>
 
 //               <div className="flex items-center justify-end gap-3">
 //                 <button
-//                   onClick={() => setDeleteModal({ show: false, id: null, name: '' })}
+//                   onClick={() => setDeleteModal({ show: false, id: null, name: '', productCount: 0 })}
 //                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
 //                 >
 //                   Cancel
@@ -1026,15 +1154,17 @@ import {
   FileText,
   Hash,
   Clock,
+  RefreshCw,
   Upload,
   Package,
   Info,
-  RefreshCw
+  FolderTree,
+  ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function CreateCategories() {
+export default function ModeratorCategories() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1048,7 +1178,12 @@ export default function CreateCategories() {
   const [errors, setErrors] = useState({});
   const [imageError, setImageError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  
+
+  // Expandable subcategories in view modal
+  const [expandedSubcategories, setExpandedSubcategories] = useState(false);
+  const [viewSubcategoriesList, setViewSubcategoriesList] = useState([]);
+  const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
+
   // File input refs
   const fileInputRef = useRef(null);
   const editFileInputRef = useRef(null);
@@ -1058,78 +1193,151 @@ export default function CreateCategories() {
   const [viewModal, setViewModal] = useState({ show: false, category: null });
   const [editModal, setEditModal] = useState({ show: false, category: null, imageFile: null, imagePreview: null, imageError: '' });
 
+  // Subcategory Modals
+  const [subcategoryModal, setSubcategoryModal] = useState({ 
+    show: false, 
+    category: null,
+    subcategories: [{ name: '', id: Date.now() }],
+    isSubmitting: false
+  });
+
+  const [editSubcategoryModal, setEditSubcategoryModal] = useState({
+    show: false,
+    category: null,
+    subcategory: null,
+    name: '',
+    isSubmitting: false
+  });
+
+  const [viewSubcategoriesModal, setViewSubcategoriesModal] = useState({
+    show: false,
+    category: null,
+    subcategories: [],
+    isLoading: false
+  });
+
+  const [deleteSubcategoryModal, setDeleteSubcategoryModal] = useState({
+    show: false,
+    categoryId: null,
+    subcategoryId: null,
+    subcategoryName: '',
+    productCount: 0
+  });
+
   // Allowed file types
   const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
   const maxFileSize = 5 * 1024 * 1024; // 5MB
 
-  // Fetch existing categories with product counts
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // Check user role
+  // Check moderator access
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     console.log('Current user role:', user.role);
     
     if (user.role !== 'moderator' && user.role !== 'admin') {
-      console.log('Unauthorized - redirecting');
+      console.log('Unauthorized - redirecting to login');
+      toast.error('Moderator access required');
       router.push('/login');
     }
+  }, [router]);
+
+  // Fetch categories with product counts
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
- const fetchCategories = async () => {
-  setIsLoading(true);
-  try {
-    const token = localStorage.getItem('token');
-    
-    // Fetch categories
-    const response = await fetch('http://localhost:5000/api/categories', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      // Method 1: If categories already have embedded products (from your earlier implementation)
-      const categoriesWithCounts = data.data.map(category => {
-        let productCount = 0;
-        
-        // Check if category has embedded products array
-        if (category.products && Array.isArray(category.products)) {
-          productCount = category.products.length;
-        } 
-        // Check if category has productCount field directly
-        else if (category.productCount !== undefined) {
-          productCount = category.productCount;
+  const fetchCategories = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('http://localhost:5000/api/categories', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-        
-        return {
-          ...category,
-          productCount
-        };
       });
       
-      setCategories(categoriesWithCounts);
+      const data = await response.json();
+      
+      if (data.success) {
+        const categoriesWithCounts = data.data.map(category => {
+          let productCount = 0;
+          
+          if (category.products && Array.isArray(category.products)) {
+            productCount = category.products.length;
+          } else if (category.productCount) {
+            productCount = category.productCount;
+          }
+          
+          return {
+            ...category,
+            productCount,
+            subcategoryCount: category.subcategories?.length || 0
+          };
+        });
+        
+        setCategories(categoriesWithCounts);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast.error('Failed to fetch categories');
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    toast.error('Failed to fetch categories');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
+
+  // Fetch subcategories for a category
+  const fetchSubcategories = async (categoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data.subcategories;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      return [];
+    }
+  };
+
+  const fetchViewSubcategories = async (categoryId) => {
+    setIsLoadingSubcategories(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setViewSubcategoriesList(data.data.subcategories);
+      } else {
+        setViewSubcategoriesList([]);
+      }
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      setViewSubcategoriesList([]);
+    } finally {
+      setIsLoadingSubcategories(false);
+    }
+  };
 
   // View Modal Handlers
   const handleViewClick = (category) => {
     setViewModal({ show: true, category });
+    setExpandedSubcategories(false);
+    fetchViewSubcategories(category._id);
   };
 
   const handleViewClose = () => {
     setViewModal({ show: false, category: null });
+    setExpandedSubcategories(false);
+    setViewSubcategoriesList([]);
   };
 
   // Edit Modal Handlers
@@ -1152,8 +1360,295 @@ export default function CreateCategories() {
     setErrors({});
   };
 
+  // View Subcategories Handlers
+  const handleViewSubcategories = async (category) => {
+    setViewSubcategoriesModal({
+      show: true,
+      category,
+      subcategories: [],
+      isLoading: true
+    });
+    
+    const subcategories = await fetchSubcategories(category._id);
+    setViewSubcategoriesModal(prev => ({
+      ...prev,
+      subcategories,
+      isLoading: false
+    }));
+  };
+
+  // Add Subcategory Handlers
+  const handleAddSubcategory = (category) => {
+    setSubcategoryModal({
+      show: true,
+      category,
+      subcategories: [{ name: '', id: Date.now() }],
+      isSubmitting: false
+    });
+  };
+
+  const addSubcategoryField = () => {
+    setSubcategoryModal(prev => ({
+      ...prev,
+      subcategories: [...prev.subcategories, { name: '', id: Date.now() }]
+    }));
+  };
+
+  const removeSubcategoryField = (id) => {
+    if (subcategoryModal.subcategories.length === 1) {
+      toast.error('At least one subcategory is required');
+      return;
+    }
+    setSubcategoryModal(prev => ({
+      ...prev,
+      subcategories: prev.subcategories.filter(sub => sub.id !== id)
+    }));
+  };
+
+  const updateSubcategoryName = (id, value) => {
+    setSubcategoryModal(prev => ({
+      ...prev,
+      subcategories: prev.subcategories.map(sub => 
+        sub.id === id ? { ...sub, name: value } : sub
+      )
+    }));
+  };
+
+  const handleAddSubcategorySubmit = async (e) => {
+    e.preventDefault();
+    
+    const validSubcategories = subcategoryModal.subcategories.filter(sub => sub.name.trim());
+    
+    if (validSubcategories.length === 0) {
+      toast.error('At least one subcategory name is required');
+      return;
+    }
+
+    const names = validSubcategories.map(sub => sub.name.trim().toLowerCase());
+    const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+    if (duplicates.length > 0) {
+      toast.error(`Duplicate subcategory names: ${duplicates.join(', ')}`);
+      return;
+    }
+
+    setSubcategoryModal(prev => ({ ...prev, isSubmitting: true }));
+
+    try {
+      const token = localStorage.getItem('token');
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const subcategory of validSubcategories) {
+        try {
+          const response = await fetch(`http://localhost:5000/api/categories/${subcategoryModal.category._id}/subcategories`, {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: subcategory.name.trim() })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            successCount++;
+          } else {
+            errorCount++;
+            console.error(`Failed to add subcategory "${subcategory.name}":`, data.error);
+          }
+        } catch (error) {
+          errorCount++;
+          console.error(`Error adding subcategory "${subcategory.name}":`, error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`Successfully added ${successCount} subcategor${successCount === 1 ? 'y' : 'ies'}!`);
+        if (errorCount > 0) {
+          toast.warning(`${errorCount} subcategor${errorCount === 1 ? 'y' : 'ies'} failed to add`);
+        }
+        
+        setSubcategoryModal({
+          show: false,
+          category: null,
+          subcategories: [{ name: '', id: Date.now() }],
+          isSubmitting: false
+        });
+        fetchCategories();
+        
+        if (viewSubcategoriesModal.show && viewSubcategoriesModal.category?._id === subcategoryModal.category._id) {
+          const updatedSubcategories = await fetchSubcategories(subcategoryModal.category._id);
+          setViewSubcategoriesModal(prev => ({
+            ...prev,
+            subcategories: updatedSubcategories
+          }));
+        }
+      } else {
+        toast.error('Failed to add subcategories. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding subcategories:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setSubcategoryModal(prev => ({ ...prev, isSubmitting: false }));
+    }
+  };
+
+  // Edit Subcategory Handlers
+  const handleEditSubcategory = (category, subcategory) => {
+    setEditSubcategoryModal({
+      show: true,
+      category,
+      subcategory,
+      name: subcategory.name,
+      isSubmitting: false
+    });
+  };
+
+  const handleEditSubcategorySubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!editSubcategoryModal.name.trim()) {
+      toast.error('Subcategory name is required');
+      return;
+    }
+
+    setEditSubcategoryModal(prev => ({ ...prev, isSubmitting: true }));
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(
+        `http://localhost:5000/api/categories/${editSubcategoryModal.category._id}/subcategories/${editSubcategoryModal.subcategory._id}`,
+        {
+          method: 'PUT',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: editSubcategoryModal.name.trim() })
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Subcategory updated successfully!');
+        setEditSubcategoryModal({
+          show: false,
+          category: null,
+          subcategory: null,
+          name: '',
+          isSubmitting: false
+        });
+        fetchCategories();
+        
+        if (viewSubcategoriesModal.show && viewSubcategoriesModal.category?._id === editSubcategoryModal.category._id) {
+          const updatedSubcategories = await fetchSubcategories(editSubcategoryModal.category._id);
+          setViewSubcategoriesModal(prev => ({
+            ...prev,
+            subcategories: updatedSubcategories
+          }));
+        }
+      } else {
+        toast.error(data.error || 'Failed to update subcategory');
+      }
+    } catch (error) {
+      console.error('Error updating subcategory:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setEditSubcategoryModal(prev => ({ ...prev, isSubmitting: false }));
+    }
+  };
+
+  // Delete Subcategory Handlers
+  const handleDeleteSubcategoryClick = (categoryId, subcategoryId, subcategoryName, productCount) => {
+    setDeleteSubcategoryModal({
+      show: true,
+      categoryId,
+      subcategoryId,
+      subcategoryName,
+      productCount
+    });
+  };
+
+  const handleDeleteSubcategoryConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `http://localhost:5000/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}`,
+        {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Subcategory deleted successfully');
+        setDeleteSubcategoryModal({
+          show: false,
+          categoryId: null,
+          subcategoryId: null,
+          subcategoryName: '',
+          productCount: 0
+        });
+        fetchCategories();
+        
+        if (viewSubcategoriesModal.show) {
+          const updatedSubcategories = await fetchSubcategories(viewSubcategoriesModal.category._id);
+          setViewSubcategoriesModal(prev => ({
+            ...prev,
+            subcategories: updatedSubcategories
+          }));
+        }
+      } else {
+        toast.error(data.error || 'Failed to delete subcategory');
+      }
+    } catch (error) {
+      console.error('Error deleting subcategory:', error);
+      toast.error('Network error. Please try again.');
+    }
+  };
+
+  // Delete Category Handlers
+  const handleDeleteClick = (id, name, productCount) => {
+    if (productCount > 0) {
+      toast.error('Cannot delete category with existing products');
+      return;
+    }
+    setDeleteModal({ show: true, id, name, productCount });
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${deleteModal.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Category deleted successfully');
+        fetchCategories();
+      } else {
+        toast.error(data.error || 'Failed to delete category');
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setDeleteModal({ show: false, id: null, name: '', productCount: 0 });
+    }
+  };
+
   const validateImageFile = (file) => {
-    // Check file type
     if (!allowedFileTypes.includes(file.type)) {
       const fileExtension = file.name.split('.').pop().toLowerCase();
       return {
@@ -1162,7 +1657,6 @@ export default function CreateCategories() {
       };
     }
 
-    // Check file size
     if (file.size > maxFileSize) {
       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
       return {
@@ -1178,21 +1672,18 @@ export default function CreateCategories() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
       setEditModal(prev => ({
         ...prev,
         imageError: validation.message
       }));
-      // Reset file input
       if (editFileInputRef.current) {
         editFileInputRef.current.value = '';
       }
       return;
     }
 
-    // Clear any previous error
     setEditModal(prev => ({
       ...prev,
       imageError: '',
@@ -1216,19 +1707,16 @@ export default function CreateCategories() {
       imagePreview: null,
       imageError: ''
     }));
-    // Reset file input
     if (editFileInputRef.current) {
       editFileInputRef.current.value = '';
     }
   };
 
   const handleEditChooseAgain = () => {
-    // Clear any previous error
     setEditModal(prev => ({
       ...prev,
       imageError: ''
     }));
-    // Trigger file input click
     if (editFileInputRef.current) {
       editFileInputRef.current.click();
     }
@@ -1277,42 +1765,6 @@ export default function CreateCategories() {
     }
   };
 
-  // Delete Modal Handlers
-  const handleDeleteClick = (id, name, productCount) => {
-    // Only allow delete if no products
-    if (productCount > 0) {
-      toast.error('Cannot delete category with existing products');
-      return;
-    }
-    setDeleteModal({ show: true, id, name, productCount });
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${deleteModal.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Category deleted successfully');
-        fetchCategories();
-      } else {
-        toast.error(data.error || 'Failed to delete category');
-      }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      toast.error('Network error. Please try again.');
-    } finally {
-      setDeleteModal({ show: false, id: null, name: '', productCount: 0 });
-    }
-  };
-
   const validateForm = () => {
     const newErrors = {};
     
@@ -1336,18 +1788,15 @@ export default function CreateCategories() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
       setImageError(validation.message);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
       return;
     }
 
-    // Clear any previous error
     setImageError('');
     setImageFile(file);
     const reader = new FileReader();
@@ -1361,16 +1810,13 @@ export default function CreateCategories() {
     setImageFile(null);
     setImagePreview(null);
     setImageError('');
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
   const chooseAgain = () => {
-    // Clear any previous error
     setImageError('');
-    // Trigger file input click
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -1413,7 +1859,6 @@ export default function CreateCategories() {
         setImagePreview(null);
         setImageFile(null);
         setImageError('');
-        // Reset file input
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -1455,73 +1900,68 @@ export default function CreateCategories() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-  <div className="px-4 sm:px-6 py-3 sm:py-4">
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-      {/* Left Section - Back Button and Title */}
-      <div className="flex items-center gap-2 sm:gap-4">
-        <Link 
-          href="/moderator/dashboard" 
-          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-        >
-          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 truncate">
-              Category Management
-            </h1>
-            <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap">
-              Moderator
-            </span>
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            {/* Left Section - Back Button and Title */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link 
+                href="/moderator/dashboard" 
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              </Link>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 truncate">
+                    Category Management
+                  </h1>
+                  <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-600 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap">
+                    Moderator
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 truncate">
+                  Manage categories and subcategories
+                </p>
+              </div>
+            </div>
+
+            {/* Right Section - Stats and Refresh */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
+                <div className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
+                  Total: <span className="font-semibold text-[#E39A65]">{categories.length}</span> categories
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchCategories}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Refresh"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="sm:hidden">Refresh</span>
+                </button>
+
+                <button
+                  onClick={() => document.getElementById('create-form').scrollIntoView({ behavior: 'smooth' })}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[#d48b54] transition-colors shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>Create Category</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1 truncate">
-            Create and manage product categories
-          </p>
         </div>
       </div>
-
-      {/* Right Section - Stats, Refresh, and Create Product */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-        {/* Stats - Always visible */}
-        <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
-          <div className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg">
-            Total: <span className="font-semibold text-[#E39A65]">{categories.length}</span> categories
-          </div>
-        </div>
-
-        {/* Action Buttons Group */}
-        <div className="flex items-center gap-2">
-          {/* Refresh Button */}
-          <button
-            onClick={fetchCategories}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="sm:hidden">Refresh</span>
-          </button>
-
-          {/* Create Category Button */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[#d48b54] transition-colors shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span>Create Category</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
       {/* Main Content */}
       <div className="p-6">
-        {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           {/* Left Column - Create Form */}
-          <div className="lg:col-span-1">
+          <div id="create-form" className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 sticky top-24">
               <div className="p-5 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -1689,6 +2129,12 @@ export default function CreateCategories() {
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <div className="flex items-center gap-1">
+                          <FolderTree className="w-3.5 h-3.5" />
+                          Subcategories
+                        </div>
+                      </th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <div className="flex items-center gap-1">
                           <Package className="w-3.5 h-3.5" />
                           Products
                         </div>
@@ -1699,13 +2145,13 @@ export default function CreateCategories() {
                   <tbody className="divide-y divide-gray-200">
                     {isLoading ? (
                       <tr>
-                        <td colSpan="5" className="px-5 py-8 text-center">
+                        <td colSpan="6" className="px-5 py-8 text-center">
                           <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#E39A65]" />
                         </td>
                       </tr>
                     ) : filteredCategories.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="px-5 py-8 text-center text-gray-500">
+                        <td colSpan="6" className="px-5 py-8 text-center text-gray-500">
                           {searchTerm ? 'No categories found matching your search' : 'No categories created yet'}
                         </td>
                       </tr>
@@ -1735,6 +2181,16 @@ export default function CreateCategories() {
                             </div>
                           </td>
                           <td className="px-5 py-3">
+                            <button
+                              onClick={() => handleViewSubcategories(category)}
+                              className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs font-medium"
+                            >
+                              <FolderTree className="w-3.5 h-3.5" />
+                              {category.subcategoryCount || 0} Subcategories
+                              <ChevronRight className="w-3 h-3" />
+                            </button>
+                          </td>
+                          <td className="px-5 py-3">
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                               category.productCount > 0 
                                 ? 'bg-green-100 text-green-700' 
@@ -1751,6 +2207,13 @@ export default function CreateCategories() {
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleAddSubcategory(category)}
+                                className="p-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                title="Add Subcategory"
+                              >
+                                <Plus className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleEditClick(category)}
@@ -1778,7 +2241,6 @@ export default function CreateCategories() {
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                                 
-                                {/* Custom tooltip for disabled button - positioned to the left */}
                                 {category.productCount > 0 && (
                                   <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-48 text-center shadow-lg">
                                     <div className="flex items-start gap-1.5">
@@ -1811,12 +2273,12 @@ export default function CreateCategories() {
         </div>
       </div>
 
-      {/* Compact View Modal */}
+      {/* View Category Modal with Expandable Subcategories */}
       {viewModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
                   <img 
@@ -1840,9 +2302,7 @@ export default function CreateCategories() {
 
             {/* Content */}
             <div className="p-6">
-              {/* Details Grid */}
               <div className="grid grid-cols-2 gap-4">
-                {/* ID */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Hash className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1851,7 +2311,80 @@ export default function CreateCategories() {
                   <p className="text-xs font-mono text-gray-900 break-all">{viewModal.category?._id}</p>
                 </div>
 
-                {/* Product Count */}
+                {/* Subcategories Section - Expandable */}
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FolderTree className="w-3.5 h-3.5 text-[#E39A65]" />
+                    <span className="text-xs font-medium text-gray-500">Subcategories</span>
+                  </div>
+                  
+                  <button
+                    onClick={() => setExpandedSubcategories(!expandedSubcategories)}
+                    className="w-full flex items-center justify-between px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FolderTree className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-700">
+                        {viewSubcategoriesList.length} subcategor{viewSubcategoriesList.length === 1 ? 'y' : 'ies'}
+                      </span>
+                    </div>
+                    <ChevronRight className={`w-4 h-4 text-blue-600 transition-transform duration-200 ${expandedSubcategories ? 'rotate-90' : ''}`} />
+                  </button>
+                  
+                  {expandedSubcategories && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      {isLoadingSubcategories ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#E39A65]" />
+                          <span className="text-xs text-gray-500 ml-2">Loading...</span>
+                        </div>
+                      ) : viewSubcategoriesList.length === 0 ? (
+                        <p className="text-xs text-gray-500 text-center py-4">No subcategories found</p>
+                      ) : (
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {viewSubcategoriesList.map((sub, idx) => (
+                            <div key={sub._id} className="flex items-center justify-between p-2 bg-white rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <span className="text-xs text-gray-400 font-mono flex-shrink-0 w-5">#{idx + 1}</span>
+                                <span className="text-sm font-medium text-gray-800 truncate">{sub.name}</span>
+                                {sub.productCount > 0 && (
+                                  <span className="text-xs text-gray-500 flex-shrink-0">
+                                    ({sub.productCount})
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                <button
+                                  onClick={() => {
+                                    handleViewClose();
+                                    handleEditSubcategory(viewModal.category, sub);
+                                  }}
+                                  className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                  title="Edit Subcategory"
+                                >
+                                  <Edit className="w-3.5 h-3.5" />
+                                </button>
+                                {sub.productCount === 0 && (
+                                  <button
+                                    onClick={() => {
+                                      handleViewClose();
+                                      handleDeleteSubcategoryClick(viewModal.category._id, sub._id, sub.name, sub.productCount);
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                    title="Delete Subcategory"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Package className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1868,7 +2401,6 @@ export default function CreateCategories() {
                   </p>
                 </div>
 
-                {/* Created Date */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Calendar className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1879,7 +2411,6 @@ export default function CreateCategories() {
                   </p>
                 </div>
 
-                {/* Created By */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <User className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1890,7 +2421,6 @@ export default function CreateCategories() {
                   </p>
                 </div>
 
-                {/* Last Updated */}
                 <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1901,7 +2431,6 @@ export default function CreateCategories() {
                   </p>
                 </div>
 
-                {/* Description */}
                 <div className="col-span-2 bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <FileText className="w-3.5 h-3.5 text-[#E39A65]" />
@@ -1913,8 +2442,17 @@ export default function CreateCategories() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex justify-end gap-2 mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    handleViewClose();
+                    handleAddSubcategory(viewModal.category);
+                  }}
+                  className="px-3 py-1.5 text-xs font-medium text-green-600 hover:bg-green-50 rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Subcategory
+                </button>
                 <button
                   onClick={() => {
                     handleViewClose();
@@ -1923,7 +2461,7 @@ export default function CreateCategories() {
                   className="px-3 py-1.5 text-xs font-medium text-[#E39A65] hover:bg-orange-50 rounded-lg transition-colors flex items-center gap-1"
                 >
                   <Edit className="w-3.5 h-3.5" />
-                  Edit
+                  Edit Category
                 </button>
                 <button
                   onClick={handleViewClose}
@@ -1937,12 +2475,300 @@ export default function CreateCategories() {
         </div>
       )}
 
-      {/* Compact Edit Modal */}
+      {/* View Subcategories Modal */}
+      {viewSubcategoriesModal.show && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Subcategories: {viewSubcategoriesModal.category?.name}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Total: {viewSubcategoriesModal.subcategories.length} subcategories
+                </p>
+              </div>
+              <button 
+                onClick={() => setViewSubcategoriesModal({ show: false, category: null, subcategories: [], isLoading: false })}
+                className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {viewSubcategoriesModal.isLoading ? (
+                <div className="text-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#E39A65]" />
+                  <p className="text-gray-500 mt-2">Loading subcategories...</p>
+                </div>
+              ) : viewSubcategoriesModal.subcategories.length === 0 ? (
+                <div className="text-center py-12">
+                  <FolderTree className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                  <p className="text-gray-500">No subcategories found</p>
+                  <button
+                    onClick={() => {
+                      setViewSubcategoriesModal({ show: false, category: null, subcategories: [], isLoading: false });
+                      handleAddSubcategory(viewSubcategoriesModal.category);
+                    }}
+                    className="mt-3 px-4 py-2 bg-[#E39A65] text-white text-sm rounded-lg hover:bg-[#d48b54]"
+                  >
+                    Add First Subcategory
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {viewSubcategoriesModal.subcategories.map((sub, index) => (
+                    <div key={sub._id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-400 text-sm font-mono w-6">#{index + 1}</span>
+                        <span className="text-gray-800 font-medium">{sub.name}</span>
+                        {sub.productCount > 0 && (
+                          <span className="text-xs text-gray-500">
+                            ({sub.productCount} {sub.productCount === 1 ? 'product' : 'products'})
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            setViewSubcategoriesModal({ show: false, category: null, subcategories: [], isLoading: false });
+                            handleEditSubcategory(viewSubcategoriesModal.category, sub);
+                          }}
+                          className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                          title="Edit Subcategory"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        
+                        <div className="relative group">
+                          <button
+                            onClick={() => {
+                              if (sub.productCount === 0) {
+                                handleDeleteSubcategoryClick(
+                                  viewSubcategoriesModal.category._id,
+                                  sub._id,
+                                  sub.name,
+                                  sub.productCount || 0
+                                );
+                              }
+                            }}
+                            disabled={sub.productCount > 0}
+                            className={`p-1.5 rounded-lg ${
+                              sub.productCount > 0
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                            title={sub.productCount > 0 ? `Has ${sub.productCount} product(s)` : 'Delete Subcategory'}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          {sub.productCount > 0 && (
+                            <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                              Has {sub.productCount} product(s)
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+              <button
+                onClick={() => handleAddSubcategory(viewSubcategoriesModal.category)}
+                className="px-4 py-2 bg-[#E39A65] text-white text-sm rounded-lg hover:bg-[#d48b54] flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Add Subcategory
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Subcategory Modal - Multiple Subcategories */}
+      {subcategoryModal.show && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-[#f8efeb] rounded-lg">
+                    <Plus className="w-5 h-5 text-[#E39A65]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Add Subcategories to {subcategoryModal.category?.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Add multiple subcategories at once
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSubcategoryModal(prev => ({ ...prev, show: false }))}
+                  className="p-1 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddSubcategorySubmit} className="space-y-4">
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Subcategories <span className="text-red-500">*</span>
+                  </label>
+                  
+                  {subcategoryModal.subcategories.map((sub, index) => (
+                    <div key={sub.id} className="flex items-center gap-2">
+                      <div className="flex-1 relative">
+                        <input
+                          type="text"
+                          value={sub.name}
+                          onChange={(e) => updateSubcategoryName(sub.id, e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none"
+                          placeholder={`e.g., Subcategory ${index + 1}`}
+                          autoFocus={index === subcategoryModal.subcategories.length - 1}
+                        />
+                        {index === 0 && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Examples: Formal, Casual, Sports, Premium, etc.
+                          </p>
+                        )}
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={() => removeSubcategoryField(sub.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove subcategory"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addSubcategoryField}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-[#E39A65] hover:bg-[#ede4de] rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Another Subcategory
+                </button>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setSubcategoryModal(prev => ({ ...prev, show: false }))}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={subcategoryModal.isSubmitting}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white text-sm font-medium rounded-lg hover:bg-[#ea9354] transition-colors disabled:opacity-50"
+                  >
+                    {subcategoryModal.isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Adding {subcategoryModal.subcategories.filter(s => s.name.trim()).length} Subcategor{subcategoryModal.subcategories.filter(s => s.name.trim()).length === 1 ? 'y' : 'ies'}...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Add {subcategoryModal.subcategories.filter(s => s.name.trim()).length} Subcategor{subcategoryModal.subcategories.filter(s => s.name.trim()).length === 1 ? 'y' : 'ies'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Subcategory Modal */}
+      {editSubcategoryModal.show && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 rounded-lg">
+                    <Edit className="w-5 h-5 text-[#E39A65]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Edit Subcategory
+                  </h3>
+                </div>
+                <button 
+                  onClick={() => setEditSubcategoryModal(prev => ({ ...prev, show: false }))}
+                  className="p-1 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditSubcategorySubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subcategory Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editSubcategoryModal.name}
+                    onChange={(e) => setEditSubcategoryModal(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                    placeholder="e.g., Casual Shirts"
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => setEditSubcategoryModal(prev => ({ ...prev, show: false }))}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={editSubcategoryModal.isSubmitting}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#E39A65] text-white text-sm font-medium rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50"
+                  >
+                    {editSubcategoryModal.isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Category Modal */}
       {editModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
-              {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-[#E39A65]/10 rounded-lg">
@@ -1956,7 +2782,6 @@ export default function CreateCategories() {
               </div>
 
               <form onSubmit={handleEditSubmit} className="space-y-4">
-                {/* Image Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category Image
@@ -2028,7 +2853,6 @@ export default function CreateCategories() {
                   )}
                 </div>
 
-                {/* Category Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Name <span className="text-red-500">*</span>
@@ -2045,7 +2869,6 @@ export default function CreateCategories() {
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea
@@ -2060,7 +2883,6 @@ export default function CreateCategories() {
                   />
                 </div>
 
-                {/* Submit Buttons */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                   <button
                     type="button"
@@ -2093,7 +2915,7 @@ export default function CreateCategories() {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Category Confirmation Modal */}
       {deleteModal.show && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
@@ -2122,6 +2944,48 @@ export default function CreateCategories() {
                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                 >
                   Delete Category
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Subcategory Confirmation Modal */}
+      {deleteSubcategoryModal.show && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center gap-3 text-red-600 mb-4">
+                <AlertCircle className="w-6 h-6" />
+                <h3 className="text-lg font-semibold">Delete Subcategory</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-2">
+                Are you sure you want to delete <span className="font-semibold">"{deleteSubcategoryModal.subcategoryName}"</span>?
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                This action cannot be undone. The subcategory will be permanently removed.
+              </p>
+
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setDeleteSubcategoryModal({
+                    show: false,
+                    categoryId: null,
+                    subcategoryId: null,
+                    subcategoryName: '',
+                    productCount: 0
+                  })}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteSubcategoryConfirm}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                >
+                  Delete Subcategory
                 </button>
               </div>
             </div>

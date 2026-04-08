@@ -40,6 +40,7 @@ import CountUp from 'react-countup';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
 import { ChevronRight, Loader2 } from 'lucide-react';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function AboutClient() {
   const [isVisible, setIsVisible] = useState(false);
@@ -972,6 +973,7 @@ const companyInfo = {
       </Link>
     </div>
     <Footer />
+    <WhatsAppButton />
     </>
   );
 }

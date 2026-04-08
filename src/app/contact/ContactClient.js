@@ -32,6 +32,7 @@ import {
 import { MdVerified, MdSupportAgent, MdEmail, MdPhone, MdLocationOn } from 'react-icons/md';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function ContactClient() {
   const [formData, setFormData] = useState({
@@ -985,6 +986,7 @@ const handleSubmit = async (e) => {
     
       </div>
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }

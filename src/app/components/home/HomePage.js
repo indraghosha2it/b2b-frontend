@@ -11,6 +11,7 @@ import Footer from '../layout/Footer.js'
 
 import ReviewsSection from './ReviewsSection.js'
 import StatsSection from './StatsSection.js'
+import WhatsAppButton from '../layout/WhatsAppButton.js'
 
 export default function HomePage() {
   return (
@@ -30,7 +31,7 @@ export default function HomePage() {
         
             <ReviewsSection />
            <Footer />
-  
+<WhatsAppButton />
     </>
   )
 }

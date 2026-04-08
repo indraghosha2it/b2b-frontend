@@ -46,6 +46,7 @@ import { BsFileText, BsFileRichtext } from 'react-icons/bs';
 import Footer from '../components/layout/Footer';
 import Navbar from '../components/layout/Navbar';
 import { RiGovernmentLine } from 'react-icons/ri';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function TermsPage() {
   const [activeSection, setActiveSection] = useState('acceptance');
@@ -890,23 +891,19 @@ export default function TermsPage() {
               </p>
               <div className="flex gap-2 md:gap-3">
                 <Link
-                  href="/privacy-policy"
+                  href="/privacy"
                   className="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-gray-700 hover:text-orange-600 transition-colors"
                 >
                   Privacy Policy
                 </Link>
-                <button
-                  onClick={() => alert('Thank you for accepting our Terms & Conditions.')}
-                  className="px-4 md:px-6 py-1.5 md:py-2 bg-orange-500 text-white rounded-lg text-xs md:text-sm font-semibold hover:bg-orange-600 transition-colors"
-                >
-                  Accept & Continue
-                </button>
+                
               </div>
             </div>
           </div>
         </div>
       </div>
       <Footer />
+        <WhatsAppButton />
     </>
   );
 }

@@ -1,6 +1,4 @@
 
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -39,7 +37,8 @@
 // import { useEditor } from '@tiptap/react';
 // import StarterKit from '@tiptap/starter-kit';
 // import TextAlign from '@tiptap/extension-text-align';
-// import Link from '@tiptap/extension-link'; // Changed from TipTapLink to Link
+// import Link from '@tiptap/extension-link';
+
 // import '@mantine/tiptap/styles.css';
 // import '@mantine/core/styles.css';
 
@@ -59,7 +58,7 @@
 //   { value: 'unisex', label: 'Unisex', icon: '👤' }
 // ];
 
-// // Available tags (matching your schema)
+// // Available tags
 // const AVAILABLE_TAGS = [
 //   'Top Ranking',
 //   'New Arrival',
@@ -70,6 +69,37 @@
 //   'Limited Edition',
 //   'Trending'
 // ];
+
+// // Cloudinary upload function
+// const uploadToCloudinary = async (file) => {
+//   const formData = new FormData();
+//   formData.append('file', file);
+//   formData.append('upload_preset', 'b2b-products');
+//   formData.append('folder', 'b2b-products');
+  
+//   try {
+//     const response = await fetch(
+//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+//       {
+//         method: 'POST',
+//         body: formData,
+//       }
+//     );
+    
+//     const data = await response.json();
+//     if (data.secure_url) {
+//       return {
+//         url: data.secure_url,
+//         publicId: data.public_id,
+//       };
+//     } else {
+//       throw new Error('Upload failed');
+//     }
+//   } catch (error) {
+//     console.error('Cloudinary upload error:', error);
+//     throw error;
+//   }
+// };
 
 // export default function EditProduct() {
 //   const router = useRouter();
@@ -86,18 +116,15 @@
 //   const [originalProduct, setOriginalProduct] = useState(null);
 //   const [keywordInput, setKeywordInput] = useState('');
 
-//   // New state for collapsible sections
 //   const [showTags, setShowTags] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
   
-//   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
-//   // Form state with all fields including instruction
 //   const [formData, setFormData] = useState({
 //     productName: '',
 //     description: '',
-//     instruction: '', // ADDED instruction field
+//     instruction: '',
 //     category: '',
 //     targetedCustomer: 'unisex',
 //     fabric: '',
@@ -113,7 +140,6 @@
 //       { code: '#000000' }
 //     ],
 //     additionalInfo: [],
-//     // NEW FIELDS
 //     isFeatured: false,
 //     tags: [],
 //     metaSettings: {
@@ -123,28 +149,21 @@
 //     }
 //   });
 
-//   // Image states
 //   const [existingImages, setExistingImages] = useState([]);
 //   const [newImages, setNewImages] = useState([]);
 //   const [imagesToDelete, setImagesToDelete] = useState([]);
 
-//   // File input refs for new images
-//   const fileInputRefs = useRef([]);
-
-//   // Errors state
+//   const fileInputRefs = useRef({});
 //   const [errors, setErrors] = useState({});
 
-//   // Allowed file types
 //   const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 //   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-//   const maxFileSize = 5 * 1024 * 1024; // 5MB
+//   const maxFileSize = 5 * 1024 * 1024;
 
-//   // Set mounted state
 //   useEffect(() => {
 //     setIsMounted(true);
 //   }, []);
 
-//   // Check if product ID exists
 //   useEffect(() => {
 //     if (!productId) {
 //       toast.error('No product ID provided');
@@ -152,7 +171,6 @@
 //     }
 //   }, [productId, router]);
 
-//   // Click outside handler for color picker
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
 //       if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
@@ -167,25 +185,15 @@
 //     };
 //   }, []);
 
-//   // Initialize TipTap editor for description
 //   const editor = useEditor({
 //     extensions: [
 //       StarterKit.configure({
-//         bulletList: {
-//           keepMarks: true,
-//           keepAttributes: false,
-//         },
-//         orderedList: {
-//           keepMarks: true,
-//           keepAttributes: false,
-//         },
+//         bulletList: { keepMarks: true, keepAttributes: false },
+//         orderedList: { keepMarks: true, keepAttributes: false },
 //       }),
 //       Link.configure({
 //         openOnClick: false,
-//         HTMLAttributes: {
-//           rel: 'noopener noreferrer',
-//           target: '_blank',
-//         },
+//         HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
 //       }),
 //       TextAlign.configure({ types: ['heading', 'paragraph'] }),
 //     ],
@@ -197,25 +205,15 @@
 //     editable: true,
 //   });
 
-//   // Initialize TipTap editor for instructions
 //   const instructionEditor = useEditor({
 //     extensions: [
 //       StarterKit.configure({
-//         bulletList: {
-//           keepMarks: true,
-//           keepAttributes: false,
-//         },
-//         orderedList: {
-//           keepMarks: true,
-//           keepAttributes: false,
-//         },
+//         bulletList: { keepMarks: true, keepAttributes: false },
+//         orderedList: { keepMarks: true, keepAttributes: false },
 //       }),
 //       Link.configure({
 //         openOnClick: false,
-//         HTMLAttributes: {
-//           rel: 'noopener noreferrer',
-//           target: '_blank',
-//         },
+//         HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
 //       }),
 //       TextAlign.configure({ types: ['heading', 'paragraph'] }),
 //     ],
@@ -227,7 +225,6 @@
 //     editable: true,
 //   });
 
-//   // Fetch categories and product data on mount
 //   useEffect(() => {
 //     if (productId) {
 //       fetchCategories();
@@ -235,7 +232,6 @@
 //     }
 //   }, [productId]);
 
-//   // Fetch category details when category is selected
 //   useEffect(() => {
 //     if (formData.category) {
 //       fetchCategoryDetails(formData.category);
@@ -244,21 +240,18 @@
 //     }
 //   }, [formData.category]);
 
-//   // Update editor content when formData.description changes
 //   useEffect(() => {
 //     if (editor && formData.description !== editor.getHTML()) {
 //       editor.commands.setContent(formData.description);
 //     }
 //   }, [formData.description, editor]);
 
-//   // Update instruction editor content when formData.instruction changes
 //   useEffect(() => {
 //     if (instructionEditor && formData.instruction !== instructionEditor.getHTML()) {
 //       instructionEditor.commands.setContent(formData.instruction);
 //     }
 //   }, [formData.instruction, instructionEditor]);
 
-//   // Check user role
 //   useEffect(() => {
 //     const user = JSON.parse(localStorage.getItem('user') || '{}');
 //     if (user.role !== 'moderator' && user.role !== 'admin') {
@@ -270,9 +263,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch('http://localhost:5000/api/categories', {
-//         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
+//         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
 //       const data = await response.json();
@@ -289,9 +280,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
-//         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
+//         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
 //       const data = await response.json();
@@ -308,9 +297,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
-//         headers: {
-//           'Authorization': `Bearer ${token}`
-//         }
+//         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
 //       const data = await response.json();
@@ -318,11 +305,10 @@
 //         const product = data.data;
 //         setOriginalProduct(product);
         
-//         // Set form data including new fields
 //         setFormData({
 //           productName: product.productName || '',
 //           description: product.description || '',
-//           instruction: product.instruction || '', // ADDED instruction field
+//           instruction: product.instruction || '',
 //           category: product.category?._id || product.category || '',
 //           targetedCustomer: product.targetedCustomer || 'unisex',
 //           fabric: product.fabric || '',
@@ -332,7 +318,6 @@
 //           sizes: product.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
 //           colors: product.colors || [{ code: '#FF0000' }],
 //           additionalInfo: product.additionalInfo || [],
-//           // NEW FIELDS
 //           isFeatured: product.isFeatured || false,
 //           tags: product.tags || [],
 //           metaSettings: product.metaSettings || {
@@ -342,7 +327,6 @@
 //           }
 //         });
 
-//         // Set existing images
 //         setExistingImages(product.images || []);
 //       } else {
 //         toast.error('Failed to fetch product details');
@@ -357,7 +341,6 @@
 //     }
 //   };
 
-//   // Validate image file
 //   const validateImageFile = (file) => {
 //     if (!allowedFileTypes.includes(file.type)) {
 //       const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -378,46 +361,155 @@
 //     return { valid: true };
 //   };
 
-//   // Handle new image selection
-//   const handleNewImageChange = (e, index) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
+//  const handleNewImageChange = async (e, slotId) => {
+//   const file = e.target.files[0];
+//   if (!file) return;
 
+//   const validation = validateImageFile(file);
+//   if (!validation.valid) {
+//     toast.error(validation.message);
+//     return;
+//   }
+
+//   const imageId = Date.now() + Math.random();
+//   const previewUrl = URL.createObjectURL(file);
+  
+//   const newImageObj = {
+//     id: imageId,
+//     slotId: slotId,
+//     file,
+//     preview: previewUrl,
+//     uploading: true,
+//     url: null,
+//     publicId: null
+//   };
+  
+//   setNewImages(prev => [...prev, newImageObj]);
+
+//   try {
+//     const { url, publicId } = await uploadToCloudinary(file);
+    
+//     setNewImages(prev => prev.map(img => 
+//       img.id === imageId 
+//         ? { ...img, url, publicId, uploading: false }
+//         : img
+//     ));
+//     toast.success(`Image uploaded successfully`);
+//   } catch (error) {
+//     console.error('Upload error:', error);
+//     setNewImages(prev => prev.filter(img => img.id !== imageId));
+//     toast.error('Failed to upload image');
+//   }
+// };
+
+//   // Handle multiple image selection
+// const handleMultipleImageSelect = async (e) => {
+//   const files = Array.from(e.target.files);
+  
+//   if (files.length === 0) return;
+  
+//   // Check total images limit (6 max)
+//   const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
+//   const availableSlots = 6 - currentImagesCount;
+  
+//   if (files.length > availableSlots) {
+//     toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+//     return;
+//   }
+  
+//   // Create temporary array to store all new images
+//   const tempNewImages = [...newImages];
+  
+//   // First, add all previews immediately
+//   for (let i = 0; i < files.length; i++) {
+//     const file = files[i];
+    
+//     // Validate file
 //     const validation = validateImageFile(file);
 //     if (!validation.valid) {
-//       toast.error(validation.message);
-//       return;
+//       toast.error(`Image ${i + 1}: ${validation.message}`);
+//       continue;
 //     }
-
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       const updatedNewImages = [...newImages];
-//       updatedNewImages[index] = {
-//         file,
-//         preview: reader.result
-//       };
-//       setNewImages(updatedNewImages);
-//     };
-//     reader.readAsDataURL(file);
-//   };
-
-//   // Remove existing image
-//   const removeExistingImage = (imageId) => {
-//     setImagesToDelete(prev => [...prev, imageId]);
-//     setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
-//   };
-
-//   // Remove new image
-//   const removeNewImage = (index) => {
-//     const updatedNewImages = [...newImages];
-//     updatedNewImages[index] = null;
-//     setNewImages(updatedNewImages);
-//     if (fileInputRefs.current[index]) {
-//       fileInputRefs.current[index].value = '';
+    
+//     const imageId = Date.now() + Math.random() + i;
+//     const previewUrl = URL.createObjectURL(file);
+    
+//     // Add to temp array
+//     tempNewImages.push({
+//       id: imageId,
+//       slotId: `multi-${imageId}`,
+//       file: file,
+//       preview: previewUrl,
+//       uploading: true,
+//       url: null,
+//       publicId: null
+//     });
+//   }
+  
+//   // Update state with all previews at once
+//   setNewImages([...tempNewImages]);
+  
+//   // Now upload each image one by one
+//   for (let i = 0; i < files.length; i++) {
+//     const file = files[i];
+    
+//     const validation = validateImageFile(file);
+//     if (!validation.valid) {
+//       continue;
 //     }
-//   };
+    
+//     try {
+//       const { url, publicId } = await uploadToCloudinary(file);
+      
+//       // Update the specific image with URL while preserving others
+//       setNewImages(prev => {
+//         // Find the image that's currently uploading (the one without a URL)
+//         const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
+//         if (uploadingIndex !== -1) {
+//           const updated = [...prev];
+//           updated[uploadingIndex] = {
+//             ...updated[uploadingIndex],
+//             url: url,
+//             publicId: publicId,
+//             uploading: false
+//           };
+//           return updated;
+//         }
+//         return prev;
+//       });
+      
+//       toast.success(`Image ${i + 1} uploaded successfully`);
+//     } catch (error) {
+//       console.error('Upload error:', error);
+//       setNewImages(prev => prev.filter(img => img.file !== file));
+//       toast.error(`Failed to upload image ${i + 1}`);
+//     }
+//   }
+  
+//   // Clear the input
+//   if (fileInputRefs.current['multiple']) {
+//     fileInputRefs.current['multiple'].value = '';
+//   }
+// };
 
-//   // Handle form input changes
+// const removeNewImage = (imageId) => {
+//   // Find and revoke the object URL to free memory
+//   const imageToRemove = newImages.find(img => img.id === imageId);
+//   if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+//     URL.revokeObjectURL(imageToRemove.preview);
+//   }
+//   setNewImages(prev => prev.filter(img => img.id !== imageId));
+// };
+
+//  const removeExistingImage = (imageId, imageUrl) => {
+//   console.log('Removing image:', { imageId, imageUrl });
+//   setImagesToDelete(prev => [...prev, imageId]);
+//   setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
+//   toast.info('Image marked for deletion');
+//   // No need to do anything else - the UI will automatically show new slots 
+//   // because existingImages.length decreased
+// };
+
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
 //     setFormData(prev => ({ ...prev, [name]: value }));
@@ -426,7 +518,6 @@
 //     }
 //   };
 
-//   // Handle quantity based pricing changes
 //   const handlePricingChange = (index, field, value) => {
 //     const updatedPricing = [...formData.quantityBasedPricing];
     
@@ -446,7 +537,6 @@
 //     setFormData(prev => ({ ...prev, quantityBasedPricing: updatedPricing }));
 //   };
 
-//   // Add new pricing row
 //   const addPricingRow = () => {
 //     setFormData(prev => ({
 //       ...prev,
@@ -457,7 +547,6 @@
 //     }));
 //   };
 
-//   // Remove pricing row
 //   const removePricingRow = (index) => {
 //     if (formData.quantityBasedPricing.length > 1) {
 //       const updatedPricing = formData.quantityBasedPricing.filter((_, i) => i !== index);
@@ -465,14 +554,12 @@
 //     }
 //   };
 
-//   // Handle size changes
 //   const handleSizeChange = (index, value) => {
 //     const updatedSizes = [...formData.sizes];
 //     updatedSizes[index] = value;
 //     setFormData(prev => ({ ...prev, sizes: updatedSizes }));
 //   };
 
-//   // Add new size
 //   const addSize = () => {
 //     setFormData(prev => ({
 //       ...prev,
@@ -480,7 +567,6 @@
 //     }));
 //   };
 
-//   // Remove size
 //   const removeSize = (index) => {
 //     if (formData.sizes.length > 1) {
 //       const updatedSizes = formData.sizes.filter((_, i) => i !== index);
@@ -488,21 +574,18 @@
 //     }
 //   };
 
-//   // Handle color changes
 //   const handleColorChange = (index, field, value) => {
 //     const updatedColors = [...formData.colors];
 //     updatedColors[index] = { ...updatedColors[index], [field]: value };
 //     setFormData(prev => ({ ...prev, colors: updatedColors }));
 //   };
 
-//   // Handle color picker open
 //   const openColorPicker = (index, event) => {
 //     event.stopPropagation();
 //     setCurrentColorIndex(index);
 //     setShowColorPicker(true);
 //   };
 
-//   // Add new color
 //   const addColor = () => {
 //     setFormData(prev => ({
 //       ...prev,
@@ -510,7 +593,6 @@
 //     }));
 //   };
 
-//   // Remove color
 //   const removeColor = (index) => {
 //     if (formData.colors.length > 1) {
 //       const updatedColors = formData.colors.filter((_, i) => i !== index);
@@ -518,9 +600,6 @@
 //     }
 //   };
 
-//   // ========== ADDITIONAL INFO HANDLERS ==========
-  
-//   // Handle additional info changes
 //   const handleAdditionalInfoChange = (index, field, value) => {
 //     const updatedInfo = [...formData.additionalInfo];
 //     updatedInfo[index] = { ...updatedInfo[index], [field]: value };
@@ -531,7 +610,6 @@
 //     }
 //   };
 
-//   // Add new additional info row
 //   const addAdditionalInfo = () => {
 //     setFormData(prev => ({
 //       ...prev,
@@ -542,23 +620,18 @@
 //     }));
 //   };
 
-//   // Remove additional info row
 //   const removeAdditionalInfo = (index) => {
 //     const updatedInfo = formData.additionalInfo.filter((_, i) => i !== index);
 //     setFormData(prev => ({ ...prev, additionalInfo: updatedInfo }));
 //   };
 
-//   // ========== HANDLERS FOR TAGS AND META ==========
-  
-//   // Handle tag toggle
 //   const handleTagToggle = (tag) => {
 //     setFormData(prev => ({
 //       ...prev,
-//       tags: prev.tags.includes(tag) ? [] : [tag] 
+//       tags: prev.tags.includes(tag) ? [] : [tag]
 //     }));
 //   };
 
-//   // Handle meta settings change
 //   const handleMetaChange = (field, value) => {
 //     setFormData(prev => ({
 //       ...prev,
@@ -569,7 +642,6 @@
 //     }));
 //   };
 
-//   // Add keyword handlers
 //   const addKeyword = () => {
 //     if (!keywordInput.trim()) return;
     
@@ -611,7 +683,6 @@
 //     }));
 //   };
 
-//   // Validate additional info
 //   const validateAdditionalInfo = () => {
 //     let isValid = true;
 //     const newErrors = {};
@@ -631,7 +702,6 @@
 //     return isValid;
 //   };
 
-//   // Validate form
 //   const validateForm = () => {
 //     const newErrors = {};
 
@@ -659,7 +729,7 @@
 //       newErrors.pricePerUnit = 'Price must be 0 or greater';
 //     }
 
-//     const hasImages = existingImages.length > 0 || newImages.some(img => img !== null);
+//     const hasImages = existingImages.length > 0 || newImages.length > 0;
 //     if (!hasImages) {
 //       newErrors.images = 'At least one product image is required';
 //     }
@@ -682,57 +752,47 @@
 //     }
 
 //     setErrors(newErrors);
-    
 //     const isAdditionalInfoValid = validateAdditionalInfo();
     
 //     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
 //   };
 
-//   // Check if any changes were made
 //   const hasChanges = () => {
 //     if (!originalProduct) return false;
 
-//     // Check basic fields
 //     if (formData.productName !== originalProduct.productName) return true;
 //     if (formData.description !== originalProduct.description) return true;
-//     if (formData.instruction !== originalProduct.instruction) return true; // ADDED instruction check
+//     if (formData.instruction !== originalProduct.instruction) return true;
 //     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
 //     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
 //     if (formData.fabric !== originalProduct.fabric) return true;
 //     if (formData.moq !== originalProduct.moq) return true;
 //     if (formData.pricePerUnit !== originalProduct.pricePerUnit) return true;
-
-//     // Check quantity based pricing
 //     if (JSON.stringify(formData.quantityBasedPricing) !== JSON.stringify(originalProduct.quantityBasedPricing)) return true;
-
-//     // Check sizes
 //     if (JSON.stringify(formData.sizes) !== JSON.stringify(originalProduct.sizes)) return true;
-
-//     // Check colors
 //     if (JSON.stringify(formData.colors) !== JSON.stringify(originalProduct.colors)) return true;
-
-//     // Check additional info
 //     if (JSON.stringify(formData.additionalInfo) !== JSON.stringify(originalProduct.additionalInfo || [])) return true;
-
-//     // Check NEW FIELDS
 //     if (formData.isFeatured !== originalProduct.isFeatured) return true;
 //     if (JSON.stringify(formData.tags) !== JSON.stringify(originalProduct.tags || [])) return true;
 //     if (JSON.stringify(formData.metaSettings) !== JSON.stringify(originalProduct.metaSettings || {})) return true;
-
-//     // Check images
 //     if (imagesToDelete.length > 0) return true;
-//     if (newImages.some(img => img !== null)) return true;
+//     if (newImages.some(img => img !== null && img.url)) return true;
 
 //     return false;
 //   };
 
-//   // Handle form submission
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
 //     if (!hasChanges()) {
 //       toast.info('No changes to save');
 //       router.push('/admin/all-products');
+//       return;
+//     }
+
+//     const uploading = newImages.some(img => img.uploading === true);
+//     if (uploading) {
+//       toast.error('Please wait for all images to finish uploading');
 //       return;
 //     }
 
@@ -751,8 +811,13 @@
 
 //     try {
 //       const token = localStorage.getItem('token');
-//       const formDataToSend = new FormData();
-
+      
+//       const existingImageUrls = existingImages.map(img => img.url);
+//       const newImageUrls = newImages
+//         .filter(img => img.url)
+//         .map(img => img.url);
+//       const allImageUrls = [...existingImageUrls, ...newImageUrls];
+      
 //       const processedPricing = formData.quantityBasedPricing.map(tier => ({
 //         ...tier,
 //         price: tier.price === '' ? 0 : parseFloat(tier.price)
@@ -762,39 +827,35 @@
 //         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //       );
 
-//       formDataToSend.append('productName', formData.productName);
-//       formDataToSend.append('description', formData.description);
-//       formDataToSend.append('instruction', formData.instruction || ''); // ADDED instruction field
-//       formDataToSend.append('category', formData.category);
-//       formDataToSend.append('targetedCustomer', formData.targetedCustomer);
-//       formDataToSend.append('fabric', formData.fabric);
-//       formDataToSend.append('moq', formData.moq);
-//       formDataToSend.append('pricePerUnit', formData.pricePerUnit);
-//       formDataToSend.append('quantityBasedPricing', JSON.stringify(processedPricing));
-//       formDataToSend.append('sizes', JSON.stringify(formData.sizes.filter(s => s.trim() !== '')));
-//       formDataToSend.append('colors', JSON.stringify(formData.colors));
-//       formDataToSend.append('additionalInfo', JSON.stringify(processedAdditionalInfo));
-      
-//       formDataToSend.append('isFeatured', formData.isFeatured);
-//       formDataToSend.append('tags', JSON.stringify(formData.tags));
-//       formDataToSend.append('metaSettings', JSON.stringify(formData.metaSettings));
+//       const payload = {
+//         productName: formData.productName,
+//         description: formData.description,
+//         instruction: formData.instruction || '',
+//         category: formData.category,
+//         targetedCustomer: formData.targetedCustomer,
+//         fabric: formData.fabric,
+//         moq: formData.moq,
+//         pricePerUnit: formData.pricePerUnit,
+//         quantityBasedPricing: processedPricing,
+//         sizes: formData.sizes.filter(s => s.trim() !== ''),
+//         colors: formData.colors,
+//         additionalInfo: processedAdditionalInfo,
+//         images: allImageUrls,
+//         isFeatured: formData.isFeatured,
+//         tags: formData.tags,
+//         metaSettings: formData.metaSettings,
+//         imagesToDelete: imagesToDelete
+//       };
 
-//       if (imagesToDelete.length > 0) {
-//         formDataToSend.append('imagesToDelete', JSON.stringify(imagesToDelete));
-//       }
-
-//       newImages.forEach(img => {
-//         if (img && img.file) {
-//           formDataToSend.append('images', img.file);
-//         }
-//       });
+//       console.log('Submitting payload:', payload);
 
 //       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
 //         method: 'PUT',
 //         headers: {
-//           'Authorization': `Bearer ${token}`
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
 //         },
-//         body: formDataToSend
+//         body: JSON.stringify(payload)
 //       });
 
 //       const data = await response.json();
@@ -813,7 +874,6 @@
 //     }
 //   };
 
-//   // Get icon for selected customer
 //   const getSelectedCustomerIcon = () => {
 //     const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
 //     return customer ? customer.icon : '👤';
@@ -844,7 +904,7 @@
 //                 <div>
 //                   <div className="flex items-center gap-2">
 //                     <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-//                     <span className="px-2 py-1 bg-purple-100 text-purple-600 text-xs font-medium rounded-full flex items-center gap-1">
+//                     <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full flex items-center gap-1">
 //                       <Shield className="w-3 h-3" />
 //                       Admin
 //                     </span>
@@ -897,7 +957,7 @@
 //                       )}
 //                     </div>
 
-//                     {/* Description with Rich Text Editor */}
+//                     {/* Description */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Description
@@ -912,38 +972,33 @@
 //                                 <RichTextEditor.Underline />
 //                                 <RichTextEditor.Strikethrough />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.H1 />
 //                                 <RichTextEditor.H2 />
 //                                 <RichTextEditor.H3 />
 //                                 <RichTextEditor.H4 />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.BulletList />
 //                                 <RichTextEditor.OrderedList />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.AlignLeft />
 //                                 <RichTextEditor.AlignCenter />
 //                                 <RichTextEditor.AlignRight />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.Link />
 //                                 <RichTextEditor.Unlink />
 //                               </RichTextEditor.ControlsGroup>
 //                             </RichTextEditor.Toolbar>
-
 //                             <RichTextEditor.Content />
 //                           </RichTextEditor>
 //                         </div>
 //                       )}
 //                     </div>
 
-//                     {/* NEW: Instruction Field with Rich Text Editor */}
+//                     {/* Instruction Field */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Instructions / Care Instructions
@@ -958,31 +1013,26 @@
 //                                 <RichTextEditor.Underline />
 //                                 <RichTextEditor.Strikethrough />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.H1 />
 //                                 <RichTextEditor.H2 />
 //                                 <RichTextEditor.H3 />
 //                                 <RichTextEditor.H4 />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.BulletList />
 //                                 <RichTextEditor.OrderedList />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.AlignLeft />
 //                                 <RichTextEditor.AlignCenter />
 //                                 <RichTextEditor.AlignRight />
 //                               </RichTextEditor.ControlsGroup>
-
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.Link />
 //                                 <RichTextEditor.Unlink />
 //                               </RichTextEditor.ControlsGroup>
 //                             </RichTextEditor.Toolbar>
-
 //                             <RichTextEditor.Content />
 //                           </RichTextEditor>
 //                         </div>
@@ -992,9 +1042,8 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Targeted Customer, and Fabric */}
+//                     {/* Category, Targeted Customer, Fabric */}
 //                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Category <span className="text-red-500">*</span>
@@ -1015,8 +1064,6 @@
 //                         {errors.category && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
 //                         )}
-                        
-//                         {/* Show selected category details */}
 //                         {selectedCategoryDetails && (
 //                           <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
 //                             <p className="text-xs text-gray-600">
@@ -1026,7 +1073,6 @@
 //                         )}
 //                       </div>
 
-//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -1058,7 +1104,6 @@
 //                         )}
 //                       </div>
 
-//                       {/* Fabric */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Fabric (Material) <span className="text-red-500">*</span>
@@ -1078,6 +1123,23 @@
 //                         )}
 //                       </div>
 //                     </div>
+
+//                     {/* Quick Stats for Selected Customer */}
+//                     {formData.targetedCustomer && (
+//                       <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+//                         <div className="flex items-center gap-2">
+//                           <span className="text-2xl">{getSelectedCustomerIcon()}</span>
+//                           <div>
+//                             <p className="text-sm font-medium text-gray-900">
+//                               {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label} Collection
+//                             </p>
+//                             <p className="text-xs text-gray-600">
+//                               This product will be shown in the {formData.targetedCustomer} section
+//                             </p>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}
 //                   </div>
 //                 </div>
 //               </div>
@@ -1091,104 +1153,166 @@
 //                       Product Images <span className="text-red-500">*</span>
 //                     </h2>
 //                     <p className="text-xs text-gray-500 mt-1">
-//                       Existing images: {existingImages.length} • Max 4 images total
+//                       Existing: {existingImages.length} • New: {newImages.length} • Total: {existingImages.length + newImages.length} • Max 6 images total
 //                     </p>
 //                   </div>
                   
-//                   <div className="p-5">
-//                     {errors.images && (
-//                       <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
-//                         <AlertCircle className="w-3 h-3" />
-//                         {errors.images}
-//                       </p>
-//                     )}
-                    
-//                     {/* Existing Images */}
-//                     {existingImages.length > 0 && (
-//                       <div className="mb-4">
-//                         <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
-//                         <div className="grid grid-cols-2 gap-3">
-//                           {existingImages.map((image, index) => (
-//                             <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-//                               <img 
-//                                 src={image.url} 
-//                                 alt={`Product ${index + 1}`} 
-//                                 className="w-full h-full object-cover"
-//                               />
-//                               <button
-//                                 type="button"
-//                                 onClick={() => removeExistingImage(image.publicId)}
-//                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                                 title="Remove Image"
-//                               >
-//                                 <X className="w-3 h-3" />
-//                               </button>
-//                               {image.isPrimary && (
-//                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-//                                   Primary
-//                                 </span>
-//                               )}
-//                             </div>
-//                           ))}
-//                         </div>
-//                       </div>
-//                     )}
+//                 <div className="p-5">
+//   {errors.images && (
+//     <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
+//       <AlertCircle className="w-3 h-3" />
+//       {errors.images}
+//     </p>
+//   )}
+  
+//   {/* Multiple Image Upload Button */}
+//   <div className="mb-4">
+//     <input
+//       type="file"
+//       id="multiple-images"
+//       className="hidden"
+//       accept="image/jpeg,image/jpg,image/png,image/webp"
+//       multiple
+//       onChange={handleMultipleImageSelect}
+//       ref={el => {
+//         if (el) fileInputRefs.current['multiple'] = el;
+//       }}
+//     />
+//     <button
+//       type="button"
+//       onClick={() => fileInputRefs.current['multiple']?.click()}
+//       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
+//     >
+//       <Upload className="w-5 h-5" />
+//       <span>Select Multiple Images (Up to 6)</span>
+//     </button>
+//     <p className="text-xs text-gray-500 mt-2 text-center">
+//       You can select multiple images at once. Images will be uploaded automatically.
+//     </p>
+//   </div>
 
-//                     {/* New Images Upload */}
-//                     {existingImages.length + newImages.filter(img => img !== null).length < 4 && (
-//                       <div>
-//                         <h3 className="text-xs font-medium text-gray-500 mb-2">Add New Images</h3>
-//                         <div className="grid grid-cols-2 gap-3">
-//                           {[0, 1, 2, 3].map((index) => {
-//                             if (index >= (4 - (existingImages.length + newImages.filter(img => img !== null).length))) {
-//                               return null;
-//                             }
-                            
-//                             return (
-//                               <div key={`new-${index}`}>
-//                                 {!newImages[index] ? (
-//                                   <div 
-//                                     className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
-//                                     onClick={() => fileInputRefs.current[index]?.click()}
-//                                   >
-//                                     <input 
-//                                       type="file" 
-//                                       ref={el => fileInputRefs.current[index] = el}
-//                                       className="hidden" 
-//                                       accept="image/jpeg,image/jpg,image/png,image/webp" 
-//                                       onChange={(e) => handleNewImageChange(e, index)} 
-//                                     />
-//                                     <Upload className="w-5 h-5 text-gray-400 mb-1" />
-//                                     <p className="text-xs text-gray-600">New Image</p>
-//                                   </div>
-//                                 ) : (
-//                                   <div className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-//                                     <img 
-//                                       src={newImages[index].preview} 
-//                                       alt={`New ${index + 1}`} 
-//                                       className="w-full h-full object-cover"
-//                                     />
-//                                     <button
-//                                       type="button"
-//                                       onClick={() => removeNewImage(index)}
-//                                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                                     >
-//                                       <X className="w-3 h-3" />
-//                                     </button>
-//                                   </div>
-//                                 )}
-//                               </div>
-//                             );
-//                           })}
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
+//   {/* Existing Images */}
+//   {existingImages.length > 0 && (
+//     <div className="mb-4">
+//       <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+//       <div className="grid grid-cols-2 gap-3">
+//         {existingImages.map((image) => (
+//           <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+//             <img 
+//               src={image.url} 
+//               alt="Product" 
+//               className="w-full h-full object-cover"
+//             />
+//             <button
+//               type="button"
+//               onClick={() => removeExistingImage(image.publicId, image.url)}
+//               className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//               title="Remove Image"
+//             >
+//               <X className="w-3 h-3" />
+//             </button>
+//             {image.isPrimary && (
+//               <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//                 Primary
+//               </span>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   )}
+
+//   {/* New Images - Dynamic display */}
+//   {newImages.length > 0 && (
+//     <div className="mb-4">
+//       <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
+//       <div className="grid grid-cols-2 gap-3">
+//         {newImages.map((img) => (
+//           <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+//             <img 
+//               src={img.preview} 
+//               alt="New upload" 
+//               className="w-full h-full object-cover"
+//             />
+//             {img.uploading && (
+//               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//                 <Loader2 className="w-4 h-4 text-white animate-spin" />
+//               </div>
+//             )}
+//             <button
+//               type="button"
+//               onClick={() => removeNewImage(img.id)}
+//               className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//               disabled={img.uploading}
+//             >
+//               <X className="w-3 h-3" />
+//             </button>
+//             {!img.uploading && img.url && (
+//               <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//                 Ready
+//               </span>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   )}
+  
+//  {/* Separate Upload Slots - Updated to show up to 6 slots */}
+// <div className="mt-4">
+//   <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
+//   <div 
+//     key={`slots-${existingImages.length}-${newImages.length}`}
+//     className="grid grid-cols-2 gap-3"
+//   >
+//     {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
+//       const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
+//       return (
+//         <div key={slotId} className="relative">
+//           <input
+//             type="file"
+//             id={`image-upload-${slotId}`}
+//             className="hidden"
+//             accept="image/jpeg,image/jpg,image/png,image/webp"
+//             onChange={(e) => handleNewImageChange(e, slotId)}
+//             ref={el => {
+//               if (el) fileInputRefs.current[slotId] = el;
+//             }}
+//           />
+//           <button
+//             type="button"
+//             onClick={() => fileInputRefs.current[slotId]?.click()}
+//             className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+//           >
+//             <Upload className="w-5 h-5 text-gray-400 mb-1" />
+//             <p className="text-xs text-gray-600">Upload Image</p>
+//             <p className="text-xs text-gray-400">Slot {idx + 1}</p>
+//           </button>
+//         </div>
+//       );
+//     })}
+//   </div>
+// </div>
+  
+//   {/* Upload Progress Summary */}
+//   {newImages.some(img => img.uploading) && (
+//     <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+//       <p className="text-xs text-blue-600">
+//         Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
+//       </p>
+//     </div>
+//   )}
+  
+//   {/* Image Count Info */}
+//   <div className="mt-4 text-xs text-gray-500 text-center">
+//     {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
+//   </div>
+// </div>
 //                 </div>
 //               </div>
 //             </div>
 
-//             {/* Row 2: Sizes and Colors */}
+//             {/* Sizes and Colors */}
 //             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 //               {/* Sizes Card */}
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -1198,7 +1322,6 @@
 //                     Sizes <span className="text-red-500">*</span>
 //                   </h2>
 //                 </div>
-                
 //                 <div className="p-5">
 //                   {errors.sizes && (
 //                     <p className="text-xs text-red-600 mb-3 flex items-center gap-1">
@@ -1206,7 +1329,6 @@
 //                       {errors.sizes}
 //                     </p>
 //                   )}
-                  
 //                   <div className="space-y-2">
 //                     {formData.sizes.map((size, index) => (
 //                       <div key={index} className="flex items-center gap-2">
@@ -1228,7 +1350,6 @@
 //                         )}
 //                       </div>
 //                     ))}
-                    
 //                     <button
 //                       type="button"
 //                       onClick={addSize}
@@ -1249,7 +1370,6 @@
 //                     Colors <span className="text-red-500">*</span>
 //                   </h2>
 //                 </div>
-                
 //                 <div className="p-5">
 //                   {errors.colors && (
 //                     <p className="text-xs text-red-600 mb-3 flex items-center gap-1">
@@ -1257,12 +1377,10 @@
 //                       {errors.colors}
 //                     </p>
 //                   )}
-                  
 //                   <div className="space-y-3">
 //                     {formData.colors.map((color, index) => (
 //                       <div key={index} className="relative">
 //                         <div className="flex items-center gap-2 w-full">
-//                           {/* Color Preview and Hex Code */}
 //                           <div 
 //                             className="flex-1 flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 p-1 cursor-pointer hover:border-[#E39A65] transition-colors"
 //                             onClick={(e) => openColorPicker(index, e)}
@@ -1276,26 +1394,18 @@
 //                             </div>
 //                             <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
 //                           </div>
-                          
-//                           {/* Delete Button */}
 //                           {formData.colors.length > 1 && (
 //                             <button
 //                               type="button"
 //                               onClick={() => removeColor(index)}
 //                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-//                               title="Remove Color"
 //                             >
 //                               <Trash2 className="w-4 h-4" />
 //                             </button>
 //                           )}
 //                         </div>
-
-//                         {/* Color Picker Popup */}
 //                         {showColorPicker && currentColorIndex === index && (
-//                           <div 
-//                             ref={colorPickerRef}
-//                             className="absolute right-0 mt-2 z-50"
-//                           >
+//                           <div ref={colorPickerRef} className="absolute right-0 mt-2 z-50">
 //                             <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-3">
 //                               <SketchPicker
 //                                 color={color.code}
@@ -1307,7 +1417,6 @@
 //                         )}
 //                       </div>
 //                     ))}
-                    
 //                     <button
 //                       type="button"
 //                       onClick={addColor}
@@ -1321,7 +1430,7 @@
 //               </div>
 //             </div>
 
-//             {/* Additional Information Section */}
+//             {/* Additional Information */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1330,77 +1439,54 @@
 //                     Additional Information
 //                   </h2>
 //                   <p className="text-xs text-gray-500 mt-1">
-//                     Add or edit custom fields for extra product details (e.g., Care Instructions, Country of Origin, Warranty, etc.)
+//                     Add or edit custom fields for extra product details
 //                   </p>
 //                 </div>
-                
 //                 <div className="p-5">
 //                   <div className="space-y-4">
 //                     {formData.additionalInfo.map((info, index) => (
 //                       <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
 //                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-//                           {/* Field Name */}
 //                           <div>
 //                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <div className="flex items-center gap-1">
-//                                 <Type className="w-3 h-3" />
-//                                 Field Name
-//                               </div>
+//                               <Type className="w-3 h-3 inline mr-1" />
+//                               Field Name
 //                             </label>
 //                             <input
 //                               type="text"
 //                               value={info.fieldName}
 //                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-//                               placeholder="e.g., Care Instructions, Country, Warranty"
-//                               className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                                 errors[`additionalInfo_${index}_fieldName`] ? 'border-red-500' : 'border-gray-300'
-//                               }`}
+//                               placeholder="e.g., Material Care"
+//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                             />
-//                             {errors[`additionalInfo_${index}_fieldName`] && (
-//                               <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldName`]}</p>
-//                             )}
 //                           </div>
-                          
-//                           {/* Field Value */}
 //                           <div>
 //                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               <div className="flex items-center gap-1">
-//                                 <Hash className="w-3 h-3" />
-//                                 Field Value
-//                               </div>
+//                               <Hash className="w-3 h-3 inline mr-1" />
+//                               Field Value
 //                             </label>
 //                             <input
 //                               type="text"
 //                               value={info.fieldValue}
 //                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
-//                               placeholder="e.g., Machine Wash, Bangladesh, 2 Years"
-//                               className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                                 errors[`additionalInfo_${index}_fieldValue`] ? 'border-red-500' : 'border-gray-300'
-//                               }`}
+//                               placeholder="e.g., Machine Wash"
+//                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                             />
-//                             {errors[`additionalInfo_${index}_fieldValue`] && (
-//                               <p className="text-xs text-red-600 mt-1">{errors[`additionalInfo_${index}_fieldValue`]}</p>
-//                             )}
 //                           </div>
 //                         </div>
-                        
-//                         {/* Remove Button */}
 //                         <button
 //                           type="button"
 //                           onClick={() => removeAdditionalInfo(index)}
-//                           className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-//                           title="Remove Field"
+//                           className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
 //                         >
 //                           <Trash2 className="w-4 h-4" />
 //                         </button>
 //                       </div>
 //                     ))}
-                    
-//                     {/* Add Button */}
 //                     <button
 //                       type="button"
 //                       onClick={addAdditionalInfo}
-//                       className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50 hover:border-[#E39A65] transition-colors"
+//                       className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50"
 //                     >
 //                       <PlusCircle className="w-4 h-4" />
 //                       Add Additional Information
@@ -1410,7 +1496,7 @@
 //               </div>
 //             </div>
 
-//             {/* Featured & Tags Section */}
+//             {/* Product Promotion */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1418,13 +1504,8 @@
 //                     <Star className="w-5 h-5 text-[#E39A65]" />
 //                     Product Promotion
 //                   </h2>
-//                   <p className="text-xs text-gray-500 mt-1">
-//                     Update featured status and tags to highlight your product
-//                   </p>
 //                 </div>
-                
 //                 <div className="p-5">
-//                   {/* Featured Checkbox */}
 //                   <div className="mb-4">
 //                     <label className="flex items-center gap-3 cursor-pointer">
 //                       <input
@@ -1434,7 +1515,7 @@
 //                           setFormData({ ...formData, isFeatured: e.target.checked });
 //                           setShowTags(e.target.checked);
 //                         }}
-//                         className="w-5 h-5 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
+//                         className="w-5 h-5 text-[#E39A65] border-gray-300 rounded"
 //                       />
 //                       <div>
 //                         <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
@@ -1443,66 +1524,58 @@
 //                     </label>
 //                   </div>
 
-//                   {/* Tags Section */}
-//                 {/* Tags Section */}
-// <div className="mt-4">
-//   <div 
-//     className="flex items-center justify-between cursor-pointer py-2"
-//     onClick={() => setShowTags(!showTags)}
-//   >
-//     <div className="flex items-center gap-2">
-//       <Tag className="w-4 h-4 text-[#E39A65]" />
-//       <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
-//     </div>
-//     <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
-//   </div>
-
-//   {showTags && (
-//     <div className="mt-3">
-//       <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
-//       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-//         {AVAILABLE_TAGS.map(tag => (
-//           <label key={tag} className="flex items-center gap-2 cursor-pointer">
-//             <input
-//               type="radio" // Changed from checkbox to radio
-//               name="productTag" // Add name to group radio buttons
-//               checked={formData.tags.includes(tag)}
-//               onChange={() => handleTagToggle(tag)}
-//               className="w-4 h-4 text-[#E39A65] border-gray-300 focus:ring-[#E39A65]"
-//             />
-//             <span className="text-sm text-gray-600">{tag}</span>
-//           </label>
-//         ))}
-//       </div>
-      
-//       {/* Selected Tags Display - Now shows only one tag */}
-//       {formData.tags.length > 0 && (
-//         <div className="mt-4 flex flex-wrap gap-2">
-//           {formData.tags.map(tag => (
-//             <span
-//               key={tag}
-//               className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
-//             >
-//               {tag}
-//               <button
-//                 type="button"
-//                 onClick={() => handleTagToggle(tag)}
-//                 className="ml-1.5 text-orange-600 hover:text-orange-800"
-//               >
-//                 <X className="w-3 h-3" />
-//               </button>
-//             </span>
-//           ))}
-//         </div>
-//       )}
-//     </div>
-//   )}
-// </div>
+//                   <div className="mt-4">
+//                     <div 
+//                       className="flex items-center justify-between cursor-pointer py-2"
+//                       onClick={() => setShowTags(!showTags)}
+//                     >
+//                       <div className="flex items-center gap-2">
+//                         <Tag className="w-4 h-4 text-[#E39A65]" />
+//                         <h3 className="text-sm font-medium text-gray-700">Product Tags/Labels</h3>
+//                       </div>
+//                       <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
+//                     </div>
+//                     {showTags && (
+//                       <div className="mt-3">
+//                         <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
+//                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+//                           {AVAILABLE_TAGS.map(tag => (
+//                             <label key={tag} className="flex items-center gap-2 cursor-pointer">
+//                               <input
+//                                 type="radio"
+//                                 name="productTag"
+//                                 checked={formData.tags.includes(tag)}
+//                                 onChange={() => handleTagToggle(tag)}
+//                                 className="w-4 h-4 text-[#E39A65] border-gray-300"
+//                               />
+//                               <span className="text-sm text-gray-600">{tag}</span>
+//                             </label>
+//                           ))}
+//                         </div>
+//                         {formData.tags.length > 0 && (
+//                           <div className="mt-4 flex flex-wrap gap-2">
+//                             {formData.tags.map(tag => (
+//                               <span key={tag} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+//                                 {tag}
+//                                 <button
+//                                   type="button"
+//                                   onClick={() => handleTagToggle(tag)}
+//                                   className="ml-1.5 text-orange-600 hover:text-orange-800"
+//                                 >
+//                                   <X className="w-3 h-3" />
+//                                 </button>
+//                               </span>
+//                             ))}
+//                           </div>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div>
 //                 </div>
 //               </div>
 //             </div>
 
-//             {/* Meta Settings (SEO) Section */}
+//             {/* Meta Settings (SEO) */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1516,94 +1589,59 @@
 //                     </h2>
 //                     <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
 //                   </div>
-//                   <p className="text-xs text-gray-500 mt-1">
-//                     Update SEO settings to optimize your product for search engines
-//                   </p>
 //                 </div>
-                
 //                 {showMeta && (
 //                   <div className="p-5">
 //                     <div className="space-y-4">
 //                       {/* Meta Title */}
 //                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Meta Title
-//                         </label>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
 //                         <input
 //                           type="text"
-//                           value={formData.metaSettings.metaTitle || ''}
+//                           value={formData.metaSettings.metaTitle}
 //                           onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
 //                           maxLength="70"
 //                           placeholder="Enter meta title (max 70 characters)"
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                             errors.metaTitle ? 'border-red-500' : 'border-gray-300'
-//                           }`}
+//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                         />
 //                         <div className="flex justify-between mt-1">
 //                           <p className="text-xs text-gray-500">Appears in search engine results</p>
-//                           <span className={`text-xs ${(formData.metaSettings.metaTitle?.length || 0) > 60 ? 'text-orange-600' : 'text-gray-500'}`}>
-//                             {formData.metaSettings.metaTitle?.length || 0}/70
-//                           </span>
+//                           <span className="text-xs text-gray-500">{formData.metaSettings.metaTitle?.length || 0}/70</span>
 //                         </div>
-//                         {errors.metaTitle && (
-//                           <p className="text-xs text-red-600 mt-1">{errors.metaTitle}</p>
-//                         )}
 //                       </div>
 
 //                       {/* Meta Description */}
 //                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Meta Description
-//                         </label>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
 //                         <textarea
-//                           value={formData.metaSettings.metaDescription || ''}
+//                           value={formData.metaSettings.metaDescription}
 //                           onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
 //                           maxLength="160"
 //                           placeholder="Enter meta description (max 160 characters)"
 //                           rows="3"
-//                           className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none ${
-//                             errors.metaDescription ? 'border-red-500' : 'border-gray-300'
-//                           }`}
+//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none"
 //                         />
 //                         <div className="flex justify-between mt-1">
 //                           <p className="text-xs text-gray-500">Brief description for search results</p>
-//                           <span className={`text-xs ${(formData.metaSettings.metaDescription?.length || 0) > 150 ? 'text-orange-600' : 'text-gray-500'}`}>
-//                             {formData.metaSettings.metaDescription?.length || 0}/160
-//                           </span>
+//                           <span className="text-xs text-gray-500">{formData.metaSettings.metaDescription?.length || 0}/160</span>
 //                         </div>
-//                         {errors.metaDescription && (
-//                           <p className="text-xs text-red-600 mt-1">{errors.metaDescription}</p>
-//                         )}
 //                       </div>
 
 //                       {/* Meta Keywords */}
 //                       <div>
-//                         <label className="block text-sm font-medium text-gray-700 mb-1">
-//                           Meta Keywords
-//                         </label>
-                        
-//                         {/* Display existing keywords as chips */}
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
 //                         {formData.metaSettings.metaKeywords?.length > 0 && (
 //                           <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
 //                             {formData.metaSettings.metaKeywords.map((keyword, index) => (
-//                               <span
-//                                 key={index}
-//                                 className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
-//                               >
+//                               <span key={index} className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
 //                                 {keyword}
-//                                 <button
-//                                   type="button"
-//                                   onClick={() => removeKeyword(index)}
-//                                   className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
-//                                 >
+//                                 <button type="button" onClick={() => removeKeyword(index)} className="ml-1.5 text-blue-600 hover:text-blue-800">
 //                                   <X className="w-3 h-3" />
 //                                 </button>
 //                               </span>
 //                             ))}
 //                           </div>
 //                         )}
-                        
-//                         {/* Input for new keywords */}
 //                         <div className="relative">
 //                           <input
 //                             type="text"
@@ -1628,24 +1666,6 @@
 //                           Type a keyword and press Enter or comma to add. Keywords appear as chips above.
 //                         </p>
 //                       </div>
-
-//                       {/* SEO Preview */}
-//                       {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
-//                         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-//                           <h4 className="text-xs font-medium text-gray-700 mb-2">Search Engine Preview:</h4>
-//                           <div className="space-y-1">
-//                             <div className="text-blue-600 text-sm font-medium truncate">
-//                               {formData.metaSettings.metaTitle || formData.productName || 'Product Title'}
-//                             </div>
-//                             <div className="text-green-600 text-xs">
-//                               {typeof window !== 'undefined' ? window.location.origin : ''}/product/{formData.productName?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}
-//                             </div>
-//                             <div className="text-gray-600 text-xs line-clamp-2">
-//                               {formData.metaSettings.metaDescription || formData.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Product description will appear here...'}
-//                             </div>
-//                           </div>
-//                         </div>
-//                       )}
 //                     </div>
 //                   </div>
 //                 )}
@@ -1661,9 +1681,7 @@
 //                     Bulk Pricing
 //                   </h2>
 //                 </div>
-                
 //                 <div className="p-5 space-y-4">
-//                   {/* MOQ and Base Price */}
 //                   <div className="grid grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1675,15 +1693,10 @@
 //                         value={formData.moq}
 //                         onChange={handleChange}
 //                         min="1"
-//                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                           errors.moq ? 'border-red-500' : 'border-gray-300'
-//                         }`}
+//                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                       />
-//                       {errors.moq && (
-//                         <p className="text-xs text-red-600 mt-1">{errors.moq}</p>
-//                       )}
+//                       {errors.moq && <p className="text-xs text-red-600 mt-1">{errors.moq}</p>}
 //                     </div>
-
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Price Per Unit ($) <span className="text-red-500">*</span>
@@ -1695,22 +1708,15 @@
 //                         onChange={handleChange}
 //                         min="0"
 //                         step="0.01"
-//                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
-//                           errors.pricePerUnit ? 'border-red-500' : 'border-gray-300'
-//                         }`}
+//                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                       />
-//                       {errors.pricePerUnit && (
-//                         <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>
-//                       )}
+//                       {errors.pricePerUnit && <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>}
 //                     </div>
 //                   </div>
 
-//                   {/* Quantity Based Pricing */}
 //                   <div>
 //                     <div className="flex items-center justify-between mb-4">
-//                       <label className="block text-sm font-medium text-gray-700">
-//                         Quantity Based Pricing:
-//                       </label>
+//                       <label className="block text-sm font-medium text-gray-700">Quantity Based Pricing:</label>
 //                       <button
 //                         type="button"
 //                         onClick={addPricingRow}
@@ -1720,14 +1726,11 @@
 //                         Add Tier
 //                       </button>
 //                     </div>
-                    
 //                     <div className="space-y-4">
 //                       {formData.quantityBasedPricing.map((tier, index) => (
 //                         <div key={index} className="flex items-start gap-3">
 //                           <div className="w-1/2">
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               Quantity Range
-//                             </label>
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">Quantity Range</label>
 //                             <input
 //                               type="text"
 //                               value={tier.range}
@@ -1736,11 +1739,8 @@
 //                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                             />
 //                           </div>
-                          
 //                           <div className="w-1/2">
-//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-//                               Price ($)
-//                             </label>
+//                             <label className="block text-xs font-medium text-gray-600 mb-1.5">Price ($)</label>
 //                             <input
 //                               type="number"
 //                               value={tier.price}
@@ -1751,14 +1751,12 @@
 //                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                             />
 //                           </div>
-                          
 //                           {formData.quantityBasedPricing.length > 1 && (
 //                             <div className="flex items-end h-[62px]">
 //                               <button
 //                                 type="button"
 //                                 onClick={() => removePricingRow(index)}
 //                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-//                                 title="Remove Tier"
 //                               >
 //                                 <MinusCircle className="w-5 h-5" />
 //                               </button>
@@ -1768,19 +1766,6 @@
 //                       ))}
 //                     </div>
 //                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//             {/* Info Message - Admin Permissions */}
-//             <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
-//               <div className="flex items-start gap-2">
-//                 <Shield className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
-//                 <div>
-//                   <p className="text-sm text-purple-800 font-medium">Admin Access</p>
-//                   <p className="text-xs text-purple-600">
-//                     You have full access to update all product information including instructions, featured status, tags, and SEO settings.
-//                   </p>
 //                 </div>
 //               </div>
 //             </div>
@@ -1819,6 +1804,7 @@
 // }
 
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1847,7 +1833,8 @@ import {
   Star,
   Search,
   Tag,
-  Shield
+  Shield,
+  FolderTree
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1929,6 +1916,7 @@ export default function EditProduct() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
@@ -1946,6 +1934,7 @@ export default function EditProduct() {
     description: '',
     instruction: '',
     category: '',
+    subcategory: '',
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
@@ -2054,8 +2043,10 @@ export default function EditProduct() {
 
   useEffect(() => {
     if (formData.category) {
+      fetchSubcategories(formData.category);
       fetchCategoryDetails(formData.category);
     } else {
+      setSubcategories([]);
       setSelectedCategoryDetails(null);
     }
   }, [formData.category]);
@@ -2096,6 +2087,25 @@ export default function EditProduct() {
     }
   };
 
+  const fetchSubcategories = async (categoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setSubcategories(data.data.subcategories);
+      } else {
+        setSubcategories([]);
+      }
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      setSubcategories([]);
+    }
+  };
+
   const fetchCategoryDetails = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
@@ -2130,6 +2140,7 @@ export default function EditProduct() {
           description: product.description || '',
           instruction: product.instruction || '',
           category: product.category?._id || product.category || '',
+          subcategory: product.subcategory || '',
           targetedCustomer: product.targetedCustomer || 'unisex',
           fabric: product.fabric || '',
           moq: product.moq || 100,
@@ -2146,6 +2157,11 @@ export default function EditProduct() {
             metaKeywords: []
           }
         });
+
+        if (product.category?._id || product.category) {
+          const categoryId = product.category?._id || product.category;
+          await fetchSubcategories(categoryId);
+        }
 
         setExistingImages(product.images || []);
       } else {
@@ -2181,154 +2197,139 @@ export default function EditProduct() {
     return { valid: true };
   };
 
- const handleNewImageChange = async (e, slotId) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleNewImageChange = async (e, slotId) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const validation = validateImageFile(file);
-  if (!validation.valid) {
-    toast.error(validation.message);
-    return;
-  }
-
-  const imageId = Date.now() + Math.random();
-  const previewUrl = URL.createObjectURL(file);
-  
-  const newImageObj = {
-    id: imageId,
-    slotId: slotId,
-    file,
-    preview: previewUrl,
-    uploading: true,
-    url: null,
-    publicId: null
-  };
-  
-  setNewImages(prev => [...prev, newImageObj]);
-
-  try {
-    const { url, publicId } = await uploadToCloudinary(file);
-    
-    setNewImages(prev => prev.map(img => 
-      img.id === imageId 
-        ? { ...img, url, publicId, uploading: false }
-        : img
-    ));
-    toast.success(`Image uploaded successfully`);
-  } catch (error) {
-    console.error('Upload error:', error);
-    setNewImages(prev => prev.filter(img => img.id !== imageId));
-    toast.error('Failed to upload image');
-  }
-};
-
-  // Handle multiple image selection
-const handleMultipleImageSelect = async (e) => {
-  const files = Array.from(e.target.files);
-  
-  if (files.length === 0) return;
-  
-  // Check total images limit (6 max)
-  const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
-  const availableSlots = 6 - currentImagesCount;
-  
-  if (files.length > availableSlots) {
-    toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
-    return;
-  }
-  
-  // Create temporary array to store all new images
-  const tempNewImages = [...newImages];
-  
-  // First, add all previews immediately
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    
-    // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
-      toast.error(`Image ${i + 1}: ${validation.message}`);
-      continue;
+      toast.error(validation.message);
+      return;
     }
-    
-    const imageId = Date.now() + Math.random() + i;
+
+    const imageId = Date.now() + Math.random();
     const previewUrl = URL.createObjectURL(file);
     
-    // Add to temp array
-    tempNewImages.push({
+    const newImageObj = {
       id: imageId,
-      slotId: `multi-${imageId}`,
-      file: file,
+      slotId: slotId,
+      file,
       preview: previewUrl,
       uploading: true,
       url: null,
       publicId: null
-    });
-  }
-  
-  // Update state with all previews at once
-  setNewImages([...tempNewImages]);
-  
-  // Now upload each image one by one
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+    };
     
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      continue;
-    }
-    
+    setNewImages(prev => [...prev, newImageObj]);
+
     try {
       const { url, publicId } = await uploadToCloudinary(file);
       
-      // Update the specific image with URL while preserving others
-      setNewImages(prev => {
-        // Find the image that's currently uploading (the one without a URL)
-        const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
-        if (uploadingIndex !== -1) {
-          const updated = [...prev];
-          updated[uploadingIndex] = {
-            ...updated[uploadingIndex],
-            url: url,
-            publicId: publicId,
-            uploading: false
-          };
-          return updated;
-        }
-        return prev;
-      });
-      
-      toast.success(`Image ${i + 1} uploaded successfully`);
+      setNewImages(prev => prev.map(img => 
+        img.id === imageId 
+          ? { ...img, url, publicId, uploading: false }
+          : img
+      ));
+      toast.success(`Image uploaded successfully`);
     } catch (error) {
       console.error('Upload error:', error);
-      setNewImages(prev => prev.filter(img => img.file !== file));
-      toast.error(`Failed to upload image ${i + 1}`);
+      setNewImages(prev => prev.filter(img => img.id !== imageId));
+      toast.error('Failed to upload image');
     }
-  }
-  
-  // Clear the input
-  if (fileInputRefs.current['multiple']) {
-    fileInputRefs.current['multiple'].value = '';
-  }
-};
+  };
 
-const removeNewImage = (imageId) => {
-  // Find and revoke the object URL to free memory
-  const imageToRemove = newImages.find(img => img.id === imageId);
-  if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
-    URL.revokeObjectURL(imageToRemove.preview);
-  }
-  setNewImages(prev => prev.filter(img => img.id !== imageId));
-};
+  const handleMultipleImageSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+    
+    const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
+    const availableSlots = 6 - currentImagesCount;
+    
+    if (files.length > availableSlots) {
+      toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+      return;
+    }
+    
+    const tempNewImages = [...newImages];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast.error(`Image ${i + 1}: ${validation.message}`);
+        continue;
+      }
+      
+      const imageId = Date.now() + Math.random() + i;
+      const previewUrl = URL.createObjectURL(file);
+      
+      tempNewImages.push({
+        id: imageId,
+        slotId: `multi-${imageId}`,
+        file: file,
+        preview: previewUrl,
+        uploading: true,
+        url: null,
+        publicId: null
+      });
+    }
+    
+    setNewImages([...tempNewImages]);
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        continue;
+      }
+      
+      try {
+        const { url, publicId } = await uploadToCloudinary(file);
+        
+        setNewImages(prev => {
+          const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
+          if (uploadingIndex !== -1) {
+            const updated = [...prev];
+            updated[uploadingIndex] = {
+              ...updated[uploadingIndex],
+              url: url,
+              publicId: publicId,
+              uploading: false
+            };
+            return updated;
+          }
+          return prev;
+        });
+        
+        toast.success(`Image ${i + 1} uploaded successfully`);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setNewImages(prev => prev.filter(img => img.file !== file));
+        toast.error(`Failed to upload image ${i + 1}`);
+      }
+    }
+    
+    if (fileInputRefs.current['multiple']) {
+      fileInputRefs.current['multiple'].value = '';
+    }
+  };
 
- const removeExistingImage = (imageId, imageUrl) => {
-  console.log('Removing image:', { imageId, imageUrl });
-  setImagesToDelete(prev => [...prev, imageId]);
-  setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
-  toast.info('Image marked for deletion');
-  // No need to do anything else - the UI will automatically show new slots 
-  // because existingImages.length decreased
-};
+  const removeNewImage = (imageId) => {
+    const imageToRemove = newImages.find(img => img.id === imageId);
+    if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+    setNewImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const removeExistingImage = (imageId, imageUrl) => {
+    setImagesToDelete(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
+    toast.info('Image marked for deletion');
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -2584,6 +2585,7 @@ const removeNewImage = (imageId) => {
     if (formData.description !== originalProduct.description) return true;
     if (formData.instruction !== originalProduct.instruction) return true;
     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
+    if (formData.subcategory !== (originalProduct.subcategory || '')) return true;
     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
     if (formData.fabric !== originalProduct.fabric) return true;
     if (formData.moq !== originalProduct.moq) return true;
@@ -2652,6 +2654,7 @@ const removeNewImage = (imageId) => {
         description: formData.description,
         instruction: formData.instruction || '',
         category: formData.category,
+        subcategory: formData.subcategory || '',
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
@@ -2666,8 +2669,6 @@ const removeNewImage = (imageId) => {
         metaSettings: formData.metaSettings,
         imagesToDelete: imagesToDelete
       };
-
-      console.log('Submitting payload:', payload);
 
       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
         method: 'PUT',
@@ -2792,26 +2793,31 @@ const removeNewImage = (imageId) => {
                                 <RichTextEditor.Underline />
                                 <RichTextEditor.Strikethrough />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.H1 />
                                 <RichTextEditor.H2 />
                                 <RichTextEditor.H3 />
                                 <RichTextEditor.H4 />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.BulletList />
                                 <RichTextEditor.OrderedList />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.AlignLeft />
                                 <RichTextEditor.AlignCenter />
                                 <RichTextEditor.AlignRight />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.Link />
                                 <RichTextEditor.Unlink />
                               </RichTextEditor.ControlsGroup>
                             </RichTextEditor.Toolbar>
+
                             <RichTextEditor.Content />
                           </RichTextEditor>
                         </div>
@@ -2833,26 +2839,31 @@ const removeNewImage = (imageId) => {
                                 <RichTextEditor.Underline />
                                 <RichTextEditor.Strikethrough />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.H1 />
                                 <RichTextEditor.H2 />
                                 <RichTextEditor.H3 />
                                 <RichTextEditor.H4 />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.BulletList />
                                 <RichTextEditor.OrderedList />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.AlignLeft />
                                 <RichTextEditor.AlignCenter />
                                 <RichTextEditor.AlignRight />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.Link />
                                 <RichTextEditor.Unlink />
                               </RichTextEditor.ControlsGroup>
                             </RichTextEditor.Toolbar>
+
                             <RichTextEditor.Content />
                           </RichTextEditor>
                         </div>
@@ -2862,8 +2873,9 @@ const removeNewImage = (imageId) => {
                       </p>
                     </div>
 
-                    {/* Category, Targeted Customer, Fabric */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Category, Subcategory, Targeted Customer, Fabric */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Category */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Category <span className="text-red-500">*</span>
@@ -2884,15 +2896,36 @@ const removeNewImage = (imageId) => {
                         {errors.category && (
                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
                         )}
-                        {selectedCategoryDetails && (
-                          <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
-                            <p className="text-xs text-gray-600">
-                              <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
-                            </p>
+                      </div>
+
+                      {/* Subcategory Field */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <div className="flex items-center gap-1">
+                            <FolderTree className="w-4 h-4" />
+                            Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
                           </div>
+                        </label>
+                        <select
+                          name="subcategory"
+                          value={formData.subcategory}
+                          onChange={handleChange}
+                          disabled={!formData.category || subcategories.length === 0}
+                          className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
+                        >
+                          <option value="">-- Select Subcategory (Optional) --</option>
+                          {subcategories.map(sub => (
+                            <option key={sub._id} value={sub._id}>{sub.name}</option>
+                          ))}
+                        </select>
+                        {subcategories.length === 0 && formData.category && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            No subcategories available for this category
+                          </p>
                         )}
                       </div>
 
+                      {/* Targeted Customer */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <div className="flex items-center gap-1">
@@ -2924,6 +2957,7 @@ const removeNewImage = (imageId) => {
                         )}
                       </div>
 
+                      {/* Fabric */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Fabric (Material) <span className="text-red-500">*</span>
@@ -2943,6 +2977,25 @@ const removeNewImage = (imageId) => {
                         )}
                       </div>
                     </div>
+
+                    {/* Category Info Display */}
+                    {selectedCategoryDetails && (
+                      <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="flex items-center gap-2">
+                          <Package className="w-4 h-4 text-[#E39A65]" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              Selected Category: {selectedCategoryDetails.name}
+                            </p>
+                            {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Quick Stats for Selected Customer */}
                     {formData.targetedCustomer && (
@@ -2977,157 +3030,157 @@ const removeNewImage = (imageId) => {
                     </p>
                   </div>
                   
-                <div className="p-5">
-  {errors.images && (
-    <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
-      <AlertCircle className="w-3 h-3" />
-      {errors.images}
-    </p>
-  )}
-  
-  {/* Multiple Image Upload Button */}
-  <div className="mb-4">
-    <input
-      type="file"
-      id="multiple-images"
-      className="hidden"
-      accept="image/jpeg,image/jpg,image/png,image/webp"
-      multiple
-      onChange={handleMultipleImageSelect}
-      ref={el => {
-        if (el) fileInputRefs.current['multiple'] = el;
-      }}
-    />
-    <button
-      type="button"
-      onClick={() => fileInputRefs.current['multiple']?.click()}
-      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
-    >
-      <Upload className="w-5 h-5" />
-      <span>Select Multiple Images (Up to 6)</span>
-    </button>
-    <p className="text-xs text-gray-500 mt-2 text-center">
-      You can select multiple images at once. Images will be uploaded automatically.
-    </p>
-  </div>
+                  <div className="p-5">
+                    {errors.images && (
+                      <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.images}
+                      </p>
+                    )}
+                    
+                    {/* Multiple Image Upload Button */}
+                    <div className="mb-4">
+                      <input
+                        type="file"
+                        id="multiple-images"
+                        className="hidden"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        multiple
+                        onChange={handleMultipleImageSelect}
+                        ref={el => {
+                          if (el) fileInputRefs.current['multiple'] = el;
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRefs.current['multiple']?.click()}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
+                      >
+                        <Upload className="w-5 h-5" />
+                        <span>Select Multiple Images (Up to 6)</span>
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        You can select multiple images at once. Images will be uploaded automatically.
+                      </p>
+                    </div>
 
-  {/* Existing Images */}
-  {existingImages.length > 0 && (
-    <div className="mb-4">
-      <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {existingImages.map((image) => (
-          <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-            <img 
-              src={image.url} 
-              alt="Product" 
-              className="w-full h-full object-cover"
-            />
-            <button
-              type="button"
-              onClick={() => removeExistingImage(image.publicId, image.url)}
-              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              title="Remove Image"
-            >
-              <X className="w-3 h-3" />
-            </button>
-            {image.isPrimary && (
-              <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                Primary
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+                    {/* Existing Images */}
+                    {existingImages.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {existingImages.map((image) => (
+                            <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+                              <img 
+                                src={image.url} 
+                                alt="Product" 
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeExistingImage(image.publicId, image.url)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                title="Remove Image"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              {image.isPrimary && (
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-  {/* New Images - Dynamic display */}
-  {newImages.length > 0 && (
-    <div className="mb-4">
-      <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {newImages.map((img) => (
-          <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-            <img 
-              src={img.preview} 
-              alt="New upload" 
-              className="w-full h-full object-cover"
-            />
-            {img.uploading && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <Loader2 className="w-4 h-4 text-white animate-spin" />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => removeNewImage(img.id)}
-              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              disabled={img.uploading}
-            >
-              <X className="w-3 h-3" />
-            </button>
-            {!img.uploading && img.url && (
-              <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                Ready
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-  
- {/* Separate Upload Slots - Updated to show up to 6 slots */}
-<div className="mt-4">
-  <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
-  <div 
-    key={`slots-${existingImages.length}-${newImages.length}`}
-    className="grid grid-cols-2 gap-3"
-  >
-    {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
-      const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
-      return (
-        <div key={slotId} className="relative">
-          <input
-            type="file"
-            id={`image-upload-${slotId}`}
-            className="hidden"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onChange={(e) => handleNewImageChange(e, slotId)}
-            ref={el => {
-              if (el) fileInputRefs.current[slotId] = el;
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRefs.current[slotId]?.click()}
-            className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
-          >
-            <Upload className="w-5 h-5 text-gray-400 mb-1" />
-            <p className="text-xs text-gray-600">Upload Image</p>
-            <p className="text-xs text-gray-400">Slot {idx + 1}</p>
-          </button>
-        </div>
-      );
-    })}
-  </div>
-</div>
-  
-  {/* Upload Progress Summary */}
-  {newImages.some(img => img.uploading) && (
-    <div className="mt-4 p-2 bg-blue-50 rounded-lg">
-      <p className="text-xs text-blue-600">
-        Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
-      </p>
-    </div>
-  )}
-  
-  {/* Image Count Info */}
-  <div className="mt-4 text-xs text-gray-500 text-center">
-    {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
-  </div>
-</div>
+                    {/* New Images */}
+                    {newImages.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {newImages.map((img) => (
+                            <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+                              <img 
+                                src={img.preview} 
+                                alt="New upload" 
+                                className="w-full h-full object-cover"
+                              />
+                              {img.uploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeNewImage(img.id)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                disabled={img.uploading}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              {!img.uploading && img.url && (
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+                                  Ready
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Add More Images Slots */}
+                    <div className="mt-4">
+                      <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
+                      <div 
+                        key={`slots-${existingImages.length}-${newImages.length}`}
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
+                          const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
+                          return (
+                            <div key={slotId} className="relative">
+                              <input
+                                type="file"
+                                id={`image-upload-${slotId}`}
+                                className="hidden"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                onChange={(e) => handleNewImageChange(e, slotId)}
+                                ref={el => {
+                                  if (el) fileInputRefs.current[slotId] = el;
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => fileInputRefs.current[slotId]?.click()}
+                                className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+                              >
+                                <Upload className="w-5 h-5 text-gray-400 mb-1" />
+                                <p className="text-xs text-gray-600">Upload Image</p>
+                                <p className="text-xs text-gray-400">Slot {idx + 1}</p>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Upload Progress Summary */}
+                    {newImages.some(img => img.uploading) && (
+                      <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+                        <p className="text-xs text-blue-600">
+                          Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Image Count Info */}
+                    <div className="mt-4 text-xs text-gray-500 text-center">
+                      {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3269,27 +3322,31 @@ const removeNewImage = (imageId) => {
                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Type className="w-3 h-3 inline mr-1" />
-                              Field Name
+                              <div className="flex items-center gap-1">
+                                <Type className="w-3 h-3" />
+                                Field Name
+                              </div>
                             </label>
                             <input
                               type="text"
                               value={info.fieldName}
                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-                              placeholder="e.g., Material Care"
+                              placeholder="e.g., Material Care, Country, Warranty"
                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Hash className="w-3 h-3 inline mr-1" />
-                              Field Value
+                              <div className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                Field Value
+                              </div>
                             </label>
                             <input
                               type="text"
                               value={info.fieldValue}
                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
-                              placeholder="e.g., Machine Wash"
+                              placeholder="e.g., Machine Wash, Bangladesh, 2 Years"
                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
@@ -3297,7 +3354,8 @@ const removeNewImage = (imageId) => {
                         <button
                           type="button"
                           onClick={() => removeAdditionalInfo(index)}
-                          className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                          title="Remove Field"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -3306,11 +3364,37 @@ const removeNewImage = (imageId) => {
                     <button
                       type="button"
                       onClick={addAdditionalInfo}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50 hover:border-[#E39A65] transition-colors"
                     >
                       <PlusCircle className="w-4 h-4" />
                       Add Additional Information
                     </button>
+
+                    {formData.additionalInfo.length === 0 && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-xs font-medium text-blue-800 mb-2">Suggested fields:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Care Instructions', 'Country of Origin', 'Warranty', 'Material Composition', 'Season', 'Occasion'].map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  additionalInfo: [
+                                    ...prev.additionalInfo,
+                                    { fieldName: suggestion, fieldValue: '' }
+                                  ]
+                                }));
+                              }}
+                              className="px-2 py-1 text-xs bg-white text-blue-700 rounded-full border border-blue-300 hover:bg-blue-100 transition-colors"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3324,7 +3408,11 @@ const removeNewImage = (imageId) => {
                     <Star className="w-5 h-5 text-[#E39A65]" />
                     Product Promotion
                   </h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Mark as featured and add tags to highlight your product
+                  </p>
                 </div>
+                
                 <div className="p-5">
                   <div className="mb-4">
                     <label className="flex items-center gap-3 cursor-pointer">
@@ -3335,7 +3423,7 @@ const removeNewImage = (imageId) => {
                           setFormData({ ...formData, isFeatured: e.target.checked });
                           setShowTags(e.target.checked);
                         }}
-                        className="w-5 h-5 text-[#E39A65] border-gray-300 rounded"
+                        className="w-5 h-5 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
                       />
                       <div>
                         <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
@@ -3355,6 +3443,7 @@ const removeNewImage = (imageId) => {
                       </div>
                       <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
                     </div>
+
                     {showTags && (
                       <div className="mt-3">
                         <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
@@ -3366,16 +3455,20 @@ const removeNewImage = (imageId) => {
                                 name="productTag"
                                 checked={formData.tags.includes(tag)}
                                 onChange={() => handleTagToggle(tag)}
-                                className="w-4 h-4 text-[#E39A65] border-gray-300"
+                                className="w-4 h-4 text-[#E39A65] border-gray-300 focus:ring-[#E39A65]"
                               />
                               <span className="text-sm text-gray-600">{tag}</span>
                             </label>
                           ))}
                         </div>
+                        
                         {formData.tags.length > 0 && (
                           <div className="mt-4 flex flex-wrap gap-2">
                             {formData.tags.map(tag => (
-                              <span key={tag} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              <span
+                                key={tag}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                              >
                                 {tag}
                                 <button
                                   type="button"
@@ -3409,59 +3502,89 @@ const removeNewImage = (imageId) => {
                     </h2>
                     <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Optimize your product for search engines
+                  </p>
                 </div>
+                
                 {showMeta && (
                   <div className="p-5">
                     <div className="space-y-4">
-                      {/* Meta Title */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Title
+                        </label>
                         <input
                           type="text"
                           value={formData.metaSettings.metaTitle}
                           onChange={(e) => handleMetaChange('metaTitle', e.target.value)}
                           maxLength="70"
                           placeholder="Enter meta title (max 70 characters)"
-                          className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                            errors.metaTitle ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
                         <div className="flex justify-between mt-1">
                           <p className="text-xs text-gray-500">Appears in search engine results</p>
-                          <span className="text-xs text-gray-500">{formData.metaSettings.metaTitle?.length || 0}/70</span>
+                          <span className={`text-xs ${formData.metaSettings.metaTitle?.length > 60 ? 'text-orange-600' : 'text-gray-500'}`}>
+                            {formData.metaSettings.metaTitle?.length || 0}/70
+                          </span>
                         </div>
+                        {errors.metaTitle && (
+                          <p className="text-xs text-red-600 mt-1">{errors.metaTitle}</p>
+                        )}
                       </div>
 
-                      {/* Meta Description */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Description
+                        </label>
                         <textarea
                           value={formData.metaSettings.metaDescription}
                           onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
                           maxLength="160"
                           placeholder="Enter meta description (max 160 characters)"
                           rows="3"
-                          className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none"
+                          className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition resize-none ${
+                            errors.metaDescription ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
                         <div className="flex justify-between mt-1">
                           <p className="text-xs text-gray-500">Brief description for search results</p>
-                          <span className="text-xs text-gray-500">{formData.metaSettings.metaDescription?.length || 0}/160</span>
+                          <span className={`text-xs ${formData.metaSettings.metaDescription?.length > 150 ? 'text-orange-600' : 'text-gray-500'}`}>
+                            {formData.metaSettings.metaDescription?.length || 0}/160
+                          </span>
                         </div>
+                        {errors.metaDescription && (
+                          <p className="text-xs text-red-600 mt-1">{errors.metaDescription}</p>
+                        )}
                       </div>
 
-                      {/* Meta Keywords */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Keywords
+                        </label>
+                        
                         {formData.metaSettings.metaKeywords?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                             {formData.metaSettings.metaKeywords.map((keyword, index) => (
-                              <span key={index} className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                              >
                                 {keyword}
-                                <button type="button" onClick={() => removeKeyword(index)} className="ml-1.5 text-blue-600 hover:text-blue-800">
+                                <button
+                                  type="button"
+                                  onClick={() => removeKeyword(index)}
+                                  className="ml-1.5 text-blue-600 hover:text-blue-800 focus:outline-none"
+                                >
                                   <X className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
                           </div>
                         )}
+                        
                         <div className="relative">
                           <input
                             type="text"
@@ -3486,6 +3609,23 @@ const removeNewImage = (imageId) => {
                           Type a keyword and press Enter or comma to add. Keywords appear as chips above.
                         </p>
                       </div>
+
+                      {(formData.metaSettings.metaTitle || formData.metaSettings.metaDescription) && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <h4 className="text-xs font-medium text-gray-700 mb-2">Search Engine Preview:</h4>
+                          <div className="space-y-1">
+                            <div className="text-blue-600 text-sm font-medium truncate">
+                              {formData.metaSettings.metaTitle || formData.productName || 'Product Title'}
+                            </div>
+                            <div className="text-green-600 text-xs">
+                              {typeof window !== 'undefined' ? `${window.location.origin}/product/${formData.productName?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}` : ''}
+                            </div>
+                            <div className="text-gray-600 text-xs line-clamp-2">
+                              {formData.metaSettings.metaDescription || formData.description?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Product description will appear here...'}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -3501,6 +3641,7 @@ const removeNewImage = (imageId) => {
                     Bulk Pricing
                   </h2>
                 </div>
+                
                 <div className="p-5 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -3512,11 +3653,17 @@ const removeNewImage = (imageId) => {
                         name="moq"
                         value={formData.moq}
                         onChange={handleChange}
+                        onWheel={(e) => e.target.blur()}
                         min="1"
-                        className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                          errors.moq ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
-                      {errors.moq && <p className="text-xs text-red-600 mt-1">{errors.moq}</p>}
+                      {errors.moq && (
+                        <p className="text-xs text-red-600 mt-1">{errors.moq}</p>
+                      )}
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Price Per Unit ($) <span className="text-red-500">*</span>
@@ -3526,17 +3673,24 @@ const removeNewImage = (imageId) => {
                         name="pricePerUnit"
                         value={formData.pricePerUnit}
                         onChange={handleChange}
+                        onWheel={(e) => e.target.blur()}
                         min="0"
                         step="0.01"
-                        className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
+                        className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                          errors.pricePerUnit ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
-                      {errors.pricePerUnit && <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>}
+                      {errors.pricePerUnit && (
+                        <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>
+                      )}
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <label className="block text-sm font-medium text-gray-700">Quantity Based Pricing:</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Quantity Based Pricing:
+                      </label>
                       <button
                         type="button"
                         onClick={addPricingRow}
@@ -3546,11 +3700,14 @@ const removeNewImage = (imageId) => {
                         Add Tier
                       </button>
                     </div>
+                    
                     <div className="space-y-4">
                       {formData.quantityBasedPricing.map((tier, index) => (
                         <div key={index} className="flex items-start gap-3">
                           <div className="w-1/2">
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Quantity Range</label>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              Quantity Range
+                            </label>
                             <input
                               type="text"
                               value={tier.range}
@@ -3559,24 +3716,30 @@ const removeNewImage = (imageId) => {
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
+                          
                           <div className="w-1/2">
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Price ($)</label>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              Price ($)
+                            </label>
                             <input
                               type="number"
                               value={tier.price}
                               onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
+                              onWheel={(e) => e.target.blur()}
                               placeholder="0.00"
                               min="0"
                               step="0.01"
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
+                          
                           {formData.quantityBasedPricing.length > 1 && (
                             <div className="flex items-end h-[62px]">
                               <button
                                 type="button"
                                 onClick={() => removePricingRow(index)}
                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Remove Tier"
                               >
                                 <MinusCircle className="w-5 h-5" />
                               </button>

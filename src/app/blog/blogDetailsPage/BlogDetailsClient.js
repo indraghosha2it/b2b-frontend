@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/app/components/layout/Navbar';
 import Footer from '@/app/components/layout/Footer';
+import WhatsAppButton from '@/app/components/layout/WhatsAppButton';
 
 export default function BlogDetailsClient() {
   const searchParams = useSearchParams();
@@ -355,12 +356,12 @@ export default function BlogDetailsClient() {
                     </div>
                     <span>{blog.author}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-white/10 rounded-lg">
                       <Clock className="w-4 h-4" />
                     </div>
                     <span>{getReadingTime(blog.content)} min read</span>
-                  </div>
+                  </div> */}
                  
                 </motion.div>
               </div>
@@ -669,6 +670,7 @@ export default function BlogDetailsClient() {
       </section>
 
       <Footer />
+      <WhatsAppButton />
 
       {/* Global styles for rich text content - Matches product page exactly */}
       <style jsx global>{`

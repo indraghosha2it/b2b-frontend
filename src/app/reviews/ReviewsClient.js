@@ -26,6 +26,7 @@ import {
 import { toast } from 'sonner';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function AllReviewsPage() {
   const [reviews, setReviews] = useState([]);
@@ -773,6 +774,7 @@ export default function AllReviewsPage() {
       </AnimatePresence>
 
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }

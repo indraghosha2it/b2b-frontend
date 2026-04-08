@@ -27,6 +27,7 @@ import {
   Filter
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import WhatsAppButton from '../components/layout/WhatsAppButton';
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState([]);
@@ -130,7 +131,7 @@ export default function BlogPage() {
 
   // Calculate reading time
   const getReadingTime = (content) => {
-    const wordsPerMinute = 60;
+    const wordsPerMinute = 10;
     const wordCount = content?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0;
     const minutes = Math.ceil(wordCount / wordsPerMinute);
     return minutes;
@@ -634,12 +635,12 @@ export default function BlogPage() {
                               )}
                               
                               {/* Reading Time Badge */}
-                              <motion.div 
+                              {/* <motion.div 
                                 className="absolute top-2 right-2 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700 shadow-sm"
                                 whileHover={{ scale: 1.1 }}
                               >
                                 {getReadingTime(blog.content)} min read
-                              </motion.div>
+                              </motion.div> */}
                             </motion.div>
 
                             {/* Content */}
@@ -780,6 +781,7 @@ export default function BlogPage() {
       </section>
 
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }
