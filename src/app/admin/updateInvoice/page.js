@@ -35,7 +35,8 @@
 //   CreditCard,
 //   Wallet,
 //   Landmark,
-//   Lock
+//   Lock,
+//   AlertTriangle
 // } from 'lucide-react';
 // import { toast } from 'sonner';
 
@@ -46,16 +47,6 @@
 //     currency: 'USD',
 //     minimumFractionDigits: 2
 //   }).format(price || 0);
-// };
-
-// // Helper function to format date
-// const formatDate = (dateString) => {
-//   const date = new Date(dateString);
-//   return date.toLocaleDateString('en-US', {
-//     year: 'numeric',
-//     month: 'long',
-//     day: 'numeric'
-//   });
 // };
 
 // // Default logo URL
@@ -124,9 +115,9 @@
 //         value={displayValue}
 //         onChange={handleChange}
 //         onBlur={handleBlur}
-//           onWheel={(e) => e.target.blur()}
+//         onWheel={(e) => e.target.blur()}
 //         readOnly={readOnly}
-//         className={`w-14 px-1 py-1.5 text-xs text-center border-none focus:outline-none ${!readOnly && 'focus:ring-2 focus:ring-[#E39A65]'}  ${readOnly ? 'bg-gray-50 text-gray-600' : ''}`}
+//         className={`w-14 px-1 py-1.5 text-xs text-center border-none focus:outline-none ${!readOnly && 'focus:ring-2 focus:ring-[#E39A65]'} ${readOnly ? 'bg-gray-50 text-gray-600' : ''}`}
 //         placeholder="0"
 //       />
 //       {!readOnly && (
@@ -142,12 +133,51 @@
 //   );
 // };
 
+// // Banking Term Field Component
+// const BankingTermField = ({ field, onUpdate, onRemove, readOnly = false }) => {
+//   return (
+//     <div className="flex flex-col sm:flex-row items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+//       <div className="flex-1 w-full">
+//         <input
+//           type="text"
+//           value={field.title}
+//           onChange={(e) => onUpdate(field.id, 'title', e.target.value)}
+//           readOnly={readOnly}
+//           placeholder="Term title (e.g., Payment Terms, Late Fee)"
+//           className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent mb-2 ${readOnly ? 'bg-gray-50 text-gray-600' : ''}`}
+//         />
+//         <textarea
+//           value={field.value}
+//           onChange={(e) => onUpdate(field.id, 'value', e.target.value)}
+//           readOnly={readOnly}
+//           placeholder="Term description or value (optional - can be left empty)"
+//           rows="2"
+//           className={`w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent ${readOnly ? 'bg-gray-50 text-gray-600' : ''}`}
+//         />
+//         <p className="text-xs text-gray-400 mt-1">
+//           You can leave the value empty if this is just a heading or note
+//         </p>
+//       </div>
+//       {!readOnly && (
+//         <button
+//           onClick={() => onRemove(field.id)}
+//           className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+//           title="Remove term"
+//         >
+//           <Trash2 className="w-4 h-4" />
+//         </button>
+//       )}
+//     </div>
+//   );
+// };
+
 // // Product Item Card Component
 // const ProductItemCard = ({ 
 //   item, 
 //   itemIndex, 
 //   product, 
 //   onUpdate, 
+//   onUpdateUnitPrice,  
 //   onAddColor, 
 //   onAddSize, 
 //   onRemoveColor, 
@@ -157,6 +187,7 @@
 //   onToggleExpand,
 //   readOnly = false
 // }) => {
+  
 //   const availableColors = product?.colors || [];
 //   const availableSizes = product?.sizes || [];
 
@@ -191,143 +222,180 @@
 //   return (
 //     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
 //       <div 
-//         className={`bg-gradient-to-r from-gray-50 to-white px-5 py-4 border-b border-gray-200 ${!readOnly && 'cursor-pointer hover:bg-gray-100/50'} transition-colors`}
+//         className={`bg-gradient-to-r from-gray-50 to-white px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-200 ${!readOnly && 'cursor-pointer hover:bg-gray-100/50'} transition-colors`}
 //         onClick={readOnly ? undefined : onToggleExpand}
 //       >
-//         <div className="flex items-start gap-4">
-//           <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-//             <img 
-//               src={imageUrl} 
-//               alt={item.productName}
-//               className="w-full h-full object-cover"
-//               onError={(e) => {
-//                 e.target.onerror = null;
-//                 e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
-//               }}
-//             />
-//           </div>
-          
-//           <div className="flex-1">
-//             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-//               <div className="flex-1">
-//                 <h3 className="text-base font-semibold text-gray-900">{item.productName}</h3>
-//                 <div className="flex items-center gap-3 mt-1">
-//                   <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
-//                     {item.colors.length} Colors
-//                   </span>
-//                   <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">
-//                     {item.totalQuantity} Total Pcs
-//                   </span>
-//                 </div>
-//               </div>
+//         <div className="flex flex-col gap-3">
+//           {/* Row 1: Image and Product Name + Stats Row */}
+//           <div className="flex items-start gap-3 sm:gap-4">
+//             {/* Product Image */}
+//             <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+//               <img 
+//                 src={imageUrl} 
+//                 alt={item.productName}
+//                 className="w-full h-full object-cover"
+//                 onError={(e) => {
+//                   e.target.onerror = null;
+//                   e.target.src = 'https://via.placeholder.com/80x80?text=No+Image';
+//                 }}
+//               />
+//             </div>
+            
+//             {/* Product Info Area */}
+//             <div className="flex-1">
+//               {/* Product Name */}
+//               <h3 className="text-sm sm:text-base font-semibold text-gray-900">{item.productName}</h3>
               
-//               <div className="flex items-center gap-4">
-//                 <div className="text-right">
-//                   <p className="text-xs text-gray-500">Unit Price</p>
-//                   <p className="text-base font-bold text-[#E39A65]">{formatPrice(item.unitPrice)}</p>
-//                 </div>
-                
-//                 <div className="text-right min-w-[100px]">
-//                   <p className="text-xs text-gray-500">Product Total</p>
-//                   <p className="text-base font-bold text-[#E39A65]">{formatPrice(productTotalPrice)}</p>
-//                 </div>
-                
-//                 {!readOnly && (
-//                   <div className="flex items-center gap-1 ml-2">
-//                     <button 
-//                       onClick={(e) => {
-//                         e.stopPropagation();
-//                         onRemoveProduct(itemIndex);
-//                       }}
-//                       className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
-//                       title="Remove product"
-//                     >
-//                       <Trash2 className="w-4 h-4 text-red-500" />
-//                     </button>
-//                     <button 
-//                       onClick={(e) => {
-//                         e.stopPropagation();
-//                         onToggleExpand();
-//                       }}
-//                       className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
-//                     >
-//                       {isExpanded ? (
-//                         <ChevronUp className="w-5 h-5 text-gray-500" />
-//                       ) : (
-//                         <ChevronDown className="w-5 h-5 text-gray-500" />
-//                       )}
-//                     </button>
-//                   </div>
-//                 )}
+//               {/* Stats Row - Colors and Total Pcs */}
+//               <div className="flex flex-wrap items-center gap-2 mt-2">
+//                 <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+//                   {item.colors.length} Colors
+//                 </span>
+//                 <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">
+//                   {item.totalQuantity} Total Pcs
+//                 </span>
 //               </div>
 //             </div>
+//           </div>
+          
+//           {/* Row 2: Pricing and Actions */}
+//           <div className="flex items-center justify-between gap-3 ml-0 sm:ml-0">
+//             {/* Unit Price */}
+//             <div className="text-left">
+//               <p className="text-xs text-gray-500">Unit Price</p>
+//               <p className="text-sm sm:text-base font-bold text-[#E39A65]">{formatPrice(item.unitPrice)}</p>
+//             </div>
+            
+//             {/* Product Total */}
+//             <div className="text-left">
+//               <p className="text-xs text-gray-500">Product Total</p>
+//               <p className="text-sm sm:text-base font-bold text-[#E39A65]">{formatPrice(productTotalPrice)}</p>
+//             </div>
+            
+//             {/* Action Buttons */}
+//             {!readOnly && (
+//               <div className="flex items-center gap-1">
+//                 <button 
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     onRemoveProduct(itemIndex);
+//                   }}
+//                   className="p-1.5 hover:bg-red-100 rounded-lg transition-colors"
+//                   title="Remove product"
+//                 >
+//                   <Trash2 className="w-4 h-4 text-red-500" />
+//                 </button>
+//                 <button 
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     onToggleExpand();
+//                   }}
+//                   className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+//                 >
+//                   {isExpanded ? (
+//                     <ChevronUp className="w-5 h-5 text-gray-500" />
+//                   ) : (
+//                     <ChevronDown className="w-5 h-5 text-gray-500" />
+//                   )}
+//                 </button>
+//               </div>
+//             )}
 //           </div>
 //         </div>
 //       </div>
 
 //       {isExpanded && (
-//         <div className="p-5 space-y-4">
-//           {item.colors.map((color, colorIndex) => (
-//             <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-4 border border-gray-100">
-//               <div className="flex items-center justify-between mb-3">
-//                 <div className="flex items-center gap-2">
-//                   <div 
-//                     className="w-6 h-6 rounded-full border-2 border-white shadow-md" 
-//                     style={{ backgroundColor: color.color.code }}
-//                   />
-//                   <span className="text-sm font-semibold text-gray-800">
-//                     {color.color.name || color.color.code}
-//                   </span>
-//                   <span className="text-xs bg-white px-2 py-1 rounded-full border border-gray-200">
-//                     {color.totalForColor} pcs
-//                   </span>
+//         <div className="p-4 sm:p-5 space-y-4">
+//           {item.colors.map((color, colorIndex) => {
+//             const colorTotal = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+//             const displayUnitPrice = color.unitPrice || 0;
+            
+//             return (
+//               <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
+//                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+//                   <div className="flex items-center gap-2">
+//                     <div 
+//                       className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md" 
+//                       style={{ backgroundColor: color.color.code }}
+//                     />
+//                     <span className="text-xs sm:text-sm font-semibold text-gray-800">
+//                       {color.color.name || color.color.code}
+//                     </span>
+//                     <span className="text-[10px] sm:text-xs bg-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-gray-200">
+//                       {colorTotal} pcs
+//                     </span>
+//                   </div>
+                  
+//                   {/* Editable Unit Price */}
+//                   <div className="flex items-center gap-2">
+//                     {colorTotal > 0 && (
+//                       <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full">
+//                         <span className="text-[9px] sm:text-[10px] text-gray-500">$</span>
+//                         <input
+//                           type="number"
+//                           step="0.01"
+//                           min="0"
+//                           value={displayUnitPrice}
+//                           onChange={(e) => {
+//                             const newPrice = parseFloat(e.target.value) || 0;
+//                             if (onUpdateUnitPrice) {
+//                               onUpdateUnitPrice(itemIndex, colorIndex, newPrice);
+//                             }
+//                           }}
+//                           readOnly={readOnly}
+//                           className="w-16 sm:w-20 px-1 py-0.5 text-[9px] sm:text-[10px] text-center bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//                         />
+//                         <span className="text-[9px] sm:text-[10px] text-gray-500">/pc</span>
+//                       </div>
+//                     )}
+//                     {!readOnly && (
+//                       <button
+//                         onClick={() => handleRemoveColor(colorIndex)}
+//                         className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
+//                         title="Remove color"
+//                       >
+//                         <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+//                       </button>
+//                     )}
+//                   </div>
 //                 </div>
-//                 {!readOnly && (
-//                   <button
-//                     onClick={() => handleRemoveColor(colorIndex)}
-//                     className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-//                     title="Remove color"
-//                   >
-//                     <Trash2 className="w-4 h-4" />
-//                   </button>
-//                 )}
-//               </div>
 
-//               <div className="flex flex-wrap gap-2 mt-3">
-//                 {color.sizeQuantities.map((sq, sizeIndex) => (
-//                   <SizeBadge
-//                     key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
-//                     size={sq.size}
-//                     quantity={sq.quantity}
-//                     onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
-//                     onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
-//                     readOnly={readOnly}
-//                   />
-//                 ))}
-                
-//                 {!readOnly && availableSizes.length > 0 && (
-//                   <select
-//                     onChange={(e) => {
-//                       if (e.target.value) {
-//                         handleAddSize(colorIndex, e.target.value);
-//                         e.target.value = '';
+//                 <div className="flex flex-wrap gap-2 mt-3">
+//                   {color.sizeQuantities.map((sq, sizeIndex) => (
+//                     <SizeBadge
+//                       key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
+//                       size={sq.size}
+//                       quantity={sq.quantity}
+//                       onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
+//                       onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
+//                       readOnly={readOnly}
+//                     />
+//                   ))}
+                  
+//                   {!readOnly && availableSizes.length > 0 && (
+//                     <select
+//                       onChange={(e) => {
+//                         if (e.target.value) {
+//                           handleAddSize(colorIndex, e.target.value);
+//                           e.target.value = '';
+//                         }
+//                       }}
+//                       className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
+//                       value=""
+//                     >
+//                       <option value="">+ Add Size</option>
+//                       {availableSizes
+//                         .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
+//                         .map(size => (
+//                           <option key={size} value={size}>{size}</option>
+//                         ))
 //                       }
-//                     }}
-//                     className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
-//                     value=""
-//                   >
-//                     <option value="">+ Add Size</option>
-//                     {availableSizes
-//                       .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
-//                       .map(size => (
-//                         <option key={size} value={size}>{size}</option>
-//                       ))
-//                     }
-//                   </select>
-//                 )}
+//                     </select>
+//                   )}
+//                 </div>
 //               </div>
-//             </div>
-//           ))}
+//             );
+//           })}
 
 //           {!readOnly && availableColors.length > 0 && (
 //             <div className="mt-4 pt-3 border-t border-gray-200">
@@ -368,7 +436,7 @@
 //   );
 // };
 
-// // Search Product Modal
+// // Search Product Modal Component
 // const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductIds }) => {
 //   const [searchTerm, setSearchTerm] = useState('');
 //   const [searchResults, setSearchResults] = useState([]);
@@ -386,7 +454,7 @@
 //   const searchProducts = async () => {
 //     setSearching(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=10`);
+//       const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
 //       const data = await response.json();
 //       if (data.success) {
 //         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -404,24 +472,15 @@
 //     setSelectedProduct(product);
 //   };
 
-//   const handleAddProduct = () => {
-//     if (selectedProduct) {
-//       onSelectProduct(selectedProduct);
-//       setSearchTerm('');
-//       setSearchResults([]);
-//       setSelectedProduct(null);
-//       onClose();
-//     }
-//   };
-
 //   if (!isOpen) return null;
 
 //   return (
-//     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-//       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-//         <div className="p-6 border-b border-gray-200">
+//     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+//       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
+//         {/* Header - Fixed */}
+//         <div className="flex-shrink-0 p-4 sm:p-6 border-b border-gray-200">
 //           <div className="flex items-center justify-between">
-//             <h2 className="text-xl font-semibold text-gray-900">Add Product to Invoice</h2>
+//             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add Product to Invoice</h2>
 //             <button
 //               onClick={onClose}
 //               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -431,8 +490,9 @@
 //           </div>
 //         </div>
 
-//         <div className="p-6">
-//           <div className="relative mb-4">
+//         {/* Search Input - Fixed */}
+//         <div className="flex-shrink-0 p-4 sm:p-6 pb-0">
+//           <div className="relative">
 //             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
 //             <input
 //               type="text"
@@ -446,8 +506,11 @@
 //               <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 animate-spin text-[#E39A65]" />
 //             )}
 //           </div>
+//         </div>
 
-//           <div className="space-y-2 max-h-96 overflow-y-auto">
+//         {/* Products List - Scrollable */}
+//         <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 pt-4">
+//           <div className="space-y-2">
 //             {searchResults.length > 0 ? (
 //               searchResults.map((product) => (
 //                 <div
@@ -459,46 +522,66 @@
 //                       : 'border-gray-200 hover:border-[#E39A65] hover:bg-gray-50'
 //                   }`}
 //                 >
-//                   <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+//                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
 //                     <img
 //                       src={product.images?.[0]?.url || 'https://via.placeholder.com/48'}
 //                       alt={product.productName}
 //                       className="w-full h-full object-cover"
 //                     />
 //                   </div>
-//                   <div className="flex-1">
-//                     <h3 className="text-sm font-medium text-gray-900">{product.productName}</h3>
-//                     <p className="text-xs text-gray-500 mt-0.5">
+//                   <div className="flex-1 min-w-0">
+//                     <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">{product.productName}</h3>
+//                     <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
 //                       {product.colors?.length || 0} colors • {product.sizes?.length || 0} sizes
 //                     </p>
 //                   </div>
-//                   <div className="text-right">
-//                     <p className="text-sm font-bold text-[#E39A65]">{formatPrice(product.pricePerUnit)}</p>
-//                     <p className="text-xs text-gray-500">MOQ: {product.moq}</p>
+//                   <div className="text-right flex-shrink-0">
+//                     <p className="text-xs sm:text-sm font-bold text-[#E39A65]">{formatPrice(product.pricePerUnit)}</p>
+//                     <p className="text-[10px] sm:text-xs text-gray-500">MOQ: {product.moq}</p>
 //                   </div>
 //                 </div>
 //               ))
 //             ) : searchTerm.length > 2 && !searching ? (
-//               <div className="text-center py-8">
-//                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+//               <div className="text-center py-8 sm:py-12">
+//                 <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
 //                 <p className="text-sm text-gray-500">No products found</p>
+//                 <p className="text-xs text-gray-400 mt-1">Try searching with different keywords</p>
 //               </div>
-//             ) : null}
+//             ) : searchTerm.length > 0 && searchTerm.length <= 2 ? (
+//               <div className="text-center py-8 sm:py-12">
+//                 <Search className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+//                 <p className="text-sm text-gray-500">Type at least 3 characters to search</p>
+//               </div>
+//             ) : (
+//               <div className="text-center py-8 sm:py-12">
+//                 <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3" />
+//                 <p className="text-sm text-gray-500">Start typing to search for products</p>
+//               </div>
+//             )}
 //           </div>
 //         </div>
 
-//         <div className="p-6 border-t border-gray-200 bg-gray-50">
+//         {/* Footer - Fixed */}
+//         <div className="flex-shrink-0 p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
 //           <div className="flex justify-end gap-2">
 //             <button
 //               onClick={onClose}
-//               className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+//               className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
 //             >
 //               Cancel
 //             </button>
 //             <button
-//               onClick={handleAddProduct}
+//               onClick={() => {
+//                 if (selectedProduct) {
+//                   onSelectProduct(selectedProduct);
+//                   setSearchTerm('');
+//                   setSearchResults([]);
+//                   setSelectedProduct(null);
+//                   onClose();
+//                 }
+//               }}
 //               disabled={!selectedProduct}
-//               className="px-4 py-2 text-sm font-medium bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//               className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 //             >
 //               Add Product
 //             </button>
@@ -521,7 +604,10 @@
 //   const [expandedItems, setExpandedItems] = useState({});
 //   const [showProductSearch, setShowProductSearch] = useState(false);
 //   const [dynamicFields, setDynamicFields] = useState([]);
+//   const [bankingTerms, setBankingTerms] = useState([]);
 //   const [isPaid, setIsPaid] = useState(false);
+//   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+//   const [productToDelete, setProductToDelete] = useState(null);
   
 //   const [invoiceData, setInvoiceData] = useState({
 //     invoiceNumber: '',
@@ -582,6 +668,29 @@
 //     paymentStatus: 'unpaid'
 //   });
 
+//   // Banking Terms Handlers
+//   const handleAddBankingTerm = () => {
+//     if (isPaid) return;
+//     setBankingTerms(prev => [
+//       ...prev,
+//       { id: Date.now(), title: '', value: '' }
+//     ]);
+//   };
+
+//   const handleBankingTermUpdate = (id, field, value) => {
+//     if (isPaid) return;
+//     setBankingTerms(prev =>
+//       prev.map(term =>
+//         term.id === id ? { ...term, [field]: value } : term
+//       )
+//     );
+//   };
+
+//   const handleRemoveBankingTerm = (id) => {
+//     if (isPaid) return;
+//     setBankingTerms(prev => prev.filter(term => term.id !== id));
+//   };
+
 //   // Fetch invoice data
 //   useEffect(() => {
 //     if (!invoiceId) {
@@ -619,6 +728,15 @@
 //         };
 
 //         setInvoiceData(formattedInvoice);
+
+//         // Set banking terms if they exist
+//         if (invoice.bankingTerms && invoice.bankingTerms.length > 0) {
+//           setBankingTerms(invoice.bankingTerms.map((term, index) => ({
+//             id: Date.now() + index,
+//             title: term.title || '',
+//             value: term.value || ''
+//           })));
+//         }
 
 //         // Fetch product details for each item
 //         if (invoice.items && invoice.items.length > 0) {
@@ -702,10 +820,15 @@
 //     }));
 //   };
 
-//   const calculateUnitPrice = (productId, totalQuantity) => {
+//   const calculateUnitPrice = (productId, quantity) => {
 //     const product = productDetails[productId];
-//     if (!product || !product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
-//       return product?.pricePerUnit || 0;
+//     if (!product) return 0;
+    
+//     if (quantity === 0) return product.pricePerUnit;
+//     if (quantity < product.moq) return product.pricePerUnit;
+    
+//     if (!product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
+//       return product.pricePerUnit;
 //     }
 
 //     const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
@@ -718,40 +841,59 @@
 //       const range = tier.range;
 //       if (range.includes('-')) {
 //         const [min, max] = range.split('-').map(Number);
-//         if (totalQuantity >= min && totalQuantity <= max) {
+//         if (quantity >= min && quantity <= max) {
 //           return tier.price;
 //         }
 //       } else if (range.includes('+')) {
 //         const minQty = parseInt(range.replace('+', ''));
-//         if (totalQuantity >= minQty) {
+//         if (quantity >= minQty) {
 //           return tier.price;
 //         }
 //       }
 //     }
 
 //     const highestTier = sortedTiers[sortedTiers.length - 1];
-//     return highestTier?.price || product.pricePerUnit;
+//     if (highestTier && highestTier.range.includes('-') && quantity > parseInt(highestTier.range.split('-')[1])) {
+//       return highestTier.price;
+//     }
+    
+//     return product.pricePerUnit;
 //   };
 
 //   const recalculateTotals = (items) => {
 //     let subtotal = 0;
     
 //     const updatedItems = items.map(item => {
-//       const itemTotalQty = item.colors.reduce((sum, color) => {
-//         const colorQty = color.sizeQuantities.reduce((s, sq) => s + (sq.quantity || 0), 0);
-//         return sum + colorQty;
-//       }, 0);
+//       let itemTotalQty = 0;
+//       let itemTotalPrice = 0;
       
-//       const unitPrice = calculateUnitPrice(item.productId, itemTotalQty);
-//       const itemTotal = itemTotalQty * unitPrice;
+//       item.colors.forEach(color => {
+//         const colorQty = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+        
+//         let unitPrice;
+        
+//         if (color.unitPrice && color.unitPrice > 0) {
+//           unitPrice = color.unitPrice;
+//         } else if (item.originalUnitPrice && item.originalUnitPrice > 0) {
+//           unitPrice = item.originalUnitPrice;
+//         } else {
+//           unitPrice = calculateUnitPrice(item.productId, colorQty);
+//         }
+        
+//         const colorTotal = colorQty * unitPrice;
+//         itemTotalQty += colorQty;
+//         itemTotalPrice += colorTotal;
+        
+//         color.unitPrice = unitPrice;
+//       });
       
-//       subtotal += itemTotal;
+//       subtotal += itemTotalPrice;
       
 //       return {
 //         ...item,
 //         totalQuantity: itemTotalQty,
-//         unitPrice,
-//         total: itemTotal
+//         unitPrice: item.unitPrice || 0,
+//         total: itemTotalPrice
 //       };
 //     });
     
@@ -766,6 +908,23 @@
       
 //       color.sizeQuantities[sizeIndex].quantity = newQuantity;
 //       color.totalForColor = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+      
+//       const { items, subtotal } = recalculateTotals(updatedItems);
+      
+//       return {
+//         ...prev,
+//         items,
+//         subtotal
+//       };
+//     });
+//   };
+
+//   const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
+//     setInvoiceData(prev => {
+//       const updatedItems = JSON.parse(JSON.stringify(prev.items));
+//       const color = updatedItems[itemIndex].colors[colorIndex];
+      
+//       color.unitPrice = newUnitPrice;
       
 //       const { items, subtotal } = recalculateTotals(updatedItems);
       
@@ -800,7 +959,8 @@
 //           name: colorName || colorCode
 //         },
 //         sizeQuantities,
-//         totalForColor: 0
+//         totalForColor: 0,
+//         unitPrice: product.pricePerUnit
 //       });
       
 //       const { items, subtotal } = recalculateTotals(updatedItems);
@@ -879,29 +1039,35 @@
 //   };
 
 //   const handleRemoveProduct = (itemIndex) => {
-//     if (isPaid) return;
-//     if (!confirm('Are you sure you want to remove this product from the invoice?')) return;
-    
-//     setInvoiceData(prev => {
-//       const updatedItems = JSON.parse(JSON.stringify(prev.items));
-//       updatedItems.splice(itemIndex, 1);
-      
-//       const { items, subtotal } = recalculateTotals(updatedItems);
-      
-//       const newExpandedItems = {};
-//       items.forEach((_, index) => {
-//         newExpandedItems[index] = true;
+//     setProductToDelete(itemIndex);
+//     setShowDeleteConfirm(true);
+//   };
+
+//   const handleConfirmRemoveProduct = () => {
+//     if (productToDelete !== null) {
+//       setInvoiceData(prev => {
+//         const updatedItems = JSON.parse(JSON.stringify(prev.items));
+//         updatedItems.splice(productToDelete, 1);
+        
+//         const { items, subtotal } = recalculateTotals(updatedItems);
+        
+//         const newExpandedItems = {};
+//         items.forEach((_, index) => {
+//           newExpandedItems[index] = true;
+//         });
+//         setExpandedItems(newExpandedItems);
+        
+//         toast.success('Product removed from invoice');
+        
+//         return {
+//           ...prev,
+//           items,
+//           subtotal
+//         };
 //       });
-//       setExpandedItems(newExpandedItems);
-      
-//       toast.success('Product removed from invoice');
-      
-//       return {
-//         ...prev,
-//         items,
-//         subtotal
-//       };
-//     });
+//     }
+//     setShowDeleteConfirm(false);
+//     setProductToDelete(null);
 //   };
 
 //   const handleAddProduct = (product) => {
@@ -1118,7 +1284,10 @@
 //         field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
 //       );
       
-//       // Get the current admin user from localStorage
+//       const validBankingTerms = bankingTerms.filter(
+//         term => term.title.trim() !== '' || term.value.trim() !== ''
+//       );
+      
 //       const userStr = localStorage.getItem('user');
 //       let adminId = null;
       
@@ -1131,7 +1300,6 @@
 //         }
 //       }
 
-//       // Format the items to match backend schema
 //       const formattedItems = invoiceData.items.map(item => ({
 //         productId: item.productId,
 //         productName: item.productName,
@@ -1144,7 +1312,8 @@
 //             size: sq.size,
 //             quantity: sq.quantity
 //           })),
-//           totalForColor: color.totalForColor
+//           totalForColor: color.totalForColor,
+//           unitPrice: color.unitPrice || 0
 //         })),
 //         totalQuantity: item.totalQuantity,
 //         unitPrice: item.unitPrice,
@@ -1153,7 +1322,6 @@
 //         total: item.total
 //       }));
 
-//       // Create payload matching backend schema
 //       const invoicePayload = {
 //         invoiceNumber: invoiceData.invoiceNumber,
 //         invoiceDate: invoiceData.invoiceDate,
@@ -1161,7 +1329,6 @@
 //         inquiryId: invoiceData.inquiryId,
 //         inquiryNumber: invoiceData.inquiryNumber,
         
-//         // Customer info
 //         customer: {
 //           companyName: invoiceData.customer?.companyName || '',
 //           contactPerson: invoiceData.customer?.contactPerson || '',
@@ -1178,7 +1345,6 @@
 //           shippingCountry: invoiceData.customer?.shippingCountry || ''
 //         },
         
-//         // Company info
 //         company: {
 //           logo: invoiceData.company?.logo || '',
 //           logoPublicId: invoiceData.company?.logoPublicId || '',
@@ -1189,7 +1355,6 @@
 //           address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
 //         },
         
-//         // Bank details
 //         bankDetails: {
 //           bankName: invoiceData.bankDetails?.bankName || '',
 //           accountName: invoiceData.bankDetails?.accountName || '',
@@ -1201,10 +1366,13 @@
 //           bankAddress: invoiceData.bankDetails?.bankAddress || ''
 //         },
         
-//         // Items
+//         bankingTerms: validBankingTerms.map(term => ({
+//           title: term.title.trim(),
+//           value: term.value.trim()
+//         })),
+        
 //         items: formattedItems,
         
-//         // Calculations
 //         subtotal: subtotal,
 //         vatPercentage: vatPercentage,
 //         vatAmount: vatAmount,
@@ -1217,15 +1385,12 @@
 //         amountPaid: paidAmount,
 //         dueAmount: dueAmount,
         
-//         // Status fields
 //         paymentStatus: status.text.toLowerCase(),
         
-//         // Additional info
 //         notes: invoiceData.notes || '',
 //         terms: invoiceData.terms || '',
 //         customFields: validDynamicFields,
         
-//         // Tracking
 //         updatedAt: new Date().toISOString()
 //       };
 
@@ -1264,7 +1429,7 @@
 //   if (loading) {
 //     return (
 //       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-//         <div className="text-center">
+//         <div className="text-center px-4">
 //           <Loader2 className="w-10 h-10 animate-spin text-[#E39A65] mx-auto mb-4" />
 //           <p className="text-sm text-gray-500">Loading invoice details...</p>
 //         </div>
@@ -1276,9 +1441,9 @@
 //     <div className="min-h-screen bg-gray-50">
 //       {/* Header */}
 //       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-//         <div className="container mx-auto px-4 max-w-7xl py-4">
-//           <div className="flex items-center justify-between">
-//             <div className="flex items-center gap-4">
+//         <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
+//           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+//             <div className="flex items-center gap-3 sm:gap-4">
 //               <Link
 //                 href="/admin/invoices"
 //                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1286,7 +1451,7 @@
 //                 <ArrowLeft className="w-5 h-5 text-gray-600" />
 //               </Link>
 //               <div>
-//                 <h1 className="text-2xl font-bold text-gray-900">
+//                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
 //                   {isPaid ? 'View Invoice (Read Only)' : 'Update Invoice'}
 //                 </h1>
 //                 <p className="text-xs text-gray-500 mt-0.5">
@@ -1296,15 +1461,15 @@
 //             </div>
 //             <div className="flex items-center gap-2">
 //               {isPaid ? (
-//                 <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200">
+//                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-amber-50 text-amber-700 rounded-lg border border-amber-200">
 //                   <Lock className="w-4 h-4" />
-//                   <span className="text-sm font-medium">Paid Invoice - Read Only</span>
+//                   <span className="text-xs sm:text-sm font-medium">Paid Invoice - Read Only</span>
 //                 </div>
 //               ) : (
 //                 <button
 //                   onClick={handleUpdateInvoice}
 //                   disabled={saving}
-//                   className="flex items-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                   className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
 //                 >
 //                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
 //                   Update Invoice
@@ -1318,8 +1483,8 @@
 //       {/* Read-Only Banner for Paid Invoices */}
 //       {isPaid && (
 //         <div className="container mx-auto px-4 max-w-7xl pt-4">
-//           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
-//             <Lock className="w-5 h-5 text-amber-600" />
+//           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4 flex items-center gap-3">
+//             <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
 //             <div>
 //               <p className="text-sm font-medium text-amber-800">This invoice is Paid, you can't update it.</p>
 //               <p className="text-xs text-amber-600 mt-1">No changes can be made to paid invoices.</p>
@@ -1330,21 +1495,21 @@
 
 //       {/* Invoice Information */}
 //       <div className="container mx-auto px-4 max-w-7xl pt-6">
-//         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+//         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 shadow-sm">
 //           <h2 className="text-lg font-semibold text-gray-900 mb-4">Invoice Information</h2>
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-//            <div>
-//   <label className="block text-xs font-medium text-gray-500 mb-1">
-//     Invoice Number
-//   </label>
-//   <input
-//     type="text"
-//     value={invoiceData.invoiceNumber || 'N/A'}
-//     readOnly
-//     disabled
-//     className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 cursor-not-allowed"
-//   />
-// </div>
+//           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+//             <div>
+//               <label className="block text-xs font-medium text-gray-500 mb-1">
+//                 Invoice Number
+//               </label>
+//               <input
+//                 type="text"
+//                 value={invoiceData.invoiceNumber || 'N/A'}
+//                 readOnly
+//                 disabled
+//                 className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 cursor-not-allowed"
+//               />
+//             </div>
 //             <div>
 //               <label className="block text-xs font-medium text-gray-500 mb-1">
 //                 Invoice Date
@@ -1375,17 +1540,17 @@
 
 //       {/* Company and Customer Information */}
 //       <div className="container mx-auto px-4 max-w-7xl pb-6">
-//         <div className="grid grid-cols-2 gap-6 mb-6">
+//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 //           {/* Company Information */}
-//           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//           <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
 //             <h2 className="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
             
 //             <div className="mb-6">
 //               <label className="block text-xs font-medium text-gray-500 mb-2">
 //                 Company Logo
 //               </label>
-//               <div className="flex items-start gap-4">
-//                 <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center overflow-hidden">
+//               <div className="flex flex-col sm:flex-row items-start gap-4">
+//                 <div className="w-20 h-20 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
 //                   {invoiceData.company.logo ? (
 //                     <img 
 //                       src={invoiceData.company.logo} 
@@ -1401,8 +1566,8 @@
 //                   )}
 //                 </div>
 //                 {!isPaid && (
-//                   <div className="flex-1">
-//                     <div className="flex gap-2">
+//                   <div className="flex-1 w-full">
+//                     <div className="flex flex-wrap gap-2">
 //                       <input
 //                         type="file"
 //                         id="logo-upload"
@@ -1440,8 +1605,8 @@
 //               </div>
 //             </div>
 
-//             <div className="grid grid-cols-2 gap-4">
-//               <div className="col-span-2">
+//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//               <div className="sm:col-span-2">
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Company Name
 //                 </label>
@@ -1454,7 +1619,7 @@
 //                   placeholder="Your company name"
 //                 />
 //               </div>
-//               <div className="col-span-2">
+//               <div className="sm:col-span-2">
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Contact Person
 //                 </label>
@@ -1467,7 +1632,7 @@
 //                   placeholder="Contact person"
 //                 />
 //               </div>
-//               <div className="col-span-2">
+//               <div className="sm:col-span-2">
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Email
 //                 </label>
@@ -1480,7 +1645,7 @@
 //                   placeholder="company@example.com"
 //                 />
 //               </div>
-//               <div className="col-span-2">
+//               <div className="sm:col-span-2">
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Phone
 //                 </label>
@@ -1493,7 +1658,7 @@
 //                   placeholder="Phone number"
 //                 />
 //               </div>
-//               <div className="col-span-2">
+//               <div className="sm:col-span-2">
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Address
 //                 </label>
@@ -1510,10 +1675,10 @@
 //           </div>
 
 //           {/* Customer Information */}
-//           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//           <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
 //             <h2 className="text-lg font-semibold text-gray-900 mb-4">Customer Information</h2>
             
-//             <div className="grid grid-cols-2 gap-4 mb-6">
+//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 //               <div>
 //                 <label className="block text-xs font-medium text-gray-500 mb-1">
 //                   Company Name
@@ -1584,8 +1749,8 @@
 //             {/* Billing Address */}
 //             <div className="mb-6">
 //               <h3 className="text-sm font-medium text-gray-700 mb-3">Billing Address</h3>
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div className="col-span-1">
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//                 <div className="sm:col-span-1">
 //                   <label className="block text-xs font-medium text-gray-500 mb-1">
 //                     Street Address
 //                   </label>
@@ -1642,20 +1807,20 @@
 
 //             {/* Shipping Address */}
 //             <div>
-//               <div className="flex items-center justify-between mb-3">
+//               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
 //                 <h3 className="text-sm font-medium text-gray-700">Shipping Address</h3>
 //                 {!isPaid && (
 //                   <button
 //                     onClick={copyBillingToShipping}
-//                     className="flex items-center gap-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+//                     className="flex items-center justify-center gap-1 px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
 //                   >
 //                     <Copy className="w-3 h-3" />
 //                     Copy from Billing
 //                   </button>
 //                 )}
 //               </div>
-//               <div className="grid grid-cols-2 gap-4">
-//                 <div className="col-span-1">
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//                 <div className="sm:col-span-1">
 //                   <label className="block text-xs font-medium text-gray-500 mb-1">
 //                     Street Address
 //                   </label>
@@ -1714,13 +1879,13 @@
 
 //         {/* Products Section */}
 //         <div className="mb-6">
-//           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-//             <div className="flex items-center justify-between mb-4">
+//           <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+//             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
 //               <h2 className="text-lg font-semibold text-gray-900">Products</h2>
 //               {!isPaid && (
 //                 <button
 //                   onClick={() => setShowProductSearch(true)}
-//                   className="flex items-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                   className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
 //                 >
 //                   <Plus className="w-4 h-4" />
 //                   Add Product
@@ -1741,6 +1906,7 @@
 //                       itemIndex={itemIndex}
 //                       product={product}
 //                       onUpdate={handleColorQuantityChange}
+//                       onUpdateUnitPrice={handleColorUnitPriceChange} 
 //                       onAddColor={handleAddColor}
 //                       onAddSize={handleAddSize}
 //                       onRemoveColor={handleRemoveColor}
@@ -1754,7 +1920,7 @@
 //                 })}
 //               </div>
 //             ) : (
-//               <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+//               <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
 //                 <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
 //                 <h3 className="text-sm font-medium text-gray-900 mb-1">No products added</h3>
 //                 <p className="text-xs text-gray-500 mb-4">Click the "Add Product" button to add products to this invoice</p>
@@ -1775,10 +1941,10 @@
 //         {/* Summary and Additional Information */}
 //         <div className="space-y-6">
 //           {/* Top Row - Summary and Bank Details side by side */}
-//           <div className="grid grid-cols-2 gap-6 items-start">
+//           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 //             {/* Bank Details Form */}
 //             <div className="w-full">
-//               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
+//               <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm h-full">
 //                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
 //                   <Landmark className="w-5 h-5 text-[#E39A65]" />
 //                   Bank Details
@@ -1833,7 +1999,7 @@
 //                     />
 //                   </div>
 
-//                   <div className="grid grid-cols-2 gap-3">
+//                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 //                     <div>
 //                       <label className="block text-xs font-medium text-gray-500 mb-1">Routing Number</label>
 //                       <input
@@ -1888,7 +2054,7 @@
             
 //             {/* Summary Form */}
 //             <div className="w-full">
-//               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm h-full">
+//               <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm h-full">
 //                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
                 
 //                 <div className="space-y-6">
@@ -1903,26 +2069,26 @@
 //                       </div>
 //                     </div>
 
-//                     <div className="space-y-2">
+//                     <div className="flex items-center justify-between gap-4">
 //                       <div className="flex items-center gap-2">
-//                         <span className="text-sm text-gray-600">VAT (%)</span>
-//                         <input
-//                           type="number"
-//                           value={invoiceData.vatPercentage}
-//                           onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
-//                           onBlur={() => handleNumericBlur('vatPercentage')}
+//                         <span className="text-sm text-gray-600 whitespace-nowrap">VAT</span>
+//                         <div className="flex items-center gap-1">
+//                           <span className="text-sm text-gray-600">%</span>
+//                           <input
+//                             type="number"
+//                             value={invoiceData.vatPercentage}
+//                             onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
+//                             onBlur={() => handleNumericBlur('vatPercentage')}
 //                             onWheel={(e) => e.target.blur()}
-//                           readOnly={isPaid}
-//                           min="0"
-//                           max="100"
-//                           step="0.01"
-//                           className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]  ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-//                         />
+//                             readOnly={isPaid}
+//                             min="0"
+//                             max="100"
+//                             step="0.01"
+//                             className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+//                           />
+//                         </div>
 //                       </div>
-//                       <div className="flex justify-between text-sm">
-//                         <span className="text-gray-500">VAT Amount</span>
-//                         <span className="font-medium text-blue-600">{formatPrice(vatAmount)}</span>
-//                       </div>
+//                       <span className="text-sm font-medium text-blue-600">{formatPrice(vatAmount)}</span>
 //                     </div>
 
 //                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -1932,26 +2098,26 @@
 //                       </div>
 //                     </div>
 
-//                     <div className="space-y-2">
+//                     <div className="flex items-center justify-between gap-4">
 //                       <div className="flex items-center gap-2">
-//                         <span className="text-sm text-gray-600">Discount (%)</span>
-//                         <input
-//                           type="number"
-//                           value={invoiceData.discountPercentage}
-//                           onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
-//                           onBlur={() => handleNumericBlur('discountPercentage')}
+//                         <span className="text-sm text-gray-600 whitespace-nowrap">Discount</span>
+//                         <div className="flex items-center gap-1">
+//                           <span className="text-sm text-gray-600">%</span>
+//                           <input
+//                             type="number"
+//                             value={invoiceData.discountPercentage}
+//                             onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
+//                             onBlur={() => handleNumericBlur('discountPercentage')}
 //                             onWheel={(e) => e.target.blur()}
-//                           readOnly={isPaid}
-//                           min="0"
-//                           max="100"
-//                           step="0.01"
-//                           className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-//                         />
+//                             readOnly={isPaid}
+//                             min="0"
+//                             max="100"
+//                             step="0.01"
+//                             className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+//                           />
+//                         </div>
 //                       </div>
-//                       <div className="flex justify-between text-sm">
-//                         <span className="text-gray-500">Discount Amount</span>
-//                         <span className="font-medium text-red-600">-{formatPrice(discountAmount)}</span>
-//                       </div>
+//                       <span className="text-sm font-medium text-red-600">-{formatPrice(discountAmount)}</span>
 //                     </div>
 
 //                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
@@ -1961,19 +2127,22 @@
 //                       </div>
 //                     </div>
 
-//                     <div className="flex justify-between items-center">
-//                       <span className="text-sm text-gray-600">Shipping Cost</span>
-//                       <input
-//                         type="number"
-//                         value={invoiceData.shippingCost}
-//                         onChange={(e) => handleInputChange('shippingCost', e.target.value)}
-//                         onBlur={() => handleNumericBlur('shippingCost')}
+//                     <div className="flex items-center justify-between gap-4">
+//                       <span className="text-sm text-gray-600 whitespace-nowrap">Shipping Cost</span>
+//                       <div className="flex items-center gap-2">
+//                         <span className="text-sm text-gray-600">$</span>
+//                         <input
+//                           type="number"
+//                           value={invoiceData.shippingCost}
+//                           onChange={(e) => handleInputChange('shippingCost', e.target.value)}
+//                           onBlur={() => handleNumericBlur('shippingCost')}
 //                           onWheel={(e) => e.target.blur()}
-//                         readOnly={isPaid}
-//                         min="0"
-//                         step="0.01"
-//                         className={`w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-//                       />
+//                           readOnly={isPaid}
+//                           min="0"
+//                           step="0.01"
+//                           className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+//                         />
+//                       </div>
 //                     </div>
 
 //                     <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
@@ -1985,128 +2154,176 @@
 //                   </div>
 
 //                   {/* Payment Details */}
-//                 {/* Payment Details */}
-// <div className="space-y-4 pt-3 border-t border-gray-200">
-//   <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-//     <CreditCard className="w-4 h-4 text-[#E39A65]" />
-//     Payment Details
-//   </h3>
-  
-//   <div className="space-y-3">
-//     <div className="flex justify-between items-center">
-//       <span className="text-sm text-gray-600">Amount Paid</span>
-//       <input
-//         type="number"
-//         value={invoiceData.amountPaid}
-//         onChange={(e) => handleInputChange('amountPaid', e.target.value)}
-//         onBlur={() => handleNumericBlur('amountPaid')}
-//           onWheel={(e) => e.target.blur()}
-//         readOnly={isPaid}
-//         min="0"
-//         max={finalTotal}
-//         step="0.01"
-//         className={`w-24 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65]  ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-//       />
-//     </div>
+//                   <div className="space-y-4 pt-3 border-t border-gray-200">
+//                     <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+//                       <CreditCard className="w-4 h-4 text-[#E39A65]" />
+//                       Payment Details
+//                     </h3>
+                    
+//                     <div className="space-y-3">
+//                       <div className="flex items-center justify-between gap-4">
+//                         <span className="text-sm text-gray-600 whitespace-nowrap">Amount Paid</span>
+//                         <div className="flex items-center gap-2">
+//                           <span className="text-sm text-gray-600">$</span>
+//                           <input
+//                             type="number"
+//                             value={invoiceData.amountPaid}
+//                             onChange={(e) => handleInputChange('amountPaid', e.target.value)}
+//                             onBlur={() => handleNumericBlur('amountPaid')}
+//                             onWheel={(e) => e.target.blur()}
+//                             readOnly={isPaid}
+//                             min="0"
+//                             max={finalTotal}
+//                             step="0.01"
+//                             className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+//                           />
+//                         </div>
+//                       </div>
 
-//     <div className="flex justify-between items-center">
-//       <span className="text-sm text-gray-600">Due Amount</span>
-//       <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
-//     </div>
+//                       <div className="flex justify-between items-center">
+//                         <span className="text-sm text-gray-600">Due Amount</span>
+//                         <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
+//                       </div>
 
-//     {/* Paid Section with Amount and Percentage */}
-//     <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-//       <div className="flex justify-between items-center mb-2">
-//         <div className="flex items-center gap-2">
-//           <TrendingUp className="w-4 h-4 text-green-600" />
-//           <span className="text-sm font-medium text-green-700">Paid</span>
-//         </div>
-//         <span className="text-sm font-bold text-green-700">
-//           {formatPrice(paidAmount)}
-//         </span>
-//       </div>
-//       <div className="space-y-2">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-green-600">Percentage</span>
-//           <span className="font-medium text-green-700">
-//             {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
-//           </span>
-//         </div>
-//         <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
-//           <div 
-//             className="h-full bg-green-500 rounded-full transition-all duration-300"
-//             style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
-//           />
-//         </div>
-//       </div>
-//     </div>
+//                       <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+//                         <div className="flex justify-between items-center mb-2">
+//                           <div className="flex items-center gap-2">
+//                             <TrendingUp className="w-4 h-4 text-green-600" />
+//                             <span className="text-sm font-medium text-green-700">Paid</span>
+//                           </div>
+//                           <span className="text-sm font-bold text-green-700">
+//                             {formatPrice(paidAmount)}
+//                           </span>
+//                         </div>
+//                         <div className="space-y-2">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-green-600">Percentage</span>
+//                             <span className="font-medium text-green-700">
+//                               {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
+//                             </span>
+//                           </div>
+//                           <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+//                             <div 
+//                               className="h-full bg-green-500 rounded-full transition-all duration-300"
+//                               style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
+//                             />
+//                           </div>
+//                         </div>
+//                       </div>
 
-//     {/* Unpaid Section with Amount and Percentage */}
-//     <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-//       <div className="flex justify-between items-center mb-2">
-//         <div className="flex items-center gap-2">
-//           <TrendingDown className="w-4 h-4 text-red-600" />
-//           <span className="text-sm font-medium text-red-700">Unpaid</span>
-//         </div>
-//         <span className="text-sm font-bold text-red-700">
-//           {formatPrice(dueAmount)}
-//         </span>
-//       </div>
-//       <div className="space-y-2">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-red-600">Percentage</span>
-//           <span className="font-medium text-red-700">
-//             {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
-//           </span>
-//         </div>
-//         <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
-//           <div 
-//             className="h-full bg-red-500 rounded-full transition-all duration-300"
-//             style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
-//           />
-//         </div>
-//       </div>
-//     </div>
+//                       <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+//                         <div className="flex justify-between items-center mb-2">
+//                           <div className="flex items-center gap-2">
+//                             <TrendingDown className="w-4 h-4 text-red-600" />
+//                             <span className="text-sm font-medium text-red-700">Unpaid</span>
+//                           </div>
+//                           <span className="text-sm font-bold text-red-700">
+//                             {formatPrice(dueAmount)}
+//                           </span>
+//                         </div>
+//                         <div className="space-y-2">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-red-600">Percentage</span>
+//                             <span className="font-medium text-red-700">
+//                               {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
+//                             </span>
+//                           </div>
+//                           <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+//                             <div 
+//                               className="h-full bg-red-500 rounded-full transition-all duration-300"
+//                               style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
+//                             />
+//                           </div>
+//                         </div>
+//                       </div>
 
-//     <div className="flex justify-center mt-2">
-//       <StatusBadge status={status.text} />
-//     </div>
+//                       <div className="flex justify-center mt-2">
+//                         <StatusBadge status={status.text} />
+//                       </div>
 
-//     <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-//       <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
-//       <div className="space-y-1.5">
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Final Total:</span>
-//           <span className="font-medium">{formatPrice(finalTotal)}</span>
-//         </div>
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Paid:</span>
-//           <span className="font-medium text-green-600">
-//             {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-//           </span>
-//         </div>
-//         <div className="flex justify-between text-xs">
-//           <span className="text-gray-600">Unpaid:</span>
-//           <span className="font-medium text-red-500">
-//             {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-//           </span>
-//         </div>
-//         <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
-//           <span className={status.color}>Status:</span>
-//           <span className={status.color}>{status.text}</span>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// </div>
+//                       <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+//                         <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
+//                         <div className="space-y-1.5">
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Final Total:</span>
+//                             <span className="font-medium">{formatPrice(finalTotal)}</span>
+//                           </div>
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Paid:</span>
+//                             <span className="font-medium text-green-600">
+//                               {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+//                             </span>
+//                           </div>
+//                           <div className="flex justify-between text-xs">
+//                             <span className="text-gray-600">Unpaid:</span>
+//                             <span className="font-medium text-red-500">
+//                               {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+//                             </span>
+//                           </div>
+//                           <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
+//                             <span className={status.color}>Status:</span>
+//                             <span className={status.color}>{status.text}</span>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
 //                 </div>
 //               </div>
 //             </div>
 //           </div>
 
-//           {/* Additional Information - Full Width Below */}
+//           {/* Banking Terms Section */}
 //           <div className="w-full">
-//             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+//             <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
+//               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+//                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+//                   <FileText className="w-5 h-5 text-[#E39A65]" />
+//                   Banking Terms (Optional)
+//                 </h2>
+//                 {!isPaid && (
+//                   <button
+//                     onClick={handleAddBankingTerm}
+//                     className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                   >
+//                     <Plus className="w-4 h-4" />
+//                     Add Term
+//                   </button>
+//                 )}
+//               </div>
+              
+//               <p className="text-xs text-gray-500 mb-4">
+//                 Add any banking terms, conditions, or instructions. Each term can have a title and an optional value/description.
+//                 Leave the value empty if you only want to display the title as a heading.
+//               </p>
+
+//               {bankingTerms.length > 0 ? (
+//                 <div className="space-y-3">
+//                   {bankingTerms.map((term) => (
+//                     <BankingTermField
+//                       key={term.id}
+//                       field={term}
+//                       onUpdate={handleBankingTermUpdate}
+//                       onRemove={handleRemoveBankingTerm}
+//                       readOnly={isPaid}
+//                     />
+//                   ))}
+//                 </div>
+//               ) : (
+//                 <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+//                   <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+//                   <p className="text-sm text-gray-500">No banking terms added</p>
+//                   <p className="text-xs text-gray-400 mt-1">
+//                     {isPaid ? 'No banking terms available' : 'Click "Add Term" to add payment terms, banking instructions, or other conditions'}
+//                   </p>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* Additional Information */}
+//           <div className="w-full">
+//             <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
 //               <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
               
 //               <div className="space-y-6">
@@ -2139,12 +2356,12 @@
 
 //                 {/* Dynamic Fields Section */}
 //                 <div className="border-t border-gray-200 pt-4">
-//                   <div className="flex items-center justify-between mb-3">
+//                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
 //                     <h3 className="text-sm font-medium text-gray-700">Custom Fields</h3>
 //                     {!isPaid && (
 //                       <button
 //                         onClick={handleAddField}
-//                         className="flex items-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                         className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
 //                       >
 //                         <Plus className="w-3.5 h-3.5" />
 //                         Add Field
@@ -2155,8 +2372,8 @@
 //                   {dynamicFields.length > 0 ? (
 //                     <div className="space-y-3">
 //                       {dynamicFields.map((field) => (
-//                         <div key={field.id} className="flex items-center gap-2">
-//                           <div className="flex-1">
+//                         <div key={field.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+//                           <div className="flex-1 w-full">
 //                             <input
 //                               type="text"
 //                               value={field.fieldName}
@@ -2166,7 +2383,7 @@
 //                               className={`w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] focus:border-transparent ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
 //                             />
 //                           </div>
-//                           <div className="flex-1">
+//                           <div className="flex-1 w-full">
 //                             <input
 //                               type="text"
 //                               value={field.fieldValue}
@@ -2194,27 +2411,28 @@
 //                     </p>
 //                   )}
 //                 </div>
+
 //                 <div className="pt-4 border-t border-gray-200">
-//   <div className="space-y-2">
-//     {!isPaid && (
-//       <button
-//         onClick={handleUpdateInvoice}
-//         disabled={saving}
-//         className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
-//       >
-//         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-//         Update Invoice
-//       </button>
-//     )}
-//   </div>
-// </div>
+//                   <div className="space-y-2">
+//                     {!isPaid && (
+//                       <button
+//                         onClick={handleUpdateInvoice}
+//                         disabled={saving}
+//                         className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors"
+//                       >
+//                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+//                         Update Invoice
+//                       </button>
+//                     )}
+//                   </div>
+//                 </div>
 //               </div>
 //             </div>
 //           </div>
 //         </div>
 //       </div>
 
-//       {/* Search Product Modal - Only show if not paid */}
+//       {/* Search Product Modal */}
 //       {!isPaid && (
 //         <SearchProductModal
 //           isOpen={showProductSearch}
@@ -2223,9 +2441,50 @@
 //           existingProductIds={existingProductIds}
 //         />
 //       )}
+
+//       {/* Delete Product Confirmation Modal */}
+//       {showDeleteConfirm && productToDelete !== null && (
+//         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+//           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+//             <div className="p-4 sm:p-6">
+//               <div className="flex items-center gap-2 sm:gap-3 text-red-600 mb-3 sm:mb-4">
+//                 <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+//                 <h3 className="text-base sm:text-lg font-semibold">Remove Product</h3>
+//               </div>
+              
+//               <p className="text-xs sm:text-sm text-gray-600 mb-2">
+//                 Are you sure you want to remove <span className="font-semibold">"{invoiceData.items[productToDelete]?.productName}"</span> from this invoice?
+//               </p>
+//               <p className="text-[10px] sm:text-xs text-gray-500 mb-4 sm:mb-6">
+//                 This action cannot be undone. All quantities and color selections for this product will be lost.
+//               </p>
+
+//               <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3">
+//                 <button
+//                   onClick={() => {
+//                     setShowDeleteConfirm(false);
+//                     setProductToDelete(null);
+//                   }}
+//                   className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   onClick={handleConfirmRemoveProduct}
+//                   className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2"
+//                 >
+//                   <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+//                   Remove Product
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
 //     </div>
 //   );
-// }
+// } 
+
 
 
 'use client';
@@ -2407,6 +2666,7 @@ const ProductItemCard = ({
   itemIndex, 
   product, 
   onUpdate, 
+  onUpdateUnitPrice,  
   onAddColor, 
   onAddSize, 
   onRemoveColor, 
@@ -2535,67 +2795,96 @@ const ProductItemCard = ({
 
       {isExpanded && (
         <div className="p-4 sm:p-5 space-y-4">
-          {item.colors.map((color, colorIndex) => (
-            <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-6 h-6 rounded-full border-2 border-white shadow-md" 
-                    style={{ backgroundColor: color.color.code }}
-                  />
-                  <span className="text-sm font-semibold text-gray-800">
-                    {color.color.name || color.color.code}
-                  </span>
-                  <span className="text-xs bg-white px-2 py-1 rounded-full border border-gray-200">
-                    {color.totalForColor} pcs
-                  </span>
+          {item.colors.map((color, colorIndex) => {
+            const colorTotal = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+            const displayUnitPrice = color.unitPrice || 0;
+            
+            return (
+              <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md" 
+                      style={{ backgroundColor: color.color.code }}
+                    />
+                    <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                      {color.color.name || color.color.code}
+                    </span>
+                    <span className="text-[10px] sm:text-xs bg-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-gray-200">
+                      {colorTotal} pcs
+                    </span>
+                  </div>
+                  
+                  {/* Editable Unit Price */}
+                  <div className="flex items-center gap-2">
+                    {colorTotal > 0 && (
+                      <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full">
+                        <span className="text-[9px] sm:text-[10px] text-gray-500">$</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={displayUnitPrice}
+                          onChange={(e) => {
+                            const newPrice = parseFloat(e.target.value) || 0;
+                            if (onUpdateUnitPrice) {
+                              onUpdateUnitPrice(itemIndex, colorIndex, newPrice);
+                            }
+                          }}
+                          readOnly={readOnly}
+                          className="w-16 sm:w-20 px-1 py-0.5 text-[9px] sm:text-[10px] text-center bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+                        />
+                        <span className="text-[9px] sm:text-[10px] text-gray-500">/pc</span>
+                      </div>
+                    )}
+                    {!readOnly && (
+                      <button
+                        onClick={() => handleRemoveColor(colorIndex)}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
+                        title="Remove color"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </button>
+                    )}
+                  </div>
                 </div>
-                {!readOnly && (
-                  <button
-                    onClick={() => handleRemoveColor(colorIndex)}
-                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
-                    title="Remove color"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
 
-              <div className="flex flex-wrap gap-2 mt-3">
-                {color.sizeQuantities.map((sq, sizeIndex) => (
-                  <SizeBadge
-                    key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
-                    size={sq.size}
-                    quantity={sq.quantity}
-                    onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
-                    onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
-                    readOnly={readOnly}
-                  />
-                ))}
-                
-                {!readOnly && availableSizes.length > 0 && (
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleAddSize(colorIndex, e.target.value);
-                        e.target.value = '';
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {color.sizeQuantities.map((sq, sizeIndex) => (
+                    <SizeBadge
+                      key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
+                      size={sq.size}
+                      quantity={sq.quantity}
+                      onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
+                      onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
+                      readOnly={readOnly}
+                    />
+                  ))}
+                  
+                  {!readOnly && availableSizes.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleAddSize(colorIndex, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                      className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
+                      value=""
+                    >
+                      <option value="">+ Add Size</option>
+                      {availableSizes
+                        .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
+                        .map(size => (
+                          <option key={size} value={size}>{size}</option>
+                        ))
                       }
-                    }}
-                    className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
-                    value=""
-                  >
-                    <option value="">+ Add Size</option>
-                    {availableSizes
-                      .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
-                      .map(size => (
-                        <option key={size} value={size}>{size}</option>
-                      ))
-                    }
-                  </select>
-                )}
+                    </select>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {!readOnly && availableColors.length > 0 && (
             <div className="mt-4 pt-3 border-t border-gray-200">
@@ -2633,11 +2922,10 @@ const ProductItemCard = ({
         </div>
       )}
     </div>
-
-    
   );
 };
 
+// Search Product Modal Component
 const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductIds }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -2671,16 +2959,6 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
 
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
-  };
-
-  const handleAddProduct = () => {
-    if (selectedProduct) {
-      onSelectProduct(selectedProduct);
-      setSearchTerm('');
-      setSearchResults([]);
-      setSelectedProduct(null);
-      onClose();
-    }
   };
 
   if (!isOpen) return null;
@@ -2782,7 +3060,15 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
               Cancel
             </button>
             <button
-              onClick={handleAddProduct}
+              onClick={() => {
+                if (selectedProduct) {
+                  onSelectProduct(selectedProduct);
+                  setSearchTerm('');
+                  setSearchResults([]);
+                  setSelectedProduct(null);
+                  onClose();
+                }
+              }}
               disabled={!selectedProduct}
               className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium bg-[#E39A65] text-white rounded-lg hover:bg-[#d48b54] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -2810,7 +3096,7 @@ export default function UpdateInvoicePage() {
   const [bankingTerms, setBankingTerms] = useState([]);
   const [isPaid, setIsPaid] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-const [productToDelete, setProductToDelete] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
   
   const [invoiceData, setInvoiceData] = useState({
     invoiceNumber: '',
@@ -3023,10 +3309,15 @@ const [productToDelete, setProductToDelete] = useState(null);
     }));
   };
 
-  const calculateUnitPrice = (productId, totalQuantity) => {
+  const calculateUnitPrice = (productId, quantity) => {
     const product = productDetails[productId];
-    if (!product || !product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
-      return product?.pricePerUnit || 0;
+    if (!product) return 0;
+    
+    if (quantity === 0) return product.pricePerUnit;
+    if (quantity < product.moq) return product.pricePerUnit;
+    
+    if (!product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
+      return product.pricePerUnit;
     }
 
     const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
@@ -3039,40 +3330,59 @@ const [productToDelete, setProductToDelete] = useState(null);
       const range = tier.range;
       if (range.includes('-')) {
         const [min, max] = range.split('-').map(Number);
-        if (totalQuantity >= min && totalQuantity <= max) {
+        if (quantity >= min && quantity <= max) {
           return tier.price;
         }
       } else if (range.includes('+')) {
         const minQty = parseInt(range.replace('+', ''));
-        if (totalQuantity >= minQty) {
+        if (quantity >= minQty) {
           return tier.price;
         }
       }
     }
 
     const highestTier = sortedTiers[sortedTiers.length - 1];
-    return highestTier?.price || product.pricePerUnit;
+    if (highestTier && highestTier.range.includes('-') && quantity > parseInt(highestTier.range.split('-')[1])) {
+      return highestTier.price;
+    }
+    
+    return product.pricePerUnit;
   };
 
   const recalculateTotals = (items) => {
     let subtotal = 0;
     
     const updatedItems = items.map(item => {
-      const itemTotalQty = item.colors.reduce((sum, color) => {
-        const colorQty = color.sizeQuantities.reduce((s, sq) => s + (sq.quantity || 0), 0);
-        return sum + colorQty;
-      }, 0);
+      let itemTotalQty = 0;
+      let itemTotalPrice = 0;
       
-      const unitPrice = calculateUnitPrice(item.productId, itemTotalQty);
-      const itemTotal = itemTotalQty * unitPrice;
+      item.colors.forEach(color => {
+        const colorQty = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+        
+        let unitPrice;
+        
+        if (color.unitPrice && color.unitPrice > 0) {
+          unitPrice = color.unitPrice;
+        } else if (item.originalUnitPrice && item.originalUnitPrice > 0) {
+          unitPrice = item.originalUnitPrice;
+        } else {
+          unitPrice = calculateUnitPrice(item.productId, colorQty);
+        }
+        
+        const colorTotal = colorQty * unitPrice;
+        itemTotalQty += colorQty;
+        itemTotalPrice += colorTotal;
+        
+        color.unitPrice = unitPrice;
+      });
       
-      subtotal += itemTotal;
+      subtotal += itemTotalPrice;
       
       return {
         ...item,
         totalQuantity: itemTotalQty,
-        unitPrice,
-        total: itemTotal
+        unitPrice: item.unitPrice || 0,
+        total: itemTotalPrice
       };
     });
     
@@ -3087,6 +3397,23 @@ const [productToDelete, setProductToDelete] = useState(null);
       
       color.sizeQuantities[sizeIndex].quantity = newQuantity;
       color.totalForColor = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+      
+      const { items, subtotal } = recalculateTotals(updatedItems);
+      
+      return {
+        ...prev,
+        items,
+        subtotal
+      };
+    });
+  };
+
+  const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
+    setInvoiceData(prev => {
+      const updatedItems = JSON.parse(JSON.stringify(prev.items));
+      const color = updatedItems[itemIndex].colors[colorIndex];
+      
+      color.unitPrice = newUnitPrice;
       
       const { items, subtotal } = recalculateTotals(updatedItems);
       
@@ -3121,7 +3448,8 @@ const [productToDelete, setProductToDelete] = useState(null);
           name: colorName || colorCode
         },
         sizeQuantities,
-        totalForColor: 0
+        totalForColor: 0,
+        unitPrice: product.pricePerUnit
       });
       
       const { items, subtotal } = recalculateTotals(updatedItems);
@@ -3199,39 +3527,37 @@ const [productToDelete, setProductToDelete] = useState(null);
     });
   };
 
- // Replace the existing handleRemoveProduct function with this:
-const handleRemoveProduct = (itemIndex) => {
-  setProductToDelete(itemIndex);
-  setShowDeleteConfirm(true);
-};
+  const handleRemoveProduct = (itemIndex) => {
+    setProductToDelete(itemIndex);
+    setShowDeleteConfirm(true);
+  };
 
-// Add this new function for confirming deletion:
-const handleConfirmRemoveProduct = () => {
-  if (productToDelete !== null) {
-    setInvoiceData(prev => {
-      const updatedItems = JSON.parse(JSON.stringify(prev.items));
-      updatedItems.splice(productToDelete, 1);
-      
-      const { items, subtotal } = recalculateTotals(updatedItems);
-      
-      const newExpandedItems = {};
-      items.forEach((_, index) => {
-        newExpandedItems[index] = true;
+  const handleConfirmRemoveProduct = () => {
+    if (productToDelete !== null) {
+      setInvoiceData(prev => {
+        const updatedItems = JSON.parse(JSON.stringify(prev.items));
+        updatedItems.splice(productToDelete, 1);
+        
+        const { items, subtotal } = recalculateTotals(updatedItems);
+        
+        const newExpandedItems = {};
+        items.forEach((_, index) => {
+          newExpandedItems[index] = true;
+        });
+        setExpandedItems(newExpandedItems);
+        
+        toast.success('Product removed from invoice');
+        
+        return {
+          ...prev,
+          items,
+          subtotal
+        };
       });
-      setExpandedItems(newExpandedItems);
-      
-      toast.success('Product removed from invoice');
-      
-      return {
-        ...prev,
-        items,
-        subtotal
-      };
-    });
-  }
-  setShowDeleteConfirm(false);
-  setProductToDelete(null);
-};
+    }
+    setShowDeleteConfirm(false);
+    setProductToDelete(null);
+  };
 
   const handleAddProduct = (product) => {
     if (isPaid) return;
@@ -3447,12 +3773,10 @@ const handleConfirmRemoveProduct = () => {
         field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
       );
       
-      // Filter out empty banking terms (both title and value empty)
       const validBankingTerms = bankingTerms.filter(
         term => term.title.trim() !== '' || term.value.trim() !== ''
       );
       
-      // Get the current admin user from localStorage
       const userStr = localStorage.getItem('user');
       let adminId = null;
       
@@ -3465,7 +3789,6 @@ const handleConfirmRemoveProduct = () => {
         }
       }
 
-      // Format the items to match backend schema
       const formattedItems = invoiceData.items.map(item => ({
         productId: item.productId,
         productName: item.productName,
@@ -3478,7 +3801,8 @@ const handleConfirmRemoveProduct = () => {
             size: sq.size,
             quantity: sq.quantity
           })),
-          totalForColor: color.totalForColor
+          totalForColor: color.totalForColor,
+          unitPrice: color.unitPrice || 0
         })),
         totalQuantity: item.totalQuantity,
         unitPrice: item.unitPrice,
@@ -3487,7 +3811,6 @@ const handleConfirmRemoveProduct = () => {
         total: item.total
       }));
 
-      // Create payload matching backend schema
       const invoicePayload = {
         invoiceNumber: invoiceData.invoiceNumber,
         invoiceDate: invoiceData.invoiceDate,
@@ -3495,7 +3818,6 @@ const handleConfirmRemoveProduct = () => {
         inquiryId: invoiceData.inquiryId,
         inquiryNumber: invoiceData.inquiryNumber,
         
-        // Customer info
         customer: {
           companyName: invoiceData.customer?.companyName || '',
           contactPerson: invoiceData.customer?.contactPerson || '',
@@ -3512,7 +3834,6 @@ const handleConfirmRemoveProduct = () => {
           shippingCountry: invoiceData.customer?.shippingCountry || ''
         },
         
-        // Company info
         company: {
           logo: invoiceData.company?.logo || '',
           logoPublicId: invoiceData.company?.logoPublicId || '',
@@ -3523,7 +3844,6 @@ const handleConfirmRemoveProduct = () => {
           address: invoiceData.company?.address || '49/10-C, Ground Floor, Genda, Savar, Dhaka, Bangladesh'
         },
         
-        // Bank details
         bankDetails: {
           bankName: invoiceData.bankDetails?.bankName || '',
           accountName: invoiceData.bankDetails?.accountName || '',
@@ -3535,16 +3855,13 @@ const handleConfirmRemoveProduct = () => {
           bankAddress: invoiceData.bankDetails?.bankAddress || ''
         },
         
-        // NEW: Banking Terms
         bankingTerms: validBankingTerms.map(term => ({
           title: term.title.trim(),
           value: term.value.trim()
         })),
         
-        // Items
         items: formattedItems,
         
-        // Calculations
         subtotal: subtotal,
         vatPercentage: vatPercentage,
         vatAmount: vatAmount,
@@ -3557,15 +3874,12 @@ const handleConfirmRemoveProduct = () => {
         amountPaid: paidAmount,
         dueAmount: dueAmount,
         
-        // Status fields
         paymentStatus: status.text.toLowerCase(),
         
-        // Additional info
         notes: invoiceData.notes || '',
         terms: invoiceData.terms || '',
         customFields: validDynamicFields,
         
-        // Tracking
         updatedAt: new Date().toISOString()
       };
 
@@ -4081,6 +4395,7 @@ const handleConfirmRemoveProduct = () => {
                       itemIndex={itemIndex}
                       product={product}
                       onUpdate={handleColorQuantityChange}
+                      onUpdateUnitPrice={handleColorUnitPriceChange} 
                       onAddColor={handleAddColor}
                       onAddSize={handleAddSize}
                       onRemoveColor={handleRemoveColor}
@@ -4232,229 +4547,216 @@ const handleConfirmRemoveProduct = () => {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
                 
                 <div className="space-y-6">
-               {/* Calculations */}
-<div className="space-y-4">
-  <h3 className="text-sm font-semibold text-gray-700">Calculations</h3>
-  
-  <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-    <div className="flex justify-between items-center">
-      <span className="text-sm text-gray-600">Subtotal</span>
-      <span className="text-lg font-bold text-gray-900">{formatPrice(subtotal)}</span>
-    </div>
-  </div>
+                  {/* Calculations */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-semibold text-gray-700">Calculations</h3>
+                    
+                    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Subtotal</span>
+                        <span className="text-lg font-bold text-gray-900">{formatPrice(subtotal)}</span>
+                      </div>
+                    </div>
 
-  {/* VAT Row - Fixed: VAT% then value */}
-  <div className="space-y-2">
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600 whitespace-nowrap">VAT</span>
-        <div className="flex items-center gap-1">
-          <span className="text-sm text-gray-600">%</span>
-          <input
-            type="number"
-            value={invoiceData.vatPercentage}
-            onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
-            onBlur={() => handleNumericBlur('vatPercentage')}
-            onWheel={(e) => e.target.blur()}
-            readOnly={isPaid}
-            min="0"
-            max="100"
-            step="0.01"
-            className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-          />
-        </div>
-      </div>
-      <span className="text-sm font-medium text-blue-600">{formatPrice(vatAmount)}</span>
-    </div>
-  </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600 whitespace-nowrap">VAT</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-600">%</span>
+                          <input
+                            type="number"
+                            value={invoiceData.vatPercentage}
+                            onChange={(e) => handleInputChange('vatPercentage', e.target.value)}
+                            onBlur={() => handleNumericBlur('vatPercentage')}
+                            onWheel={(e) => e.target.blur()}
+                            readOnly={isPaid}
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-blue-600">{formatPrice(vatAmount)}</span>
+                    </div>
 
-  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-    <div className="flex justify-between items-center">
-      <span className="text-sm text-blue-700">After VAT</span>
-      <span className="text-lg font-bold text-blue-700">{formatPrice(totalAfterVat)}</span>
-    </div>
-  </div>
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-blue-700">After VAT</span>
+                        <span className="text-lg font-bold text-blue-700">{formatPrice(totalAfterVat)}</span>
+                      </div>
+                    </div>
 
-  {/* Discount Row - Fixed: Discount% then value */}
-  <div className="space-y-2">
-    <div className="flex items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600 whitespace-nowrap">Discount</span>
-        <div className="flex items-center gap-1">
-          <span className="text-sm text-gray-600">%</span>
-          <input
-            type="number"
-            value={invoiceData.discountPercentage}
-            onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
-            onBlur={() => handleNumericBlur('discountPercentage')}
-            onWheel={(e) => e.target.blur()}
-            readOnly={isPaid}
-            min="0"
-            max="100"
-            step="0.01"
-            className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-          />
-        </div>
-      </div>
-      <span className="text-sm font-medium text-red-600">-{formatPrice(discountAmount)}</span>
-    </div>
-  </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600 whitespace-nowrap">Discount</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-600">%</span>
+                          <input
+                            type="number"
+                            value={invoiceData.discountPercentage}
+                            onChange={(e) => handleInputChange('discountPercentage', e.target.value)}
+                            onBlur={() => handleNumericBlur('discountPercentage')}
+                            onWheel={(e) => e.target.blur()}
+                            readOnly={isPaid}
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            className={`w-20 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-red-600">-{formatPrice(discountAmount)}</span>
+                    </div>
 
-  <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-    <div className="flex justify-between items-center">
-      <span className="text-sm text-yellow-700">After Discount</span>
-      <span className="text-lg font-bold text-yellow-700">{formatPrice(totalAfterDiscount)}</span>
-    </div>
-  </div>
+                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-yellow-700">After Discount</span>
+                        <span className="text-lg font-bold text-yellow-700">{formatPrice(totalAfterDiscount)}</span>
+                      </div>
+                    </div>
 
-  {/* Shipping Cost Row - Fixed: Shipping Cost $ then value */}
-  <div className="flex items-center justify-between gap-4">
-    <span className="text-sm text-gray-600 whitespace-nowrap">Shipping Cost</span>
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600">$</span>
-      <input
-        type="number"
-        value={invoiceData.shippingCost}
-        onChange={(e) => handleInputChange('shippingCost', e.target.value)}
-        onBlur={() => handleNumericBlur('shippingCost')}
-        onWheel={(e) => e.target.blur()}
-        readOnly={isPaid}
-        min="0"
-        step="0.01"
-        className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-      />
-    </div>
-  </div>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm text-gray-600 whitespace-nowrap">Shipping Cost</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">$</span>
+                        <input
+                          type="number"
+                          value={invoiceData.shippingCost}
+                          onChange={(e) => handleInputChange('shippingCost', e.target.value)}
+                          onBlur={() => handleNumericBlur('shippingCost')}
+                          onWheel={(e) => e.target.blur()}
+                          readOnly={isPaid}
+                          min="0"
+                          step="0.01"
+                          className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+                        />
+                      </div>
+                    </div>
 
-  <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-    <div className="flex justify-between items-center">
-      <span className="text-sm font-semibold text-emerald-700">Final Total</span>
-      <span className="text-xl font-bold text-emerald-700">{formatPrice(finalTotal)}</span>
-    </div>
-  </div>
-</div>
+                    <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-emerald-700">Final Total</span>
+                        <span className="text-xl font-bold text-emerald-700">{formatPrice(finalTotal)}</span>
+                      </div>
+                    </div>
+                  </div>
 
-{/* Payment Details */}
-<div className="space-y-4 pt-3 border-t border-gray-200">
-  <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-    <CreditCard className="w-4 h-4 text-[#E39A65]" />
-    Payment Details
-  </h3>
-  
-  <div className="space-y-3">
-    {/* Amount Paid Row - Fixed: Amount Paid $ then value */}
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-gray-600 whitespace-nowrap">Amount Paid</span>
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">$</span>
-        <input
-          type="number"
-          value={invoiceData.amountPaid}
-          onChange={(e) => handleInputChange('amountPaid', e.target.value)}
-          onBlur={() => handleNumericBlur('amountPaid')}
-          onWheel={(e) => e.target.blur()}
-          readOnly={isPaid}
-          min="0"
-          max={finalTotal}
-          step="0.01"
-          className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
-        />
-      </div>
-    </div>
+                  {/* Payment Details */}
+                  <div className="space-y-4 pt-3 border-t border-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-[#E39A65]" />
+                      Payment Details
+                    </h3>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-sm text-gray-600 whitespace-nowrap">Amount Paid</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">$</span>
+                          <input
+                            type="number"
+                            value={invoiceData.amountPaid}
+                            onChange={(e) => handleInputChange('amountPaid', e.target.value)}
+                            onBlur={() => handleNumericBlur('amountPaid')}
+                            onWheel={(e) => e.target.blur()}
+                            readOnly={isPaid}
+                            min="0"
+                            max={finalTotal}
+                            step="0.01"
+                            className={`w-28 px-2 py-1 text-right text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E39A65] ${isPaid ? 'bg-gray-50 text-gray-600' : ''}`}
+                          />
+                        </div>
+                      </div>
 
-    {/* Due Amount Row */}
-    <div className="flex justify-between items-center">
-      <span className="text-sm text-gray-600">Due Amount</span>
-      <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
-    </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Due Amount</span>
+                        <span className={`text-lg font-bold ${status.color}`}>{formatPrice(dueAmount)}</span>
+                      </div>
 
-    {/* Paid Section */}
-    <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-medium text-green-700">Paid</span>
-        </div>
-        <span className="text-sm font-bold text-green-700">
-          {formatPrice(paidAmount)}
-        </span>
-      </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs">
-          <span className="text-green-600">Percentage</span>
-          <span className="font-medium text-green-700">
-            {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
-          </span>
-        </div>
-        <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-green-500 rounded-full transition-all duration-300"
-            style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
-          />
-        </div>
-      </div>
-    </div>
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-green-700">Paid</span>
+                          </div>
+                          <span className="text-sm font-bold text-green-700">
+                            {formatPrice(paidAmount)}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-green-600">Percentage</span>
+                            <span className="font-medium text-green-700">
+                              {finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 bg-green-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-green-500 rounded-full transition-all duration-300"
+                              style={{ width: `${finalTotal > 0 ? Math.min((paidAmount / finalTotal) * 100, 100) : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-    {/* Unpaid Section */}
-    <div className="bg-red-50 p-3 rounded-lg border border-red-200">
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <TrendingDown className="w-4 h-4 text-red-600" />
-          <span className="text-sm font-medium text-red-700">Unpaid</span>
-        </div>
-        <span className="text-sm font-bold text-red-700">
-          {formatPrice(dueAmount)}
-        </span>
-      </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs">
-          <span className="text-red-600">Percentage</span>
-          <span className="font-medium text-red-700">
-            {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
-          </span>
-        </div>
-        <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-red-500 rounded-full transition-all duration-300"
-            style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
-          />
-        </div>
-      </div>
-    </div>
+                      <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="flex items-center gap-2">
+                            <TrendingDown className="w-4 h-4 text-red-600" />
+                            <span className="text-sm font-medium text-red-700">Unpaid</span>
+                          </div>
+                          <span className="text-sm font-bold text-red-700">
+                            {formatPrice(dueAmount)}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-red-600">Percentage</span>
+                            <span className="font-medium text-red-700">
+                              {finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-red-500 rounded-full transition-all duration-300"
+                              style={{ width: `${finalTotal > 0 ? Math.max(Math.min((dueAmount / finalTotal) * 100, 100), 0) : 0}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-    <div className="flex justify-center mt-2">
-      <StatusBadge status={status.text} />
-    </div>
+                      <div className="flex justify-center mt-2">
+                        <StatusBadge status={status.text} />
+                      </div>
 
-    <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-      <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs">
-          <span className="text-gray-600">Final Total:</span>
-          <span className="font-medium">{formatPrice(finalTotal)}</span>
-        </div>
-        <div className="flex justify-between text-xs">
-          <span className="text-gray-600">Paid:</span>
-          <span className="font-medium text-green-600">
-            {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-          </span>
-        </div>
-        <div className="flex justify-between text-xs">
-          <span className="text-gray-600">Unpaid:</span>
-          <span className="font-medium text-red-500">
-            {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
-          </span>
-        </div>
-        <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
-          <span className={status.color}>Status:</span>
-          <span className={status.color}>{status.text}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-                
+                      <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                        <h4 className="text-xs font-semibold text-gray-700 mb-2">Payment Summary</h4>
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Final Total:</span>
+                            <span className="font-medium">{formatPrice(finalTotal)}</span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Paid:</span>
+                            <span className="font-medium text-green-600">
+                              {formatPrice(paidAmount)} ({finalTotal > 0 ? ((paidAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-600">Unpaid:</span>
+                            <span className="font-medium text-red-500">
+                              {formatPrice(dueAmount)} ({finalTotal > 0 ? ((dueAmount / finalTotal) * 100).toFixed(1) : '0'}%)
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs pt-1 border-t border-gray-200">
+                            <span className={status.color}>Status:</span>
+                            <span className={status.color}>{status.text}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -4630,44 +4932,44 @@ const handleConfirmRemoveProduct = () => {
       )}
 
       {/* Delete Product Confirmation Modal */}
-{showDeleteConfirm && productToDelete !== null && (
-  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-      <div className="p-4 sm:p-6">
-        <div className="flex items-center gap-2 sm:gap-3 text-red-600 mb-3 sm:mb-4">
-          <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
-          <h3 className="text-base sm:text-lg font-semibold">Remove Product</h3>
-        </div>
-        
-        <p className="text-xs sm:text-sm text-gray-600 mb-2">
-          Are you sure you want to remove <span className="font-semibold">"{invoiceData.items[productToDelete]?.productName}"</span> from this invoice?
-        </p>
-        <p className="text-[10px] sm:text-xs text-gray-500 mb-4 sm:mb-6">
-          This action cannot be undone. All quantities and color selections for this product will be lost.
-        </p>
+      {showDeleteConfirm && productToDelete !== null && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 sm:gap-3 text-red-600 mb-3 sm:mb-4">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+                <h3 className="text-base sm:text-lg font-semibold">Remove Product</h3>
+              </div>
+              
+              <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                Are you sure you want to remove <span className="font-semibold">"{invoiceData.items[productToDelete]?.productName}"</span> from this invoice?
+              </p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mb-4 sm:mb-6">
+                This action cannot be undone. All quantities and color selections for this product will be lost.
+              </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3">
-          <button
-            onClick={() => {
-              setShowDeleteConfirm(false);
-              setProductToDelete(null);
-            }}
-            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirmRemoveProduct}
-            className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2"
-          >
-            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-            Remove Product
-          </button>
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-2 sm:gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setProductToDelete(null);
+                  }}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmRemoveProduct}
+                  className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2"
+                >
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  Remove Product
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

@@ -150,84 +150,84 @@ export default function TermsPage() {
         </div>
       )
     },
-    {
-      id: 'definitions',
-      icon: <BsFileRichtext className="text-2xl" />,
-      title: 'Definitions',
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'purple',
-      content: (
-        <div className="space-y-4">
-          <p className="text-gray-700">For the purpose of these Terms:</p>
+    // {
+    //   id: 'definitions',
+    //   icon: <BsFileRichtext className="text-2xl" />,
+    //   title: 'Definitions',
+    //   color: 'from-purple-500 to-purple-600',
+    //   bgColor: 'purple',
+    //   content: (
+    //     <div className="space-y-4">
+    //       <p className="text-gray-700">For the purpose of these Terms:</p>
           
-          <div className="grid gap-4 mt-4">
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Platform" or "Website"
-              </h4>
-              <p className="text-gray-600">Refers to Asian Clothify's website, including all subdomains and associated services.</p>
-            </div>
+    //       <div className="grid gap-4 mt-4">
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Platform" or "Website"
+    //           </h4>
+    //           <p className="text-gray-600">Refers to Asian Clothify's website, including all subdomains and associated services.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "User", "You", "Your"
-              </h4>
-              <p className="text-gray-600">Refers to the individual or business entity accessing or using the Platform.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "User", "You", "Your"
+    //           </h4>
+    //           <p className="text-gray-600">Refers to the individual or business entity accessing or using the Platform.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Admin"
-              </h4>
-              <p className="text-gray-600">Refers to authorized personnel with full access to manage the Platform, including pricing, invoices, and payments.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Admin"
+    //           </h4>
+    //           <p className="text-gray-600">Refers to authorized personnel with full access to manage the Platform, including pricing, invoices, and payments.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Moderator"
-              </h4>
-              <p className="text-gray-600">Refers to authorized personnel responsible for product posting and editing without pricing or payment access.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Moderator"
+    //           </h4>
+    //           <p className="text-gray-600">Refers to authorized personnel responsible for product posting and editing without pricing or payment access.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Customer" or "Buyer"
-              </h4>
-              <p className="text-gray-600">Refers customers/retailers who browse products, submit inquiries, and make purchases through the Platform.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Customer" or "Buyer"
+    //           </h4>
+    //           <p className="text-gray-600">Refers customers/retailers who browse products, submit inquiries, and make purchases through the Platform.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Inquiry"
-              </h4>
-              <p className="text-gray-600">Refers to a request submitted by a customer to purchase products, which may be converted to an invoice by Admin.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Inquiry"
+    //           </h4>
+    //           <p className="text-gray-600">Refers to a request submitted by a customer to purchase products, which may be converted to an invoice by Admin.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "MOQ"
-              </h4>
-              <p className="text-gray-600">Minimum Order Quantity - the smallest quantity of a product that a customer can purchase.</p>
-            </div>
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "MOQ"
+    //           </h4>
+    //           <p className="text-gray-600">Minimum Order Quantity - the smallest quantity of a product that a customer can purchase.</p>
+    //         </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
-              <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                "Invoice"
-              </h4>
-              <p className="text-gray-600">A commercial document issued by Admin to a customer, indicating the products, quantities, and agreed prices for a transaction.</p>
-            </div>
-          </div>
-        </div>
-      )
-    },
+    //         <div className="bg-white p-4 rounded-xl border border-gray-200 hover:border-purple-300 transition-colors">
+    //           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+    //             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+    //             "Invoice"
+    //           </h4>
+    //           <p className="text-gray-600">A commercial document issued by Admin to a customer, indicating the products, quantities, and agreed prices for a transaction.</p>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   )
+    // },
     {
       id: 'user-obligations',
       icon: <FaUsers className="text-2xl" />,
@@ -466,67 +466,7 @@ export default function TermsPage() {
         </div>
       )
     },
-    {
-      id: 'roles',
-      icon: <FaUserTie className="text-2xl" />,
-      title: 'User Roles & Responsibilities',
-      color: 'from-indigo-500 to-indigo-600',
-      bgColor: 'indigo',
-      content: (
-        <div className="space-y-6">
-          <p className="text-gray-700">The Platform has three distinct user roles:</p>
-          
-          <div className="grid gap-6 mt-4">
-            <div className="bg-gradient-to-r from-indigo-50 to-indigo-100/50 p-6 rounded-xl border-l-4 border-indigo-500">
-              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-lg">
-                <FaUserShield className="text-indigo-600" />
-                Admin
-              </h4>
-              <p className="text-gray-700 mb-2 font-medium">Full access including:</p>
-              <ul className="space-y-1 text-gray-600">
-                <li>• Final pricing control</li>
-                <li>• Invoice management</li>
-                <li>• Payment oversight</li>
-                <li>• Product approval</li>
-                <li>• Full system configuration</li>
-              </ul>
-            </div>
-
-            <div className="bg-gradient-to-r from-purple-50 to-purple-100/50 p-6 rounded-xl border-l-4 border-purple-500">
-              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-lg">
-                <FaUsers className="text-purple-600" />
-                Moderator
-              </h4>
-              <p className="text-gray-700 mb-2 font-medium">Limited access:</p>
-              <ul className="space-y-1 text-gray-600">
-                <li>✓ Product posting and editing</li>
-                <li>✓ Image uploads</li>
-                <li>✓ Color and size management</li>
-                <li>✓ Add internal notes</li>
-                <li className="text-red-500 mt-2">✗ Cannot edit prices</li>
-                <li className="text-red-500">✗ Cannot create invoices</li>
-                <li className="text-red-500">✗ Cannot view payments</li>
-              </ul>
-            </div>
-
-            <div className="bg-gradient-to-r from-green-50 to-green-100/50 p-6 rounded-xl border-l-4 border-green-500">
-              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-lg">
-                <FaBuilding className="text-green-600" />
-                 Customer
-              </h4>
-              <p className="text-gray-700 mb-2 font-medium">Access includes:</p>
-              <ul className="space-y-1 text-gray-600">
-                <li>• Browse products</li>
-                <li>• Submit inquiries</li>
-                <li>• View inquiry history</li>
-                <li>• View/download invoices</li>
-                <li>• Make payments (where enabled)</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )
-    },
+ 
     {
       id: 'whatsapp',
       icon: <FaWhatsapp className="text-2xl" />,
@@ -669,13 +609,7 @@ export default function TermsPage() {
             By continuing to access or use our Platform after those revisions become effective, you agree to be bound by the revised terms.
           </p>
 
-          <div className="bg-cyan-50 rounded-xl p-5 flex items-center gap-4">
-            <FaCalendarAlt className="text-cyan-600 text-2xl" />
-            <div>
-              <p className="font-semibold text-gray-900">Effective Date</p>
-              <p className="text-gray-600">{effectiveDate}</p>
-            </div>
-          </div>
+         
         </div>
       )
     },
@@ -804,16 +738,7 @@ export default function TermsPage() {
                   ))}
                 </nav>
 
-                {/* Acknowledge Button */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <button
-                    onClick={() => alert('Thank you for acknowledging our Terms & Conditions.')}
-                    className="w-full px-4 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FaCheckCircle />
-                    I Acknowledge
-                  </button>
-                </div>
+             
               </div>
             </div>
 
@@ -867,7 +792,7 @@ export default function TermsPage() {
                         Create Account
                       </Link>
                       <Link
-                        href="/privacy-policy"
+                        href="/privacy"
                         className="px-4 md:px-6 py-2.5 md:py-3 bg-white text-gray-700 rounded-lg md:rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 border border-gray-200 inline-flex items-center justify-center gap-2 text-sm md:text-base"
                       >
                         <FaShieldAlt />

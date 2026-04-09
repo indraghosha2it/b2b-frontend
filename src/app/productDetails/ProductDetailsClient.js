@@ -4195,12 +4195,12 @@ export default function ProductDetailsClient() {
         >
           {product.category?.name || 'Category'}
         </Link>
-        {/* NEW: Add subcategory to breadcrumb */}
-        {product.subcategoryName && (
+        {/* FIXED: Use correct field names - subcategory (ID) and subcategoryName (name) */}
+        {product.subcategoryName && product.subcategory && (
           <>
             <span className="flex-shrink-0">/</span>
             <Link 
-              href={`/products?category=${product.category?._id}&subcategory=${product.subcategoryName}`} 
+              href={`/products?category=${product.category?._id}&subcategory=${product.subcategory}`} 
               className="hover:text-[#E39A65] transition-colors flex-shrink-0"
             >
               {product.subcategoryName}

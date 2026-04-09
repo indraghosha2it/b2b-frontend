@@ -2846,14 +2846,7 @@ const handleEditSubcategorySubmit = async (e) => {
                           <Trash2 className="w-3.5 h-3.5" />
                           Remove
                         </button>
-                        <button 
-                          type="button" 
-                          onClick={handleEditChooseAgain}
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          Choose Again
-                        </button>
+                        
                       </div>
                     </div>
                   )}

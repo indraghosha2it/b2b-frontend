@@ -1661,7 +1661,7 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
         </div>
 
         {/* Section Image (Optional) */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-600 mb-1.5">
             Section Image (Optional)
           </label>
@@ -1706,7 +1706,7 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
               </button>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

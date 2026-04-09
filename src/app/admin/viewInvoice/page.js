@@ -1410,53 +1410,59 @@ const ProductRow = ({ product, index }) => {
       </tr>
 
       {/* Expanded Color Details */}
-      {expanded && product.colors?.map((color, colorIdx) => (
-        <tr key={`color-${index}-${colorIdx}`} className="bg-gray-50/30 border-b border-gray-100">
-          <td className="px-2 sm:px-6 py-2 sm:py-3"></td>
-          <td className="px-2 sm:px-6 py-2 sm:py-3" colSpan={5}>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-              {/* Color Swatch */}
-              <div className="relative flex-shrink-0">
+    {expanded && product.colors?.map((color, colorIdx) => {
+  // Get per-color unit price (use color.unitPrice, fallback to product.unitPrice)
+  const colorUnitPrice = color.unitPrice || product.unitPrice || 0;
+  const colorSubtotal = (color.totalForColor || 0) * colorUnitPrice;
+  
+  return (
+    <tr key={`color-${index}-${colorIdx}`} className="bg-gray-50/30 border-b border-gray-100">
+      <td className="px-2 sm:px-6 py-2 sm:py-3"></td>
+      <td className="px-2 sm:px-6 py-2 sm:py-3" colSpan={5}>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          {/* Color Swatch */}
+          <div className="relative flex-shrink-0">
+            <div 
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg border-2 border-white shadow-md"
+              style={{ backgroundColor: color.color.code }}
+              title={color.color.name || color.color.code}
+            />
+            <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full border border-gray-200"></div>
+          </div>
+
+          {/* Size Breakdown */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+              {color.sizeQuantities?.map((sq, sqIdx) => sq.quantity > 0 && (
                 <div 
-                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg border-2 border-white shadow-md"
-                  style={{ backgroundColor: color.color.code }}
-                  title={color.color.name || color.color.code}
-                />
-                <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full border border-gray-200"></div>
-              </div>
-
-              {/* Size Breakdown */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                  {color.sizeQuantities?.map((sq, sqIdx) => sq.quantity > 0 && (
-                    <div 
-                      key={`size-${index}-${colorIdx}-${sqIdx}`} 
-                      className="inline-flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
-                    >
-                      <span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-[10px] sm:text-xs font-medium text-gray-700 border-r border-gray-200">
-                        {sq.size}
-                      </span>
-                      <span className="px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-gray-900">
-                        {sq.quantity}
-                      </span>
-                    </div>
-                  ))}
+                  key={`size-${index}-${colorIdx}-${sqIdx}`} 
+                  className="inline-flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+                >
+                  <span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-[10px] sm:text-xs font-medium text-gray-700 border-r border-gray-200">
+                    {sq.size}
+                  </span>
+                  <span className="px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-gray-900">
+                    {sq.quantity}
+                  </span>
                 </div>
-              </div>
-
-              {/* Color Summary */}
-              <div className="text-right flex-shrink-0">
-                <div className="text-xs sm:text-sm font-medium text-gray-900 whitespace-nowrap">
-                  {color.totalForColor} pcs × {formatPrice(product.unitPrice)}
-                </div>
-                <div className="text-sm sm:text-base font-bold text-[#E39A65] mt-0.5 sm:mt-1 whitespace-nowrap">
-                  {formatPrice(color.totalForColor * product.unitPrice)}
-                </div>
-              </div>
+              ))}
             </div>
-          </td>
-        </tr>
-      ))}
+          </div>
+
+          {/* Color Summary with Per-Color Unit Price */}
+          <div className="text-right flex-shrink-0">
+            <div className="text-[10px] sm:text-xs font-medium text-gray-500 whitespace-nowrap">
+              {color.totalForColor} pcs × {formatPrice(colorUnitPrice)}/pc
+            </div>
+            <div className="text-xs sm:text-sm font-semibold text-[#E39A65] mt-0.5 sm:mt-1 whitespace-nowrap">
+              = {formatPrice(colorSubtotal)}
+            </div>
+          </div>
+        </div>
+      </td>
+     </tr>
+  );
+})}
 
       {/* Special Instructions */}
       {expanded && product.specialInstructions && (
@@ -1478,6 +1484,180 @@ const ProductRow = ({ product, index }) => {
     </React.Fragment>
   );
 };
+
+// Product Row Component - CORRECTED
+// const ProductRow = ({ product, index }) => {
+//   const [expanded, setExpanded] = useState(true);
+  
+//   const totalQuantity = product.colors?.reduce((sum, color) => 
+//     sum + (color.totalForColor || 0), 0) || 0;
+  
+//   const productTotal = product.total || (totalQuantity * product.unitPrice);
+//   const productNameLines = wrapText(product.productName, 50);
+
+//   return (
+//     <React.Fragment key={`product-${index}`}>
+//       {/* Main Product Row */}
+//       <tr className="border-b border-gray-200 hover:bg-gray-50/80 transition-colors">
+//         <td className="px-2 sm:px-6 py-3 sm:py-4 w-6 sm:w-12">
+//           <button
+//             onClick={() => setExpanded(!expanded)}
+//             className="w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center rounded-md hover:bg-gray-200 transition-colors text-gray-500"
+//             title={expanded ? "Hide details" : "Show details"}
+//           >
+//             {expanded ? <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />}
+//           </button>
+//         </td>
+//         <td className="px-2 sm:px-6 py-3 sm:py-4" colSpan={2}>
+//           <div className="flex items-start gap-2 sm:gap-4">
+//             {/* Product Image */}
+//             <div className="w-12 h-14 sm:w-16 sm:h-[88px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200 overflow-hidden shadow-sm flex-shrink-0">
+//               {product.productImage ? (
+//                 <img 
+//                   src={product.productImage} 
+//                   alt={product.productName}
+//                   className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+//                   onError={(e) => {
+//                     e.target.onerror = null;
+//                     e.target.src = 'https://via.placeholder.com/64x64?text=No+Image';
+//                   }}
+//                 />
+//               ) : (
+//                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
+//                   <Package className="w-4 h-4 sm:w-6 sm:h-6 text-gray-400" />
+//                 </div>
+//               )}
+//             </div>
+//             <div className="flex-1 min-w-0">
+//               {/* Product Name - Multi-line */}
+//               <div className="mb-1 sm:mb-2">
+//                 {productNameLines && productNameLines.length > 1 ? (
+//                   <div className="space-y-0.5">
+//                     {productNameLines.map((line, idx) => (
+//                       <h4 
+//                         key={idx} 
+//                         className="font-semibold text-gray-900 text-xs sm:text-sm break-words"
+//                         style={{ wordBreak: 'break-word' }}
+//                       >
+//                         {line}
+//                       </h4>
+//                     ))}
+//                   </div>
+//                 ) : (
+//                   <h4 className="font-semibold text-gray-900 text-xs sm:text-sm break-words">
+//                     {product.productName || 'N/A'}
+//                   </h4>
+//                 )}
+//               </div>
+              
+//               <div className="flex flex-wrap items-center gap-1.5 sm:gap-4 mt-1 sm:mt-2">
+//                 <span className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs font-medium">
+//                   <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-500"></span>
+//                   {product.colors?.length || 0} Colors
+//                 </span>
+//                 <span className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 bg-purple-50 text-purple-700 rounded-full text-[10px] sm:text-xs font-medium">
+//                   <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-purple-500"></span>
+//                   {totalQuantity} Units
+//                 </span>
+//                 {product.moq && (
+//                   <span className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 bg-gray-50 text-gray-600 rounded-full text-[10px] sm:text-xs font-medium">
+//                     MOQ: {product.moq}
+//                   </span>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </td>
+//         <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
+//           <div className="text-base sm:text-2xl font-bold text-gray-900">{totalQuantity}</div>
+//           <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Total Units</div>
+//         </td>
+//         <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
+//           <div className="text-sm sm:text-lg font-semibold text-gray-900">{formatPrice(product.unitPrice)}</div>
+//           <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Per Unit</div>
+//         </td>
+//         <td className="px-2 sm:px-6 py-3 sm:py-4 text-right">
+//           <div className="text-base sm:text-xl font-bold text-[#E39A65]">{formatPrice(productTotal)}</div>
+//           <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Line Total</div>
+//         </td>
+//       </table>
+
+//       {/* Expanded Color Details with Per-Color Unit Price */}
+//       {expanded && product.colors?.map((color, colorIdx) => {
+//         // Get per-color unit price (use color.unitPrice, fallback to product.unitPrice)
+//         const colorUnitPrice = color.unitPrice || product.unitPrice || 0;
+//         const colorSubtotal = (color.totalForColor || 0) * colorUnitPrice;
+        
+//         return (
+//           <tr key={`color-${index}-${colorIdx}`} className="bg-gray-50/30 border-b border-gray-100">
+//             <td className="px-2 sm:px-6 py-2 sm:py-3"></td>
+//             <td className="px-2 sm:px-6 py-2 sm:py-3" colSpan={5}>
+//               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+//                 {/* Color Swatch */}
+//                 <div className="relative flex-shrink-0">
+//                   <div 
+//                     className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg border-2 border-white shadow-md"
+//                     style={{ backgroundColor: color.color.code }}
+//                     title={color.color.name || color.color.code}
+//                   />
+//                   <div className="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full border border-gray-200"></div>
+//                 </div>
+
+//                 {/* Size Breakdown */}
+//                 <div className="flex-1 min-w-0">
+//                   <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+//                     {color.sizeQuantities?.map((sq, sqIdx) => sq.quantity > 0 && (
+//                       <div 
+//                         key={`size-${index}-${colorIdx}-${sqIdx}`} 
+//                         className="inline-flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+//                       >
+//                         <span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-gray-100 text-[10px] sm:text-xs font-medium text-gray-700 border-r border-gray-200">
+//                           {sq.size}
+//                         </span>
+//                         <span className="px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-gray-900">
+//                           {sq.quantity}
+//                         </span>
+//                       </div>
+//                     ))}
+//                   </div>
+//                 </div>
+
+//                 {/* Color Summary with Per-Color Unit Price */}
+//                 <div className="text-right flex-shrink-0">
+//                   <div className="text-[10px] sm:text-xs font-medium text-gray-500 whitespace-nowrap">
+//                     {color.totalForColor} pcs × {formatPrice(colorUnitPrice)}/pc
+//                   </div>
+//                   <div className="text-xs sm:text-sm font-semibold text-[#E39A65] mt-0.5 sm:mt-1 whitespace-nowrap">
+//                     = {formatPrice(colorSubtotal)}
+//                   </div>
+//                 </div>
+//               </div>
+//             </td>
+//             </tr>
+//           );
+//         }
+//       )}
+
+//       {/* Special Instructions */}
+//       {expanded && product.specialInstructions && (
+//         <tr className="bg-amber-50/30 border-b border-gray-200">
+//           <td className="px-2 sm:px-6 py-2 sm:py-3" colSpan={2}></td>
+//           <td className="px-2 sm:px-6 py-2 sm:py-3" colSpan={4}>
+//             <div className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-amber-50 rounded-lg border border-amber-200">
+//               <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+//               <div>
+//                 <span className="text-[10px] sm:text-xs font-semibold text-amber-800 uppercase tracking-wider block mb-0.5 sm:mb-1">
+//                   Special Instructions
+//                 </span>
+//                 <p className="text-xs sm:text-sm text-amber-700">{product.specialInstructions}</p>
+//               </div>
+//             </div>
+//           </td>
+//         </tr>
+//       )}
+//     </React.Fragment>
+//   );
+// };
 
 // Banking Terms Component
 const BankingTermsSection = ({ bankingTerms }) => {

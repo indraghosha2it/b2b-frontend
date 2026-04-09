@@ -55,6 +55,9 @@ export default function ContactClient() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
   const [activeFaq, setActiveFaq] = useState(null);
+  const [customInquiryText, setCustomInquiryText] = useState('');
+const [showCustomInquiryField, setShowCustomInquiryField] = useState(false);
+
 
 // Add this useEffect in your contact page component
 useEffect(() => {
@@ -184,16 +187,41 @@ useEffect(() => {
     }
   ];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+// In your ContactClient component, add a new state for custom inquiry type:
 
+
+
+// Update handleInputChange to handle custom inquiry text:
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setFormData(prev => ({
+    ...prev,
+    [name]: value
+  }));
+  
+  // Show/hide custom inquiry field based on selection
+  if (name === 'inquiryType') {
+    setShowCustomInquiryField(value === 'other');
+    if (value !== 'other') {
+      setCustomInquiryText('');
+    }
+  }
+};
+
+// Handle custom inquiry text change
+const handleCustomInquiryChange = (e) => {
+  setCustomInquiryText(e.target.value);
+};
+
+// Update handleSubmit to include custom inquiry text:
 const handleSubmit = async (e) => {
   e.preventDefault();
+  
+  // Determine the final inquiry type value
+  let finalInquiryType = formData.inquiryType;
+  if (formData.inquiryType === 'other' && customInquiryText.trim()) {
+    finalInquiryType = customInquiryText.trim();
+  }
   
   setFormStatus({ submitted: true, success: false, message: 'Sending...' });
 
@@ -209,7 +237,7 @@ const handleSubmit = async (e) => {
         phone: formData.phone,
         company: formData.company,
         country: formData.country,
-        inquiryType: formData.inquiryType,
+        inquiryType: finalInquiryType, // Send custom text if "other" was selected
         message: formData.message,
         productInterest: formData.productInterest
       }),
@@ -238,6 +266,8 @@ const handleSubmit = async (e) => {
       message: '',
       productInterest: ''
     });
+    setCustomInquiryText('');
+    setShowCustomInquiryField(false);
 
   } catch (error) {
     console.error('Contact form error:', error);
@@ -729,23 +759,54 @@ const handleSubmit = async (e) => {
     </select>
   </div>
 
-  <div className="w-full">
+ <div className="w-full">
+  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">
+    Inquiry Type
+  </label>
+  <select
+    name="inquiryType"
+    value={formData.inquiryType}
+    onChange={handleInputChange}
+    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-white"
+  >
+    <option value="wholesale">Wholesale Inquiry</option>
+    <option value="custom">Custom Manufacturing</option>
+    <option value="sample">Sample Request</option>
+    <option value="partnership">Partnership</option>
+    <option value="other">Other</option>
+  </select>
+</div>
+
+{/* Custom Inquiry Text Field - Shows only when "Other" is selected */}
+{showCustomInquiryField && (
+  <motion.div
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="w-full"
+  >
     <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">
-      Inquiry Type
+      Please specify your inquiry type <span className="text-orange-500">*</span>
     </label>
-    <select
-      name="inquiryType"
-      value={formData.inquiryType}
-      onChange={handleInputChange}
-      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all bg-white"
-    >
-      <option value="wholesale">Wholesale Inquiry</option>
-      <option value="custom">Custom Manufacturing</option>
-      <option value="sample">Sample Request</option>
-      <option value="partnership">Partnership</option>
-      <option value="other">Other</option>
-    </select>
-  </div>
+    <div className="relative w-full">
+      <FaQuestionCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs sm:text-sm z-10" />
+      <input
+        type="text"
+        value={customInquiryText}
+        onChange={handleCustomInquiryChange}
+        required={showCustomInquiryField}
+        className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+        placeholder="e.g., Franchise Inquiry, Bulk Export, etc."
+      />
+    </div>
+    <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
+      Please describe your inquiry type in detail
+    </p>
+  </motion.div>
+)}
+
+
+
 </div>
 
             <div className="w-full">

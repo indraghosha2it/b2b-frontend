@@ -3018,6 +3018,7 @@ export default function ProductsClient() {
   const [activeImageIndex, setActiveImageIndex] = useState({});
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  
   const [expandedSections, setExpandedSections] = useState({
     price: true,
     categories: true,
@@ -3141,27 +3142,74 @@ export default function ProductsClient() {
     setCurrentPage(1);
   };
 
-  // First, fetch categories on mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  // // First, fetch categories on mount
+  // useEffect(() => {
+  //   fetchCategories();
+  // }, []);
 
-  // Then, after categories are loaded, handle URL parameter
-  useEffect(() => {
-    if (categories.length > 0 && !initialCategorySet) {
-      const categoryParam = searchParams.get('category');
-      if (categoryParam) {
-        const categoryExists = categories.some(cat => cat._id === categoryParam);
-        if (categoryExists) {
-          setFilters(prev => ({
-            ...prev,
-            categories: [categoryParam]
-          }));
-        }
+  // // Then, after categories are loaded, handle URL parameter
+  // useEffect(() => {
+  //   if (categories.length > 0 && !initialCategorySet) {
+  //     const categoryParam = searchParams.get('category');
+  //     if (categoryParam) {
+  //       const categoryExists = categories.some(cat => cat._id === categoryParam);
+  //       if (categoryExists) {
+  //         setFilters(prev => ({
+  //           ...prev,
+  //           categories: [categoryParam]
+  //         }));
+  //       }
+  //     }
+  //     setInitialCategorySet(true);
+  //   }
+  // }, [categories, searchParams, initialCategorySet]);
+
+  // First, fetch categories on mount
+useEffect(() => {
+  fetchCategories();
+}, []);
+
+// Then, after categories are loaded, handle URL parameters (category AND subcategory)
+useEffect(() => {
+  if (categories.length > 0 && !initialCategorySet) {
+    const categoryParam = searchParams.get('category');
+    const subcategoryParam = searchParams.get('subcategory');
+    
+    console.log('URL params - Category:', categoryParam, 'Subcategory:', subcategoryParam);
+    
+    if (categoryParam) {
+      const categoryExists = categories.some(cat => cat._id === categoryParam);
+      if (categoryExists) {
+        // Set category filter
+        setFilters(prev => ({
+          ...prev,
+          categories: [categoryParam]
+        }));
+        
+        // If subcategory parameter exists, set it
+      // If subcategory parameter exists, set it
+if (subcategoryParam) {
+  // First fetch subcategories for this category to validate
+  const loadSubcategoriesAndSetFilter = async () => {
+    const subcats = await fetchSubcategories(categoryParam);
+    // Check if subcats is an array and the subcategory exists
+    if (subcats && Array.isArray(subcats)) {
+      const subcategoryExists = subcats.some(sub => sub._id === subcategoryParam);
+      if (subcategoryExists) {
+        setFilters(prev => ({
+          ...prev,
+          subcategories: [subcategoryParam]
+        }));
       }
-      setInitialCategorySet(true);
     }
-  }, [categories, searchParams, initialCategorySet]);
+  };
+  loadSubcategoriesAndSetFilter();
+}
+      }
+    }
+    setInitialCategorySet(true);
+  }
+}, [categories, searchParams, initialCategorySet]);
 
  // NEW: Fetch subcategories when category is selected
   useEffect(() => {
@@ -3214,14 +3262,17 @@ const fetchSubcategories = async (categoryId) => {
   try {
     const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
     const data = await response.json();
-    if (data.success) {
+    if (data.success && Array.isArray(data.data.subcategories)) {
       setSubcategories(data.data.subcategories);
+      return data.data.subcategories;
     } else {
       setSubcategories([]);
+      return [];
     }
   } catch (error) {
     console.error('Error fetching subcategories:', error);
     setSubcategories([]);
+    return [];
   }
 };
 
@@ -3447,9 +3498,12 @@ const fetchSubcategories = async (categoryId) => {
               <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 text-white" />
             </button>
             <div className="flex items-center gap-1.5 text-xs">
-              <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-                Home
-              </Link>
+             <Link 
+  href="/" 
+  className="text-gray-300 hover:text-white transition-colors relative z-50"
+>
+  Home
+</Link>
               <span className="text-gray-500">/</span>
               <span className="text-white font-medium">Products</span>
             </div>

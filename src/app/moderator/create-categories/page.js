@@ -1934,24 +1934,7 @@ export default function ModeratorCategories() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={fetchCategories}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                  title="Refresh"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="sm:hidden">Refresh</span>
-                </button>
-
-                <button
-                  onClick={() => document.getElementById('create-form').scrollIntoView({ behavior: 'smooth' })}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#E39A65] text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-[#d48b54] transition-colors shadow-sm"
-                >
-                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>Create Category</span>
-                </button>
-              </div>
+           
             </div>
           </div>
         </div>
@@ -2840,14 +2823,7 @@ export default function ModeratorCategories() {
                           <Trash2 className="w-3.5 h-3.5" />
                           Remove
                         </button>
-                        <button 
-                          type="button" 
-                          onClick={handleEditChooseAgain}
-                          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <Upload className="w-3.5 h-3.5" />
-                          Choose Again
-                        </button>
+                       
                       </div>
                     </div>
                   )}

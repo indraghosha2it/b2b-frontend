@@ -329,13 +329,13 @@ export default function BlogPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                       >
-                        <motion.span 
+                        {/* <motion.span 
                           className="flex items-center gap-1"
                           whileHover={{ color: "#E39A65", x: 2 }}
                         >
                           <Calendar className="w-4 h-4" />
                           {formatDate(latestFeaturedBlog.publishDate)}
-                        </motion.span>
+                        </motion.span> */}
                         <motion.span 
                           className="flex items-center gap-1"
                           whileHover={{ color: "#E39A65", x: 2 }}
@@ -343,13 +343,13 @@ export default function BlogPage() {
                           <User className="w-4 h-4" />
                           {latestFeaturedBlog.author}
                         </motion.span>
-                        <motion.span 
+                        {/* <motion.span 
                           className="flex items-center gap-1"
                           whileHover={{ color: "#E39A65", x: 2 }}
                         >
                           <Clock className="w-4 h-4" />
                           {getReadingTime(latestFeaturedBlog.content)} min read
-                        </motion.span>
+                        </motion.span> */}
                       </motion.div>
                       
                       {/* Category Badge */}
@@ -647,13 +647,13 @@ export default function BlogPage() {
                             <div className={`p-4 flex-1 ${viewMode === 'list' ? 'flex flex-col justify-center' : ''}`}>
                               {/* Meta */}
                               <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
-                                <motion.span 
+                                {/* <motion.span 
                                   className="flex items-center gap-1"
                                   whileHover={{ color: "#E39A65" }}
                                 >
                                   <Calendar className="w-3 h-3" />
                                   {formatDate(blog.publishDate)}
-                                </motion.span>
+                                </motion.span> */}
                                 <motion.span 
                                   className="flex items-center gap-1"
                                   whileHover={{ color: "#E39A65" }}
