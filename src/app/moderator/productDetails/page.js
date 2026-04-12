@@ -1573,6 +1573,11 @@ const KeyAttributes = ({ product }) => {
     attributes.push({ label: 'Subcategory', value: product.subcategoryName });
   }
 
+    // NEW: Add child subcategory if exists
+  if (product.childSubcategoryName) {
+    attributes.push({ label: 'Child Subcategory', value: product.childSubcategoryName });
+  }
+
   // Add additional info attributes
   if (product.additionalInfo && product.additionalInfo.length > 0) {
     product.additionalInfo.forEach(info => {
@@ -1834,18 +1839,40 @@ export default function ModeratorProductDetails() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 max-w-7xl py-8">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/moderator/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
-            <span>/</span>
-            <Link href="/moderator/all-products" className="hover:text-[#E39A65] transition-colors">All Products</Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
-              {product.productName}
-            </span>
-          </div>
-        </div>
+      
+      {/* Breadcrumb */}
+<div className="mb-6">
+  <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+    <Link href="/moderator/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
+    <span>/</span>
+    <Link href="/moderator/all-products" className="hover:text-[#E39A65] transition-colors">All Products</Link>
+    <span>/</span>
+    {product.category?.name && (
+      <>
+        <Link href={`/moderator/all-products?category=${product.category?._id}`} className="hover:text-[#E39A65] transition-colors">
+          {product.category.name}
+        </Link>
+        <span>/</span>
+      </>
+    )}
+    {product.subcategoryName && (
+      <>
+        <span className="text-gray-500">{product.subcategoryName}</span>
+        <span>/</span>
+      </>
+    )}
+    {/* NEW: Child Subcategory in Breadcrumb */}
+    {product.childSubcategoryName && (
+      <>
+        <span className="text-gray-500">{product.childSubcategoryName}</span>
+        <span>/</span>
+      </>
+    )}
+    <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
+      {product.productName}
+    </span>
+  </div>
+</div>
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1893,6 +1920,13 @@ export default function ModeratorProductDetails() {
           {product.subcategoryName}
         </span>
       )}
+
+      {product.childSubcategoryName && (
+      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full flex items-center gap-1">
+        <FolderTree className="w-3.5 h-3.5" />
+        {product.childSubcategoryName}
+      </span>
+    )}
       
                   {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">

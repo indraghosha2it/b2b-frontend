@@ -633,43 +633,6 @@ const CreatorInfo = ({ createdBy }) => {
   );
 };
 
-// Key Attributes Component - Updated to include new fields
-// const KeyAttributes = ({ product }) => {
-//   const attributes = [
-//     { label: 'MOQ', value: `${product.moq} pieces` },
-//     { label: 'Fabric', value: product.fabric || 'Standard' },
-//     { label: 'Target Audience', value: capitalizeFirst(product.targetedCustomer || 'Unisex') },
-//     { label: 'Category', value: product.category?.name || 'Uncategorized' },
-  
-//     ...(product.additionalInfo || []).map(info => ({
-//       label: info.fieldName,
-//       value: info.fieldValue
-//     }))
-//   ];
-
-//   // Add featured to attributes if true
-//   if (product.isFeatured) {
-//     attributes.push({ label: 'Featured', value: 'Yes' });
-//   }
-
-//   return (
-//     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-//       <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-//         <h3 className="text-lg font-semibold text-gray-900">Key Attributes</h3>
-//       </div>
-//       <div className="p-6">
-//         <div className="grid grid-cols-2 gap-4">
-//           {attributes.map((attr, index) => (
-//             <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
-//               <p className="text-sm text-gray-500 mb-1">{attr.label}</p>
-//               <p className="text-sm font-medium text-gray-900">{attr.value}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 // Key Attributes Component - Updated to include subcategory
 const KeyAttributes = ({ product }) => {
@@ -684,6 +647,11 @@ const KeyAttributes = ({ product }) => {
   // Add subcategory to attributes if exists
   if (product.subcategoryName) {
     attributes.push({ label: 'Subcategory', value: product.subcategoryName });
+  }
+  
+  // NEW: Add child subcategory to attributes if exists
+  if (product.childSubcategoryName) {
+    attributes.push({ label: 'Child Subcategory', value: product.childSubcategoryName });
   }
 
   // Add additional info attributes
@@ -1022,18 +990,38 @@ export default function AdminProductDetails() {
       {/* Main Content */}
       <div className="container mx-auto px-4 max-w-7xl py-8">
         {/* Breadcrumb */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/admin/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
-            <span>/</span>
-            <Link href="/admin/all-products" className="hover:text-[#E39A65] transition-colors">All Products</Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
-              {product.productName}
-            </span>
-          </div>
-        </div>
-
+       
+{/* Breadcrumb */}
+<div className="mb-6">
+  <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+    <Link href="/admin/dashboard" className="hover:text-[#E39A65] transition-colors">Dashboard</Link>
+    <span>/</span>
+    <Link href="/admin/all-products" className="hover:text-[#E39A65] transition-colors">All Products</Link>
+    <span>/</span>
+    {product.category?.name && (
+      <>
+        <span className="text-gray-500">{product.category.name}</span>
+        <span>/</span>
+      </>
+    )}
+    {product.subcategoryName && (
+      <>
+        <span className="text-gray-500">{product.subcategoryName}</span>
+        <span>/</span>
+      </>
+    )}
+    {/* NEW: Child Subcategory in Breadcrumb */}
+    {product.childSubcategoryName && (
+      <>
+        <span className="text-gray-500">{product.childSubcategoryName}</span>
+        <span>/</span>
+      </>
+    )}
+    <span className="text-gray-900 font-medium max-w-[200px] truncate" title={product.productName}>
+      {product.productName}
+    </span>
+  </div>
+</div>
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Image Gallery (5 columns) */}
@@ -1080,6 +1068,13 @@ export default function AdminProductDetails() {
           {product.subcategoryName}
         </span>
       )}
+
+      {product.childSubcategoryName && (
+      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm rounded-full flex items-center gap-1">
+        <FolderTree className="w-3.5 h-3.5" />
+        {product.childSubcategoryName}
+      </span>
+    )}
                   {product.targetedCustomer && product.targetedCustomer !== 'unisex' && (
                     <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
                       {capitalizeFirst(product.targetedCustomer)}

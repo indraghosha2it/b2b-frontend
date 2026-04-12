@@ -1,6 +1,5 @@
 
 
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -28,7 +27,8 @@
 //   Type,
 //   Star,
 //   Search,
-//   Tag
+//   Tag,
+//   FolderTree
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -107,6 +107,7 @@
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
+//   const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
 //   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
@@ -123,6 +124,7 @@
 //     description: '',
 //     instruction: '', 
 //     category: '',
+//     subcategory: '', // NEW: Subcategory field
 //     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
@@ -226,15 +228,21 @@
 //     editable: true,
 //   });
 
+//   // Fetch categories on mount
 //   useEffect(() => {
 //     fetchCategories();
 //   }, []);
 
+//   // Fetch subcategories when category changes
 //   useEffect(() => {
 //     if (formData.category) {
+//       fetchSubcategories(formData.category);
 //       fetchCategoryDetails(formData.category);
 //     } else {
+//       setSubcategories([]);
 //       setSelectedCategoryDetails(null);
+//       // Reset subcategory when category changes
+//       setFormData(prev => ({ ...prev, subcategory: '' }));
 //     }
 //   }, [formData.category]);
 
@@ -262,6 +270,26 @@
 //       toast.error('Failed to fetch categories');
 //     } finally {
 //       setIsLoading(false);
+//     }
+//   };
+
+//   // NEW: Fetch subcategories for selected category
+//   const fetchSubcategories = async (categoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setSubcategories(data.data.subcategories);
+//       } else {
+//         setSubcategories([]);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching subcategories:', error);
+//       setSubcategories([]);
 //     }
 //   };
 
@@ -313,7 +341,7 @@
 //     return;
 //   }
 
-//   // Create preview using URL.createObjectURL (better performance)
+//   // Create preview using URL.createObjectURL
 //   const previewUrl = URL.createObjectURL(file);
   
 //   // Show preview immediately with uploading state
@@ -768,11 +796,13 @@
 //         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //       );
 
+//       // NEW: Include subcategory in payload
 //       const payload = {
 //         productName: formData.productName,
 //         description: formData.description,
 //         instruction: formData.instruction || '',
 //         category: formData.category,
+//         subcategory: formData.subcategory || '', // NEW: Send subcategory
 //         targetedCustomer: formData.targetedCustomer,
 //         fabric: formData.fabric,
 //         moq: formData.moq,
@@ -789,6 +819,7 @@
       
 //       console.log('Submitting images:', imageUrls);
 //       console.log('Images count:', imageUrls.length);
+//       console.log('Subcategory:', formData.subcategory);
 
 //       const response = await fetch('http://localhost:5000/api/products', {
 //         method: 'POST',
@@ -969,8 +1000,9 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Targeted Customer, Fabric */}
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                     {/* Category, Subcategory, Targeted Customer, Fabric */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Category <span className="text-red-500">*</span>
@@ -991,15 +1023,36 @@
 //                         {errors.category && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
 //                         )}
-//                         {selectedCategoryDetails && (
-//                           <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
-//                             <p className="text-xs text-gray-600">
-//                               <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
-//                             </p>
+//                       </div>
+
+//                       {/* Subcategory Field */}
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           <div className="flex items-center gap-1">
+//                             <FolderTree className="w-4 h-4" />
+//                             Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
 //                           </div>
+//                         </label>
+//                         <select
+//                           name="subcategory"
+//                           value={formData.subcategory}
+//                           onChange={handleChange}
+//                           disabled={!formData.category || subcategories.length === 0}
+//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
+//                         >
+//                           <option value="">-- Select Subcategory (Optional) --</option>
+//                           {subcategories.map(sub => (
+//                             <option key={sub._id} value={sub._id}>{sub.name}</option>
+//                           ))}
+//                         </select>
+//                         {subcategories.length === 0 && formData.category && (
+//                           <p className="text-xs text-gray-500 mt-1">
+//                             No subcategories available for this category
+//                           </p>
 //                         )}
 //                       </div>
 
+//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -1031,6 +1084,7 @@
 //                         )}
 //                       </div>
 
+//                       {/* Fabric */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Fabric (Material) <span className="text-red-500">*</span>
@@ -1050,6 +1104,25 @@
 //                         )}
 //                       </div>
 //                     </div>
+
+//                     {/* Category Info Display */}
+//                     {selectedCategoryDetails && (
+//                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
+//                         <div className="flex items-center gap-2">
+//                           <Package className="w-4 h-4 text-[#E39A65]" />
+//                           <div>
+//                             <p className="text-sm font-medium text-gray-900">
+//                               Selected Category: {selectedCategoryDetails.name}
+//                             </p>
+//                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
+//                               <p className="text-xs text-gray-600 mt-1">
+//                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+//                               </p>
+//                             )}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}
 
 //                     {formData.targetedCustomer && (
 //                       <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -1079,7 +1152,6 @@
 //         Product Images <span className="text-red-500">*</span>
 //       </h2>
 //       <p className="text-xs text-gray-500 mt-1">Upload up to 6 images (JPG, PNG, WebP, max 5MB each)</p>
-//       {/* <p className="text-xs text-blue-600 mt-1">💡 Tip: You can select multiple images at once by holding Ctrl/Cmd while selecting</p> */}
 //     </div>
     
 //     <div className="p-5">
@@ -1673,6 +1745,7 @@
 //   );
 // }
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1780,12 +1853,14 @@ export default function ModeratorCreateProduct() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
+  const [subcategories, setSubcategories] = useState([]);
+  const [childSubcategories, setChildSubcategories] = useState([]);
   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [keywordInput, setKeywordInput] = useState('');
+  const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
@@ -1797,7 +1872,8 @@ export default function ModeratorCreateProduct() {
     description: '',
     instruction: '', 
     category: '',
-    subcategory: '', // NEW: Subcategory field
+    subcategory: '',
+    childSubcategory: '', // NEW: Child subcategory field
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
@@ -1914,10 +1990,22 @@ const [productImages, setProductImages] = useState([
     } else {
       setSubcategories([]);
       setSelectedCategoryDetails(null);
-      // Reset subcategory when category changes
-      setFormData(prev => ({ ...prev, subcategory: '' }));
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
+      setFormData(prev => ({ ...prev, subcategory: '', childSubcategory: '' }));
     }
   }, [formData.category]);
+
+  // Fetch child subcategories when subcategory changes
+  useEffect(() => {
+    if (formData.category && formData.subcategory) {
+      fetchChildSubcategories(formData.category, formData.subcategory);
+    } else {
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
+      setFormData(prev => ({ ...prev, childSubcategory: '' }));
+    }
+  }, [formData.subcategory]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -1946,7 +2034,6 @@ const [productImages, setProductImages] = useState([
     }
   };
 
-  // NEW: Fetch subcategories for selected category
   const fetchSubcategories = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
@@ -1963,6 +2050,29 @@ const [productImages, setProductImages] = useState([
     } catch (error) {
       console.error('Error fetching subcategories:', error);
       setSubcategories([]);
+    }
+  };
+
+  // NEW: Fetch child subcategories for a subcategory
+  const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setChildSubcategories(data.data.children);
+        setShowChildSubcategory(data.data.children.length > 0);
+      } else {
+        setChildSubcategories([]);
+        setShowChildSubcategory(false);
+      }
+    } catch (error) {
+      console.error('Error fetching child subcategories:', error);
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
     }
   };
 
@@ -2014,10 +2124,8 @@ const handleImageChange = async (e, index) => {
     return;
   }
 
-  // Create preview using URL.createObjectURL
   const previewUrl = URL.createObjectURL(file);
   
-  // Show preview immediately with uploading state
   const updatedImages = [...productImages];
   updatedImages[index] = {
     file: file,
@@ -2030,7 +2138,6 @@ const handleImageChange = async (e, index) => {
   setProductImages(updatedImages);
   console.log('Preview set for index:', index);
 
-  // Upload to Cloudinary
   try {
     const { url, publicId } = await uploadToCloudinary(file);
     console.log('Upload successful for index:', index, 'URL:', url);
@@ -2062,14 +2169,11 @@ const handleImageChange = async (e, index) => {
   }
 };
 
-
-// Handle multiple image selection
 const handleMultipleImageSelect = async (e) => {
   const files = Array.from(e.target.files);
   
   if (files.length === 0) return;
   
-  // Check total images limit (6 max)
   const currentImagesCount = productImages.filter(img => img.url !== null || img.uploading).length;
   const availableSlots = 6 - currentImagesCount;
   
@@ -2078,7 +2182,6 @@ const handleMultipleImageSelect = async (e) => {
     return;
   }
   
-  // Find empty slots
   const emptySlots = [];
   for (let i = 0; i < productImages.length; i++) {
     if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
@@ -2086,25 +2189,20 @@ const handleMultipleImageSelect = async (e) => {
     }
   }
   
-  // Create temporary array to store all images being processed
   const tempImages = [...productImages];
   
-  // First, add all previews immediately
   for (let i = 0; i < files.length && i < emptySlots.length; i++) {
     const file = files[i];
     const slotIndex = emptySlots[i];
     
-    // Validate file
     const validation = validateImageFile(file);
     if (!validation.valid) {
       toast.error(`Image ${i + 1}: ${validation.message}`);
       continue;
     }
     
-    // Create preview URL
     const previewUrl = URL.createObjectURL(file);
     
-    // Update temp array with preview
     tempImages[slotIndex] = {
       file: file,
       preview: previewUrl,
@@ -2115,18 +2213,14 @@ const handleMultipleImageSelect = async (e) => {
     };
   }
   
-  // Update state with all previews at once
   setProductImages([...tempImages]);
   
-  // Now upload each image one by one
   for (let i = 0; i < files.length && i < emptySlots.length; i++) {
     const file = files[i];
     const slotIndex = emptySlots[i];
     
-    // Skip if validation failed
     const validation = validateImageFile(file);
     if (!validation.valid) {
-      // Remove the preview for invalid files
       const updatedImages = [...productImages];
       updatedImages[slotIndex] = { file: null, preview: null, error: validation.message, url: null, publicId: null, uploading: false };
       setProductImages(updatedImages);
@@ -2136,7 +2230,6 @@ const handleMultipleImageSelect = async (e) => {
     try {
       const { url, publicId } = await uploadToCloudinary(file);
       
-      // Update the specific image with URL while preserving others
       setProductImages(prevImages => {
         const updatedImages = [...prevImages];
         updatedImages[slotIndex] = {
@@ -2164,14 +2257,12 @@ const handleMultipleImageSelect = async (e) => {
     }
   }
   
-  // Clear the input so the same files can be selected again if needed
   if (fileInputRefs.current['multiple']) {
     fileInputRefs.current['multiple'].value = '';
   }
 };
 
 const removeImage = (index) => {
-  // Revoke the object URL to free memory
   if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
     URL.revokeObjectURL(productImages[index].preview);
   }
@@ -2469,13 +2560,13 @@ const removeImage = (index) => {
         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
       );
 
-      // NEW: Include subcategory in payload
       const payload = {
         productName: formData.productName,
         description: formData.description,
         instruction: formData.instruction || '',
         category: formData.category,
-        subcategory: formData.subcategory || '', // NEW: Send subcategory
+        subcategory: formData.subcategory || '',
+        childSubcategory: formData.childSubcategory || '', // NEW: Include child subcategory
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
@@ -2493,6 +2584,7 @@ const removeImage = (index) => {
       console.log('Submitting images:', imageUrls);
       console.log('Images count:', imageUrls.length);
       console.log('Subcategory:', formData.subcategory);
+      console.log('Child Subcategory:', formData.childSubcategory);
 
       const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
@@ -2673,8 +2765,8 @@ const removeImage = (index) => {
                       </p>
                     </div>
 
-                    {/* Category, Subcategory, Targeted Customer, Fabric */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
                       {/* Category */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2709,7 +2801,10 @@ const removeImage = (index) => {
                         <select
                           name="subcategory"
                           value={formData.subcategory}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            handleChange(e);
+                            setFormData(prev => ({ ...prev, childSubcategory: '' }));
+                          }}
                           disabled={!formData.category || subcategories.length === 0}
                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
                         >
@@ -2724,6 +2819,29 @@ const removeImage = (index) => {
                           </p>
                         )}
                       </div>
+
+                      {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
+                      {showChildSubcategory && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex items-center gap-1">
+                              <FolderTree className="w-4 h-4" />
+                              Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                            </div>
+                          </label>
+                          <select
+                            name="childSubcategory"
+                            value={formData.childSubcategory}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition border-gray-300"
+                          >
+                            <option value="">-- Select Child Subcategory (Optional) --</option>
+                            {childSubcategories.map(child => (
+                              <option key={child._id} value={child._id}>{child.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       {/* Targeted Customer */}
                       <div>
@@ -2778,7 +2896,7 @@ const removeImage = (index) => {
                       </div>
                     </div>
 
-                    {/* Category Info Display */}
+                    {/* Category Info Display - Shows all selected levels */}
                     {selectedCategoryDetails && (
                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <div className="flex items-center gap-2">
@@ -2790,6 +2908,11 @@ const removeImage = (index) => {
                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
                               <p className="text-xs text-gray-600 mt-1">
                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+                              </p>
+                            )}
+                            {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
                               </p>
                             )}
                           </div>

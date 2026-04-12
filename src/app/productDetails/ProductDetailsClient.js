@@ -2947,7 +2947,7 @@ const KeyAttributes = ({ product }) => {
 
   // Build subcategory attribute if exists
   const subcategoryAttribute = product.subcategoryName ? [{ label: 'Subcategory', value: product.subcategoryName }] : [];
-
+  const childSubcategoryAttribute = product.childSubcategoryName ? [{ label: 'Child Subcategory', value: product.childSubcategoryName }] : [];
   const attributes = [
     { label: 'MOQ (Per Color)', value: `${product.moq} pieces` },
     { label: 'Fabric', value: product.fabric || 'Standard' },
@@ -2955,6 +2955,7 @@ const KeyAttributes = ({ product }) => {
     { label: 'Available Sizes', value: product.sizes?.filter(s => s.trim()).slice(0, 5).join(', ') + (product.sizes?.length > 5 ? ` +${product.sizes.length - 5} more` : '') || 'Standard' },
     { label: 'Category', value: product.category?.name || 'Uncategorized' },
     ...subcategoryAttribute,
+      ...childSubcategoryAttribute,
     ...additionalInfoAttributes
   ];
 
@@ -4173,12 +4174,13 @@ export default function ProductDetailsClient() {
       <Navbar />
       <div className="min-h-screen bg-gray-50 mt-16 sm:mt-20">
         {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
+    {/* Breadcrumb */}
+<div className="bg-white border-b border-gray-200">
   <div className="container mx-auto px-4 max-w-7xl py-3 sm:py-4">
     <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-      <button
+       <button
         onClick={() => router.back()}
-        className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
+        className="lg:hidden flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex-shrink-0"
         aria-label="Go back"
       >
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
@@ -4195,7 +4197,8 @@ export default function ProductDetailsClient() {
         >
           {product.category?.name || 'Category'}
         </Link>
-        {/* FIXED: Use correct field names - subcategory (ID) and subcategoryName (name) */}
+        
+        {/* Subcategory */}
         {product.subcategoryName && product.subcategory && (
           <>
             <span className="flex-shrink-0">/</span>
@@ -4207,6 +4210,20 @@ export default function ProductDetailsClient() {
             </Link>
           </>
         )}
+        
+        {/* NEW: Child Subcategory */}
+        {product.childSubcategoryName && product.childSubcategory && (
+          <>
+            <span className="flex-shrink-0">/</span>
+            <Link 
+              href={`/products?category=${product.category?._id}&subcategory=${product.subcategory}&childSubcategory=${product.childSubcategory}`} 
+              className="hover:text-[#E39A65] transition-colors flex-shrink-0"
+            >
+              {product.childSubcategoryName}
+            </Link>
+          </>
+        )}
+        
         <span className="flex-shrink-0">/</span>
         <span className="text-gray-900 font-medium truncate">{product.productName}</span>
       </div>
@@ -4254,6 +4271,24 @@ export default function ProductDetailsClient() {
               <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Subcategory</span>
               <span className="text-xs font-semibold text-gray-900">
                 {product.subcategoryName}
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+
+         {/* NEW: Child Subcategory - Add this block */}
+      {product.childSubcategoryName && (
+        <>
+          <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
+              <FolderTree className="w-3.5 h-3.5 text-[#E39A65]" />
+            </div>
+            <div>
+              <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Sub-Subcategory</span>
+              <span className="text-xs font-semibold text-gray-900">
+                {product.childSubcategoryName}
               </span>
             </div>
           </div>

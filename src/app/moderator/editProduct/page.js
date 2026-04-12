@@ -27,7 +27,8 @@
 //   Type,
 //   Star,
 //   Search,
-//   Tag
+//   Tag,
+//   FolderTree
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -108,6 +109,7 @@
 //   const [isLoading, setIsLoading] = useState(true);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
+//   const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
 //   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
@@ -126,6 +128,7 @@
 //     description: '',
 //     instruction: '',
 //     category: '',
+//     subcategory: '', // NEW: Subcategory field
 //     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
@@ -240,10 +243,13 @@
 //     }
 //   }, [productId]);
 
+//   // Fetch subcategories when category changes
 //   useEffect(() => {
 //     if (formData.category) {
+//       fetchSubcategories(formData.category);
 //       fetchCategoryDetails(formData.category);
 //     } else {
+//       setSubcategories([]);
 //       setSelectedCategoryDetails(null);
 //     }
 //   }, [formData.category]);
@@ -274,6 +280,26 @@
 //     } catch (error) {
 //       console.error('Error fetching categories:', error);
 //       toast.error('Failed to fetch categories');
+//     }
+//   };
+
+//   // NEW: Fetch subcategories for selected category
+//   const fetchSubcategories = async (categoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setSubcategories(data.data.subcategories);
+//       } else {
+//         setSubcategories([]);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching subcategories:', error);
+//       setSubcategories([]);
 //     }
 //   };
 
@@ -311,6 +337,7 @@
 //           description: product.description || '',
 //           instruction: product.instruction || '',
 //           category: product.category?._id || product.category || '',
+//           subcategory: product.subcategory || '', // NEW: Set subcategory
 //           targetedCustomer: product.targetedCustomer || 'unisex',
 //           fabric: product.fabric || '',
 //           moq: product.moq || 100,
@@ -327,6 +354,12 @@
 //             metaKeywords: []
 //           }
 //         });
+
+//         // If category is selected, fetch its subcategories
+//         if (product.category?._id || product.category) {
+//           const categoryId = product.category?._id || product.category;
+//           await fetchSubcategories(categoryId);
+//         }
 
 //         setExistingImages(product.images || []);
 //       } else {
@@ -763,6 +796,7 @@
 //     if (formData.description !== originalProduct.description) return true;
 //     if (formData.instruction !== originalProduct.instruction) return true;
 //     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
+//     if (formData.subcategory !== (originalProduct.subcategory || '')) return true; // NEW: Check subcategory change
 //     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
 //     if (formData.fabric !== originalProduct.fabric) return true;
 //     if (formData.moq !== originalProduct.moq) return true;
@@ -826,11 +860,13 @@
 //         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //       );
 
+//       // NEW: Include subcategory in payload
 //       const payload = {
 //         productName: formData.productName,
 //         description: formData.description,
 //         instruction: formData.instruction || '',
 //         category: formData.category,
+//         subcategory: formData.subcategory || '', // NEW: Send subcategory
 //         targetedCustomer: formData.targetedCustomer,
 //         fabric: formData.fabric,
 //         moq: formData.moq,
@@ -1041,8 +1077,9 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Targeted Customer, Fabric */}
-//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                     {/* Category, Subcategory, Targeted Customer, Fabric */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Category <span className="text-red-500">*</span>
@@ -1063,15 +1100,36 @@
 //                         {errors.category && (
 //                           <p className="text-xs text-red-600 mt-1">{errors.category}</p>
 //                         )}
-//                         {selectedCategoryDetails && (
-//                           <div className="mt-2 p-2 bg-orange-50 rounded-lg border border-orange-200">
-//                             <p className="text-xs text-gray-600">
-//                               <span className="font-medium">Selected:</span> {selectedCategoryDetails.name}
-//                             </p>
+//                       </div>
+
+//                       {/* Subcategory Field */}
+//                       <div>
+//                         <label className="block text-sm font-medium text-gray-700 mb-1">
+//                           <div className="flex items-center gap-1">
+//                             <FolderTree className="w-4 h-4" />
+//                             Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
 //                           </div>
+//                         </label>
+//                         <select
+//                           name="subcategory"
+//                           value={formData.subcategory}
+//                           onChange={handleChange}
+//                           disabled={!formData.category || subcategories.length === 0}
+//                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
+//                         >
+//                           <option value="">-- Select Subcategory (Optional) --</option>
+//                           {subcategories.map(sub => (
+//                             <option key={sub._id} value={sub._id}>{sub.name}</option>
+//                           ))}
+//                         </select>
+//                         {subcategories.length === 0 && formData.category && (
+//                           <p className="text-xs text-gray-500 mt-1">
+//                             No subcategories available for this category
+//                           </p>
 //                         )}
 //                       </div>
 
+//                       {/* Targeted Customer */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -1103,6 +1161,7 @@
 //                         )}
 //                       </div>
 
+//                       {/* Fabric */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           Fabric (Material) <span className="text-red-500">*</span>
@@ -1122,6 +1181,25 @@
 //                         )}
 //                       </div>
 //                     </div>
+
+//                     {/* Category Info Display */}
+//                     {selectedCategoryDetails && (
+//                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
+//                         <div className="flex items-center gap-2">
+//                           <Package className="w-4 h-4 text-[#E39A65]" />
+//                           <div>
+//                             <p className="text-sm font-medium text-gray-900">
+//                               Selected Category: {selectedCategoryDetails.name}
+//                             </p>
+//                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
+//                               <p className="text-xs text-gray-600 mt-1">
+//                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+//                               </p>
+//                             )}
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}
 
 //                     {/* Quick Stats for Selected Customer */}
 //                     {formData.targetedCustomer && (
@@ -1797,7 +1875,6 @@
 // }
 
 
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1908,7 +1985,8 @@ export default function ModeratorEditProduct() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
+  const [subcategories, setSubcategories] = useState([]);
+  const [childSubcategories, setChildSubcategories] = useState([]);
   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [currentColorIndex, setCurrentColorIndex] = useState(null);
@@ -1916,6 +1994,7 @@ export default function ModeratorEditProduct() {
   const [originalProduct, setOriginalProduct] = useState(null);
   const [userRole, setUserRole] = useState('');
   const [keywordInput, setKeywordInput] = useState('');
+  const [showChildSubcategory, setShowChildSubcategory] = useState(false);
 
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
@@ -1927,7 +2006,8 @@ export default function ModeratorEditProduct() {
     description: '',
     instruction: '',
     category: '',
-    subcategory: '', // NEW: Subcategory field
+    subcategory: '',
+    childSubcategory: '', // NEW: Child subcategory field
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
@@ -2050,8 +2130,21 @@ export default function ModeratorEditProduct() {
     } else {
       setSubcategories([]);
       setSelectedCategoryDetails(null);
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
     }
   }, [formData.category]);
+
+  // Fetch child subcategories when subcategory changes
+  useEffect(() => {
+    if (formData.category && formData.subcategory) {
+      fetchChildSubcategories(formData.category, formData.subcategory);
+    } else {
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
+      setFormData(prev => ({ ...prev, childSubcategory: '' }));
+    }
+  }, [formData.subcategory]);
 
   useEffect(() => {
     if (editor && formData.description !== editor.getHTML()) {
@@ -2082,7 +2175,6 @@ export default function ModeratorEditProduct() {
     }
   };
 
-  // NEW: Fetch subcategories for selected category
   const fetchSubcategories = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
@@ -2099,6 +2191,29 @@ export default function ModeratorEditProduct() {
     } catch (error) {
       console.error('Error fetching subcategories:', error);
       setSubcategories([]);
+    }
+  };
+
+  // NEW: Fetch child subcategories for a subcategory
+  const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setChildSubcategories(data.data.children);
+        setShowChildSubcategory(data.data.children.length > 0);
+      } else {
+        setChildSubcategories([]);
+        setShowChildSubcategory(false);
+      }
+    } catch (error) {
+      console.error('Error fetching child subcategories:', error);
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
     }
   };
 
@@ -2136,7 +2251,8 @@ export default function ModeratorEditProduct() {
           description: product.description || '',
           instruction: product.instruction || '',
           category: product.category?._id || product.category || '',
-          subcategory: product.subcategory || '', // NEW: Set subcategory
+          subcategory: product.subcategory || '',
+          childSubcategory: product.childSubcategory || '',
           targetedCustomer: product.targetedCustomer || 'unisex',
           fabric: product.fabric || '',
           moq: product.moq || 100,
@@ -2158,6 +2274,11 @@ export default function ModeratorEditProduct() {
         if (product.category?._id || product.category) {
           const categoryId = product.category?._id || product.category;
           await fetchSubcategories(categoryId);
+          
+          // If subcategory is selected, fetch its child subcategories
+          if (product.subcategory) {
+            await fetchChildSubcategories(categoryId, product.subcategory);
+          }
         }
 
         setExistingImages(product.images || []);
@@ -2235,104 +2356,92 @@ export default function ModeratorEditProduct() {
     }
   };
 
-  // Handle multiple image selection
-const handleMultipleImageSelect = async (e) => {
-  const files = Array.from(e.target.files);
-  
-  if (files.length === 0) return;
-  
-  // Check total images limit (6 max)
-  const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
-  const availableSlots = 6 - currentImagesCount;
-  
-  if (files.length > availableSlots) {
-    toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
-    return;
-  }
-  
-  // Create temporary array to store all new images
-  const tempNewImages = [...newImages];
-  
-  // First, add all previews immediately
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  const handleMultipleImageSelect = async (e) => {
+    const files = Array.from(e.target.files);
     
-    // Validate file
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      toast.error(`Image ${i + 1}: ${validation.message}`);
-      continue;
+    if (files.length === 0) return;
+    
+    const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
+    const availableSlots = 6 - currentImagesCount;
+    
+    if (files.length > availableSlots) {
+      toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+      return;
     }
     
-    const imageId = Date.now() + Math.random() + i;
-    const previewUrl = URL.createObjectURL(file);
+    const tempNewImages = [...newImages];
     
-    // Add to temp array
-    tempNewImages.push({
-      id: imageId,
-      slotId: `multi-${imageId}`,
-      file: file,
-      preview: previewUrl,
-      uploading: true,
-      url: null,
-      publicId: null
-    });
-  }
-  
-  // Update state with all previews at once
-  setNewImages([...tempNewImages]);
-  
-  // Now upload each image one by one
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      continue;
-    }
-    
-    try {
-      const { url, publicId } = await uploadToCloudinary(file);
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       
-      // Update the specific image with URL while preserving others
-      setNewImages(prev => {
-        // Find the image that's currently uploading (the one without a URL)
-        const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
-        if (uploadingIndex !== -1) {
-          const updated = [...prev];
-          updated[uploadingIndex] = {
-            ...updated[uploadingIndex],
-            url: url,
-            publicId: publicId,
-            uploading: false
-          };
-          return updated;
-        }
-        return prev;
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast.error(`Image ${i + 1}: ${validation.message}`);
+        continue;
+      }
+      
+      const imageId = Date.now() + Math.random() + i;
+      const previewUrl = URL.createObjectURL(file);
+      
+      tempNewImages.push({
+        id: imageId,
+        slotId: `multi-${imageId}`,
+        file: file,
+        preview: previewUrl,
+        uploading: true,
+        url: null,
+        publicId: null
       });
-      
-      toast.success(`Image ${i + 1} uploaded successfully`);
-    } catch (error) {
-      console.error('Upload error:', error);
-      setNewImages(prev => prev.filter(img => img.file !== file));
-      toast.error(`Failed to upload image ${i + 1}`);
     }
-  }
-  
-  // Clear the input
-  if (fileInputRefs.current['multiple']) {
-    fileInputRefs.current['multiple'].value = '';
-  }
-};
+    
+    setNewImages([...tempNewImages]);
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        continue;
+      }
+      
+      try {
+        const { url, publicId } = await uploadToCloudinary(file);
+        
+        setNewImages(prev => {
+          const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
+          if (uploadingIndex !== -1) {
+            const updated = [...prev];
+            updated[uploadingIndex] = {
+              ...updated[uploadingIndex],
+              url: url,
+              publicId: publicId,
+              uploading: false
+            };
+            return updated;
+          }
+          return prev;
+        });
+        
+        toast.success(`Image ${i + 1} uploaded successfully`);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setNewImages(prev => prev.filter(img => img.file !== file));
+        toast.error(`Failed to upload image ${i + 1}`);
+      }
+    }
+    
+    if (fileInputRefs.current['multiple']) {
+      fileInputRefs.current['multiple'].value = '';
+    }
+  };
 
- const removeNewImage = (imageId) => {
-  // Find and revoke the object URL to free memory
-  const imageToRemove = newImages.find(img => img.id === imageId);
-  if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
-    URL.revokeObjectURL(imageToRemove.preview);
-  }
-  setNewImages(prev => prev.filter(img => img.id !== imageId));
-};
+  const removeNewImage = (imageId) => {
+    const imageToRemove = newImages.find(img => img.id === imageId);
+    if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+    setNewImages(prev => prev.filter(img => img.id !== imageId));
+  };
 
   const removeExistingImage = (imageId, imageUrl) => {
     console.log('Removing image:', { imageId, imageUrl });
@@ -2595,7 +2704,8 @@ const handleMultipleImageSelect = async (e) => {
     if (formData.description !== originalProduct.description) return true;
     if (formData.instruction !== originalProduct.instruction) return true;
     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
-    if (formData.subcategory !== (originalProduct.subcategory || '')) return true; // NEW: Check subcategory change
+    if (formData.subcategory !== (originalProduct.subcategory || '')) return true;
+    if (formData.childSubcategory !== (originalProduct.childSubcategory || '')) return true;
     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
     if (formData.fabric !== originalProduct.fabric) return true;
     if (formData.moq !== originalProduct.moq) return true;
@@ -2659,13 +2769,13 @@ const handleMultipleImageSelect = async (e) => {
         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
       );
 
-      // NEW: Include subcategory in payload
       const payload = {
         productName: formData.productName,
         description: formData.description,
         instruction: formData.instruction || '',
         category: formData.category,
-        subcategory: formData.subcategory || '', // NEW: Send subcategory
+        subcategory: formData.subcategory || '',
+        childSubcategory: formData.childSubcategory || '', // NEW: Send child subcategory
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
@@ -2806,26 +2916,31 @@ const handleMultipleImageSelect = async (e) => {
                                 <RichTextEditor.Underline />
                                 <RichTextEditor.Strikethrough />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.H1 />
                                 <RichTextEditor.H2 />
                                 <RichTextEditor.H3 />
                                 <RichTextEditor.H4 />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.BulletList />
                                 <RichTextEditor.OrderedList />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.AlignLeft />
                                 <RichTextEditor.AlignCenter />
                                 <RichTextEditor.AlignRight />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.Link />
                                 <RichTextEditor.Unlink />
                               </RichTextEditor.ControlsGroup>
                             </RichTextEditor.Toolbar>
+
                             <RichTextEditor.Content />
                           </RichTextEditor>
                         </div>
@@ -2847,26 +2962,31 @@ const handleMultipleImageSelect = async (e) => {
                                 <RichTextEditor.Underline />
                                 <RichTextEditor.Strikethrough />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.H1 />
                                 <RichTextEditor.H2 />
                                 <RichTextEditor.H3 />
                                 <RichTextEditor.H4 />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.BulletList />
                                 <RichTextEditor.OrderedList />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.AlignLeft />
                                 <RichTextEditor.AlignCenter />
                                 <RichTextEditor.AlignRight />
                               </RichTextEditor.ControlsGroup>
+
                               <RichTextEditor.ControlsGroup>
                                 <RichTextEditor.Link />
                                 <RichTextEditor.Unlink />
                               </RichTextEditor.ControlsGroup>
                             </RichTextEditor.Toolbar>
+
                             <RichTextEditor.Content />
                           </RichTextEditor>
                         </div>
@@ -2876,8 +2996,8 @@ const handleMultipleImageSelect = async (e) => {
                       </p>
                     </div>
 
-                    {/* Category, Subcategory, Targeted Customer, Fabric */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
                       {/* Category */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2912,7 +3032,10 @@ const handleMultipleImageSelect = async (e) => {
                         <select
                           name="subcategory"
                           value={formData.subcategory}
-                          onChange={handleChange}
+                          onChange={(e) => {
+                            handleChange(e);
+                            setFormData(prev => ({ ...prev, childSubcategory: '' }));
+                          }}
                           disabled={!formData.category || subcategories.length === 0}
                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
                         >
@@ -2927,6 +3050,29 @@ const handleMultipleImageSelect = async (e) => {
                           </p>
                         )}
                       </div>
+
+                      {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
+                      {showChildSubcategory && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex items-center gap-1">
+                              <FolderTree className="w-4 h-4" />
+                              Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                            </div>
+                          </label>
+                          <select
+                            name="childSubcategory"
+                            value={formData.childSubcategory}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition border-gray-300"
+                          >
+                            <option value="">-- Select Child Subcategory (Optional) --</option>
+                            {childSubcategories.map(child => (
+                              <option key={child._id} value={child._id}>{child.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       {/* Targeted Customer */}
                       <div>
@@ -2981,7 +3127,7 @@ const handleMultipleImageSelect = async (e) => {
                       </div>
                     </div>
 
-                    {/* Category Info Display */}
+                    {/* Category Info Display - Shows all selected levels */}
                     {selectedCategoryDetails && (
                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <div className="flex items-center gap-2">
@@ -2993,6 +3139,11 @@ const handleMultipleImageSelect = async (e) => {
                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
                               <p className="text-xs text-gray-600 mt-1">
                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+                              </p>
+                            )}
+                            {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
+                              <p className="text-xs text-gray-600 mt-1">
+                                <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
                               </p>
                             )}
                           </div>
@@ -3033,157 +3184,157 @@ const handleMultipleImageSelect = async (e) => {
                     </p>
                   </div>
                   
-                 <div className="p-5">
-  {errors.images && (
-    <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
-      <AlertCircle className="w-3 h-3" />
-      {errors.images}
-    </p>
-  )}
-  
-  {/* Multiple Image Upload Button */}
-  <div className="mb-4">
-    <input
-      type="file"
-      id="multiple-images"
-      className="hidden"
-      accept="image/jpeg,image/jpg,image/png,image/webp"
-      multiple
-      onChange={handleMultipleImageSelect}
-      ref={el => {
-        if (el) fileInputRefs.current['multiple'] = el;
-      }}
-    />
-    <button
-      type="button"
-      onClick={() => fileInputRefs.current['multiple']?.click()}
-      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
-    >
-      <Upload className="w-5 h-5" />
-      <span>Select Multiple Images (Up to 6)</span>
-    </button>
-    <p className="text-xs text-gray-500 mt-2 text-center">
-      You can select multiple images at once. Images will be uploaded automatically.
-    </p>
-  </div>
+                  <div className="p-5">
+                    {errors.images && (
+                      <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.images}
+                      </p>
+                    )}
+                    
+                    {/* Multiple Image Upload Button */}
+                    <div className="mb-4">
+                      <input
+                        type="file"
+                        id="multiple-images"
+                        className="hidden"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        multiple
+                        onChange={handleMultipleImageSelect}
+                        ref={el => {
+                          if (el) fileInputRefs.current['multiple'] = el;
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRefs.current['multiple']?.click()}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
+                      >
+                        <Upload className="w-5 h-5" />
+                        <span>Select Multiple Images (Up to 6)</span>
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        You can select multiple images at once. Images will be uploaded automatically.
+                      </p>
+                    </div>
 
-  {/* Existing Images */}
-  {existingImages.length > 0 && (
-    <div className="mb-4">
-      <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {existingImages.map((image) => (
-          <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-            <img 
-              src={image.url} 
-              alt="Product" 
-              className="w-full h-full object-cover"
-            />
-            <button
-              type="button"
-              onClick={() => removeExistingImage(image.publicId, image.url)}
-              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              title="Remove Image"
-            >
-              <X className="w-3 h-3" />
-            </button>
-            {image.isPrimary && (
-              <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                Primary
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
+                    {/* Existing Images */}
+                    {existingImages.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {existingImages.map((image) => (
+                            <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+                              <img 
+                                src={image.url} 
+                                alt="Product" 
+                                className="w-full h-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeExistingImage(image.publicId, image.url)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                title="Remove Image"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              {image.isPrimary && (
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+                                  Primary
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-  {/* New Images - Dynamic display */}
-  {newImages.length > 0 && (
-    <div className="mb-4">
-      <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
-      <div className="grid grid-cols-2 gap-3">
-        {newImages.map((img) => (
-          <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-            <img 
-              src={img.preview} 
-              alt="New upload" 
-              className="w-full h-full object-cover"
-            />
-            {img.uploading && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <Loader2 className="w-4 h-4 text-white animate-spin" />
-              </div>
-            )}
-            <button
-              type="button"
-              onClick={() => removeNewImage(img.id)}
-              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              disabled={img.uploading}
-            >
-              <X className="w-3 h-3" />
-            </button>
-            {!img.uploading && img.url && (
-              <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                Ready
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-  
-  {/* Separate Upload Slots - Updated to show up to 6 slots */}
-  <div className="mt-4">
-    <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
-    <div 
-      key={`slots-${existingImages.length}-${newImages.length}`}
-      className="grid grid-cols-2 gap-3"
-    >
-      {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
-        const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
-        return (
-          <div key={slotId} className="relative">
-            <input
-              type="file"
-              id={`image-upload-${slotId}`}
-              className="hidden"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={(e) => handleNewImageChange(e, slotId)}
-              ref={el => {
-                if (el) fileInputRefs.current[slotId] = el;
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRefs.current[slotId]?.click()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
-            >
-              <Upload className="w-5 h-5 text-gray-400 mb-1" />
-              <p className="text-xs text-gray-600">Upload Image</p>
-              <p className="text-xs text-gray-400">Slot {idx + 1}</p>
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-  
-  {/* Upload Progress Summary */}
-  {newImages.some(img => img.uploading) && (
-    <div className="mt-4 p-2 bg-blue-50 rounded-lg">
-      <p className="text-xs text-blue-600">
-        Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
-      </p>
-    </div>
-  )}
-  
-  {/* Image Count Info */}
-  <div className="mt-4 text-xs text-gray-500 text-center">
-    {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
-  </div>
-</div>
+                    {/* New Images */}
+                    {newImages.length > 0 && (
+                      <div className="mb-4">
+                        <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {newImages.map((img) => (
+                            <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+                              <img 
+                                src={img.preview} 
+                                alt="New upload" 
+                                className="w-full h-full object-cover"
+                              />
+                              {img.uploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => removeNewImage(img.id)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                                disabled={img.uploading}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              {!img.uploading && img.url && (
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+                                  Ready
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Add More Images Slots */}
+                    <div className="mt-4">
+                      <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
+                      <div 
+                        key={`slots-${existingImages.length}-${newImages.length}`}
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
+                          const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
+                          return (
+                            <div key={slotId} className="relative">
+                              <input
+                                type="file"
+                                id={`image-upload-${slotId}`}
+                                className="hidden"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                onChange={(e) => handleNewImageChange(e, slotId)}
+                                ref={el => {
+                                  if (el) fileInputRefs.current[slotId] = el;
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => fileInputRefs.current[slotId]?.click()}
+                                className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+                              >
+                                <Upload className="w-5 h-5 text-gray-400 mb-1" />
+                                <p className="text-xs text-gray-600">Upload Image</p>
+                                <p className="text-xs text-gray-400">Slot {idx + 1}</p>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    {/* Upload Progress Summary */}
+                    {newImages.some(img => img.uploading) && (
+                      <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+                        <p className="text-xs text-blue-600">
+                          Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Image Count Info */}
+                    <div className="mt-4 text-xs text-gray-500 text-center">
+                      {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3562,6 +3713,7 @@ const handleMultipleImageSelect = async (e) => {
                         name="moq"
                         value={formData.moq}
                         onChange={handleChange}
+                        onWheel={(e) => e.target.blur()}
                         min="1"
                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                       />
@@ -3576,6 +3728,7 @@ const handleMultipleImageSelect = async (e) => {
                         name="pricePerUnit"
                         value={formData.pricePerUnit}
                         onChange={handleChange}
+                        onWheel={(e) => e.target.blur()}
                         min="0"
                         step="0.01"
                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
@@ -3605,6 +3758,7 @@ const handleMultipleImageSelect = async (e) => {
                               type="text"
                               value={tier.range}
                               onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
+                             
                               placeholder="e.g., 100-299"
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
@@ -3615,6 +3769,7 @@ const handleMultipleImageSelect = async (e) => {
                               type="number"
                               value={tier.price}
                               onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
+                              onWheel={(e) => e.target.blur()}
                               placeholder="0.00"
                               min="0"
                               step="0.01"

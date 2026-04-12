@@ -858,7 +858,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -893,9 +893,13 @@ import { toast } from 'sonner';
 const FilterBar = ({ 
   filters, 
   handleFilterChange,
+    handleChildSubcategoryChange, 
   categories,
   subcategories,
+   childSubcategories, 
   selectedCategory,
+   selectedSubcategory, // ADD THIS
+  showChildSubcategory, // ADD THIS
   minPriceInput,
   maxPriceInput,
   setMinPriceInput,
@@ -921,7 +925,7 @@ const FilterBar = ({
       )}
     </div>
   
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-3 mb-3">
       {/* Category Filter */}
       <div>
         <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Category</label>
@@ -953,6 +957,23 @@ const FilterBar = ({
           </select>
         </div>
       )}
+
+
+       {showChildSubcategory && selectedSubcategory && childSubcategories.length > 0 && (
+    <div>
+      <label className="block text-[10px] sm:text-xs text-gray-500 mb-0.5 sm:mb-1">Child Subcategory</label>
+      <select
+        value={filters.childSubcategory}
+        onChange={(e) => handleChildSubcategoryChange(e.target.value)}
+        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] sm:text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none bg-white"
+      >
+        <option value="">All Child Subcategories</option>
+        {childSubcategories.map(child => (
+          <option key={child._id} value={child._id}>{child.name}</option>
+        ))}
+      </select>
+    </div>
+  )}
 
       {/* Target Audience Filter */}
       <div>
@@ -1089,6 +1110,7 @@ export default function ModeratorAllProducts() {
     search: '',
     category: '',
     subcategory: '', // NEW: Subcategory filter
+     childSubcategory: '',
     targetedCustomer: '',
     minPrice: '',
     maxPrice: '',
@@ -1109,6 +1131,12 @@ export default function ModeratorAllProducts() {
   const [subcategories, setSubcategories] = useState([]); // NEW: Subcategories state
   const [selectedCategory, setSelectedCategory] = useState(null); // NEW: Track selected category
   
+
+  // Add these with your other state variables
+const [childSubcategories, setChildSubcategories] = useState([]);
+const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+const [showChildSubcategory, setShowChildSubcategory] = useState(false);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -1138,6 +1166,23 @@ export default function ModeratorAllProducts() {
       }
     }
   }, [filters.category]);
+
+
+  // Fetch child subcategories when subcategory is selected
+useEffect(() => {
+  if (filters.category && filters.subcategory) {
+    setSelectedSubcategory(filters.subcategory);
+    fetchChildSubcategories(filters.category, filters.subcategory);
+  } else {
+    setChildSubcategories([]);
+    setSelectedSubcategory(null);
+    setShowChildSubcategory(false);
+    // Clear child subcategory filter when subcategory changes
+    if (filters.childSubcategory) {
+      setFilters(prev => ({ ...prev, childSubcategory: '' }));
+    }
+  }
+}, [filters.subcategory, filters.category]);
 
   // Helper functions
   const capitalizeFirst = (str) => {
@@ -1209,19 +1254,51 @@ export default function ModeratorAllProducts() {
   }, [filters.search]);
 
   // Fetch products when other filters change
-  useEffect(() => {
-    fetchProducts();
-  }, [
-    filters.category, 
-    filters.subcategory, // NEW: Add subcategory to dependencies
-    filters.targetedCustomer, 
-    filters.minPrice, 
-    filters.maxPrice, 
-    filters.status,
-    filters.isFeatured,
-    filters.sortBy, 
-    currentPage
-  ]);
+  // useEffect(() => {
+  //   fetchProducts();
+  // }, [
+  //   filters.category, 
+  //   filters.subcategory, 
+  //   filters.targetedCustomer, 
+  //   filters.minPrice, 
+  //   filters.maxPrice, 
+  //   filters.status,
+  //   filters.isFeatured,
+  //   filters.sortBy, 
+  //   currentPage
+  // ]);
+  // Fetch products when other filters change
+// Create a stable filter key for useEffect dependency
+const filterKey = useMemo(() => {
+  return JSON.stringify({
+    category: filters.category || '',
+    subcategory: filters.subcategory || '',
+    childSubcategory: filters.childSubcategory || '',
+    targetedCustomer: filters.targetedCustomer || '',
+    minPrice: filters.minPrice || '',
+    maxPrice: filters.maxPrice || '',
+    status: filters.status || 'all',
+    isFeatured: filters.isFeatured || '',
+    sortBy: filters.sortBy || 'newest',
+    page: currentPage
+  });
+}, [
+  filters.category,
+  filters.subcategory,
+  filters.childSubcategory,
+  filters.targetedCustomer,
+  filters.minPrice,
+  filters.maxPrice,
+  filters.status,
+  filters.isFeatured,
+  filters.sortBy,
+  currentPage
+]);
+
+// Fetch products when filterKey changes
+useEffect(() => {
+  fetchProducts();
+}, [filterKey]);
 
   const fetchCategories = async () => {
     try {
@@ -1257,6 +1334,28 @@ export default function ModeratorAllProducts() {
     }
   };
 
+  // Fetch child subcategories for a subcategory
+const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.success) {
+      setChildSubcategories(data.data.children);
+      setShowChildSubcategory(data.data.children.length > 0);
+    } else {
+      setChildSubcategories([]);
+      setShowChildSubcategory(false);
+    }
+  } catch (error) {
+    console.error('Error fetching child subcategories:', error);
+    setChildSubcategories([]);
+    setShowChildSubcategory(false);
+  }
+};
+
   const fetchProducts = async () => {
     if (filters.search) {
       setSearchLoading(true);
@@ -1273,6 +1372,7 @@ export default function ModeratorAllProducts() {
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.category) queryParams.append('category', filters.category);
       if (filters.subcategory) queryParams.append('subcategory', filters.subcategory); // NEW: Add subcategory to query
+      if (filters.childSubcategory) queryParams.append('childSubcategory', filters.childSubcategory);
       if (filters.targetedCustomer) queryParams.append('targetedCustomer', filters.targetedCustomer);
       if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
       if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
@@ -1341,6 +1441,11 @@ export default function ModeratorAllProducts() {
     setCurrentPage(1);
   };
 
+  const handleChildSubcategoryChange = (value) => {
+  setFilters(prev => ({ ...prev, childSubcategory: value }));
+  setCurrentPage(1);
+};
+
   // Apply price range function
   const applyPriceRange = () => {
     setFilters(prev => ({
@@ -1381,6 +1486,8 @@ export default function ModeratorAllProducts() {
       search: '',
       category: '',
       subcategory: '', // NEW: Clear subcategory
+      childSubcategory: '', 
+      
       targetedCustomer: '',
       minPrice: '',
       maxPrice: '',
@@ -1413,6 +1520,7 @@ export default function ModeratorAllProducts() {
     let count = 0;
     if (filters.category) count++;
     if (filters.subcategory) count++; // NEW: Count subcategory filter
+   if (filters.childSubcategory) count++;
     if (filters.targetedCustomer) count++;
     if (filters.minPrice || filters.maxPrice) count++;
     if (filters.status !== 'all') count++;
@@ -1677,7 +1785,11 @@ export default function ModeratorAllProducts() {
           handleFilterChange={handleFilterChange}
           categories={categories}
           subcategories={subcategories}
+           childSubcategories={childSubcategories}
           selectedCategory={selectedCategory}
+           selectedSubcategory={selectedSubcategory} // ADD THIS
+  showChildSubcategory={showChildSubcategory} // ADD THIS
+  handleChildSubcategoryChange={handleChildSubcategoryChange} // ADD THIS
           minPriceInput={minPriceInput}
           maxPriceInput={maxPriceInput}
           setMinPriceInput={setMinPriceInput}
