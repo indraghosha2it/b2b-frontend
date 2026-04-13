@@ -522,7 +522,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -560,6 +560,14 @@ export default function RegisterPage() {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [registrationData, setRegistrationData] = useState(null);
+  const timerRef = useRef(null);
+
+  // Helper function to format seconds as MM:SS
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -744,21 +752,44 @@ export default function RegisterPage() {
     }
   };
 
-  const startCountdown = () => {
-    setResendDisabled(true);
-    setCountdown(60);
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setResendDisabled(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  // const startCountdown = () => {
+  //   setResendDisabled(true);
+  //   setCountdown(600);
+  //   const timer = setInterval(() => {
+  //     setCountdown((prev) => {
+  //       if (prev <= 1) {
+  //         clearInterval(timer);
+  //         setResendDisabled(false);
+  //         return 0;
+  //       }
+  //       return prev - 1;
+  //     });
+  //   }, 1000);
+  // };
 
+const startCountdown = () => {
+  // Clear existing timer if it exists
+  if (timerRef.current) {
+    clearInterval(timerRef.current);
+    timerRef.current = null;
+  }
+  
+  setResendDisabled(true);
+  setCountdown(600); // 10 minutes
+  
+  timerRef.current = setInterval(() => {
+    setCountdown((prev) => {
+      if (prev <= 1) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+        setResendDisabled(false);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+};
+ 
   const handleGoogleSuccess = (data) => {
     if (data.isNewUser) {
       toast.success('Account created successfully!', {
@@ -1097,7 +1128,7 @@ export default function RegisterPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="mt-4">
+                    {/* <div className="mt-4">
                       <button
                         type="submit"
                         disabled={isSubmitting}
@@ -1119,7 +1150,32 @@ export default function RegisterPage() {
                           'Create Account'
                         )}
                       </button>
-                    </div>
+                    </div> */}
+
+                    {/* Submit Button */}
+<div className="mt-4">
+  <button
+    type="submit"
+    disabled={isSubmitting || !formData.agreeToTerms}
+    className="w-full px-6 py-2.5 text-sm text-white rounded-lg hover:opacity-90 transition-all transform hover:scale-105 flex items-center justify-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+    style={{ 
+      background: 'linear-gradient(135deg, #d9884e 0%, #e6a87c 100%)',
+      opacity: (isSubmitting || !formData.agreeToTerms) ? 0.7 : 1
+    }}
+  >
+    {isSubmitting ? (
+      <>
+        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Creating Account...
+      </>
+    ) : (
+      'Create Account'
+    )}
+  </button>
+</div>
 
                     {/* Divider */}
                     <div className="relative my-3">
@@ -1180,7 +1236,7 @@ export default function RegisterPage() {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
-        <button
+        {/* <button
           onClick={() => setShowOtpModal(false)}
           disabled={isVerifying}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -1188,7 +1244,21 @@ export default function RegisterPage() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
+        </button> */}
+        <button
+  onClick={() => {
+    // Clear timer when modal closes
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setShowOtpModal(false);
+  }}
+  disabled={isVerifying}
+  className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
+>
+  Cancel
+</button>
 
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1244,13 +1314,21 @@ export default function RegisterPage() {
         </button>
 
         <div className="mt-4 text-center">
-          <button
+          {/* <button
             onClick={handleResendOTP}
             disabled={resendDisabled}
             className="text-sm text-[#d9884e] hover:text-[#c9773e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {resendDisabled ? `Resend OTP in ${countdown}s` : 'Resend OTP'}
-          </button>
+          </button> */}
+
+     <button
+  onClick={handleResendOTP}
+  disabled={resendDisabled}
+  className="text-sm text-[#d9884e] hover:text-[#c9773e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+>
+  {resendDisabled ? `Resend OTP in ${formatTime(countdown)}` : 'Resend OTP'}
+</button>
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-200">

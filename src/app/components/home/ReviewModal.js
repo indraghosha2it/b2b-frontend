@@ -2394,7 +2394,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted }) {
                                   />
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="col-span-1">
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Address <span className="text-[#E39A65]">*</span>
                                   </label>

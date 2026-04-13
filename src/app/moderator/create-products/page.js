@@ -1,5 +1,6 @@
 
 
+
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -107,12 +108,14 @@
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
-//   const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
+//   const [subcategories, setSubcategories] = useState([]);
+//   const [childSubcategories, setChildSubcategories] = useState([]);
 //   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
 //   const [keywordInput, setKeywordInput] = useState('');
+//   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
 //   const [showTags, setShowTags] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
@@ -124,7 +127,8 @@
 //     description: '',
 //     instruction: '', 
 //     category: '',
-//     subcategory: '', // NEW: Subcategory field
+//     subcategory: '',
+//     childSubcategory: '', // NEW: Child subcategory field
 //     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
@@ -241,10 +245,22 @@
 //     } else {
 //       setSubcategories([]);
 //       setSelectedCategoryDetails(null);
-//       // Reset subcategory when category changes
-//       setFormData(prev => ({ ...prev, subcategory: '' }));
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       setFormData(prev => ({ ...prev, subcategory: '', childSubcategory: '' }));
 //     }
 //   }, [formData.category]);
+
+//   // Fetch child subcategories when subcategory changes
+//   useEffect(() => {
+//     if (formData.category && formData.subcategory) {
+//       fetchChildSubcategories(formData.category, formData.subcategory);
+//     } else {
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       setFormData(prev => ({ ...prev, childSubcategory: '' }));
+//     }
+//   }, [formData.subcategory]);
 
 //   useEffect(() => {
 //     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -273,7 +289,6 @@
 //     }
 //   };
 
-//   // NEW: Fetch subcategories for selected category
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
@@ -290,6 +305,29 @@
 //     } catch (error) {
 //       console.error('Error fetching subcategories:', error);
 //       setSubcategories([]);
+//     }
+//   };
+
+//   // NEW: Fetch child subcategories for a subcategory
+//   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setChildSubcategories(data.data.children);
+//         setShowChildSubcategory(data.data.children.length > 0);
+//       } else {
+//         setChildSubcategories([]);
+//         setShowChildSubcategory(false);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching child subcategories:', error);
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
 //     }
 //   };
 
@@ -341,10 +379,8 @@
 //     return;
 //   }
 
-//   // Create preview using URL.createObjectURL
 //   const previewUrl = URL.createObjectURL(file);
   
-//   // Show preview immediately with uploading state
 //   const updatedImages = [...productImages];
 //   updatedImages[index] = {
 //     file: file,
@@ -357,7 +393,6 @@
 //   setProductImages(updatedImages);
 //   console.log('Preview set for index:', index);
 
-//   // Upload to Cloudinary
 //   try {
 //     const { url, publicId } = await uploadToCloudinary(file);
 //     console.log('Upload successful for index:', index, 'URL:', url);
@@ -389,14 +424,11 @@
 //   }
 // };
 
-
-// // Handle multiple image selection
 // const handleMultipleImageSelect = async (e) => {
 //   const files = Array.from(e.target.files);
   
 //   if (files.length === 0) return;
   
-//   // Check total images limit (6 max)
 //   const currentImagesCount = productImages.filter(img => img.url !== null || img.uploading).length;
 //   const availableSlots = 6 - currentImagesCount;
   
@@ -405,7 +437,6 @@
 //     return;
 //   }
   
-//   // Find empty slots
 //   const emptySlots = [];
 //   for (let i = 0; i < productImages.length; i++) {
 //     if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
@@ -413,25 +444,20 @@
 //     }
 //   }
   
-//   // Create temporary array to store all images being processed
 //   const tempImages = [...productImages];
   
-//   // First, add all previews immediately
 //   for (let i = 0; i < files.length && i < emptySlots.length; i++) {
 //     const file = files[i];
 //     const slotIndex = emptySlots[i];
     
-//     // Validate file
 //     const validation = validateImageFile(file);
 //     if (!validation.valid) {
 //       toast.error(`Image ${i + 1}: ${validation.message}`);
 //       continue;
 //     }
     
-//     // Create preview URL
 //     const previewUrl = URL.createObjectURL(file);
     
-//     // Update temp array with preview
 //     tempImages[slotIndex] = {
 //       file: file,
 //       preview: previewUrl,
@@ -442,18 +468,14 @@
 //     };
 //   }
   
-//   // Update state with all previews at once
 //   setProductImages([...tempImages]);
   
-//   // Now upload each image one by one
 //   for (let i = 0; i < files.length && i < emptySlots.length; i++) {
 //     const file = files[i];
 //     const slotIndex = emptySlots[i];
     
-//     // Skip if validation failed
 //     const validation = validateImageFile(file);
 //     if (!validation.valid) {
-//       // Remove the preview for invalid files
 //       const updatedImages = [...productImages];
 //       updatedImages[slotIndex] = { file: null, preview: null, error: validation.message, url: null, publicId: null, uploading: false };
 //       setProductImages(updatedImages);
@@ -463,7 +485,6 @@
 //     try {
 //       const { url, publicId } = await uploadToCloudinary(file);
       
-//       // Update the specific image with URL while preserving others
 //       setProductImages(prevImages => {
 //         const updatedImages = [...prevImages];
 //         updatedImages[slotIndex] = {
@@ -491,14 +512,12 @@
 //     }
 //   }
   
-//   // Clear the input so the same files can be selected again if needed
 //   if (fileInputRefs.current['multiple']) {
 //     fileInputRefs.current['multiple'].value = '';
 //   }
 // };
 
 // const removeImage = (index) => {
-//   // Revoke the object URL to free memory
 //   if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
 //     URL.revokeObjectURL(productImages[index].preview);
 //   }
@@ -796,13 +815,13 @@
 //         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //       );
 
-//       // NEW: Include subcategory in payload
 //       const payload = {
 //         productName: formData.productName,
 //         description: formData.description,
 //         instruction: formData.instruction || '',
 //         category: formData.category,
-//         subcategory: formData.subcategory || '', // NEW: Send subcategory
+//         subcategory: formData.subcategory || '',
+//         childSubcategory: formData.childSubcategory || '', // NEW: Include child subcategory
 //         targetedCustomer: formData.targetedCustomer,
 //         fabric: formData.fabric,
 //         moq: formData.moq,
@@ -820,6 +839,7 @@
 //       console.log('Submitting images:', imageUrls);
 //       console.log('Images count:', imageUrls.length);
 //       console.log('Subcategory:', formData.subcategory);
+//       console.log('Child Subcategory:', formData.childSubcategory);
 
 //       const response = await fetch('http://localhost:5000/api/products', {
 //         method: 'POST',
@@ -1000,8 +1020,8 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Subcategory, Targeted Customer, Fabric */}
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                     {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
 //                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1036,7 +1056,10 @@
 //                         <select
 //                           name="subcategory"
 //                           value={formData.subcategory}
-//                           onChange={handleChange}
+//                           onChange={(e) => {
+//                             handleChange(e);
+//                             setFormData(prev => ({ ...prev, childSubcategory: '' }));
+//                           }}
 //                           disabled={!formData.category || subcategories.length === 0}
 //                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
 //                         >
@@ -1051,6 +1074,29 @@
 //                           </p>
 //                         )}
 //                       </div>
+
+//                       {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
+//                       {showChildSubcategory && (
+//                         <div>
+//                           <label className="block text-sm font-medium text-gray-700 mb-1">
+//                             <div className="flex items-center gap-1">
+//                               <FolderTree className="w-4 h-4" />
+//                               Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+//                             </div>
+//                           </label>
+//                           <select
+//                             name="childSubcategory"
+//                             value={formData.childSubcategory}
+//                             onChange={handleChange}
+//                             className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition border-gray-300"
+//                           >
+//                             <option value="">-- Select Child Subcategory (Optional) --</option>
+//                             {childSubcategories.map(child => (
+//                               <option key={child._id} value={child._id}>{child.name}</option>
+//                             ))}
+//                           </select>
+//                         </div>
+//                       )}
 
 //                       {/* Targeted Customer */}
 //                       <div>
@@ -1105,7 +1151,7 @@
 //                       </div>
 //                     </div>
 
-//                     {/* Category Info Display */}
+//                     {/* Category Info Display - Shows all selected levels */}
 //                     {selectedCategoryDetails && (
 //                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
 //                         <div className="flex items-center gap-2">
@@ -1117,6 +1163,11 @@
 //                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
 //                               <p className="text-xs text-gray-600 mt-1">
 //                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+//                               </p>
+//                             )}
+//                             {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
+//                               <p className="text-xs text-gray-600 mt-1">
+//                                 <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
 //                               </p>
 //                             )}
 //                           </div>
@@ -1746,6 +1797,12 @@
 // }
 
 
+
+
+
+
+
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1774,7 +1831,8 @@ import {
   Star,
   Search,
   Tag,
-  FolderTree
+  FolderTree,
+  GripVertical
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1865,6 +1923,9 @@ export default function ModeratorCreateProduct() {
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
   
+
+  const [draggedIndex, setDraggedIndex] = useState(null);
+const [dragOverIndex, setDragOverIndex] = useState(null);
   const colorPickerRef = useRef(null);
   
   const [formData, setFormData] = useState({
@@ -2274,6 +2335,51 @@ const removeImage = (index) => {
     fileInputRefs.current[index].value = '';
   }
 };
+
+// ADD THESE FUNCTIONS ↓
+const moveImage = (fromIndex, toIndex) => {
+  const updatedImages = [...productImages];
+  const [movedImage] = updatedImages.splice(fromIndex, 1);
+  updatedImages.splice(toIndex, 0, movedImage);
+  setProductImages(updatedImages);
+};
+
+const handleDragStart = (index) => {
+  setDraggedIndex(index);
+};
+
+const handleDragOver = (event) => {
+  event.preventDefault();
+};
+
+const handleDragOverWithFeedback = (event, index) => {
+  event.preventDefault();
+  if (productImages[index].preview) {
+    setDragOverIndex(index);
+  }
+};
+
+const handleDragLeave = () => {
+  setDragOverIndex(null);
+};
+
+const handleDrop = (dropIndex) => {
+  if (draggedIndex === null || draggedIndex === dropIndex) {
+    setDragOverIndex(null);
+    setDraggedIndex(null);
+    return;
+  }
+  moveImage(draggedIndex, dropIndex);
+  setDraggedIndex(null);
+  setDragOverIndex(null);
+};
+
+const handleDragEnd = () => {
+  setDraggedIndex(null);
+  setDragOverIndex(null);
+};
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -2985,7 +3091,7 @@ const removeImage = (index) => {
       </div>
 
       {/* Image Preview Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-2 gap-4">
         {productImages.map((img, index) => (
           <div key={index}>
             {img.preview ? (
@@ -3041,8 +3147,88 @@ const removeImage = (index) => {
             )}
           </div>
         ))}
-      </div>
-      
+      </div> */}
+      {/* Image Preview Grid with Drag and Drop */}
+<div className="grid grid-cols-2 gap-4">
+  {productImages.map((img, index) => (
+    <div
+      key={index}
+      draggable={img.preview !== null}
+      onDragStart={() => img.preview && handleDragStart(index)}
+      onDragOver={(e) => img.preview && handleDragOverWithFeedback(e, index)}
+      onDragLeave={handleDragLeave}
+      onDrop={() => img.preview && handleDrop(index)}
+      onDragEnd={handleDragEnd}
+      className={`transition-all duration-200 ${
+        draggedIndex === index ? 'opacity-50 scale-95' : ''
+      } ${
+        dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+          ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
+          : ''
+      }`}
+    >
+      {img.preview ? (
+        <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing">
+          {/* Drag handle indicator */}
+          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+            <GripVertical className="w-3 h-3 text-white" />
+          </div>
+          
+          <img 
+            src={img.preview} 
+            alt={`Product ${index + 1}`} 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Image failed to load');
+              e.target.src = 'https://via.placeholder.com/150?text=Error';
+            }}
+          />
+          
+          {img.uploading && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <Loader2 className="w-6 h-6 text-white animate-spin" />
+            </div>
+          )}
+          
+          <button
+            type="button"
+            onClick={() => removeImage(index)}
+            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+            disabled={img.uploading}
+          >
+            <X className="w-3 h-3" />
+          </button>
+          
+          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
+            {index + 1}
+          </span>
+        </div>
+      ) : (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center cursor-pointer ${
+            img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
+          }`}
+          onClick={() => fileInputRefs.current[index]?.click()}
+        >
+          <input 
+            type="file" 
+            ref={el => fileInputRefs.current[index] = el}
+            className="hidden" 
+            accept="image/jpeg,image/jpg,image/png,image/webp" 
+            onChange={(e) => handleImageChange(e, index)} 
+          />
+          <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+          <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
+            Slot {index + 1}
+          </p>
+          {img.error && (
+            <p className="text-xs text-red-600 mt-1">{img.error}</p>
+          )}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
       {/* Upload Progress Summary */}
       {productImages.some(img => img.uploading) && (
         <div className="mt-4 p-2 bg-blue-50 rounded-lg">

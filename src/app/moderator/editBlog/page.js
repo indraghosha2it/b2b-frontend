@@ -1846,53 +1846,7 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
           )}
         </div>
 
-        {/* Section Image (Optional) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1.5">
-            Section Image (Optional)
-          </label>
-          {paragraph.imagePreview ? (
-            <div className="relative rounded-lg overflow-hidden border border-gray-200">
-              <img 
-                src={paragraph.imagePreview} 
-                alt={`Section ${index + 1}`} 
-                className="w-full h-32 object-cover"
-              />
-              {paragraph.imageUploading && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => onUpdate(index, 'imageFile', null)}
-                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                disabled={paragraph.imageUploading}
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                ref={imageInputRef}
-                className="hidden"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={handleImageUpload}
-              />
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-[#E39A65] border border-dashed border-[#E39A65] rounded-lg hover:bg-orange-50 transition-colors"
-                disabled={paragraph.imageUploading}
-              >
-                <ImagePlus className="w-4 h-4" />
-                {paragraph.imageUploading ? 'Uploading...' : 'Add Image'}
-              </button>
-            </div>
-          )}
-        </div>
+    
       </div>
     </div>
   );

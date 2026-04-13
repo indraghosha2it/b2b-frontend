@@ -2010,7 +2010,8 @@ import {
   Search,
   Tag,
   Shield,
-  FolderTree
+  FolderTree,
+   GripVertical 
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -2104,6 +2105,9 @@ export default function EditProduct() {
 
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
+
+  const [draggedImageIndex, setDraggedImageIndex] = useState(null);
+const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
   
   const colorPickerRef = useRef(null);
   
@@ -2548,6 +2552,49 @@ export default function EditProduct() {
     setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
     toast.info('Image marked for deletion');
   };
+
+// ADD THESE FUNCTIONS ↓
+// Move existing image
+const moveExistingImage = (fromIndex, toIndex) => {
+  const updatedImages = [...existingImages];
+  const [movedImage] = updatedImages.splice(fromIndex, 1);
+  updatedImages.splice(toIndex, 0, movedImage);
+  setExistingImages(updatedImages);
+};
+
+const handleDragStartExisting = (index) => {
+  setDraggedImageIndex(index);
+};
+
+const handleDragOverExisting = (event) => {
+  event.preventDefault();
+};
+
+const handleDragOverExistingWithFeedback = (event, index) => {
+  event.preventDefault();
+  setDragOverImageIndex(index);
+};
+
+const handleDragLeaveExisting = () => {
+  setDragOverImageIndex(null);
+};
+
+const handleDropExisting = (dropIndex) => {
+  if (draggedImageIndex === null || draggedImageIndex === dropIndex) {
+    setDragOverImageIndex(null);
+    setDraggedImageIndex(null);
+    return;
+  }
+  moveExistingImage(draggedImageIndex, dropIndex);
+  setDraggedImageIndex(null);
+  setDragOverImageIndex(null);
+};
+
+const handleDragEndExisting = () => {
+  setDraggedImageIndex(null);
+  setDragOverImageIndex(null);
+};
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -3316,7 +3363,7 @@ export default function EditProduct() {
                     </div>
 
                     {/* Existing Images */}
-                    {existingImages.length > 0 && (
+                    {/* {existingImages.length > 0 && (
                       <div className="mb-4">
                         <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
                         <div className="grid grid-cols-2 gap-3">
@@ -3344,7 +3391,61 @@ export default function EditProduct() {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
+
+                    {/* Existing Images with Drag and Drop */}
+{existingImages.length > 0 && (
+  <div className="mb-4">
+    <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images (Drag to reorder)</h3>
+    <div className="grid grid-cols-2 gap-3">
+      {existingImages.map((image, index) => (
+        <div
+          key={image.publicId}
+          draggable={true}
+          onDragStart={() => handleDragStartExisting(index)}
+          onDragOver={handleDragOverExisting}
+          onDragOverCapture={(e) => handleDragOverExistingWithFeedback(e, index)}
+          onDragLeave={handleDragLeaveExisting}
+          onDrop={() => handleDropExisting(index)}
+          onDragEnd={handleDragEndExisting}
+          className={`relative rounded-lg overflow-hidden transition-all duration-200 h-24 ${
+            draggedImageIndex === index ? 'opacity-50 scale-95' : 'border border-gray-200'
+          } ${
+            dragOverImageIndex === index && draggedImageIndex !== index && draggedImageIndex !== null 
+              ? 'ring-2 ring-[#E39A65] ring-offset-2' 
+              : ''
+          }`}
+        >
+          {/* Drag handle */}
+          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10 cursor-grab active:cursor-grabbing">
+            <GripVertical className="w-3 h-3 text-white" />
+          </div>
+          
+          <img 
+            src={image.url} 
+            alt="Product" 
+            className="w-full h-full object-cover"
+          />
+          
+          <button
+            type="button"
+            onClick={() => removeExistingImage(image.publicId, image.url)}
+            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+            title="Remove Image"
+          >
+            <X className="w-3 h-3" />
+          </button>
+          
+          {image.isPrimary && (
+            <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded z-10">
+              Primary
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
                     {/* New Images */}
                     {newImages.length > 0 && (

@@ -213,7 +213,6 @@ const handleCustomInquiryChange = (e) => {
   setCustomInquiryText(e.target.value);
 };
 
-// Update handleSubmit to include custom inquiry text:
 const handleSubmit = async (e) => {
   e.preventDefault();
   

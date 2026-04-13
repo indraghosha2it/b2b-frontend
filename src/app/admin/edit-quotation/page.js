@@ -493,6 +493,7 @@ const handleSubmitQuotation = async () => {
                                   step="0.01"
                                   value={color.unitPrice || 0}
                                   onChange={(e) => updateColorUnitPrice(productIndex, colorIndex, e.target.value)}
+                                  onWheel={(e) => e.target.blur()}
                                   disabled={!isColorAvailable}
                                   className="w-20 px-2 py-1 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#E39A65] disabled:bg-gray-100"
                                 />
@@ -551,6 +552,7 @@ const handleSubmitQuotation = async () => {
               min="0"
               value={sq.quantity}
               onChange={(e) => updateColorQuantity(productIndex, colorIndex, sq.size, e.target.value)}
+              onWheel={(e) => e.target.blur()}
               disabled={!isSizeAvailable}
               className={`w-full px-2 py-1 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] ${
                 isSizeAvailable 

@@ -2004,6 +2004,9 @@ export default function CreateProduct() {
   const [keywordInput, setKeywordInput] = useState('');
   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
+
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   // New state for collapsible sections
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
@@ -2442,6 +2445,57 @@ export default function CreateProduct() {
     }
   };
 
+
+  // Move image function for reordering
+const moveImage = (fromIndex, toIndex) => {
+  const updatedImages = [...productImages];
+  const [movedImage] = updatedImages.splice(fromIndex, 1);
+  updatedImages.splice(toIndex, 0, movedImage);
+  setProductImages(updatedImages);
+};
+
+const handleDragStart = (index) => {
+  setDraggedIndex(index);
+};
+
+const handleDragOver = (event) => {
+  event.preventDefault(); // Required to allow drop
+};
+
+const handleDrop = (dropIndex) => {
+  if (draggedIndex === null || draggedIndex === dropIndex) {
+    setDraggedIndex(null);
+    return;
+  }
+  moveImage(draggedIndex, dropIndex);
+  setDraggedIndex(null);
+};
+
+const handleDragEnd = () => {
+  setDraggedIndex(null);
+};
+
+const handleDragOverWithFeedback = (event, index) => {
+  event.preventDefault();
+  if (productImages[index].preview) {
+    setDragOverIndex(index);
+  }
+};
+
+const handleDragLeave = () => {
+  setDragOverIndex(null);
+};
+
+const handleDropWithFeedback = (dropIndex) => {
+  if (draggedIndex === null || draggedIndex === dropIndex) {
+    setDragOverIndex(null);
+    setDraggedIndex(null);
+    return;
+  }
+  moveImage(draggedIndex, dropIndex);
+  setDraggedIndex(null);
+  setDragOverIndex(null);
+};
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -3140,7 +3194,7 @@ export default function CreateProduct() {
                     </div>
 
                     {/* Image Preview Grid */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* <div className="grid grid-cols-2 gap-4">
                       {productImages.map((img, index) => (
                         <div key={index}>
                           {img.preview ? (
@@ -3191,7 +3245,81 @@ export default function CreateProduct() {
                           )}
                         </div>
                       ))}
-                    </div>
+                    </div> */}
+
+                    {/* Image Preview Grid with Drag and Drop */}
+<div className="grid grid-cols-2 gap-4">
+  {productImages.map((img, index) => (
+   <div
+  key={index}
+  draggable={img.preview !== null}
+  onDragStart={() => img.preview && handleDragStart(index)}
+  onDragOver={(e) => img.preview && handleDragOverWithFeedback(e, index)}
+  onDragLeave={handleDragLeave}
+  onDrop={() => img.preview && handleDropWithFeedback(index)}
+  onDragEnd={handleDragEnd}
+  className={`transition-all duration-200 ${
+    draggedIndex === index ? 'opacity-50 scale-95' : ''
+  } ${
+    dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' : ''
+  }`}
+>
+      {img.preview ? (
+        <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing">
+          {/* Drag handle indicator */}
+          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            </svg>
+          </div>
+          
+          <img 
+            src={img.preview} 
+            alt={`Product ${index + 1}`} 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Image failed to load:', img.preview);
+              e.target.src = 'https://via.placeholder.com/150?text=Error';
+            }}
+          />
+          
+          {img.uploading && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <Loader2 className="w-6 h-6 text-white animate-spin" />
+            </div>
+          )}
+          
+          <button
+            type="button"
+            onClick={() => removeImage(index)}
+            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+            disabled={img.uploading}
+          >
+            <X className="w-3 h-3" />
+          </button>
+          
+          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded">
+            {index + 1}
+          </span>
+        </div>
+      ) : (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center ${
+            img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'
+          }`}
+        >
+          <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+          <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
+            Slot {index + 1}
+          </p>
+          {img.error && (
+            <p className="text-xs text-red-600 mt-1">{img.error}</p>
+          )}
+        </div>
+      )}
+    </div>
+  ))}
+</div>
                     
                     {/* Upload Progress Summary */}
                     {productImages.some(img => img.uploading) && (

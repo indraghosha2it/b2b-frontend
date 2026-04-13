@@ -1180,33 +1180,108 @@ export const generateInvoicePDF = async (invoice) => {
     doc.roundedRect(margin, yPos, contentWidth, 26, 2, 2, 'F');
 
     // Logo
-    const logoSize = 16;
-    const logoX = margin + 5;
-    const logoY = yPos + 5;
+    // const logoSize = 16;
+    // const logoX = margin + 5;
+    // const logoY = yPos + 5;
     
-    if (companyLogoBase64) {
-      try {
-        doc.addImage(companyLogoBase64, 'PNG', logoX, logoY, logoSize, logoSize);
-      } catch (error) {
-        const companyName = invoice.company?.companyName || 'Asian Clothify';
-        const initials = getCompanyInitials(companyName);
-        doc.setFillColor(227, 154, 101);
-        doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(255, 255, 255);
-        doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
-      }
+    // if (companyLogoBase64) {
+    //   try {
+    //     doc.addImage(companyLogoBase64, 'PNG', logoX, logoY, logoSize, logoSize);
+    //   } catch (error) {
+    //     const companyName = invoice.company?.companyName || 'Asian Clothify';
+    //     const initials = getCompanyInitials(companyName);
+    //     doc.setFillColor(227, 154, 101);
+    //     doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
+    //     doc.setFontSize(9);
+    //     doc.setFont('helvetica', 'bold');
+    //     doc.setTextColor(255, 255, 255);
+    //     doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
+    //   }
+    // } else {
+    //   const companyName = invoice.company?.companyName || 'Asian Clothify';
+    //   const initials = getCompanyInitials(companyName);
+    //   doc.setFillColor(227, 154, 101);
+    //   doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
+    //   doc.setFontSize(9);
+    //   doc.setFont('helvetica', 'bold');
+    //   doc.setTextColor(255, 255, 255);
+    //   doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
+    // }
+
+    // Logo - with proper aspect ratio and size constraints
+const logoSize = 16;
+const logoMaxWidth = 20;
+const logoMaxHeight = 16;
+const logoX = margin + 5;
+const logoY = yPos + 5;
+
+if (companyLogoBase64) {
+  try {
+    // Get image dimensions
+    const img = new Image();
+    img.src = companyLogoBase64;
+    
+    // Wait for image to load to get dimensions
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+    
+    // Calculate dimensions maintaining aspect ratio
+    let imgWidth = img.width;
+    let imgHeight = img.height;
+    let finalWidth = logoSize;
+    let finalHeight = logoSize;
+    
+    // Calculate aspect ratio
+    const aspectRatio = imgWidth / imgHeight;
+    
+    if (aspectRatio > 1) {
+      // Wider than tall
+      finalWidth = logoSize;
+      finalHeight = logoSize / aspectRatio;
     } else {
-      const companyName = invoice.company?.companyName || 'Asian Clothify';
-      const initials = getCompanyInitials(companyName);
-      doc.setFillColor(227, 154, 101);
-      doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(255, 255, 255);
-      doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
+      // Taller than wide
+      finalHeight = logoSize;
+      finalWidth = logoSize * aspectRatio;
     }
+    
+    // Ensure it doesn't exceed max dimensions
+    if (finalWidth > logoMaxWidth) {
+      finalWidth = logoMaxWidth;
+      finalHeight = finalWidth / aspectRatio;
+    }
+    if (finalHeight > logoMaxHeight) {
+      finalHeight = logoMaxHeight;
+      finalWidth = finalHeight * aspectRatio;
+    }
+    
+    // Center the image within the logo area
+    const offsetX = (logoSize - finalWidth) / 2;
+    const offsetY = (logoSize - finalHeight) / 2;
+    
+    doc.addImage(companyLogoBase64, 'PNG', logoX + offsetX, logoY + offsetY, finalWidth, finalHeight);
+  } catch (error) {
+    console.error('Error adding logo image:', error);
+    // Fallback to initials
+    const companyName = invoice.company?.companyName || 'Asian Clothify';
+    const initials = getCompanyInitials(companyName);
+    doc.setFillColor(227, 154, 101);
+    doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
+  }
+} else {
+  const companyName = invoice.company?.companyName || 'Asian Clothify';
+  const initials = getCompanyInitials(companyName);
+  doc.setFillColor(227, 154, 101);
+  doc.roundedRect(logoX, logoY, logoSize, logoSize, 2, 2, 'F');
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(255, 255, 255);
+  doc.text(initials, logoX + logoSize/2, logoY + logoSize/2 + 1, { align: 'center' });
+}
 
     // Company Info
     const companyX = logoX + logoSize + 8;

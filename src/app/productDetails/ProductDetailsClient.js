@@ -4278,22 +4278,7 @@ export default function ProductDetailsClient() {
       )}
 
          {/* NEW: Child Subcategory - Add this block */}
-      {product.childSubcategoryName && (
-        <>
-          <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-7 h-7 bg-[#E39A65]/10 rounded-lg">
-              <FolderTree className="w-3.5 h-3.5 text-[#E39A65]" />
-            </div>
-            <div>
-              <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block leading-none mb-1">Sub-Subcategory</span>
-              <span className="text-xs font-semibold text-gray-900">
-                {product.childSubcategoryName}
-              </span>
-            </div>
-          </div>
-        </>
-      )}
+     
                     
 
                     <div className="w-px h-8 bg-gray-200 hidden sm:block"></div>
