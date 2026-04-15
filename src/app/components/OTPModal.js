@@ -61,7 +61,7 @@ export default function OTPModal({ isOpen, onClose, email, onSuccess, onResendOT
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function OTPModal({ isOpen, onClose, email, onSuccess, onResendOT
   const handleResendOTP = async () => {
     setResendLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/resend-otp', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/resend-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

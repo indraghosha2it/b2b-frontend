@@ -267,7 +267,7 @@
 //   const fetchCategories = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
@@ -284,7 +284,7 @@
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -303,7 +303,7 @@
 //   const fetchCategoryDetails = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
@@ -320,7 +320,7 @@
 //     setIsLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
       
@@ -864,7 +864,7 @@
 //         imagesToDelete: imagesToDelete
 //       };
 
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2268,7 +2268,7 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2285,7 +2285,7 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
   const fetchSubcategories = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2304,7 +2304,7 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2326,7 +2326,7 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
   const fetchCategoryDetails = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2343,7 +2343,7 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -2937,7 +2937,7 @@ const handleDragEndExisting = () => {
         imagesToDelete: imagesToDelete
       };
 
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

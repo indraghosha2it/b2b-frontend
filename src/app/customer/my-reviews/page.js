@@ -94,7 +94,7 @@
 //         params.append('search', searchTerm.trim());
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params.toString()}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/user/me?${params.toString()}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -203,7 +203,7 @@
 //     setActionLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -918,7 +918,7 @@ useEffect(() => {
         params.append('search', searchTerm.trim());
       }
 
-      const response = await fetch(`http://localhost:5000/api/reviews/user/me?${params.toString()}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/user/me?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1027,7 +1027,7 @@ useEffect(() => {
     setActionLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/reviews/${editModal.review._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/reviews/${editModal.review._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

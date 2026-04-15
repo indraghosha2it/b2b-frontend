@@ -174,7 +174,7 @@
 //     setLoadingProducts(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/products?limit=100&includeInactive=false', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?limit=100&includeInactive=false', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -295,7 +295,7 @@
 //     setLoading(true);
 
 //     try {
-//       const response = await fetch('http://localhost:5000/api/auth/login', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/login', {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify({
@@ -386,7 +386,7 @@
 //     }
 
 //     try {
-//       const response = await fetch('http://localhost:5000/api/auth/register', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/register', {
 //         method: 'POST',
 //         headers: { 'Content-Type': 'application/json' },
 //         body: JSON.stringify({
@@ -514,7 +514,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('http://localhost:5000/api/reviews', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/reviews', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -1607,7 +1607,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     setLoadingProducts(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/products?limit=100&includeInactive=false', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?limit=100&includeInactive=false', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1729,7 +1729,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1821,7 +1821,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1948,7 +1948,7 @@ export default function ReviewModal({ isOpen, onClose, onReviewSubmitted, produc
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/reviews', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

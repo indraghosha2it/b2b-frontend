@@ -162,6 +162,7 @@
 //   itemIndex, 
 //   product, 
 //   onUpdate, 
+//   onUpdateUnitPrice,
 //   onAddColor, 
 //   onAddSize, 
 //   onRemoveColor, 
@@ -202,6 +203,9 @@
 //   const imageUrl = item.productImage || product?.images?.[0]?.url || 'https://via.placeholder.com/80x80?text=No+Image';
 //   const productTotalPrice = item.total || 0;
 
+//   // Calculate if this product is from inquiry (has originalUnitPrice)
+//   const isFromInquiry = item.originalUnitPrice !== undefined && item.originalUnitPrice !== null;
+
 //   return (
 //     <>
 //       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
@@ -233,13 +237,26 @@
 //                     <span className="text-[10px] sm:text-xs bg-purple-50 text-purple-700 px-1.5 sm:px-2 py-0.5 rounded-full">
 //                       {item.totalQuantity} Total Pcs
 //                     </span>
+//                     {!isFromInquiry && (
+//                       <span className="text-[10px] sm:text-xs bg-green-50 text-green-700 px-1.5 sm:px-2 py-0.5 rounded-full">
+//                         New Product (Bulk Pricing)
+//                       </span>
+//                     )}
+//                     {isFromInquiry && (
+//                       <span className="text-[10px] sm:text-xs bg-orange-50 text-orange-700 px-1.5 sm:px-2 py-0.5 rounded-full">
+//                         From Inquiry (Fixed Price)
+//                       </span>
+//                     )}
 //                   </div>
 //                 </div>
                 
 //                 <div className="flex flex-wrap items-center justify-between md:justify-end gap-3">
 //                   <div className="text-left md:text-right">
-//                     <p className="text-[10px] sm:text-xs text-gray-500">Unit Price</p>
+//                     <p className="text-[10px] sm:text-xs text-gray-500">Basic Unit Price</p>
 //                     <p className="text-sm sm:text-base font-bold text-[#E39A65]">{formatPrice(item.unitPrice)}</p>
+//                     {!isFromInquiry && item.colors.length > 0 && (
+//                       <p className="text-[8px] text-gray-400">Per color based on quantity</p>
+//                     )}
 //                   </div>
                   
 //                   <div className="text-left md:text-right min-w-[80px] sm:min-w-[100px]">
@@ -280,64 +297,135 @@
 
 //         {isExpanded && (
 //           <div className="p-3 sm:p-5 space-y-4">
-//             {item.colors.map((color, colorIndex) => (
-//               <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
-//                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-//                   <div className="flex items-center gap-2">
-//                     <div 
-//                       className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md" 
-//                       style={{ backgroundColor: color.color.code }}
-//                     />
-//                     <span className="text-xs sm:text-sm font-semibold text-gray-800">
-//                       {color.color.name || color.color.code}
-//                     </span>
-//                     <span className="text-[10px] sm:text-xs bg-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-gray-200">
-//                       {color.totalForColor} pcs
-//                     </span>
-//                   </div>
-//                   <button
-//                     onClick={() => handleRemoveColor(colorIndex)}
-//                     className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
-//                     title="Remove color"
-//                   >
-//                     <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-//                   </button>
-//                 </div>
+//   {item.colors.map((color, colorIndex) => {
+//   const colorTotal = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+//   const displayUnitPrice = color.originalUnitPrice || color.unitPrice || 0;
+//   const isInquiryColor = color.originalUnitPrice !== undefined && color.originalUnitPrice !== null;
 
-//                 <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
-//                   {color.sizeQuantities.map((sq, sizeIndex) => (
-//                     <SizeBadge
-//                       key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
-//                       size={sq.size}
-//                       quantity={sq.quantity}
-//                       onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
-//                       onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
-//                     />
-//                   ))}
-                  
-//                   {availableSizes.length > 0 && (
-//                     <select
-//                       onChange={(e) => {
-//                         if (e.target.value) {
-//                           handleAddSize(colorIndex, e.target.value);
-//                           e.target.value = '';
-//                         }
-//                       }}
-//                       className="px-1.5 sm:px-2 py-1 sm:py-1.5 text-[10px] sm:text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
-//                       value=""
-//                     >
-//                       <option value="">+ Add Size</option>
-//                       {availableSizes
-//                         .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
-//                         .map(size => (
-//                           <option key={size} value={size}>{size}</option>
-//                         ))
-//                       }
-//                     </select>
-//                   )}
-//                 </div>
-//               </div>
-//             ))}
+//   return (
+//     <div key={`${itemIndex}-${colorIndex}-${color.color.code}`} className="bg-gray-50/50 rounded-lg p-3 sm:p-4 border border-gray-100">
+//       {/* Color Header */}
+//       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+//         <div className="flex items-center gap-2">
+//           <div 
+//             className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md" 
+//             style={{ backgroundColor: color.color.code }}
+//           />
+//           <span className="text-xs sm:text-sm font-semibold text-gray-800">
+//             {color.color.name || color.color.code}
+//           </span>
+//           <span className="text-[10px] sm:text-xs bg-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full border border-gray-200">
+//             {colorTotal} pcs
+//           </span>
+//         </div>
+        
+//         {/* Editable Unit Price - REPLACE THIS SECTION */}
+//         <div className="flex items-center gap-2">
+//           {colorTotal > 0 && (
+//             <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-full">
+//               <span className="text-[9px] sm:text-[10px] text-gray-500">$</span>
+//               <input
+//                 type="number"
+//                 step="0.01"
+//                 min="0"
+//                 value={displayUnitPrice}
+//                 onChange={(e) => {
+//                   const newPrice = parseFloat(e.target.value) || 0;
+//                   onUpdateUnitPrice(itemIndex, colorIndex, newPrice);
+//                 }}
+//                 className="w-16 sm:w-20 px-1 py-0.5 text-[9px] sm:text-[10px] text-center bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#E39A65]"
+//               />
+//               <span className="text-[9px] sm:text-[10px] text-gray-500">/pc</span>
+//             </div>
+//           )}
+//           <button
+//             onClick={() => handleRemoveColor(colorIndex)}
+//             className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-start sm:self-auto"
+//             title="Remove color"
+//           >
+//             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+//           </button>
+//         </div>
+//       </div>
+
+//       {/* Size Quantities Grid */}
+//       <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3">
+//         {color.sizeQuantities.map((sq, sizeIndex) => (
+//           <SizeBadge
+//             key={`${itemIndex}-${colorIndex}-${sizeIndex}-${sq.size}`}
+//             size={sq.size}
+//             quantity={sq.quantity}
+//             onQuantityChange={(newQty) => handleQuantityChange(colorIndex, sizeIndex, newQty)}
+//             onRemove={() => handleRemoveSize(colorIndex, sizeIndex)}
+//           />
+//         ))}
+        
+//         {availableSizes.length > 0 && (
+//           <select
+//             onChange={(e) => {
+//               if (e.target.value) {
+//                 handleAddSize(colorIndex, e.target.value);
+//                 e.target.value = '';
+//               }
+//             }}
+//             className="px-1.5 sm:px-2 py-1 sm:py-1.5 text-[10px] sm:text-xs border border-gray-200 rounded-lg bg-white hover:border-[#E39A65] focus:outline-none focus:ring-2 focus:ring-[#E39A65] transition-colors"
+//             value=""
+//           >
+//             <option value="">+ Add Size</option>
+//             {availableSizes
+//               .filter(s => !color.sizeQuantities.some(sq => sq.size === s))
+//               .map(size => (
+//                 <option key={size} value={size}>{size}</option>
+//               ))
+//             }
+//           </select>
+//         )}
+//       </div>
+
+//       {/* MOQ Warning for new products only */}
+//       {!isInquiryColor && colorTotal > 0 && colorTotal < item.moq && (
+//         <div className="mt-2 p-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
+//           <p className="text-[8px] sm:text-[9px] text-yellow-700">
+//             ⚠️ Quantity ({colorTotal} pcs) is below MOQ ({item.moq} pcs). 
+//             Using base price: {formatPrice(item.unitPrice)}/pc
+//           </p>
+//         </div>
+//       )}
+      
+//       {/* PRICE BREAKDOWN */}
+//       {colorTotal > 0 && (
+//         <div className="mt-2 pt-2 border-t border-gray-200">
+//           <div className="flex justify-between items-center text-[9px] sm:text-[10px]">
+//             <span className="text-gray-500">
+//               {isInquiryColor ? (
+//                 "Fixed Price (from inquiry) - Editable"
+//               ) : (
+//                 colorTotal < item.moq ? (
+//                   <span className="text-yellow-600">⚠️ Below MOQ - Base Price Applied</span>
+//                 ) : (
+//                   "Bulk Pricing Applied - Editable"
+//                 )
+//               )}
+//             </span>
+//             <div className="text-right">
+//               <span className="text-gray-500">
+//                 {colorTotal} pcs × {formatPrice(displayUnitPrice)}/pc = 
+//               </span>
+//               <span className="font-semibold text-[#E39A65] ml-1">
+//                 {formatPrice(colorTotal * displayUnitPrice)}
+//               </span>
+//             </div>
+//           </div>
+//           {!isInquiryColor && colorTotal < item.moq && (
+//             <p className="text-[8px] text-gray-400 mt-1">
+//               Add {item.moq - colorTotal} more pieces to unlock bulk pricing
+//             </p>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// })}
 
 //             {availableColors.length > 0 && (
 //               <div className="mt-4 pt-3 border-t border-gray-200">
@@ -434,7 +522,7 @@
 //   const searchProducts = async () => {
 //     setSearching(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
 //       const data = await response.json();
 //       if (data.success) {
 //         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -643,61 +731,205 @@
 //     status: 'draft'
 //   });
 
-
-//   // Add this filterAvailableItems function right after the useState declarations (around line 600)
-
-// const filterAvailableItems = (items) => {
-//   if (!items || !Array.isArray(items)) return [];
-  
-//   const filteredProducts = [];
-  
-//   for (const product of items) {
-//     // Skip if product is explicitly marked as unavailable
-//     if (product.isAvailable === false) {
-//       console.log(`❌ Filtering out product: ${product.productName} (marked unavailable)`);
-//       continue;
-//     }
+//   // Filter out unavailable items
+//   const filterAvailableItems = (items) => {
+//     if (!items || !Array.isArray(items)) return [];
     
-//     // Filter colors - only keep available colors
-//     const availableColors = (product.colors || []).filter(color => {
-//       if (color.isAvailable === false) {
-//         console.log(`❌ Filtering out color: ${color.color?.code} from product ${product.productName} (marked unavailable)`);
-//         return false;
+//     const filteredProducts = [];
+    
+//     for (const product of items) {
+//       if (product.isAvailable === false) {
+//         console.log(`❌ Filtering out product: ${product.productName} (marked unavailable)`);
+//         continue;
 //       }
-//       return true;
-//     });
-    
-//     // For each available color, filter sizes
-//     const processedColors = availableColors.map(color => {
-//       const availableSizes = (color.sizeQuantities || []).filter(size => {
-//         if (size.isAvailable === false) {
-//           console.log(`❌ Filtering out size: ${size.size} from color ${color.color?.code} (marked unavailable)`);
+      
+//       const availableColors = (product.colors || []).filter(color => {
+//         if (color.isAvailable === false) {
+//           console.log(`❌ Filtering out color: ${color.color?.code} from product ${product.productName} (marked unavailable)`);
 //           return false;
 //         }
 //         return true;
 //       });
       
-//       return {
-//         ...color,
-//         sizeQuantities: availableSizes,
-//         totalForColor: availableSizes.reduce((sum, sq) => sum + (sq.quantity || 0), 0)
-//       };
-//     }).filter(color => color.sizeQuantities.length > 0); // Remove colors with no sizes left
-    
-//     // Only add product if it has at least one color with sizes
-//     if (processedColors.length > 0) {
-//       filteredProducts.push({
-//         ...product,
-//         colors: processedColors,
-//         totalQuantity: processedColors.reduce((sum, color) => sum + color.totalForColor, 0)
-//       });
-//     } else {
-//       console.log(`❌ Filtering out product: ${product.productName} (no available colors/sizes left)`);
+//       const processedColors = availableColors.map(color => {
+//         const availableSizes = (color.sizeQuantities || []).filter(size => {
+//           if (size.isAvailable === false) {
+//             console.log(`❌ Filtering out size: ${size.size} from color ${color.color?.code} (marked unavailable)`);
+//             return false;
+//           }
+//           return true;
+//         });
+        
+//         return {
+//           ...color,
+//           sizeQuantities: availableSizes,
+//           totalForColor: availableSizes.reduce((sum, sq) => sum + (sq.quantity || 0), 0)
+//         };
+//       }).filter(color => color.sizeQuantities.length > 0);
+      
+//       if (processedColors.length > 0) {
+//         filteredProducts.push({
+//           ...product,
+//           colors: processedColors,
+//           totalQuantity: processedColors.reduce((sum, color) => sum + color.totalForColor, 0)
+//         });
+//       } else {
+//         console.log(`❌ Filtering out product: ${product.productName} (no available colors/sizes left)`);
+//       }
 //     }
+    
+//     console.log(`📊 Filtered products: ${filteredProducts.length} out of ${items.length}`);
+//     return filteredProducts;
+//   };
+
+//   // Calculate unit price based on bulk pricing tiers (for NEW products)
+// // Calculate unit price based on bulk pricing tiers (for NEW products)
+// const calculateUnitPrice = (productId, quantity) => {
+//   const product = productDetails[productId];
+//   if (!product) return 0;
+  
+//   // If no quantity or quantity below MOQ, return base price
+//   if (quantity === 0) return product.pricePerUnit;
+  
+//   // Check if quantity meets minimum MOQ
+//   if (quantity < product.moq) {
+//     return product.pricePerUnit;
 //   }
   
-//   console.log(`📊 Filtered products: ${filteredProducts.length} out of ${items.length}`);
-//   return filteredProducts;
+//   // If no bulk pricing tiers, return base price
+//   if (!product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
+//     return product.pricePerUnit;
+//   }
+
+//   // Sort tiers by minimum quantity
+//   const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
+//     const aMin = parseInt(a.range.split('-')[0] || a.range.replace('+', ''));
+//     const bMin = parseInt(b.range.split('-')[0] || b.range.replace('+', ''));
+//     return aMin - bMin;
+//   });
+
+//   // Find matching tier
+//   for (const tier of sortedTiers) {
+//     const range = tier.range;
+//     if (range.includes('-')) {
+//       const [min, max] = range.split('-').map(Number);
+//       if (quantity >= min && quantity <= max) {
+//         return tier.price;
+//       }
+//     } else if (range.includes('+')) {
+//       const minQty = parseInt(range.replace('+', ''));
+//       if (quantity >= minQty) {
+//         return tier.price;
+//       }
+//     }
+//   }
+
+//   // If no tier matched, check highest tier
+//   const highestTier = sortedTiers[sortedTiers.length - 1];
+//   if (highestTier && highestTier.range.includes('-') && quantity > parseInt(highestTier.range.split('-')[1])) {
+//     return highestTier.price;
+//   }
+  
+//   // Default to base price
+//   return product.pricePerUnit;
+// };
+
+//  // Recalculate all totals - FIXED: Per-color pricing for new products previous
+// // const recalculateTotals = (items) => {
+// //   let subtotal = 0;
+  
+// //   const updatedItems = items.map(item => {
+// //     let itemTotalQty = 0;
+// //     let itemTotalPrice = 0;
+    
+// //     // For each color, calculate based on its quantities
+// //     item.colors.forEach(color => {
+// //       // Calculate total quantity for this color
+// //       const colorQty = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+      
+// //       let unitPrice;
+      
+// //       // Check if this product came from inquiry (has originalUnitPrice)
+// //       if (item.originalUnitPrice !== undefined && item.originalUnitPrice !== null && item.originalUnitPrice > 0) {
+// //         // Use the original unit price from inquiry (preserved during quotation)
+// //         unitPrice = item.originalUnitPrice;
+// //       } else {
+// //         // NEW product - calculate based on bulk pricing tiers for THIS COLOR'S quantity
+// //         unitPrice = calculateUnitPrice(item.productId, colorQty);
+// //       }
+      
+// //       const colorTotal = colorQty * unitPrice;
+// //       itemTotalQty += colorQty;
+// //       itemTotalPrice += colorTotal;
+      
+// //       // Update the color's unit price for display
+// //       color.unitPrice = unitPrice;
+// //     });
+    
+// //     subtotal += itemTotalPrice;
+    
+// //     return {
+// //       ...item,
+// //       totalQuantity: itemTotalQty,
+// //       unitPrice: item.originalUnitPrice !== undefined && item.originalUnitPrice > 0 ? item.originalUnitPrice : (item.unitPrice || 0),
+// //       total: itemTotalPrice
+// //     };
+// //   });
+  
+// //   return { items: updatedItems, subtotal };
+// // };
+
+// // Recalculate all totals - Use per-color original prices for inquiry products
+// const recalculateTotals = (items) => {
+//   let subtotal = 0;
+  
+//   const updatedItems = items.map(item => {
+//     let itemTotalQty = 0;
+//     let itemTotalPrice = 0;
+    
+//     // For each color, calculate based on its quantities
+//     item.colors.forEach(color => {
+//       // Calculate total quantity for this color
+//       const colorQty = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
+      
+//       let unitPrice;
+      
+//       // PRIORITY 1: Check if this color has an original unit price from inquiry
+//       if (color.originalUnitPrice !== undefined && color.originalUnitPrice !== null && color.originalUnitPrice > 0) {
+//         // Use the per-color original unit price from inquiry
+//         unitPrice = color.originalUnitPrice;
+//         console.log(`🎨 Using color original price: ${color.color?.code} - ${unitPrice}`);
+//       } 
+//       // PRIORITY 2: Check if product level has originalUnitPrice (fallback)
+//       else if (item.originalUnitPrice !== undefined && item.originalUnitPrice !== null && item.originalUnitPrice > 0) {
+//         unitPrice = item.originalUnitPrice;
+//         console.log(`📦 Using product original price: ${item.productName} - ${unitPrice}`);
+//       } 
+//       // PRIORITY 3: NEW product - calculate based on bulk pricing tiers
+//       else {
+//         unitPrice = calculateUnitPrice(item.productId, colorQty);
+//         console.log(`🆕 Using calculated bulk price: ${item.productName} - ${colorQty} pcs = ${unitPrice}`);
+//       }
+      
+//       const colorTotal = colorQty * unitPrice;
+//       itemTotalQty += colorQty;
+//       itemTotalPrice += colorTotal;
+      
+//       // Update the color's unit price for display
+//       color.unitPrice = unitPrice;
+//     });
+    
+//     subtotal += itemTotalPrice;
+    
+//     return {
+//       ...item,
+//       totalQuantity: itemTotalQty,
+//       unitPrice: item.originalUnitPrice !== undefined && item.originalUnitPrice > 0 ? item.originalUnitPrice : (item.unitPrice || 0),
+//       total: itemTotalPrice
+//     };
+//   });
+  
+//   return { items: updatedItems, subtotal };
 // };
 
 //   // Banking Terms Handlers
@@ -729,7 +961,7 @@
 //     setLoadingNextNumber(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch('http://localhost:5000/api/invoices/next-number', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/next-number', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -866,7 +1098,7 @@
 //         inquiryNumber: updatedData.inquiryNumber
 //       });
 
-//      if (itemsParam) {
+//  if (itemsParam) {
 //   try {
 //     const parsedItems = JSON.parse(itemsParam);
     
@@ -876,13 +1108,15 @@
 //       colorsCount: p.colors?.length,
 //       colors: p.colors?.map(c => ({
 //         code: c.color?.code,
+//         unitPrice: c.unitPrice,
 //         isAvailable: c.isAvailable,
+//         totalForColor: c.totalForColor,
 //         sizesCount: c.sizeQuantities?.length,
 //         sizes: c.sizeQuantities?.map(s => ({ size: s.size, isAvailable: s.isAvailable, qty: s.quantity }))
 //       }))
 //     })));
     
-//     // 🔥 FILTER OUT UNAVAILABLE ITEMS - ADD THIS LINE
+//     // FILTER OUT UNAVAILABLE ITEMS
 //     const availableItems = filterAvailableItems(parsedItems);
     
 //     console.log('📦 Available items after filtering:', availableItems.map(p => ({
@@ -890,6 +1124,8 @@
 //       colorsCount: p.colors?.length,
 //       colors: p.colors?.map(c => ({
 //         code: c.color?.code,
+//         unitPrice: c.unitPrice,
+//         totalForColor: c.totalForColor,
 //         sizesCount: c.sizeQuantities?.length
 //       }))
 //     })));
@@ -905,24 +1141,20 @@
 //       });
 //     }
 
-//     // Calculate subtotal from available items only
-//     const calculatedSubtotal = availableItems.reduce((sum, item) => {
-//       const itemTotal = (item.colors || []).reduce((colorSum, color) => {
-//         const colorTotal = (color.sizeQuantities || []).reduce((sizeSum, sq) => {
-//           return sizeSum + (sq.quantity || 0);
-//         }, 0);
-//         return colorSum + (colorTotal * (item.unitPrice || 0));
-//       }, 0);
-//       return sum + itemTotal;
-//     }, 0);
-
-//     updatedData.items = availableItems.map(item => ({
+//     // IMPORTANT: Preserve the per-color original unit prices from inquiry
+//     let processedItems = availableItems.map(item => ({
 //       ...item,
+//       productImage: item.productImage || '',
+//       // Store product level original price as fallback
+//       originalUnitPrice: item.unitPrice,
 //       unitPrice: item.unitPrice || 0,
 //       total: (item.totalQuantity || 0) * (item.unitPrice || 0),
-//       productImage: item.productImage || '',
 //       colors: (item.colors || []).map(color => ({
 //         ...color,
+//         // CRITICAL: Store the per-color unit price from inquiry
+//         originalUnitPrice: color.unitPrice || item.unitPrice,
+//         unitPrice: color.unitPrice || item.unitPrice || 0,
+//         totalForColor: color.totalForColor || 0,
 //         sizeQuantities: (color.sizeQuantities || []).map(sq => ({
 //           size: sq.size,
 //           quantity: sq.quantity || 0
@@ -930,16 +1162,31 @@
 //       }))
 //     }));
 
-//     updatedData.subtotal = calculatedSubtotal;
+//     // FORCE RECALCULATION using per-color prices
+//     const { items: recalculatedItems, subtotal: recalculatedSubtotal } = recalculateTotals(processedItems);
     
-//     // Update expanded state for available items
+//     updatedData.items = recalculatedItems;
+//     updatedData.subtotal = recalculatedSubtotal;
+    
+//     console.log('📊 Recalculated subtotal using per-color prices:', recalculatedSubtotal);
+//     console.log('📊 Items after recalculation:', recalculatedItems.map(item => ({
+//       productName: item.productName,
+//       totalQuantity: item.totalQuantity,
+//       total: item.total,
+//       colors: item.colors.map(c => ({
+//         code: c.color?.code,
+//         originalUnitPrice: c.originalUnitPrice,
+//         unitPrice: c.unitPrice,
+//         totalForColor: c.totalForColor
+//       }))
+//     })));
+    
 //     const initialExpandedState = {};
 //     availableItems.forEach((_, index) => {
 //       initialExpandedState[index] = true;
 //     });
 //     setExpandedItems(initialExpandedState);
     
-//     // Fetch product details for available items only
 //     availableItems.forEach(item => {
 //       if (item.productId) {
 //         fetchProductDetails(item.productId);
@@ -958,7 +1205,7 @@
 //   // Fetch product details for available colors and sizes
 //   const fetchProductDetails = async (productId) => {
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
 //       const data = await response.json();
 //       if (data.success) {
 //         setProductDetails(prev => ({
@@ -971,6 +1218,26 @@
 //     }
 //   };
 
+//   // Add this useEffect right after the fetchProductDetails function or near other useEffects
+
+// // Recalculate totals when product details are loaded or when items change
+// useEffect(() => {
+//   if (invoiceData.items.length > 0 && Object.keys(productDetails).length > 0) {
+//     // Small delay to ensure all product details are loaded
+//     const timer = setTimeout(() => {
+//       const { items, subtotal } = recalculateTotals(invoiceData.items);
+//       if (JSON.stringify(items) !== JSON.stringify(invoiceData.items)) {
+//         setInvoiceData(prev => ({
+//           ...prev,
+//           items: items,
+//           subtotal: subtotal
+//         }));
+//       }
+//     }, 100);
+//     return () => clearTimeout(timer);
+//   }
+// }, [productDetails, invoiceData.items.length]);
+
 //   // Toggle expand/collapse for an item
 //   const toggleExpand = (itemIndex) => {
 //     setExpandedItems(prev => ({
@@ -979,73 +1246,16 @@
 //     }));
 //   };
 
-//   // Calculate unit price based on bulk pricing tiers
-//   const calculateUnitPrice = (productId, totalQuantity) => {
-//     const product = productDetails[productId];
-//     if (!product || !product.quantityBasedPricing || product.quantityBasedPricing.length === 0) {
-//       return product?.pricePerUnit || 0;
-//     }
-
-//     const sortedTiers = [...product.quantityBasedPricing].sort((a, b) => {
-//       const aMin = parseInt(a.range.split('-')[0] || a.range.replace('+', ''));
-//       const bMin = parseInt(b.range.split('-')[0] || b.range.replace('+', ''));
-//       return aMin - bMin;
-//     });
-
-//     for (const tier of sortedTiers) {
-//       const range = tier.range;
-//       if (range.includes('-')) {
-//         const [min, max] = range.split('-').map(Number);
-//         if (totalQuantity >= min && totalQuantity <= max) {
-//           return tier.price;
-//         }
-//       } else if (range.includes('+')) {
-//         const minQty = parseInt(range.replace('+', ''));
-//         if (totalQuantity >= minQty) {
-//           return tier.price;
-//         }
-//       }
-//     }
-
-//     const highestTier = sortedTiers[sortedTiers.length - 1];
-//     return highestTier?.price || product.pricePerUnit;
-//   };
-
-//   // Recalculate all totals
-//   const recalculateTotals = (items) => {
-//     let subtotal = 0;
-    
-//     const updatedItems = items.map(item => {
-//       const itemTotalQty = item.colors.reduce((sum, color) => {
-//         const colorQty = color.sizeQuantities.reduce((s, sq) => s + (sq.quantity || 0), 0);
-//         return sum + colorQty;
-//       }, 0);
-      
-//       const unitPrice = calculateUnitPrice(item.productId, itemTotalQty);
-//       const itemTotal = itemTotalQty * unitPrice;
-      
-//       subtotal += itemTotal;
-      
-//       return {
-//         ...item,
-//         totalQuantity: itemTotalQty,
-//         unitPrice,
-//         total: itemTotal
-//       };
-//     });
-    
-//     return { items: updatedItems, subtotal };
-//   };
-
-//   // Handle color quantity change
+//   // Handle color quantity change - UPDATED
 //   const handleColorQuantityChange = (itemIndex, colorIndex, sizeIndex, newQuantity) => {
 //     setInvoiceData(prev => {
 //       const updatedItems = JSON.parse(JSON.stringify(prev.items));
 //       const color = updatedItems[itemIndex].colors[colorIndex];
+//       const item = updatedItems[itemIndex];
       
 //       color.sizeQuantities[sizeIndex].quantity = newQuantity;
-//       color.totalForColor = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
       
+//       // Recalculate totals (this will recalculate per-color pricing)
 //       const { items, subtotal } = recalculateTotals(updatedItems);
       
 //       return {
@@ -1055,6 +1265,30 @@
 //       };
 //     });
 //   };
+
+//   // Handle color unit price change
+// const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
+//   setInvoiceData(prev => {
+//     const updatedItems = JSON.parse(JSON.stringify(prev.items));
+//     const color = updatedItems[itemIndex].colors[colorIndex];
+    
+//     // Update the color's unit price
+//     color.unitPrice = newUnitPrice;
+//     // Also update originalUnitPrice if it exists (for inquiry products)
+//     if (color.originalUnitPrice !== undefined) {
+//       color.originalUnitPrice = newUnitPrice;
+//     }
+    
+//     // Recalculate totals
+//     const { items, subtotal } = recalculateTotals(updatedItems);
+    
+//     return {
+//       ...prev,
+//       items,
+//       subtotal
+//     };
+//   });
+// };
 
 //   // Add a new color to an item
 //   const handleAddColor = (itemIndex, colorCode, colorName) => {
@@ -1079,9 +1313,11 @@
 //           name: colorName || colorCode
 //         },
 //         sizeQuantities,
-//         totalForColor: 0
+//         totalForColor: 0,
+//         unitPrice: 0 // Will be calculated in recalculateTotals
 //       });
       
+//       // Recalculate totals (this will handle pricing correctly)
 //       const { items, subtotal } = recalculateTotals(updatedItems);
       
 //       return {
@@ -1106,8 +1342,7 @@
 //         quantity: 0
 //       });
       
-//       color.totalForColor = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
-      
+//       // Recalculate totals
 //       const { items, subtotal } = recalculateTotals(updatedItems);
       
 //       return {
@@ -1145,7 +1380,6 @@
 //       const color = updatedItems[itemIndex].colors[colorIndex];
       
 //       color.sizeQuantities.splice(sizeIndex, 1);
-//       color.totalForColor = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
       
 //       const { items, subtotal } = recalculateTotals(updatedItems);
       
@@ -1192,7 +1426,8 @@
 //         totalQuantity: 0,
 //         unitPrice: product.pricePerUnit,
 //         moq: product.moq,
-//         total: 0
+//         total: 0,
+//         originalUnitPrice: null // Mark as NOT from inquiry (will use bulk pricing)
 //       };
 
 //       const updatedItems = [...prev.items, newItem];
@@ -1266,7 +1501,7 @@
 
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('http://localhost:5000/api/upload/company-logo', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/upload/company-logo', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1294,7 +1529,7 @@
 
 //   const resetToDefaultLogo = () => {
 //     if (invoiceData.company.logoPublicId) {
-//       fetch(`http://localhost:5000/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
+//       fetch(`https://b2b-backend-rosy.vercel.app/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1382,7 +1617,6 @@
 //         field => field.fieldName.trim() !== '' && field.fieldValue.trim() !== ''
 //       );
       
-//       // Filter out empty banking terms (both title and value empty)
 //       const validBankingTerms = bankingTerms.filter(
 //         term => term.title.trim() !== '' || term.value.trim() !== ''
 //       );
@@ -1427,7 +1661,8 @@
 //               size: sq.size,
 //               quantity: sq.quantity
 //             })),
-//             totalForColor: color.totalForColor
+//             totalForColor: color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0),
+//             unitPrice: color.unitPrice || 0
 //           })),
 //           totalQuantity: item.totalQuantity,
 //           unitPrice: Number(item.unitPrice.toFixed(2)),
@@ -1535,7 +1770,7 @@
 //         finalTotal: invoicePayload.finalTotal
 //       });
 
-//       const response = await fetch('http://localhost:5000/api/invoices', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -1614,7 +1849,6 @@
 //               </div>
 //             </div>
 //             <div className="flex flex-wrap items-center gap-2">
-             
 //               <button
 //                 onClick={handleSendInvoice}
 //                 disabled={saving}
@@ -2002,12 +2236,13 @@
 //                   const isExpanded = expandedItems[itemIndex] !== false;
                   
 //                   return (
-//                     <ProductItemCard
+//                    <ProductItemCard
 //                       key={`${itemIndex}-${item.productId}`}
 //                       item={item}
 //                       itemIndex={itemIndex}
 //                       product={product}
 //                       onUpdate={handleColorQuantityChange}
+//                       onUpdateUnitPrice={handleColorUnitPriceChange}  // ← ADD THIS
 //                       onAddColor={handleAddColor}
 //                       onAddSize={handleAddSize}
 //                       onRemoveColor={handleRemoveColor}
@@ -2524,6 +2759,18 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3049,7 +3296,7 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
   const searchProducts = async () => {
     setSearching(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
       const data = await response.json();
       if (data.success) {
         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -3361,7 +3608,9 @@ const calculateUnitPrice = (productId, quantity) => {
   return product.pricePerUnit;
 };
 
- // Recalculate all totals - FIXED: Per-color pricing for new products previous
+
+
+// Recalculate all totals - Use per-color original prices for inquiry products
 // const recalculateTotals = (items) => {
 //   let subtotal = 0;
   
@@ -3376,13 +3625,21 @@ const calculateUnitPrice = (productId, quantity) => {
       
 //       let unitPrice;
       
-//       // Check if this product came from inquiry (has originalUnitPrice)
-//       if (item.originalUnitPrice !== undefined && item.originalUnitPrice !== null && item.originalUnitPrice > 0) {
-//         // Use the original unit price from inquiry (preserved during quotation)
+//       // PRIORITY 1: Check if this color has an original unit price from inquiry
+//       if (color.originalUnitPrice !== undefined && color.originalUnitPrice !== null && color.originalUnitPrice > 0) {
+//         // Use the per-color original unit price from inquiry
+//         unitPrice = color.originalUnitPrice;
+//         console.log(`🎨 Using color original price: ${color.color?.code} - ${unitPrice}`);
+//       } 
+//       // PRIORITY 2: Check if product level has originalUnitPrice (fallback)
+//       else if (item.originalUnitPrice !== undefined && item.originalUnitPrice !== null && item.originalUnitPrice > 0) {
 //         unitPrice = item.originalUnitPrice;
-//       } else {
-//         // NEW product - calculate based on bulk pricing tiers for THIS COLOR'S quantity
+//         console.log(`📦 Using product original price: ${item.productName} - ${unitPrice}`);
+//       } 
+//       // PRIORITY 3: NEW product - calculate based on bulk pricing tiers
+//       else {
 //         unitPrice = calculateUnitPrice(item.productId, colorQty);
+//         console.log(`🆕 Using calculated bulk price: ${item.productName} - ${colorQty} pcs = ${unitPrice}`);
 //       }
       
 //       const colorTotal = colorQty * unitPrice;
@@ -3406,7 +3663,6 @@ const calculateUnitPrice = (productId, quantity) => {
 //   return { items: updatedItems, subtotal };
 // };
 
-// Recalculate all totals - Use per-color original prices for inquiry products
 const recalculateTotals = (items) => {
   let subtotal = 0;
   
@@ -3414,35 +3670,33 @@ const recalculateTotals = (items) => {
     let itemTotalQty = 0;
     let itemTotalPrice = 0;
     
-    // For each color, calculate based on its quantities
     item.colors.forEach(color => {
-      // Calculate total quantity for this color
       const colorQty = color.sizeQuantities.reduce((sum, sq) => sum + (sq.quantity || 0), 0);
       
       let unitPrice;
       
-      // PRIORITY 1: Check if this color has an original unit price from inquiry
-      if (color.originalUnitPrice !== undefined && color.originalUnitPrice !== null && color.originalUnitPrice > 0) {
-        // Use the per-color original unit price from inquiry
+      // PRIORITY 1: Use existing unitPrice (user may have edited it)
+      if (color.userSetUnitPrice !== undefined && color.userSetUnitPrice !== null) {
+        unitPrice = color.userSetUnitPrice;
+      }
+      // PRIORITY 2: Use originalUnitPrice from inquiry
+      else if (color.originalUnitPrice !== undefined && color.originalUnitPrice !== null && color.originalUnitPrice > 0) {
         unitPrice = color.originalUnitPrice;
-        console.log(`🎨 Using color original price: ${color.color?.code} - ${unitPrice}`);
       } 
-      // PRIORITY 2: Check if product level has originalUnitPrice (fallback)
+      // PRIORITY 3: Use product level originalUnitPrice
       else if (item.originalUnitPrice !== undefined && item.originalUnitPrice !== null && item.originalUnitPrice > 0) {
         unitPrice = item.originalUnitPrice;
-        console.log(`📦 Using product original price: ${item.productName} - ${unitPrice}`);
       } 
-      // PRIORITY 3: NEW product - calculate based on bulk pricing tiers
+      // PRIORITY 4: Calculate based on bulk pricing for new products
       else {
         unitPrice = calculateUnitPrice(item.productId, colorQty);
-        console.log(`🆕 Using calculated bulk price: ${item.productName} - ${colorQty} pcs = ${unitPrice}`);
       }
       
       const colorTotal = colorQty * unitPrice;
       itemTotalQty += colorQty;
       itemTotalPrice += colorTotal;
       
-      // Update the color's unit price for display
+      // Store the unit price being used
       color.unitPrice = unitPrice;
     });
     
@@ -3488,7 +3742,7 @@ const recalculateTotals = (items) => {
     setLoadingNextNumber(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/invoices/next-number', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/next-number', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -3732,7 +3986,7 @@ const recalculateTotals = (items) => {
   // Fetch product details for available colors and sizes
   const fetchProductDetails = async (productId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
       const data = await response.json();
       if (data.success) {
         setProductDetails(prev => ({
@@ -3794,6 +4048,52 @@ useEffect(() => {
   };
 
   // Handle color unit price change
+// const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
+//   setInvoiceData(prev => {
+//     const updatedItems = JSON.parse(JSON.stringify(prev.items));
+//     const color = updatedItems[itemIndex].colors[colorIndex];
+    
+//     // Update the color's unit price
+//     color.unitPrice = newUnitPrice;
+//     // Also update originalUnitPrice if it exists (for inquiry products)
+//     if (color.originalUnitPrice !== undefined) {
+//       color.originalUnitPrice = newUnitPrice;
+//     }
+    
+//     // Recalculate totals
+//     const { items, subtotal } = recalculateTotals(updatedItems);
+    
+//     return {
+//       ...prev,
+//       items,
+//       subtotal
+//     };
+//   });
+// };
+// const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
+//   setInvoiceData(prev => {
+//     const updatedItems = JSON.parse(JSON.stringify(prev.items));
+//     const color = updatedItems[itemIndex].colors[colorIndex];
+    
+//     // Update the color's unit price
+//     color.unitPrice = newUnitPrice;
+    
+//     // Set originalUnitPrice if it doesn't exist (for new colors)
+//     if (color.originalUnitPrice === undefined || color.originalUnitPrice === null) {
+//       color.originalUnitPrice = newUnitPrice;
+//     }
+    
+//     // Recalculate totals with the new price
+//     const { items, subtotal } = recalculateTotals(updatedItems);
+    
+//     return {
+//       ...prev,
+//       items,
+//       subtotal
+//     };
+//   });
+// };
+
 const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
   setInvoiceData(prev => {
     const updatedItems = JSON.parse(JSON.stringify(prev.items));
@@ -3801,10 +4101,8 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
     
     // Update the color's unit price
     color.unitPrice = newUnitPrice;
-    // Also update originalUnitPrice if it exists (for inquiry products)
-    if (color.originalUnitPrice !== undefined) {
-      color.originalUnitPrice = newUnitPrice;
-    }
+    // Mark this as user-set to prevent recalculation from overwriting
+    color.userSetUnitPrice = newUnitPrice;
     
     // Recalculate totals
     const { items, subtotal } = recalculateTotals(updatedItems);
@@ -3818,42 +4116,83 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
 };
 
   // Add a new color to an item
+  // const handleAddColor = (itemIndex, colorCode, colorName) => {
+  //   setInvoiceData(prev => {
+  //     const updatedItems = JSON.parse(JSON.stringify(prev.items));
+  //     const item = updatedItems[itemIndex];
+  //     const product = productDetails[item.productId];
+      
+  //     if (!product) return prev;
+      
+  //     const colorExists = item.colors.some(c => c.color?.code === colorCode);
+  //     if (colorExists) return prev;
+      
+  //     const sizeQuantities = (product.sizes || []).map(size => ({
+  //       size,
+  //       quantity: 0
+  //     }));
+      
+  //     item.colors.push({
+  //       color: {
+  //         code: colorCode,
+  //         name: colorName || colorCode
+  //       },
+  //       sizeQuantities,
+  //       totalForColor: 0,
+  //       unitPrice: 0 // Will be calculated in recalculateTotals
+  //     });
+      
+  //     // Recalculate totals (this will handle pricing correctly)
+  //     const { items, subtotal } = recalculateTotals(updatedItems);
+      
+  //     return {
+  //       ...prev,
+  //       items,
+  //       subtotal
+  //     };
+  //   });
+  // };
+
   const handleAddColor = (itemIndex, colorCode, colorName) => {
-    setInvoiceData(prev => {
-      const updatedItems = JSON.parse(JSON.stringify(prev.items));
-      const item = updatedItems[itemIndex];
-      const product = productDetails[item.productId];
-      
-      if (!product) return prev;
-      
-      const colorExists = item.colors.some(c => c.color?.code === colorCode);
-      if (colorExists) return prev;
-      
-      const sizeQuantities = (product.sizes || []).map(size => ({
-        size,
-        quantity: 0
-      }));
-      
-      item.colors.push({
-        color: {
-          code: colorCode,
-          name: colorName || colorCode
-        },
-        sizeQuantities,
-        totalForColor: 0,
-        unitPrice: 0 // Will be calculated in recalculateTotals
-      });
-      
-      // Recalculate totals (this will handle pricing correctly)
-      const { items, subtotal } = recalculateTotals(updatedItems);
-      
-      return {
-        ...prev,
-        items,
-        subtotal
-      };
+  setInvoiceData(prev => {
+    const updatedItems = JSON.parse(JSON.stringify(prev.items));
+    const item = updatedItems[itemIndex];
+    const product = productDetails[item.productId];
+    
+    if (!product) return prev;
+    
+    const colorExists = item.colors.some(c => c.color?.code === colorCode);
+    if (colorExists) return prev;
+    
+    const sizeQuantities = (product.sizes || []).map(size => ({
+      size,
+      quantity: 0
+    }));
+    
+    // Calculate initial unit price based on product's base price
+    const initialUnitPrice = product.pricePerUnit || 0;
+    
+    item.colors.push({
+      color: {
+        code: colorCode,
+        name: colorName || colorCode
+      },
+      sizeQuantities,
+      totalForColor: 0,
+      unitPrice: initialUnitPrice,  // Initialize with product's base price
+      originalUnitPrice: null  // Mark as new color (not from inquiry)
     });
-  };
+    
+    // Recalculate totals
+    const { items, subtotal } = recalculateTotals(updatedItems);
+    
+    return {
+      ...prev,
+      items,
+      subtotal
+    };
+  });
+};
 
   // Add a new size to a color
   const handleAddSize = (itemIndex, colorIndex, size) => {
@@ -3943,39 +4282,71 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
   };
 
   // Add a new product to invoice
+  // const handleAddProduct = (product) => {
+  //   setInvoiceData(prev => {
+  //     const newItem = {
+  //       productId: product._id,
+  //       productName: product.productName,
+  //       productImage: product.images?.[0]?.url,
+  //       colors: [],
+  //       totalQuantity: 0,
+  //       unitPrice: product.pricePerUnit,
+  //       moq: product.moq,
+  //       total: 0,
+  //       originalUnitPrice: null // Mark as NOT from inquiry (will use bulk pricing)
+  //     };
+
+  //     const updatedItems = [...prev.items, newItem];
+      
+  //     fetchProductDetails(product._id);
+      
+  //     const newExpandedItems = {};
+  //     updatedItems.forEach((_, index) => {
+  //       newExpandedItems[index] = true;
+  //     });
+  //     setExpandedItems(newExpandedItems);
+      
+  //     toast.success(`${product.productName} added to invoice`);
+      
+  //     return {
+  //       ...prev,
+  //       items: updatedItems
+  //     };
+  //   });
+  // };
+
   const handleAddProduct = (product) => {
-    setInvoiceData(prev => {
-      const newItem = {
-        productId: product._id,
-        productName: product.productName,
-        productImage: product.images?.[0]?.url,
-        colors: [],
-        totalQuantity: 0,
-        unitPrice: product.pricePerUnit,
-        moq: product.moq,
-        total: 0,
-        originalUnitPrice: null // Mark as NOT from inquiry (will use bulk pricing)
-      };
+  setInvoiceData(prev => {
+    const newItem = {
+      productId: product._id,
+      productName: product.productName,
+      productImage: product.images?.[0]?.url,
+      colors: [],  // Start with no colors
+      totalQuantity: 0,
+      unitPrice: product.pricePerUnit,
+      moq: product.moq,
+      total: 0,
+      originalUnitPrice: null  // Mark as new product (not from inquiry)
+    };
 
-      const updatedItems = [...prev.items, newItem];
-      
-      fetchProductDetails(product._id);
-      
-      const newExpandedItems = {};
-      updatedItems.forEach((_, index) => {
-        newExpandedItems[index] = true;
-      });
-      setExpandedItems(newExpandedItems);
-      
-      toast.success(`${product.productName} added to invoice`);
-      
-      return {
-        ...prev,
-        items: updatedItems
-      };
+    const updatedItems = [...prev.items, newItem];
+    
+    fetchProductDetails(product._id);
+    
+    const newExpandedItems = {};
+    updatedItems.forEach((_, index) => {
+      newExpandedItems[index] = true;
     });
-  };
-
+    setExpandedItems(newExpandedItems);
+    
+    toast.success(`${product.productName} added to invoice`);
+    
+    return {
+      ...prev,
+      items: updatedItems
+    };
+  });
+};
   const handleCompanyChange = (field, value) => {
     setInvoiceData(prev => ({
       ...prev,
@@ -4028,7 +4399,7 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
 
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/upload/company-logo', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/upload/company-logo', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -4056,7 +4427,7 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
 
   const resetToDefaultLogo = () => {
     if (invoiceData.company.logoPublicId) {
-      fetch(`http://localhost:5000/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
+      fetch(`https://b2b-backend-rosy.vercel.app/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -4297,7 +4668,7 @@ const handleColorUnitPriceChange = (itemIndex, colorIndex, newUnitPrice) => {
         finalTotal: invoicePayload.finalTotal
       });
 
-      const response = await fetch('http://localhost:5000/api/invoices', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

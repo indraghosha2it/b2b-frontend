@@ -1087,7 +1087,7 @@ export default function ModeratorInquiriesPage() {
       }
 
       // Build query params
-      let url = `http://localhost:5000/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
+      let url = `https://b2b-backend-rosy.vercel.app/api/moderator/inquiries?page=${currentPage}&limit=${itemsPerPage}`;
       
       if (activeFilter !== 'All') {
         url += `&status=${activeFilter.toLowerCase()}`;

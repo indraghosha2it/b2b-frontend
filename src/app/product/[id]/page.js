@@ -6,7 +6,7 @@
 //   console.log('🔄 Generating static params for all products...');
   
 //   try {
-//     const response = await fetch('http://localhost:5000/api/products?limit=1000', {
+//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?limit=1000', {
 //       cache: 'no-store'
 //     });
     
@@ -35,7 +35,7 @@
 //   console.log(`🔍 Generating metadata for product: ${id}`);
   
 //   try {
-//     const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${id}`, {
 //       cache: 'force-cache'
 //     });
     
@@ -114,7 +114,7 @@ import ProductClient from './productClient';
 // Helper function to fetch product for metadata
 async function getProductForMetadata(id) {
   try {
-    const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+    const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${id}`, {
       next: { revalidate: 3600 } // Revalidate every hour
     });
     const data = await response.json();
@@ -132,7 +132,7 @@ async function getProductForMetadata(id) {
 // Generate static params for all products at build time
 export async function generateStaticParams() {
   try {
-    const response = await fetch('http://localhost:5000/api/products?limit=1000');
+    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products?limit=1000');
     const data = await response.json();
     
     if (data.success && data.data) {

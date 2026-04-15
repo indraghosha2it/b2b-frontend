@@ -120,7 +120,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -159,7 +159,7 @@
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -178,7 +178,7 @@
 //     setIsLoadingSubcategories(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
 //         headers: { 'Authorization': `Bearer ${token}` }
 //       });
 //       const data = await response.json();
@@ -309,7 +309,7 @@
 
 //       for (const subcategory of validSubcategories) {
 //         try {
-//           const response = await fetch(`http://localhost:5000/api/categories/${subcategoryModal.category._id}/subcategories`, {
+//           const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${subcategoryModal.category._id}/subcategories`, {
 //             method: 'POST',
 //             headers: { 
 //               'Authorization': `Bearer ${token}`,
@@ -389,7 +389,7 @@
 //       const token = localStorage.getItem('token');
       
 //       const response = await fetch(
-//         `http://localhost:5000/api/categories/${editSubcategoryModal.category._id}/subcategories/${editSubcategoryModal.subcategory._id}`,
+//         `https://b2b-backend-rosy.vercel.app/api/categories/${editSubcategoryModal.category._id}/subcategories/${editSubcategoryModal.subcategory._id}`,
 //         {
 //           method: 'PUT',
 //           headers: { 
@@ -446,7 +446,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
 //       const response = await fetch(
-//         `http://localhost:5000/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}`,
+//         `https://b2b-backend-rosy.vercel.app/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}`,
 //         {
 //           method: 'DELETE',
 //           headers: { 'Authorization': `Bearer ${token}` }
@@ -494,7 +494,7 @@
 //   const handleDeleteConfirm = async () => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/categories/${deleteModal.id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${deleteModal.id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -611,7 +611,7 @@
 //         formDataToSend.append('image', editModal.imageFile);
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/categories/${editModal.category._id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${editModal.category._id}`, {
 //         method: 'PUT',
 //         headers: { 'Authorization': `Bearer ${token}` },
 //         body: formDataToSend
@@ -714,7 +714,7 @@
 //       formDataToSend.append('description', formData.description);
 //       formDataToSend.append('image', imageFile);
 
-//       const response = await fetch('http://localhost:5000/api/categories', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
 //         method: 'POST',
 //         headers: { 'Authorization': `Bearer ${token}` },
 //         body: formDataToSend
@@ -1988,7 +1988,7 @@ const fetchCategories = async () => {
   try {
     const token = localStorage.getItem('token');
     
-    const response = await fetch('http://localhost:5000/api/categories', {
+    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -2030,7 +2030,7 @@ const fetchCategories = async () => {
   const fetchSubcategories = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2049,7 +2049,7 @@ const fetchCategories = async () => {
   const fetchChildren = async (categoryId, subcategoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2068,7 +2068,7 @@ const fetchCategories = async () => {
     setIsLoadingSubcategories(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -2219,7 +2219,7 @@ const fetchCategories = async () => {
 
       for (const subcategory of validSubcategories) {
         try {
-          const response = await fetch(`http://localhost:5000/api/categories/${subcategoryModal.category._id}/subcategories`, {
+          const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${subcategoryModal.category._id}/subcategories`, {
             method: 'POST',
             headers: { 
               'Authorization': `Bearer ${token}`,
@@ -2299,7 +2299,7 @@ const fetchCategories = async () => {
       const token = localStorage.getItem('token');
       
       const response = await fetch(
-        `http://localhost:5000/api/categories/${editSubcategoryModal.category._id}/subcategories/${editSubcategoryModal.subcategory._id}`,
+        `https://b2b-backend-rosy.vercel.app/api/categories/${editSubcategoryModal.category._id}/subcategories/${editSubcategoryModal.subcategory._id}`,
         {
           method: 'PUT',
           headers: { 
@@ -2406,7 +2406,7 @@ const fetchCategories = async () => {
       for (const child of validChildren) {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/categories/${childSubcategoryModal.category._id}/subcategories/${childSubcategoryModal.subcategory._id}/children`,
+            `https://b2b-backend-rosy.vercel.app/api/categories/${childSubcategoryModal.category._id}/subcategories/${childSubcategoryModal.subcategory._id}/children`,
             {
               method: 'POST',
               headers: { 
@@ -2490,7 +2490,7 @@ const fetchCategories = async () => {
       const token = localStorage.getItem('token');
       
       const response = await fetch(
-        `http://localhost:5000/api/categories/${editChildSubcategoryModal.category._id}/subcategories/${editChildSubcategoryModal.subcategory._id}/children/${editChildSubcategoryModal.child._id}`,
+        `https://b2b-backend-rosy.vercel.app/api/categories/${editChildSubcategoryModal.category._id}/subcategories/${editChildSubcategoryModal.subcategory._id}/children/${editChildSubcategoryModal.child._id}`,
         {
           method: 'PUT',
           headers: { 
@@ -2552,9 +2552,9 @@ const fetchCategories = async () => {
       let url;
       
       if (deleteSubcategoryModal.isChild) {
-        url = `http://localhost:5000/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}/children/${deleteSubcategoryModal.childId}`;
+        url = `https://b2b-backend-rosy.vercel.app/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}/children/${deleteSubcategoryModal.childId}`;
       } else {
-        url = `http://localhost:5000/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}`;
+        url = `https://b2b-backend-rosy.vercel.app/api/categories/${deleteSubcategoryModal.categoryId}/subcategories/${deleteSubcategoryModal.subcategoryId}`;
       }
       
       const response = await fetch(url, {
@@ -2605,7 +2605,7 @@ const fetchCategories = async () => {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/categories/${deleteModal.id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${deleteModal.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2722,7 +2722,7 @@ const fetchCategories = async () => {
         formDataToSend.append('image', editModal.imageFile);
       }
 
-      const response = await fetch(`http://localhost:5000/api/categories/${editModal.category._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${editModal.category._id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataToSend
@@ -2825,7 +2825,7 @@ const fetchCategories = async () => {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('image', imageFile);
 
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataToSend
@@ -3091,7 +3091,7 @@ const fetchCategories = async () => {
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <div className="flex items-center gap-1">
                           <FolderTree className="w-3.5 h-3.5" />
-                          Categories
+                          sub-Categories
                         </div>
                       </th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

@@ -509,7 +509,7 @@ export default function AdminDashboardPage() {
       }
 
       // Build URL with date filters
-      let url = `http://localhost:5000/api/admin/inquiries/stats/dashboard`;
+      let url = `https://b2b-backend-rosy.vercel.app/api/admin/inquiries/stats/dashboard`;
       
       // Add query parameters based on filter type
       const params = new URLSearchParams();
