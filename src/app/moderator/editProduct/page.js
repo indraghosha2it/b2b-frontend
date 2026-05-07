@@ -1,4 +1,5 @@
 
+
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -28,7 +29,8 @@
 //   Star,
 //   Search,
 //   Tag,
-//   FolderTree
+//   FolderTree,
+//   GripVertical 
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -109,7 +111,8 @@
 //   const [isLoading, setIsLoading] = useState(true);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
-//   const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories
+//   const [subcategories, setSubcategories] = useState([]);
+//   const [childSubcategories, setChildSubcategories] = useState([]);
 //   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
@@ -117,10 +120,15 @@
 //   const [originalProduct, setOriginalProduct] = useState(null);
 //   const [userRole, setUserRole] = useState('');
 //   const [keywordInput, setKeywordInput] = useState('');
+//   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
 
 //   const [showTags, setShowTags] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
   
+// // ADD THESE LINES ↓
+// const [draggedImageIndex, setDraggedImageIndex] = useState(null);
+// const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
+
 //   const colorPickerRef = useRef(null);
   
 //   const [formData, setFormData] = useState({
@@ -128,7 +136,8 @@
 //     description: '',
 //     instruction: '',
 //     category: '',
-//     subcategory: '', // NEW: Subcategory field
+//     subcategory: '',
+//     childSubcategory: '', // NEW: Child subcategory field
 //     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
@@ -251,8 +260,21 @@
 //     } else {
 //       setSubcategories([]);
 //       setSelectedCategoryDetails(null);
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
 //     }
 //   }, [formData.category]);
+
+//   // Fetch child subcategories when subcategory changes
+//   useEffect(() => {
+//     if (formData.category && formData.subcategory) {
+//       fetchChildSubcategories(formData.category, formData.subcategory);
+//     } else {
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       setFormData(prev => ({ ...prev, childSubcategory: '' }));
+//     }
+//   }, [formData.subcategory]);
 
 //   useEffect(() => {
 //     if (editor && formData.description !== editor.getHTML()) {
@@ -283,7 +305,6 @@
 //     }
 //   };
 
-//   // NEW: Fetch subcategories for selected category
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
@@ -300,6 +321,29 @@
 //     } catch (error) {
 //       console.error('Error fetching subcategories:', error);
 //       setSubcategories([]);
+//     }
+//   };
+
+//   // NEW: Fetch child subcategories for a subcategory
+//   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setChildSubcategories(data.data.children);
+//         setShowChildSubcategory(data.data.children.length > 0);
+//       } else {
+//         setChildSubcategories([]);
+//         setShowChildSubcategory(false);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching child subcategories:', error);
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
 //     }
 //   };
 
@@ -337,7 +381,8 @@
 //           description: product.description || '',
 //           instruction: product.instruction || '',
 //           category: product.category?._id || product.category || '',
-//           subcategory: product.subcategory || '', // NEW: Set subcategory
+//           subcategory: product.subcategory || '',
+//           childSubcategory: product.childSubcategory || '',
 //           targetedCustomer: product.targetedCustomer || 'unisex',
 //           fabric: product.fabric || '',
 //           moq: product.moq || 100,
@@ -359,6 +404,11 @@
 //         if (product.category?._id || product.category) {
 //           const categoryId = product.category?._id || product.category;
 //           await fetchSubcategories(categoryId);
+          
+//           // If subcategory is selected, fetch its child subcategories
+//           if (product.subcategory) {
+//             await fetchChildSubcategories(categoryId, product.subcategory);
+//           }
 //         }
 
 //         setExistingImages(product.images || []);
@@ -436,104 +486,92 @@
 //     }
 //   };
 
-//   // Handle multiple image selection
-// const handleMultipleImageSelect = async (e) => {
-//   const files = Array.from(e.target.files);
-  
-//   if (files.length === 0) return;
-  
-//   // Check total images limit (6 max)
-//   const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
-//   const availableSlots = 6 - currentImagesCount;
-  
-//   if (files.length > availableSlots) {
-//     toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
-//     return;
-//   }
-  
-//   // Create temporary array to store all new images
-//   const tempNewImages = [...newImages];
-  
-//   // First, add all previews immediately
-//   for (let i = 0; i < files.length; i++) {
-//     const file = files[i];
+//   const handleMultipleImageSelect = async (e) => {
+//     const files = Array.from(e.target.files);
     
-//     // Validate file
-//     const validation = validateImageFile(file);
-//     if (!validation.valid) {
-//       toast.error(`Image ${i + 1}: ${validation.message}`);
-//       continue;
+//     if (files.length === 0) return;
+    
+//     const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
+//     const availableSlots = 6 - currentImagesCount;
+    
+//     if (files.length > availableSlots) {
+//       toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+//       return;
 //     }
     
-//     const imageId = Date.now() + Math.random() + i;
-//     const previewUrl = URL.createObjectURL(file);
+//     const tempNewImages = [...newImages];
     
-//     // Add to temp array
-//     tempNewImages.push({
-//       id: imageId,
-//       slotId: `multi-${imageId}`,
-//       file: file,
-//       preview: previewUrl,
-//       uploading: true,
-//       url: null,
-//       publicId: null
-//     });
-//   }
-  
-//   // Update state with all previews at once
-//   setNewImages([...tempNewImages]);
-  
-//   // Now upload each image one by one
-//   for (let i = 0; i < files.length; i++) {
-//     const file = files[i];
-    
-//     const validation = validateImageFile(file);
-//     if (!validation.valid) {
-//       continue;
-//     }
-    
-//     try {
-//       const { url, publicId } = await uploadToCloudinary(file);
+//     for (let i = 0; i < files.length; i++) {
+//       const file = files[i];
       
-//       // Update the specific image with URL while preserving others
-//       setNewImages(prev => {
-//         // Find the image that's currently uploading (the one without a URL)
-//         const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
-//         if (uploadingIndex !== -1) {
-//           const updated = [...prev];
-//           updated[uploadingIndex] = {
-//             ...updated[uploadingIndex],
-//             url: url,
-//             publicId: publicId,
-//             uploading: false
-//           };
-//           return updated;
-//         }
-//         return prev;
+//       const validation = validateImageFile(file);
+//       if (!validation.valid) {
+//         toast.error(`Image ${i + 1}: ${validation.message}`);
+//         continue;
+//       }
+      
+//       const imageId = Date.now() + Math.random() + i;
+//       const previewUrl = URL.createObjectURL(file);
+      
+//       tempNewImages.push({
+//         id: imageId,
+//         slotId: `multi-${imageId}`,
+//         file: file,
+//         preview: previewUrl,
+//         uploading: true,
+//         url: null,
+//         publicId: null
 //       });
-      
-//       toast.success(`Image ${i + 1} uploaded successfully`);
-//     } catch (error) {
-//       console.error('Upload error:', error);
-//       setNewImages(prev => prev.filter(img => img.file !== file));
-//       toast.error(`Failed to upload image ${i + 1}`);
 //     }
-//   }
-  
-//   // Clear the input
-//   if (fileInputRefs.current['multiple']) {
-//     fileInputRefs.current['multiple'].value = '';
-//   }
-// };
+    
+//     setNewImages([...tempNewImages]);
+    
+//     for (let i = 0; i < files.length; i++) {
+//       const file = files[i];
+      
+//       const validation = validateImageFile(file);
+//       if (!validation.valid) {
+//         continue;
+//       }
+      
+//       try {
+//         const { url, publicId } = await uploadToCloudinary(file);
+        
+//         setNewImages(prev => {
+//           const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
+//           if (uploadingIndex !== -1) {
+//             const updated = [...prev];
+//             updated[uploadingIndex] = {
+//               ...updated[uploadingIndex],
+//               url: url,
+//               publicId: publicId,
+//               uploading: false
+//             };
+//             return updated;
+//           }
+//           return prev;
+//         });
+        
+//         toast.success(`Image ${i + 1} uploaded successfully`);
+//       } catch (error) {
+//         console.error('Upload error:', error);
+//         setNewImages(prev => prev.filter(img => img.file !== file));
+//         toast.error(`Failed to upload image ${i + 1}`);
+//       }
+//     }
+    
+//     if (fileInputRefs.current['multiple']) {
+//       fileInputRefs.current['multiple'].value = '';
+//     }
+//   };
 
-//  const removeNewImage = (imageId) => {
-//   // Find and revoke the object URL to free memory
-//   const imageToRemove = newImages.find(img => img.id === imageId);
-//   if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
-//     URL.revokeObjectURL(imageToRemove.preview);
-//   }
-//   setNewImages(prev => prev.filter(img => img.id !== imageId));
-// };
+//   const removeNewImage = (imageId) => {
+//     const imageToRemove = newImages.find(img => img.id === imageId);
+//     if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+//       URL.revokeObjectURL(imageToRemove.preview);
+//     }
+//     setNewImages(prev => prev.filter(img => img.id !== imageId));
+//   };
 
 //   const removeExistingImage = (imageId, imageUrl) => {
 //     console.log('Removing image:', { imageId, imageUrl });
@@ -541,6 +579,50 @@
 //     setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
 //     toast.info('Image marked for deletion');
 //   };
+
+
+// // Move existing image
+// const moveExistingImage = (fromIndex, toIndex) => {
+//   const updatedImages = [...existingImages];
+//   const [movedImage] = updatedImages.splice(fromIndex, 1);
+//   updatedImages.splice(toIndex, 0, movedImage);
+//   setExistingImages(updatedImages);
+// };
+
+// const handleDragStartExisting = (index) => {
+//   setDraggedImageIndex(index);
+// };
+
+// const handleDragOverExisting = (event) => {
+//   event.preventDefault();
+// };
+
+// const handleDragOverExistingWithFeedback = (event, index) => {
+//   event.preventDefault();
+//   setDragOverImageIndex(index);
+// };
+
+// const handleDragLeaveExisting = () => {
+//   setDragOverImageIndex(null);
+// };
+
+// const handleDropExisting = (dropIndex) => {
+//   if (draggedImageIndex === null || draggedImageIndex === dropIndex) {
+//     setDragOverImageIndex(null);
+//     setDraggedImageIndex(null);
+//     return;
+//   }
+//   moveExistingImage(draggedImageIndex, dropIndex);
+//   setDraggedImageIndex(null);
+//   setDragOverImageIndex(null);
+// };
+
+// const handleDragEndExisting = () => {
+//   setDraggedImageIndex(null);
+//   setDragOverImageIndex(null);
+// };
+
+
 
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
@@ -796,7 +878,8 @@
 //     if (formData.description !== originalProduct.description) return true;
 //     if (formData.instruction !== originalProduct.instruction) return true;
 //     if (formData.category !== (originalProduct.category?._id || originalProduct.category)) return true;
-//     if (formData.subcategory !== (originalProduct.subcategory || '')) return true; // NEW: Check subcategory change
+//     if (formData.subcategory !== (originalProduct.subcategory || '')) return true;
+//     if (formData.childSubcategory !== (originalProduct.childSubcategory || '')) return true;
 //     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
 //     if (formData.fabric !== originalProduct.fabric) return true;
 //     if (formData.moq !== originalProduct.moq) return true;
@@ -860,13 +943,13 @@
 //         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //       );
 
-//       // NEW: Include subcategory in payload
 //       const payload = {
 //         productName: formData.productName,
 //         description: formData.description,
 //         instruction: formData.instruction || '',
 //         category: formData.category,
-//         subcategory: formData.subcategory || '', // NEW: Send subcategory
+//         subcategory: formData.subcategory || '',
+//         childSubcategory: formData.childSubcategory || '', // NEW: Send child subcategory
 //         targetedCustomer: formData.targetedCustomer,
 //         fabric: formData.fabric,
 //         moq: formData.moq,
@@ -1007,26 +1090,31 @@
 //                                 <RichTextEditor.Underline />
 //                                 <RichTextEditor.Strikethrough />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.H1 />
 //                                 <RichTextEditor.H2 />
 //                                 <RichTextEditor.H3 />
 //                                 <RichTextEditor.H4 />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.BulletList />
 //                                 <RichTextEditor.OrderedList />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.AlignLeft />
 //                                 <RichTextEditor.AlignCenter />
 //                                 <RichTextEditor.AlignRight />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.Link />
 //                                 <RichTextEditor.Unlink />
 //                               </RichTextEditor.ControlsGroup>
 //                             </RichTextEditor.Toolbar>
+
 //                             <RichTextEditor.Content />
 //                           </RichTextEditor>
 //                         </div>
@@ -1048,26 +1136,31 @@
 //                                 <RichTextEditor.Underline />
 //                                 <RichTextEditor.Strikethrough />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.H1 />
 //                                 <RichTextEditor.H2 />
 //                                 <RichTextEditor.H3 />
 //                                 <RichTextEditor.H4 />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.BulletList />
 //                                 <RichTextEditor.OrderedList />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.AlignLeft />
 //                                 <RichTextEditor.AlignCenter />
 //                                 <RichTextEditor.AlignRight />
 //                               </RichTextEditor.ControlsGroup>
+
 //                               <RichTextEditor.ControlsGroup>
 //                                 <RichTextEditor.Link />
 //                                 <RichTextEditor.Unlink />
 //                               </RichTextEditor.ControlsGroup>
 //                             </RichTextEditor.Toolbar>
+
 //                             <RichTextEditor.Content />
 //                           </RichTextEditor>
 //                         </div>
@@ -1077,8 +1170,8 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Subcategory, Targeted Customer, Fabric */}
-//                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                     {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
 //                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1113,7 +1206,10 @@
 //                         <select
 //                           name="subcategory"
 //                           value={formData.subcategory}
-//                           onChange={handleChange}
+//                           onChange={(e) => {
+//                             handleChange(e);
+//                             setFormData(prev => ({ ...prev, childSubcategory: '' }));
+//                           }}
 //                           disabled={!formData.category || subcategories.length === 0}
 //                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
 //                         >
@@ -1128,6 +1224,29 @@
 //                           </p>
 //                         )}
 //                       </div>
+
+//                       {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
+//                       {showChildSubcategory && (
+//                         <div>
+//                           <label className="block text-sm font-medium text-gray-700 mb-1">
+//                             <div className="flex items-center gap-1">
+//                               <FolderTree className="w-4 h-4" />
+//                               Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+//                             </div>
+//                           </label>
+//                           <select
+//                             name="childSubcategory"
+//                             value={formData.childSubcategory}
+//                             onChange={handleChange}
+//                             className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition border-gray-300"
+//                           >
+//                             <option value="">-- Select Child Subcategory (Optional) --</option>
+//                             {childSubcategories.map(child => (
+//                               <option key={child._id} value={child._id}>{child.name}</option>
+//                             ))}
+//                           </select>
+//                         </div>
+//                       )}
 
 //                       {/* Targeted Customer */}
 //                       <div>
@@ -1182,7 +1301,7 @@
 //                       </div>
 //                     </div>
 
-//                     {/* Category Info Display */}
+//                     {/* Category Info Display - Shows all selected levels */}
 //                     {selectedCategoryDetails && (
 //                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
 //                         <div className="flex items-center gap-2">
@@ -1194,6 +1313,11 @@
 //                             {formData.subcategory && subcategories.find(s => s._id === formData.subcategory) && (
 //                               <p className="text-xs text-gray-600 mt-1">
 //                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
+//                               </p>
+//                             )}
+//                             {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
+//                               <p className="text-xs text-gray-600 mt-1">
+//                                 <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
 //                               </p>
 //                             )}
 //                           </div>
@@ -1234,157 +1358,250 @@
 //                     </p>
 //                   </div>
                   
-//                  <div className="p-5">
-//   {errors.images && (
-//     <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
-//       <AlertCircle className="w-3 h-3" />
-//       {errors.images}
-//     </p>
-//   )}
-  
-//   {/* Multiple Image Upload Button */}
+//                   <div className="p-5">
+//                     {errors.images && (
+//                       <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
+//                         <AlertCircle className="w-3 h-3" />
+//                         {errors.images}
+//                       </p>
+//                     )}
+                    
+//                     {/* Multiple Image Upload Button */}
+//                     <div className="mb-4">
+//                       <input
+//                         type="file"
+//                         id="multiple-images"
+//                         className="hidden"
+//                         accept="image/jpeg,image/jpg,image/png,image/webp"
+//                         multiple
+//                         onChange={handleMultipleImageSelect}
+//                         ref={el => {
+//                           if (el) fileInputRefs.current['multiple'] = el;
+//                         }}
+//                       />
+//                       <button
+//                         type="button"
+//                         onClick={() => fileInputRefs.current['multiple']?.click()}
+//                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
+//                       >
+//                         <Upload className="w-5 h-5" />
+//                         <span>Select Multiple Images (Up to 6)</span>
+//                       </button>
+//                       <p className="text-xs text-gray-500 mt-2 text-center">
+//                         You can select multiple images at once. Images will be uploaded automatically.
+//                       </p>
+//                     </div>
+
+//                     {/* Existing Images */}
+//                     {/* {existingImages.length > 0 && (
+//                       <div className="mb-4">
+//                         <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+//                         <div className="grid grid-cols-2 gap-3">
+//                           {existingImages.map((image) => (
+//                             <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+//                               <img 
+//                                 src={image.url} 
+//                                 alt="Product" 
+//                                 className="w-full h-full object-cover"
+//                               />
+//                               <button
+//                                 type="button"
+//                                 onClick={() => removeExistingImage(image.publicId, image.url)}
+//                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//                                 title="Remove Image"
+//                               >
+//                                 <X className="w-3 h-3" />
+//                               </button>
+//                               {image.isPrimary && (
+//                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//                                   Primary
+//                                 </span>
+//                               )}
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     )} */}
+// {/* Existing Images with Drag and Drop */}
+// {existingImages.length > 0 && (
 //   <div className="mb-4">
-//     <input
-//       type="file"
-//       id="multiple-images"
-//       className="hidden"
-//       accept="image/jpeg,image/jpg,image/png,image/webp"
-//       multiple
-//       onChange={handleMultipleImageSelect}
-//       ref={el => {
-//         if (el) fileInputRefs.current['multiple'] = el;
-//       }}
-//     />
-//     <button
-//       type="button"
-//       onClick={() => fileInputRefs.current['multiple']?.click()}
-//       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
-//     >
-//       <Upload className="w-5 h-5" />
-//       <span>Select Multiple Images (Up to 6)</span>
-//     </button>
-//     <p className="text-xs text-gray-500 mt-2 text-center">
-//       You can select multiple images at once. Images will be uploaded automatically.
-//     </p>
+//     <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images (Drag to reorder)</h3>
+//     <div className="grid grid-cols-2 gap-3">
+//       {existingImages.map((image, index) => (
+//         <div
+//           key={image.publicId}
+//           draggable={true}
+//           onDragStart={() => handleDragStartExisting(index)}
+//           onDragOver={handleDragOverExisting}
+//           onDragOverCapture={(e) => handleDragOverExistingWithFeedback(e, index)}
+//           onDragLeave={handleDragLeaveExisting}
+//           onDrop={() => handleDropExisting(index)}
+//           onDragEnd={handleDragEndExisting}
+//           className={`relative rounded-lg overflow-hidden border transition-all duration-200 h-24 ${
+//             draggedImageIndex === index ? 'opacity-50 scale-95' : 'border-gray-200'
+//           } ${
+//             dragOverImageIndex === index && draggedImageIndex !== index && draggedImageIndex !== null 
+//               ? 'ring-2 ring-[#E39A65] ring-offset-2' 
+//               : ''
+//           }`}
+//         >
+//           {/* Drag handle */}
+//           <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10 cursor-grab active:cursor-grabbing">
+//             <GripVertical className="w-3 h-3 text-white" />
+//           </div>
+          
+//           <img 
+//             src={image.url} 
+//             alt="Product" 
+//             className="w-full h-full object-cover"
+//           />
+          
+//           <button
+//             type="button"
+//             onClick={() => removeExistingImage(image.publicId, image.url)}
+//             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+//             title="Remove Image"
+//           >
+//             <X className="w-3 h-3" />
+//           </button>
+          
+//           {image.isPrimary && (
+//             <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded z-10">
+//               Primary
+//             </span>
+//           )}
+//         </div>
+//       ))}
+//     </div>
 //   </div>
+// )}
 
-//   {/* Existing Images */}
-//   {existingImages.length > 0 && (
-//     <div className="mb-4">
-//       <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
-//       <div className="grid grid-cols-2 gap-3">
-//         {existingImages.map((image) => (
-//           <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-//             <img 
-//               src={image.url} 
-//               alt="Product" 
-//               className="w-full h-full object-cover"
-//             />
-//             <button
-//               type="button"
-//               onClick={() => removeExistingImage(image.publicId, image.url)}
-//               className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//               title="Remove Image"
-//             >
-//               <X className="w-3 h-3" />
-//             </button>
-//             {image.isPrimary && (
-//               <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-//                 Primary
-//               </span>
-//             )}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   )}
 
-//   {/* New Images - Dynamic display */}
-//   {newImages.length > 0 && (
-//     <div className="mb-4">
-//       <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
-//       <div className="grid grid-cols-2 gap-3">
-//         {newImages.map((img) => (
-//           <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-//             <img 
-//               src={img.preview} 
-//               alt="New upload" 
-//               className="w-full h-full object-cover"
-//             />
-//             {img.uploading && (
-//               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-//                 <Loader2 className="w-4 h-4 text-white animate-spin" />
-//               </div>
-//             )}
-//             <button
-//               type="button"
-//               onClick={() => removeNewImage(img.id)}
-//               className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//               disabled={img.uploading}
-//             >
-//               <X className="w-3 h-3" />
-//             </button>
-//             {!img.uploading && img.url && (
-//               <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-//                 Ready
-//               </span>
-//             )}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   )}
-  
-//   {/* Separate Upload Slots - Updated to show up to 6 slots */}
-//   <div className="mt-4">
-//     <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
-//     <div 
-//       key={`slots-${existingImages.length}-${newImages.length}`}
-//       className="grid grid-cols-2 gap-3"
-//     >
-//       {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
-//         const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
-//         return (
-//           <div key={slotId} className="relative">
-//             <input
-//               type="file"
-//               id={`image-upload-${slotId}`}
-//               className="hidden"
-//               accept="image/jpeg,image/jpg,image/png,image/webp"
-//               onChange={(e) => handleNewImageChange(e, slotId)}
-//               ref={el => {
-//                 if (el) fileInputRefs.current[slotId] = el;
-//               }}
-//             />
-//             <button
-//               type="button"
-//               onClick={() => fileInputRefs.current[slotId]?.click()}
-//               className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
-//             >
-//               <Upload className="w-5 h-5 text-gray-400 mb-1" />
-//               <p className="text-xs text-gray-600">Upload Image</p>
-//               <p className="text-xs text-gray-400">Slot {idx + 1}</p>
-//             </button>
-//           </div>
-//         );
-//       })}
+//                     {/* New Images */}
+//                     {/* {newImages.length > 0 && (
+//                       <div className="mb-4">
+//                         <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
+//                         <div className="grid grid-cols-2 gap-3">
+//                           {newImages.map((img) => (
+//                             <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
+//                               <img 
+//                                 src={img.preview} 
+//                                 alt="New upload" 
+//                                 className="w-full h-full object-cover"
+//                               />
+//                               {img.uploading && (
+//                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//                                   <Loader2 className="w-4 h-4 text-white animate-spin" />
+//                                 </div>
+//                               )}
+//                               <button
+//                                 type="button"
+//                                 onClick={() => removeNewImage(img.id)}
+//                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//                                 disabled={img.uploading}
+//                               >
+//                                 <X className="w-3 h-3" />
+//                               </button>
+//                               {!img.uploading && img.url && (
+//                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//                                   Ready
+//                                 </span>
+//                               )}
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     )} */}
+
+//                     {/* New Images with Drag and Drop */}
+// {newImages.length > 0 && (
+//   <div className="mb-4">
+//     <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
+//     <div className="grid grid-cols-2 gap-3">
+//       {newImages.map((img, index) => (
+//         <div 
+//           key={img.id} 
+//           className="relative rounded-lg overflow-hidden border border-gray-200 h-24"
+//         >
+//           <img 
+//             src={img.preview} 
+//             alt="New upload" 
+//             className="w-full h-full object-cover"
+//           />
+//           {img.uploading && (
+//             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//               <Loader2 className="w-4 h-4 text-white animate-spin" />
+//             </div>
+//           )}
+//           <button
+//             type="button"
+//             onClick={() => removeNewImage(img.id)}
+//             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//             disabled={img.uploading}
+//           >
+//             <X className="w-3 h-3" />
+//           </button>
+//           {!img.uploading && img.url && (
+//             <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
+//               Ready
+//             </span>
+//           )}
+//         </div>
+//       ))}
 //     </div>
 //   </div>
-  
-//   {/* Upload Progress Summary */}
-//   {newImages.some(img => img.uploading) && (
-//     <div className="mt-4 p-2 bg-blue-50 rounded-lg">
-//       <p className="text-xs text-blue-600">
-//         Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
-//       </p>
-//     </div>
-//   )}
-  
-//   {/* Image Count Info */}
-//   <div className="mt-4 text-xs text-gray-500 text-center">
-//     {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
-//   </div>
-// </div>
+// )}
+                    
+//                     {/* Add More Images Slots */}
+//                     <div className="mt-4">
+//                       <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
+//                       <div 
+//                         key={`slots-${existingImages.length}-${newImages.length}`}
+//                         className="grid grid-cols-2 gap-3"
+//                       >
+//                         {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
+//                           const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
+//                           return (
+//                             <div key={slotId} className="relative">
+//                               <input
+//                                 type="file"
+//                                 id={`image-upload-${slotId}`}
+//                                 className="hidden"
+//                                 accept="image/jpeg,image/jpg,image/png,image/webp"
+//                                 onChange={(e) => handleNewImageChange(e, slotId)}
+//                                 ref={el => {
+//                                   if (el) fileInputRefs.current[slotId] = el;
+//                                 }}
+//                               />
+//                               <button
+//                                 type="button"
+//                                 onClick={() => fileInputRefs.current[slotId]?.click()}
+//                                 className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
+//                               >
+//                                 <Upload className="w-5 h-5 text-gray-400 mb-1" />
+//                                 <p className="text-xs text-gray-600">Upload Image</p>
+//                                 <p className="text-xs text-gray-400">Slot {idx + 1}</p>
+//                               </button>
+//                             </div>
+//                           );
+//                         })}
+//                       </div>
+//                     </div>
+                    
+//                     {/* Upload Progress Summary */}
+//                     {newImages.some(img => img.uploading) && (
+//                       <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+//                         <p className="text-xs text-blue-600">
+//                           Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
+//                         </p>
+//                       </div>
+//                     )}
+                    
+//                     {/* Image Count Info */}
+//                     <div className="mt-4 text-xs text-gray-500 text-center">
+//                       {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
+//                     </div>
+//                   </div>
 //                 </div>
 //               </div>
 //             </div>
@@ -1763,6 +1980,7 @@
 //                         name="moq"
 //                         value={formData.moq}
 //                         onChange={handleChange}
+//                         onWheel={(e) => e.target.blur()}
 //                         min="1"
 //                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                       />
@@ -1777,6 +1995,7 @@
 //                         name="pricePerUnit"
 //                         value={formData.pricePerUnit}
 //                         onChange={handleChange}
+//                         onWheel={(e) => e.target.blur()}
 //                         min="0"
 //                         step="0.01"
 //                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
@@ -1806,6 +2025,7 @@
 //                               type="text"
 //                               value={tier.range}
 //                               onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
+                             
 //                               placeholder="e.g., 100-299"
 //                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
 //                             />
@@ -1816,6 +2036,7 @@
 //                               type="number"
 //                               value={tier.price}
 //                               onChange={(e) => handlePricingChange(index, 'price', e.target.value)}
+//                               onWheel={(e) => e.target.blur()}
 //                               placeholder="0.00"
 //                               min="0"
 //                               step="0.01"
@@ -1999,11 +2220,11 @@ export default function ModeratorEditProduct() {
 
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
-  
-// ADD THESE LINES ↓
-const [draggedImageIndex, setDraggedImageIndex] = useState(null);
-const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
 
+  // Drag and drop state for all images (existing + new)
+  const [draggedImageIndex, setDraggedImageIndex] = useState(null);
+  const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
+  
   const colorPickerRef = useRef(null);
   
   const [formData, setFormData] = useState({
@@ -2012,13 +2233,13 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     instruction: '',
     category: '',
     subcategory: '',
-    childSubcategory: '', // NEW: Child subcategory field
+    childSubcategory: '',
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
-    pricePerUnit: 0,
+    pricePerUnit: '',
     quantityBasedPricing: [
-      { range: '100-299', price: 0 }
+      { range: '100-299', price: '' }
     ],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
@@ -2036,8 +2257,8 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     }
   });
 
-  const [existingImages, setExistingImages] = useState([]);
-  const [newImages, setNewImages] = useState([]);
+  // Unified thumbnail images state for drag & drop
+  const [allThumbnails, setAllThumbnails] = useState([]);
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const fileInputRefs = useRef({});
@@ -2127,7 +2348,6 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     }
   }, [productId]);
 
-  // Fetch subcategories when category changes
   useEffect(() => {
     if (formData.category) {
       fetchSubcategories(formData.category);
@@ -2140,7 +2360,6 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     }
   }, [formData.category]);
 
-  // Fetch child subcategories when subcategory changes
   useEffect(() => {
     if (formData.category && formData.subcategory) {
       fetchChildSubcategories(formData.category, formData.subcategory);
@@ -2199,7 +2418,6 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     }
   };
 
-  // NEW: Fetch child subcategories for a subcategory
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
       const token = localStorage.getItem('token');
@@ -2261,8 +2479,8 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
           targetedCustomer: product.targetedCustomer || 'unisex',
           fabric: product.fabric || '',
           moq: product.moq || 100,
-          pricePerUnit: product.pricePerUnit || 0,
-          quantityBasedPricing: product.quantityBasedPricing || [{ range: '100-299', price: 0 }],
+          pricePerUnit: product.pricePerUnit === 0 ? '' : product.pricePerUnit || '',
+          quantityBasedPricing: product.quantityBasedPricing || [{ range: '100-299', price: '' }],
           sizes: product.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
           colors: product.colors || [{ code: '#FF0000' }],
           additionalInfo: product.additionalInfo || [],
@@ -2275,18 +2493,29 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
           }
         });
 
-        // If category is selected, fetch its subcategories
         if (product.category?._id || product.category) {
           const categoryId = product.category?._id || product.category;
           await fetchSubcategories(categoryId);
           
-          // If subcategory is selected, fetch its child subcategories
           if (product.subcategory) {
             await fetchChildSubcategories(categoryId, product.subcategory);
           }
         }
 
-        setExistingImages(product.images || []);
+        // Set thumbnail images - combine existing into unified list
+        if (product.images && product.images.length > 0) {
+          const existingWithType = product.images.map((image, idx) => ({
+            id: `existing_${idx}_${image.publicId || image.url}`,
+            url: image.url,
+            publicId: image.publicId,
+            preview: image.url,
+            uploading: false,
+            isNew: false,
+            uploadAborted: false,
+            isPrimary: idx === 0
+          }));
+          setAllThumbnails(existingWithType);
+        }
       } else {
         toast.error('Failed to fetch product details');
         router.push('/moderator/all-products');
@@ -2320,61 +2549,64 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
     return { valid: true };
   };
 
-  const handleNewImageChange = async (e, slotId) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // Move thumbnail for drag and drop - unified function
+  const moveThumbnail = (fromIndex, toIndex) => {
+    const updatedImages = [...allThumbnails];
+    const [movedImage] = updatedImages.splice(fromIndex, 1);
+    updatedImages.splice(toIndex, 0, movedImage);
+    setAllThumbnails(updatedImages);
+  };
 
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      toast.error(validation.message);
-      return;
-    }
-
-    const imageId = Date.now() + Math.random();
-    const previewUrl = URL.createObjectURL(file);
-    
-    const newImageObj = {
-      id: imageId,
-      slotId: slotId,
-      file,
-      preview: previewUrl,
-      uploading: true,
-      url: null,
-      publicId: null
-    };
-    
-    setNewImages(prev => [...prev, newImageObj]);
-
-    try {
-      const { url, publicId } = await uploadToCloudinary(file);
-      
-      setNewImages(prev => prev.map(img => 
-        img.id === imageId 
-          ? { ...img, url, publicId, uploading: false }
-          : img
-      ));
-      toast.success(`Image uploaded successfully`);
-    } catch (error) {
-      console.error('Upload error:', error);
-      setNewImages(prev => prev.filter(img => img.id !== imageId));
-      toast.error('Failed to upload image');
+  const handleThumbnailDragStart = (index) => {
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDraggedImageIndex(index);
     }
   };
 
+  const handleThumbnailDragOver = (event, index) => {
+    event.preventDefault();
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDragOverImageIndex(index);
+    }
+  };
+
+  const handleThumbnailDragLeave = () => {
+    setDragOverImageIndex(null);
+  };
+
+  const handleThumbnailDrop = (dropIndex) => {
+    if (draggedImageIndex === null || draggedImageIndex === dropIndex) {
+      setDragOverImageIndex(null);
+      setDraggedImageIndex(null);
+      return;
+    }
+    moveThumbnail(draggedImageIndex, dropIndex);
+    setDraggedImageIndex(null);
+    setDragOverImageIndex(null);
+  };
+
+  const handleThumbnailDragEnd = () => {
+    setDraggedImageIndex(null);
+    setDragOverImageIndex(null);
+  };
+
+  // Handle multiple image selection
   const handleMultipleImageSelect = async (e) => {
     const files = Array.from(e.target.files);
     
     if (files.length === 0) return;
     
-    const currentImagesCount = existingImages.length + newImages.filter(img => img.url || img.uploading).length;
+    const currentImagesCount = allThumbnails.filter(img => img.url !== null || img.uploading).length;
     const availableSlots = 6 - currentImagesCount;
     
     if (files.length > availableSlots) {
       toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+      e.target.value = '';
       return;
     }
     
-    const tempNewImages = [...newImages];
+    const batchId = Date.now();
+    const newImagesWithPreview = [];
     
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -2385,119 +2617,71 @@ const [dragOverImageIndex, setDragOverImageIndex] = useState(null);
         continue;
       }
       
-      const imageId = Date.now() + Math.random() + i;
       const previewUrl = URL.createObjectURL(file);
-      
-      tempNewImages.push({
-        id: imageId,
-        slotId: `multi-${imageId}`,
+      newImagesWithPreview.push({
+        id: `${batchId}_${Math.random().toString(36).substr(2, 9)}`,
         file: file,
         preview: previewUrl,
-        uploading: true,
         url: null,
-        publicId: null
+        publicId: null,
+        uploading: true,
+        isNew: true,
+        uploadAborted: false,
+        uploadBatchId: batchId
       });
     }
     
-    setNewImages([...tempNewImages]);
+    if (newImagesWithPreview.length === 0) {
+      toast.error('No valid images to upload');
+      e.target.value = '';
+      return;
+    }
     
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        continue;
-      }
-      
+    setAllThumbnails(prev => [...prev, ...newImagesWithPreview]);
+    
+    // Upload each image
+    for (const img of newImagesWithPreview) {
       try {
-        const { url, publicId } = await uploadToCloudinary(file);
-        
-        setNewImages(prev => {
-          const uploadingIndex = prev.findIndex(img => img.file === file && !img.url);
-          if (uploadingIndex !== -1) {
-            const updated = [...prev];
-            updated[uploadingIndex] = {
-              ...updated[uploadingIndex],
-              url: url,
-              publicId: publicId,
-              uploading: false
-            };
-            return updated;
-          }
-          return prev;
-        });
-        
-        toast.success(`Image ${i + 1} uploaded successfully`);
+        const { url, publicId } = await uploadToCloudinary(img.file);
+        setAllThumbnails(prev => prev.map(item => 
+          item.id === img.id && !item.uploadAborted 
+            ? { ...item, url, publicId, uploading: false } 
+            : item
+        ));
+        toast.success('Image uploaded successfully');
       } catch (error) {
         console.error('Upload error:', error);
-        setNewImages(prev => prev.filter(img => img.file !== file));
-        toast.error(`Failed to upload image ${i + 1}`);
+        setAllThumbnails(prev => prev.filter(item => item.id !== img.id));
+        toast.error('Failed to upload one image');
       }
     }
     
-    if (fileInputRefs.current['multiple']) {
-      fileInputRefs.current['multiple'].value = '';
-    }
+    e.target.value = '';
   };
 
-  const removeNewImage = (imageId) => {
-    const imageToRemove = newImages.find(img => img.id === imageId);
+  const removeThumbnail = (imageId, isNew, publicId) => {
+    const imageToRemove = allThumbnails.find(img => img.id === imageId);
+    
+    // If it's an existing image (not new), mark for deletion
+    if (!isNew && publicId) {
+      setImagesToDelete(prev => [...prev, publicId]);
+    }
+    
+    // Mark as aborted to prevent success message if upload completes after removal
+    setAllThumbnails(prev => prev.map(img => 
+      img.id === imageId ? { ...img, uploadAborted: true, uploading: false } : img
+    ));
+    
+    // Revoke object URL if it exists (to prevent memory leaks)
     if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
       URL.revokeObjectURL(imageToRemove.preview);
     }
-    setNewImages(prev => prev.filter(img => img.id !== imageId));
+    
+    // Remove the image from state immediately
+    setAllThumbnails(prev => prev.filter(img => img.id !== imageId));
+    
+    toast.success('Image removed');
   };
-
-  const removeExistingImage = (imageId, imageUrl) => {
-    console.log('Removing image:', { imageId, imageUrl });
-    setImagesToDelete(prev => [...prev, imageId]);
-    setExistingImages(prev => prev.filter(img => img.publicId !== imageId));
-    toast.info('Image marked for deletion');
-  };
-
-
-// Move existing image
-const moveExistingImage = (fromIndex, toIndex) => {
-  const updatedImages = [...existingImages];
-  const [movedImage] = updatedImages.splice(fromIndex, 1);
-  updatedImages.splice(toIndex, 0, movedImage);
-  setExistingImages(updatedImages);
-};
-
-const handleDragStartExisting = (index) => {
-  setDraggedImageIndex(index);
-};
-
-const handleDragOverExisting = (event) => {
-  event.preventDefault();
-};
-
-const handleDragOverExistingWithFeedback = (event, index) => {
-  event.preventDefault();
-  setDragOverImageIndex(index);
-};
-
-const handleDragLeaveExisting = () => {
-  setDragOverImageIndex(null);
-};
-
-const handleDropExisting = (dropIndex) => {
-  if (draggedImageIndex === null || draggedImageIndex === dropIndex) {
-    setDragOverImageIndex(null);
-    setDraggedImageIndex(null);
-    return;
-  }
-  moveExistingImage(draggedImageIndex, dropIndex);
-  setDraggedImageIndex(null);
-  setDragOverImageIndex(null);
-};
-
-const handleDragEndExisting = () => {
-  setDraggedImageIndex(null);
-  setDragOverImageIndex(null);
-};
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -2672,24 +2856,55 @@ const handleDragEndExisting = () => {
     }));
   };
 
+  // const validateAdditionalInfo = () => {
+  //   let isValid = true;
+  //   const newErrors = {};
+
+  //   formData.additionalInfo.forEach((info, index) => {
+  //     if (info.fieldName.trim() || info.fieldValue.trim()) {
+  //       if (!info.fieldName.trim()) {
+  //         newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required when field value is provided';
+  //         isValid = false;
+  //       }
+  //       if (!info.fieldValue.trim()) {
+  //         newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required when field name is provided';
+  //         isValid = false;
+  //       }
+  //     }
+  //   });
+
+  //   setErrors(prev => ({ ...prev, ...newErrors }));
+  //   return isValid;
+  // };
+
+
   const validateAdditionalInfo = () => {
-    let isValid = true;
-    const newErrors = {};
+  let isValid = true;
+  const newErrors = {};
 
-    formData.additionalInfo.forEach((info, index) => {
-      if (!info.fieldName.trim()) {
-        newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
-        isValid = false;
-      }
-      if (!info.fieldValue.trim()) {
-        newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
-        isValid = false;
-      }
-    });
+  formData.additionalInfo.forEach((info, index) => {
+    const hasFieldName = info.fieldName && info.fieldName.trim();
+    const hasFieldValue = info.fieldValue && info.fieldValue.trim();
+    
+    // Case: Only field name is filled
+    if (hasFieldName && !hasFieldValue) {
+      newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required when field name is provided';
+      isValid = false;
+    }
+    // Case: Only field value is filled
+    else if (!hasFieldName && hasFieldValue) {
+      newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required when field value is provided';
+      isValid = false;
+    }
+    // Case: Both are empty - valid (skip this row silently)
+    // Case: Both are filled - valid
+  });
 
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
+  setErrors(prev => ({ ...prev, ...newErrors }));
+  return isValid;
+};
+
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -2714,11 +2929,11 @@ const handleDragEndExisting = () => {
       newErrors.moq = 'MOQ must be at least 1';
     }
 
-    if (formData.pricePerUnit < 0) {
+    if (formData.pricePerUnit !== '' && formData.pricePerUnit < 0) {
       newErrors.pricePerUnit = 'Price must be 0 or greater';
     }
 
-    const hasImages = existingImages.length > 0 || newImages.length > 0;
+    const hasImages = allThumbnails.some(img => img.url !== null && !img.uploadAborted);
     if (!hasImages) {
       newErrors.images = 'At least one product image is required';
     }
@@ -2758,7 +2973,7 @@ const handleDragEndExisting = () => {
     if (formData.targetedCustomer !== originalProduct.targetedCustomer) return true;
     if (formData.fabric !== originalProduct.fabric) return true;
     if (formData.moq !== originalProduct.moq) return true;
-    if (formData.pricePerUnit !== originalProduct.pricePerUnit) return true;
+    if (Number(formData.pricePerUnit) !== Number(originalProduct.pricePerUnit)) return true;
     if (JSON.stringify(formData.quantityBasedPricing) !== JSON.stringify(originalProduct.quantityBasedPricing)) return true;
     if (JSON.stringify(formData.sizes) !== JSON.stringify(originalProduct.sizes)) return true;
     if (JSON.stringify(formData.colors) !== JSON.stringify(originalProduct.colors)) return true;
@@ -2766,8 +2981,13 @@ const handleDragEndExisting = () => {
     if (formData.isFeatured !== originalProduct.isFeatured) return true;
     if (JSON.stringify(formData.tags) !== JSON.stringify(originalProduct.tags || [])) return true;
     if (JSON.stringify(formData.metaSettings) !== JSON.stringify(originalProduct.metaSettings || {})) return true;
+    
+    // Check if images order changed or images added/deleted
+    const originalImageUrls = (originalProduct.images || []).map(img => img.url);
+    const currentImageUrls = allThumbnails.filter(img => img.url !== null && !img.uploadAborted).map(img => img.url);
+    if (JSON.stringify(originalImageUrls) !== JSON.stringify(currentImageUrls)) return true;
+    
     if (imagesToDelete.length > 0) return true;
-    if (newImages.some(img => img !== null && img.url)) return true;
 
     return false;
   };
@@ -2775,13 +2995,7 @@ const handleDragEndExisting = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!hasChanges()) {
-      toast.info('No changes to save');
-      router.push('/moderator/all-products');
-      return;
-    }
-
-    const uploading = newImages.some(img => img.uploading === true);
+    const uploading = allThumbnails.some(img => img.uploading === true);
     if (uploading) {
       toast.error('Please wait for all images to finish uploading');
       return;
@@ -2790,6 +3004,11 @@ const handleDragEndExisting = () => {
     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
     if (hasEmptyPrice) {
       toast.error('Please fill in all price fields in Quantity Based Pricing');
+      return;
+    }
+
+    if (formData.pricePerUnit === '') {
+      toast.error('Please enter a price per unit');
       return;
     }
 
@@ -2803,11 +3022,9 @@ const handleDragEndExisting = () => {
     try {
       const token = localStorage.getItem('token');
       
-      const existingImageUrls = existingImages.map(img => img.url);
-      const newImageUrls = newImages
-        .filter(img => img.url)
+      const imageUrls = allThumbnails
+        .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
         .map(img => img.url);
-      const allImageUrls = [...existingImageUrls, ...newImageUrls];
       
       const processedPricing = formData.quantityBasedPricing.map(tier => ({
         ...tier,
@@ -2824,16 +3041,16 @@ const handleDragEndExisting = () => {
         instruction: formData.instruction || '',
         category: formData.category,
         subcategory: formData.subcategory || '',
-        childSubcategory: formData.childSubcategory || '', // NEW: Send child subcategory
+        childSubcategory: formData.childSubcategory || '',
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
-        pricePerUnit: formData.pricePerUnit,
+        pricePerUnit: formData.pricePerUnit === '' ? 0 : parseFloat(formData.pricePerUnit),
         quantityBasedPricing: processedPricing,
         sizes: formData.sizes.filter(s => s.trim() !== ''),
         colors: formData.colors,
         additionalInfo: processedAdditionalInfo,
-        images: allImageUrls,
+        images: imageUrls,
         isFeatured: formData.isFeatured,
         tags: formData.tags,
         metaSettings: formData.metaSettings,
@@ -3100,7 +3317,7 @@ const handleDragEndExisting = () => {
                         )}
                       </div>
 
-                      {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
+                      {/* Child Subcategory Field */}
                       {showChildSubcategory && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -3176,7 +3393,7 @@ const handleDragEndExisting = () => {
                       </div>
                     </div>
 
-                    {/* Category Info Display - Shows all selected levels */}
+                    {/* Category Info Display */}
                     {selectedCategoryDetails && (
                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <div className="flex items-center gap-2">
@@ -3199,23 +3416,6 @@ const handleDragEndExisting = () => {
                         </div>
                       </div>
                     )}
-
-                    {/* Quick Stats for Selected Customer */}
-                    {formData.targetedCustomer && (
-                      <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">{getSelectedCustomerIcon()}</span>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label} Collection
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              This product will be shown in the {formData.targetedCustomer} section
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -3229,7 +3429,7 @@ const handleDragEndExisting = () => {
                       Product Images <span className="text-red-500">*</span>
                     </h2>
                     <p className="text-xs text-gray-500 mt-1">
-                      Existing: {existingImages.length} • New: {newImages.length} • Total: {existingImages.length + newImages.length} • Max 6 images total
+                      Upload up to 6 images (JPG, PNG, WebP, max 5MB each) • Drag to reorder
                     </p>
                   </div>
                   
@@ -3267,215 +3467,97 @@ const handleDragEndExisting = () => {
                       </p>
                     </div>
 
-                    {/* Existing Images */}
-                    {/* {existingImages.length > 0 && (
+                    {/* All Images Grid with Drag and Drop */}
+                    {allThumbnails.length > 0 && (
                       <div className="mb-4">
-                        <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images</h3>
+                        <p className="text-xs font-medium text-gray-600 mb-2">
+                          Product Images ({allThumbnails.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length}/6):
+                        </p>
                         <div className="grid grid-cols-2 gap-3">
-                          {existingImages.map((image) => (
-                            <div key={image.publicId} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-                              <img 
-                                src={image.url} 
-                                alt="Product" 
-                                className="w-full h-full object-cover"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeExistingImage(image.publicId, image.url)}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                title="Remove Image"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                              {image.isPrimary && (
-                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                                  Primary
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )} */}
-{/* Existing Images with Drag and Drop */}
-{existingImages.length > 0 && (
-  <div className="mb-4">
-    <h3 className="text-xs font-medium text-gray-500 mb-2">Current Images (Drag to reorder)</h3>
-    <div className="grid grid-cols-2 gap-3">
-      {existingImages.map((image, index) => (
-        <div
-          key={image.publicId}
-          draggable={true}
-          onDragStart={() => handleDragStartExisting(index)}
-          onDragOver={handleDragOverExisting}
-          onDragOverCapture={(e) => handleDragOverExistingWithFeedback(e, index)}
-          onDragLeave={handleDragLeaveExisting}
-          onDrop={() => handleDropExisting(index)}
-          onDragEnd={handleDragEndExisting}
-          className={`relative rounded-lg overflow-hidden border transition-all duration-200 h-24 ${
-            draggedImageIndex === index ? 'opacity-50 scale-95' : 'border-gray-200'
-          } ${
-            dragOverImageIndex === index && draggedImageIndex !== index && draggedImageIndex !== null 
-              ? 'ring-2 ring-[#E39A65] ring-offset-2' 
-              : ''
-          }`}
-        >
-          {/* Drag handle */}
-          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10 cursor-grab active:cursor-grabbing">
-            <GripVertical className="w-3 h-3 text-white" />
-          </div>
-          
-          <img 
-            src={image.url} 
-            alt="Product" 
-            className="w-full h-full object-cover"
-          />
-          
-          <button
-            type="button"
-            onClick={() => removeExistingImage(image.publicId, image.url)}
-            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
-            title="Remove Image"
-          >
-            <X className="w-3 h-3" />
-          </button>
-          
-          {image.isPrimary && (
-            <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded z-10">
-              Primary
-            </span>
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-
-                    {/* New Images */}
-                    {/* {newImages.length > 0 && (
-                      <div className="mb-4">
-                        <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          {newImages.map((img) => (
-                            <div key={img.id} className="relative rounded-lg overflow-hidden border border-gray-200 h-24">
-                              <img 
-                                src={img.preview} 
-                                alt="New upload" 
-                                className="w-full h-full object-cover"
-                              />
-                              {img.uploading && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                          {allThumbnails.map((image, index) => (
+                            <div
+                              key={image.id}
+                              draggable={!image.uploading}
+                              onDragStart={() => handleThumbnailDragStart(index)}
+                              onDragOver={(e) => handleThumbnailDragOver(e, index)}
+                              onDragLeave={handleThumbnailDragLeave}
+                              onDrop={() => handleThumbnailDrop(index)}
+                              onDragEnd={handleThumbnailDragEnd}
+                              className={`relative rounded-lg overflow-hidden border border-gray-200 h-40 transition-all duration-200 ${
+                                !image.uploading ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                              } ${
+                                draggedImageIndex === index ? 'opacity-50 scale-95' : ''
+                              } ${
+                                dragOverImageIndex === index && draggedImageIndex !== index && draggedImageIndex !== null 
+                                  ? 'ring-2 ring-[#E39A65] ring-offset-2' 
+                                  : ''
+                              }`}
+                            >
+                              {/* Drag handle */}
+                              {!image.uploading && (
+                                <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+                                  <GripVertical className="w-3 h-3 text-white" />
                                 </div>
                               )}
+                              
+                              {/* OPTIMIZED IMAGE - object-contain for full image display */}
+                              <img 
+                                src={image.preview} 
+                                alt="Product" 
+                                className="w-full h-full object-contain bg-gray-100"
+                                onError={(e) => {
+                                  console.error('Image failed to load');
+                                  e.target.src = 'https://via.placeholder.com/150?text=Error';
+                                }}
+                              />
+                              
+                              {/* Uploading overlay for new images */}
+                              {image.uploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+                                  <Loader2 className="w-5 h-5 text-white animate-spin" />
+                                </div>
+                              )}
+                              
+                              {/* Primary badge for first image */}
+                              {index === 0 && !image.uploading && image.url && (
+                                <div className="absolute bottom-1 left-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded z-10">
+                                  Primary
+                                </div>
+                              )}
+                              
+                              {/* Remove button - Always enabled */}
                               <button
                                 type="button"
-                                onClick={() => removeNewImage(img.id)}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                disabled={img.uploading}
+                                onClick={() => removeThumbnail(image.id, image.isNew, image.publicId)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
+                                title="Remove image"
                               >
                                 <X className="w-3 h-3" />
                               </button>
-                              {!img.uploading && img.url && (
-                                <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-                                  Ready
-                                </span>
-                              )}
                             </div>
                           ))}
                         </div>
                       </div>
-                    )} */}
-
-                    {/* New Images with Drag and Drop */}
-{newImages.length > 0 && (
-  <div className="mb-4">
-    <h3 className="text-xs font-medium text-gray-500 mb-2">New Images to Add</h3>
-    <div className="grid grid-cols-2 gap-3">
-      {newImages.map((img, index) => (
-        <div 
-          key={img.id} 
-          className="relative rounded-lg overflow-hidden border border-gray-200 h-24"
-        >
-          <img 
-            src={img.preview} 
-            alt="New upload" 
-            className="w-full h-full object-cover"
-          />
-          {img.uploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <Loader2 className="w-4 h-4 text-white animate-spin" />
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => removeNewImage(img.id)}
-            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            disabled={img.uploading}
-          >
-            <X className="w-3 h-3" />
-          </button>
-          {!img.uploading && img.url && (
-            <span className="absolute bottom-1 left-1 px-1 py-0.5 bg-green-500 text-white text-xs rounded">
-              Ready
-            </span>
-          )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-                    
-                    {/* Add More Images Slots */}
-                    <div className="mt-4">
-                      <h3 className="text-xs font-medium text-gray-500 mb-2">Add More Images</h3>
-                      <div 
-                        key={`slots-${existingImages.length}-${newImages.length}`}
-                        className="grid grid-cols-2 gap-3"
-                      >
-                        {Array.from({ length: Math.max(0, 6 - (existingImages.length + newImages.length)) }).map((_, idx) => {
-                          const slotId = `slot-${Date.now()}-${idx}-${Math.random()}`;
-                          return (
-                            <div key={slotId} className="relative">
-                              <input
-                                type="file"
-                                id={`image-upload-${slotId}`}
-                                className="hidden"
-                                accept="image/jpeg,image/jpg,image/png,image/webp"
-                                onChange={(e) => handleNewImageChange(e, slotId)}
-                                ref={el => {
-                                  if (el) fileInputRefs.current[slotId] = el;
-                                }}
-                              />
-                              <button
-                                type="button"
-                                onClick={() => fileInputRefs.current[slotId]?.click()}
-                                className="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-colors cursor-pointer h-24 flex flex-col items-center justify-center hover:border-[#E39A65] hover:bg-orange-50"
-                              >
-                                <Upload className="w-5 h-5 text-gray-400 mb-1" />
-                                <p className="text-xs text-gray-600">Upload Image</p>
-                                <p className="text-xs text-gray-400">Slot {idx + 1}</p>
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    )}
                     
                     {/* Upload Progress Summary */}
-                    {newImages.some(img => img.uploading) && (
+                    {allThumbnails.some(img => img.uploading) && (
                       <div className="mt-4 p-2 bg-blue-50 rounded-lg">
                         <p className="text-xs text-blue-600">
-                          Uploading: {newImages.filter(img => img.uploading).length} image(s) remaining...
+                          Uploading: {allThumbnails.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
                         </p>
                       </div>
                     )}
                     
                     {/* Image Count Info */}
                     <div className="mt-4 text-xs text-gray-500 text-center">
-                      {existingImages.length + newImages.filter(img => img.url).length} of 6 images total
+                      {allThumbnails.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} of 6 images uploaded
+                      {imagesToDelete.length > 0 && ` (${imagesToDelete.length} marked for deletion)`}
                     </div>
+                    
+                    <p className="text-xs text-gray-400 text-center mt-2">
+                      💡 Drag and drop images to reorder. The first image will be the primary image.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -3600,70 +3682,87 @@ const handleDragEndExisting = () => {
             </div>
 
             {/* Additional Information */}
-            <div className="mb-6">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="p-5 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <Info className="w-5 h-5 text-[#E39A65]" />
-                    Additional Information
-                  </h2>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Add or edit custom fields for extra product details
+     {/* Additional Information */}
+<div className="mb-6">
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="p-5 border-b border-gray-200">
+      <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <Info className="w-5 h-5 text-[#E39A65]" />
+        Additional Information
+      </h2>
+      <p className="text-xs text-gray-500 mt-1">
+        Add or edit custom fields for extra product details
+      </p>
+    </div>
+    <div className="p-5">
+      <div className="space-y-4">
+        {formData.additionalInfo.map((info, index) => (
+          <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  <Type className="w-3 h-3 inline mr-1" />
+                  Field Name
+                </label>
+                <input
+                  type="text"
+                  value={info.fieldName}
+                  onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
+                  placeholder="e.g., Material Care"
+                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                    errors[`additionalInfo_${index}_fieldName`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                />
+                {errors[`additionalInfo_${index}_fieldName`] && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors[`additionalInfo_${index}_fieldName`]}
                   </p>
-                </div>
-                <div className="p-5">
-                  <div className="space-y-4">
-                    {formData.additionalInfo.map((info, index) => (
-                      <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Type className="w-3 h-3 inline mr-1" />
-                              Field Name
-                            </label>
-                            <input
-                              type="text"
-                              value={info.fieldName}
-                              onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-                              placeholder="e.g., Material Care"
-                              className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Hash className="w-3 h-3 inline mr-1" />
-                              Field Value
-                            </label>
-                            <input
-                              type="text"
-                              value={info.fieldValue}
-                              onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
-                              placeholder="e.g., Machine Wash"
-                              className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeAdditionalInfo(index)}
-                          className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addAdditionalInfo}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50"
-                    >
-                      <PlusCircle className="w-4 h-4" />
-                      Add Additional Information
-                    </button>
-                  </div>
-                </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  <Hash className="w-3 h-3 inline mr-1" />
+                  Field Value
+                </label>
+                <input
+                  type="text"
+                  value={info.fieldValue}
+                  onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
+                  placeholder="e.g., Machine Wash"
+                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+                    errors[`additionalInfo_${index}_fieldValue`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  }`}
+                />
+                {errors[`additionalInfo_${index}_fieldValue`] && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors[`additionalInfo_${index}_fieldValue`]}
+                  </p>
+                )}
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => removeAdditionalInfo(index)}
+              className="mt-6 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addAdditionalInfo}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50"
+        >
+          <PlusCircle className="w-4 h-4" />
+          Add Additional Information
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
             {/* Product Promotion */}
             <div className="mb-6">
@@ -3873,6 +3972,7 @@ const handleDragEndExisting = () => {
                         onWheel={(e) => e.target.blur()}
                         min="0"
                         step="0.01"
+                        placeholder="0.00"
                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                       />
                       {errors.pricePerUnit && <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>}
@@ -3900,7 +4000,6 @@ const handleDragEndExisting = () => {
                               type="text"
                               value={tier.range}
                               onChange={(e) => handlePricingChange(index, 'range', e.target.value)}
-                             
                               placeholder="e.g., 100-299"
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />

@@ -50,11 +50,11 @@
 //   { value: 'others', label: 'Others', icon: '📌' }
 // ];
 
-// // Cloudinary upload function
+// // Cloudinary upload function for images
 // const uploadToCloudinary = async (file, folder = 'blogs') => {
 //   const formData = new FormData();
 //   formData.append('file', file);
-//   formData.append('upload_preset', 'b2b-products'); // Reuse existing preset
+//   formData.append('upload_preset', 'b2b-products');
 //   formData.append('folder', folder);
   
 //   try {
@@ -81,36 +81,38 @@
 //   }
 // };
 
-// // Cloudinary video upload function
-// const uploadVideoToCloudinary = async (file) => {
-//   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', 'b2b-products');
-//   formData.append('folder', 'blogs/videos');
-//   formData.append('resource_type', 'video');
+// // YouTube helper functions
+// const getYouTubeVideoId = (url) => {
+//   if (!url) return null;
   
-//   try {
-//     const response = await fetch(
-//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
-//       {
-//         method: 'POST',
-//         body: formData,
-//       }
-//     );
-    
-//     const data = await response.json();
-//     if (data.secure_url) {
-//       return {
-//         url: data.secure_url,
-//         publicId: data.public_id,
-//       };
-//     } else {
-//       throw new Error('Upload failed');
+//   const patterns = [
+//     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/\s]+)/,
+//     /youtube\.com\/embed\/([^/?]+)/,
+//     /youtube\.com\/v\/([^/?]+)/,
+//     /youtube\.com\/shorts\/([^/?]+)/
+//   ];
+  
+//   for (const pattern of patterns) {
+//     const match = url.match(pattern);
+//     if (match && match[1]) {
+//       return match[1];
 //     }
-//   } catch (error) {
-//     console.error('Cloudinary video upload error:', error);
-//     throw error;
 //   }
+//   return null;
+// };
+
+// const getYouTubeThumbnail = (videoId) => {
+//   if (!videoId) return null;
+//   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+// };
+
+// const validateYoutubeUrl = (url) => {
+//   if (!url) return { valid: true, error: null };
+//   const videoId = getYouTubeVideoId(url);
+//   return { 
+//     valid: !!videoId, 
+//     error: videoId ? null : 'Please enter a valid YouTube URL'
+//   };
 // };
 
 // // ========== PARAGRAPH SECTION COMPONENT ==========
@@ -221,7 +223,7 @@
 //         </div>
 
 //         {/* Section Image (Optional) */}
-//         <div>
+//         {/* <div>
 //           <label className="block text-sm font-medium text-gray-600 mb-1.5">
 //             Section Image (Optional)
 //           </label>
@@ -266,7 +268,7 @@
 //               </button>
 //             </div>
 //           )}
-//         </div>
+//         </div> */}
 //       </div>
 //     </div>
 //   );
@@ -280,7 +282,6 @@
   
 //   // Refs for file inputs
 //   const featuredImageRef = useRef(null);
-//   const videoInputRef = useRef(null);
 
 //   // Form state
 //   const [formData, setFormData] = useState({
@@ -308,13 +309,11 @@
 //     error: ''
 //   });
 
-//   // Video state with Cloudinary URL
-//   const [videoFile, setVideoFile] = useState({
-//     file: null,
-//     preview: null,
-//     url: null,
-//     publicId: null,
-//     uploading: false,
+//   // YouTube video state
+//   const [youtubeVideo, setYoutubeVideo] = useState({
+//     url: '',
+//     videoId: null,
+//     thumbnail: null,
 //     error: ''
 //   });
 
@@ -329,9 +328,7 @@
 
 //   // Allowed file types
 //   const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-//   const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
 //   const maxImageSize = 5 * 1024 * 1024; // 5MB
-//   const maxVideoSize = 50 * 1024 * 1024; // 50MB
 
 //   // Set mounted state
 //   useEffect(() => {
@@ -404,27 +401,36 @@
 //     return { valid: true };
 //   };
 
-//   // Validate video file
-//   const validateVideoFile = (file) => {
-//     const fileExtension = file.name.split('.').pop().toLowerCase();
-//     const allowedExtensions = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mkv'];
+//   // YouTube URL handler
+//   const handleYoutubeUrlChange = (e) => {
+//     const url = e.target.value;
+//     const validation = validateYoutubeUrl(url);
     
-//     if (!allowedExtensions.includes(fileExtension)) {
-//       return {
-//         valid: false,
-//         message: `Invalid format: .${fileExtension}. Allowed: ${allowedExtensions.join(', ')}`
-//       };
+//     if (validation.valid && url) {
+//       const videoId = getYouTubeVideoId(url);
+//       setYoutubeVideo({
+//         url,
+//         videoId,
+//         thumbnail: getYouTubeThumbnail(videoId),
+//         error: ''
+//       });
+//     } else {
+//       setYoutubeVideo({
+//         url,
+//         videoId: null,
+//         thumbnail: null,
+//         error: validation.error || ''
+//       });
 //     }
+//   };
 
-//     if (file.size > maxVideoSize) {
-//       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-//       return {
-//         valid: false,
-//         message: `Video too large: ${fileSizeMB}MB. Max: 50MB`
-//       };
-//     }
-
-//     return { valid: true };
+//   const removeYoutubeVideo = () => {
+//     setYoutubeVideo({
+//       url: '',
+//       videoId: null,
+//       thumbnail: null,
+//       error: ''
+//     });
 //   };
 
 //   // ========== FEATURED IMAGE HANDLERS ==========
@@ -480,63 +486,6 @@
 //     setFeaturedImage({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '' });
 //     if (featuredImageRef.current) {
 //       featuredImageRef.current.value = '';
-//     }
-//   };
-
-//   // ========== VIDEO HANDLERS ==========
-
-//   const handleVideoChange = async (e) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
-
-//     const validation = validateVideoFile(file);
-//     if (!validation.valid) {
-//       setVideoFile(prev => ({ ...prev, error: validation.message }));
-//       toast.error(validation.message);
-//       return;
-//     }
-
-//     // Show preview immediately
-//     const videoUrl = URL.createObjectURL(file);
-//     setVideoFile({
-//       file,
-//       preview: videoUrl,
-//       url: null,
-//       publicId: null,
-//       uploading: true,
-//       error: ''
-//     });
-
-//     // Upload to Cloudinary
-//     try {
-//       const { url, publicId } = await uploadVideoToCloudinary(file);
-//       setVideoFile({
-//         file,
-//         preview: videoUrl,
-//         url,
-//         publicId,
-//         uploading: false,
-//         error: ''
-//       });
-//       toast.success('Video uploaded successfully');
-//     } catch (error) {
-//       console.error('Upload error:', error);
-//       setVideoFile(prev => ({
-//         ...prev,
-//         uploading: false,
-//         error: 'Failed to upload video'
-//       }));
-//       toast.error('Failed to upload video');
-//     }
-//   };
-
-//   const removeVideo = () => {
-//     if (videoFile.preview && videoFile.preview.startsWith('blob:')) {
-//       URL.revokeObjectURL(videoFile.preview);
-//     }
-//     setVideoFile({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '' });
-//     if (videoInputRef.current) {
-//       videoInputRef.current.value = '';
 //     }
 //   };
 
@@ -754,7 +703,7 @@
 //     e.preventDefault();
 
 //     // Check if any uploads are still in progress
-//     if (featuredImage.uploading || videoFile.uploading || thumbnailImages.some(img => img.uploading)) {
+//     if (featuredImage.uploading || thumbnailImages.some(img => img.uploading)) {
 //       toast.error('Please wait for all uploads to complete');
 //       return;
 //     }
@@ -784,7 +733,7 @@
 //           image: p.imageUrl || null
 //         }));
 
-//       // Prepare payload with Cloudinary URLs
+//       // Prepare payload with Cloudinary URLs and YouTube video
 //       const payload = {
 //         title: formData.title,
 //         author: formData.author,
@@ -800,8 +749,11 @@
 //         metaKeywords: formData.metaKeywords || '',
 //         featuredImageUrl: featuredImage.url,
 //         featuredImagePublicId: featuredImage.publicId,
-//         videoUrl: videoFile.url || null,
-//         videoPublicId: videoFile.publicId || null,
+//         youtubeVideo: youtubeVideo.videoId ? {
+//           url: youtubeVideo.url,
+//           videoId: youtubeVideo.videoId,
+//           thumbnail: youtubeVideo.thumbnail
+//         } : null,
 //         thumbnailImages: thumbnailImages.map(img => ({
 //           url: img.url,
 //           publicId: img.publicId
@@ -1047,7 +999,7 @@
 //                 </div>
 //               </div>
 
-//               {/* Right Column - Images */}
+//               {/* Right Column - Images & Video */}
 //               <div className="space-y-6">
 //                 {/* Featured Image (Required) */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -1118,63 +1070,81 @@
 //                   </div>
 //                 </div>
 
-//                 {/* Video Upload (Optional) */}
+//                 {/* YouTube Video (Optional) */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
 //                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
 //                       <Video className="w-5 h-5 text-[#E39A65]" />
-//                       Video (Optional)
+//                       YouTube Video (Optional)
 //                     </h2>
-//                     <p className="text-xs text-gray-500 mt-1">Upload a video to accompany your blog post (MP4, WebM, MOV - max 50MB)</p>
+//                     <p className="text-xs text-gray-500 mt-1">Add a YouTube video to accompany your blog post</p>
 //                   </div>
                   
 //                   <div className="p-5">
-//                     {!videoFile.preview ? (
-//                       <div 
-//                         className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-colors cursor-pointer hover:border-[#E39A65] hover:bg-orange-50"
-//                         onClick={() => videoInputRef.current?.click()}
-//                       >
-//                         <input 
-//                           type="file" 
-//                           ref={videoInputRef}
-//                           className="hidden" 
-//                           accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/mpeg,.mp4,.webm,.mov,.avi,.mpeg" 
-//                           onChange={handleVideoChange} 
-//                         />
-//                         <Video className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-//                         <p className="text-sm font-medium text-gray-600">
-//                           Click to upload video
-//                         </p>
-//                         <p className="text-xs text-gray-500 mt-1">
-//                           MP4, WebM, MOV up to 50MB
-//                         </p>
+//                     {!youtubeVideo.videoId ? (
+//                       <div className="space-y-3">
+//                         <div>
+//                           <label className="block text-sm font-medium text-gray-700 mb-1">
+//                             YouTube URL
+//                           </label>
+//                           <input
+//                             type="text"
+//                             value={youtubeVideo.url}
+//                             onChange={handleYoutubeUrlChange}
+//                             placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+//                               youtubeVideo.error ? 'border-red-500' : 'border-gray-300'
+//                             }`}
+//                           />
+//                           {youtubeVideo.error && (
+//                             <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+//                               <AlertCircle className="w-3 h-3" />
+//                               {youtubeVideo.error}
+//                             </p>
+//                           )}
+//                           {!youtubeVideo.error && youtubeVideo.url && (
+//                             <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+//                               ✓ Valid YouTube URL
+//                             </p>
+//                           )}
+//                         </div>
+                        
+//                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+//                           <Video className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+//                           <p className="text-sm font-medium text-gray-600">
+//                             Enter a YouTube URL above
+//                           </p>
+//                           <p className="text-xs text-gray-500 mt-1">
+//                             Supports YouTube links, shorts, and embed URLs
+//                           </p>
+//                           <div className="mt-3 text-xs text-gray-400">
+//                             <p>Examples:</p>
+//                             <p>• https://www.youtube.com/watch?v=...</p>
+//                             <p>• https://youtu.be/...</p>
+//                             <p>• https://www.youtube.com/shorts/...</p>
+//                           </div>
+//                         </div>
 //                       </div>
 //                     ) : (
 //                       <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-900">
-//                         <video 
-//                           src={videoFile.preview} 
-//                           controls
-//                           className="w-full h-auto max-h-64"
-//                         >
-//                           Your browser does not support the video tag.
-//                         </video>
-//                         {videoFile.uploading && (
-//                           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-//                             <Loader2 className="w-6 h-6 text-white animate-spin" />
-//                           </div>
-//                         )}
+//                         <div className="relative pb-[56.25%] h-0">
+//                           <iframe
+//                             src={`https://www.youtube.com/embed/${youtubeVideo.videoId}`}
+//                             title="YouTube video player"
+//                             frameBorder="0"
+//                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+//                             allowFullScreen
+//                             className="absolute top-0 left-0 w-full h-full"
+//                           ></iframe>
+//                         </div>
 //                         <button
 //                           type="button"
-//                           onClick={removeVideo}
-//                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                           disabled={videoFile.uploading}
+//                           onClick={removeYoutubeVideo}
+//                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
 //                         >
 //                           <X className="w-4 h-4" />
 //                         </button>
 //                       </div>
-//                     )}
-//                     {videoFile.error && (
-//                       <p className="text-xs text-red-600 mt-2">{videoFile.error}</p>
 //                     )}
 //                   </div>
 //                 </div>
@@ -1439,6 +1409,7 @@
 // }
 
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1461,7 +1432,8 @@ import {
   Type,
   Globe,
   ImagePlus,
-  Video
+  Video,
+  GripVertical
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1488,7 +1460,99 @@ const BLOG_CATEGORIES = [
   { value: 'others', label: 'Others', icon: '📌' }
 ];
 
-// Cloudinary upload function for images
+// Restore Draft Modal Component
+const RestoreDraftModal = ({ isOpen, onConfirm, onCancel, draftData }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <div className="flex items-center gap-3 text-amber-600 mb-4">
+          <AlertCircle className="w-6 h-6" />
+          <h3 className="text-lg font-semibold">Unsaved Draft Found</h3>
+        </div>
+        
+        <p className="text-sm text-gray-600 mb-2">
+          You have unsaved draft data from your last session.
+        </p>
+        <p className="text-xs text-gray-500 mb-4">
+          Would you like to restore it? If you choose not to restore, the draft will be discarded.
+        </p>
+        
+        {draftData && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
+            <p className="font-medium text-gray-700 mb-1">Draft preview:</p>
+            {draftData.title && (
+              <p className="text-gray-600">Title: {draftData.title}</p>
+            )}
+            <p className="text-gray-500 mt-1">
+              Last saved: {new Date().toLocaleString()}
+            </p>
+          </div>
+        )}
+        
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Discard Draft
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-medium text-white bg-[#E39A65] rounded-lg hover:bg-[#d48b54] transition-colors"
+          >
+            Restore Draft
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// YouTube helper functions
+const getYouTubeVideoId = (url) => {
+  if (!url) return null;
+  
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/\s]+)/,
+    /youtube\.com\/embed\/([^/?]+)/,
+    /youtube\.com\/v\/([^/?]+)/,
+    /youtube\.com\/shorts\/([^/?]+)/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  return null;
+};
+
+const getYouTubeThumbnail = (videoId, quality = 'maxresdefault') => {
+  if (!videoId) return null;
+  
+  const qualities = {
+    'maxresdefault': `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    'hqdefault': `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    'mqdefault': `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+    'sddefault': `https://img.youtube.com/vi/${videoId}/sddefault.jpg`
+  };
+  return qualities[quality] || qualities.hqdefault;
+};
+
+const validateYoutubeUrl = (url) => {
+  if (!url) return { valid: true, error: null };
+  
+  const videoId = getYouTubeVideoId(url);
+  return { 
+    valid: !!videoId, 
+    error: videoId ? null : 'Please enter a valid YouTube URL'
+  };
+};
+
+// Cloudinary upload function
 const uploadToCloudinary = async (file, folder = 'blogs') => {
   const formData = new FormData();
   formData.append('file', file);
@@ -1519,40 +1583,6 @@ const uploadToCloudinary = async (file, folder = 'blogs') => {
   }
 };
 
-// YouTube helper functions
-const getYouTubeVideoId = (url) => {
-  if (!url) return null;
-  
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/\s]+)/,
-    /youtube\.com\/embed\/([^/?]+)/,
-    /youtube\.com\/v\/([^/?]+)/,
-    /youtube\.com\/shorts\/([^/?]+)/
-  ];
-  
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match && match[1]) {
-      return match[1];
-    }
-  }
-  return null;
-};
-
-const getYouTubeThumbnail = (videoId) => {
-  if (!videoId) return null;
-  return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-};
-
-const validateYoutubeUrl = (url) => {
-  if (!url) return { valid: true, error: null };
-  const videoId = getYouTubeVideoId(url);
-  return { 
-    valid: !!videoId, 
-    error: videoId ? null : 'Please enter a valid YouTube URL'
-  };
-};
-
 // ========== PARAGRAPH SECTION COMPONENT ==========
 const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload, errors, isMounted }) => {
   const editor = useEditor({
@@ -1580,9 +1610,15 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     onImageUpload(index, file);
   };
+
+  // Sync editor content when paragraph.description changes
+  useEffect(() => {
+    if (editor && paragraph.description !== editor.getHTML()) {
+      editor.commands.setContent(paragraph.description);
+    }
+  }, [paragraph.description, editor]);
 
   return (
     <div className="p-5 bg-gray-50 rounded-lg border border-gray-200">
@@ -1598,7 +1634,6 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
       </div>
 
       <div className="space-y-4">
-        {/* Header */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1.5">
             Section Header <span className="text-red-500">*</span>
@@ -1617,7 +1652,6 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
           )}
         </div>
 
-        {/* Rich Text Description */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1.5">
             Section Description <span className="text-red-500">*</span>
@@ -1659,54 +1693,6 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
             <p className="text-xs text-red-600 mt-1">{errors[`paragraph_${index}_description`]}</p>
           )}
         </div>
-
-        {/* Section Image (Optional) */}
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1.5">
-            Section Image (Optional)
-          </label>
-          {paragraph.imagePreview ? (
-            <div className="relative rounded-lg overflow-hidden border border-gray-200">
-              <img 
-                src={paragraph.imagePreview} 
-                alt={`Section ${index + 1}`} 
-                className="w-full h-32 object-cover"
-              />
-              {paragraph.uploading && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => onUpdate(index, 'imageFile', null)}
-                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                disabled={paragraph.uploading}
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <input
-                type="file"
-                ref={imageInputRef}
-                className="hidden"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                onChange={handleImageUpload}
-              />
-              <button
-                type="button"
-                onClick={() => imageInputRef.current?.click()}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-[#E39A65] border border-dashed border-[#E39A65] rounded-lg hover:bg-orange-50 transition-colors"
-                disabled={paragraph.uploading}
-              >
-                <ImagePlus className="w-4 h-4" />
-                {paragraph.uploading ? 'Uploading...' : 'Add Image'}
-              </button>
-            </div>
-          )}
-        </div> */}
       </div>
     </div>
   );
@@ -1718,8 +1704,17 @@ export default function ModeratorCreateBlog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
+  // Modal state for draft restore
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState(null);
+  
+  // Drag and drop state for thumbnails
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  
   // Refs for file inputs
   const featuredImageRef = useRef(null);
+  const featuredImageUploadAbortRef = useRef(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -1737,14 +1732,16 @@ export default function ModeratorCreateBlog() {
     metaKeywords: ''
   });
 
-  // Featured image state with Cloudinary URL
+  // Featured image state
   const [featuredImage, setFeaturedImage] = useState({
     file: null,
     preview: null,
     url: null,
     publicId: null,
     uploading: false,
-    error: ''
+    error: '',
+    uploadAborted: false,
+    uploadId: null
   });
 
   // YouTube video state
@@ -1755,8 +1752,8 @@ export default function ModeratorCreateBlog() {
     error: ''
   });
 
-  // Thumbnail images state with Cloudinary URLs
-  const [thumbnailImages, setThumbnailImages] = useState([]);
+  // Thumbnail images state with drag & drop support
+  const [allThumbnails, setAllThumbnails] = useState([]);
 
   // Errors state
   const [errors, setErrors] = useState({});
@@ -1765,7 +1762,6 @@ export default function ModeratorCreateBlog() {
   const [tagInput, setTagInput] = useState('');
 
   // Allowed file types
-  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const maxImageSize = 5 * 1024 * 1024; // 5MB
 
   // Set mounted state
@@ -1779,8 +1775,7 @@ export default function ModeratorCreateBlog() {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        if (user.role !== 'moderator') {
-          toast.error('Access denied. Moderator privileges required.');
+        if (user.role !== 'moderator' && user.role !== 'admin') {
           router.push('/login');
         }
       } catch (error) {
@@ -1815,6 +1810,148 @@ export default function ModeratorCreateBlog() {
     immediatelyRender: false,
     editable: true,
   });
+
+  // Sync editor content to formData for auto-save
+  useEffect(() => {
+    if (!editor) return;
+    
+    const handleUpdate = () => {
+      const content = editor.getHTML();
+      setFormData(prev => {
+        if (prev.content !== content) {
+          return { ...prev, content: content };
+        }
+        return prev;
+      });
+    };
+    
+    editor.on('update', handleUpdate);
+    return () => {
+      editor.off('update', handleUpdate);
+    };
+  }, [editor]);
+
+  // Restore editor content after draft restore
+  useEffect(() => {
+    if (editor && formData.content && !editor.isDestroyed) {
+      const currentContent = editor.getHTML();
+      if (currentContent !== formData.content && formData.content !== '<p></p>') {
+        editor.commands.setContent(formData.content);
+      }
+    }
+  }, [editor, formData.content]);
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      const hasData = formData.title !== '' || 
+                      (formData.content !== '<p></p>' && formData.content !== '') || 
+                      formData.excerpt !== '' ||
+                      featuredImage.url !== null ||
+                      allThumbnails.length > 0;
+      
+      if (hasData) {
+        const dataToSave = {
+          formData: {
+            ...formData,
+            content: editor?.getHTML() || formData.content
+          },
+          featuredImage: {
+            url: featuredImage.url,
+            publicId: featuredImage.publicId,
+            preview: featuredImage.url,
+            uploading: false,
+            uploadAborted: false
+          },
+          youtubeVideo,
+          allThumbnails: allThumbnails.map(img => ({
+            ...img,
+            file: null,
+            preview: img.url ? img.url : img.preview,
+            uploading: false,
+            uploadAborted: false
+          })),
+          tagInput
+        };
+        localStorage.setItem('moderatorCreateBlogDraft', JSON.stringify(dataToSave));
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimeout);
+  }, [formData, featuredImage, youtubeVideo, allThumbnails, tagInput, editor]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadDraft = () => {
+      const savedDraft = localStorage.getItem('moderatorCreateBlogDraft');
+      if (savedDraft && isMounted) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          
+          const hasData = parsed.formData && (
+            parsed.formData.title !== '' || 
+            (parsed.formData.content !== '<p></p>' && parsed.formData.content !== '')
+          );
+          
+          if (hasData) {
+            setPendingDraft(parsed);
+            setShowRestoreModal(true);
+          }
+        } catch (error) {
+          console.error('Error loading draft:', error);
+        }
+      }
+    };
+    
+    const timer = setTimeout(loadDraft, 1000);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  // Handle restore draft
+  const handleRestoreDraft = () => {
+    if (pendingDraft) {
+      setFormData(pendingDraft.formData);
+      if (pendingDraft.featuredImage && pendingDraft.featuredImage.url) {
+        setFeaturedImage({
+          file: null,
+          preview: pendingDraft.featuredImage.url,
+          url: pendingDraft.featuredImage.url,
+          publicId: pendingDraft.featuredImage.publicId,
+          uploading: false,
+          error: '',
+          uploadAborted: false,
+          uploadId: null
+        });
+      }
+      if (pendingDraft.youtubeVideo) {
+        setYoutubeVideo(pendingDraft.youtubeVideo);
+      }
+      if (pendingDraft.allThumbnails && pendingDraft.allThumbnails.length > 0) {
+        setAllThumbnails(pendingDraft.allThumbnails);
+      }
+      if (pendingDraft.tagInput) {
+        setTagInput(pendingDraft.tagInput);
+      }
+      toast.info('Draft data restored', { duration: 3000 });
+    }
+    
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+  };
+
+  // Handle discard draft
+  const handleDiscardDraft = () => {
+    localStorage.removeItem('moderatorCreateBlogDraft');
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+    toast.info('Draft discarded');
+  };
 
   // Validate image file
   const validateImageFile = (file) => {
@@ -1872,7 +2009,7 @@ export default function ModeratorCreateBlog() {
   };
 
   // ========== FEATURED IMAGE HANDLERS ==========
-  
+
   const handleFeaturedImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1883,110 +2020,204 @@ export default function ModeratorCreateBlog() {
       return;
     }
 
-    // Show preview immediately
     const previewUrl = URL.createObjectURL(file);
+    const uploadId = Date.now();
+    
     setFeaturedImage({
       file,
       preview: previewUrl,
       url: null,
       publicId: null,
       uploading: true,
-      error: ''
+      error: '',
+      uploadAborted: false,
+      uploadId: uploadId
     });
 
-    // Upload to Cloudinary
     try {
       const { url, publicId } = await uploadToCloudinary(file, 'blogs/featured');
-      setFeaturedImage({
-        file,
-        preview: previewUrl,
-        url,
-        publicId,
-        uploading: false,
-        error: ''
+      
+      setFeaturedImage(prev => {
+        if (prev.uploadAborted || prev.uploadId !== uploadId) {
+          if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          return prev;
+        }
+        toast.success('Featured image uploaded successfully');
+        return {
+          ...prev,
+          url,
+          publicId,
+          uploading: false,
+          error: ''
+        };
       });
-      toast.success('Featured image uploaded successfully');
     } catch (error) {
       console.error('Upload error:', error);
-      setFeaturedImage(prev => ({
-        ...prev,
-        uploading: false,
-        error: 'Failed to upload image'
-      }));
-      toast.error('Failed to upload featured image');
+      setFeaturedImage(prev => {
+        if (prev.uploadAborted || prev.uploadId !== uploadId) {
+          if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          return prev;
+        }
+        toast.error('Failed to upload featured image');
+        return {
+          ...prev,
+          uploading: false,
+          error: 'Failed to upload image'
+        };
+      });
     }
   };
 
   const removeFeaturedImage = () => {
-    if (featuredImage.preview && featuredImage.preview.startsWith('blob:')) {
-      URL.revokeObjectURL(featuredImage.preview);
+    const currentPreview = featuredImage.preview;
+    const currentUploadId = featuredImage.uploadId;
+    
+    setFeaturedImage(prev => ({ 
+      ...prev, 
+      uploadAborted: true, 
+      uploading: false,
+      uploadId: null
+    }));
+    
+    if (currentPreview && currentPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(currentPreview);
     }
-    setFeaturedImage({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '' });
+    
+    setFeaturedImage({ 
+      file: null, 
+      preview: null, 
+      url: null, 
+      publicId: null, 
+      uploading: false, 
+      error: '', 
+      uploadAborted: false,
+      uploadId: null
+    });
+    
     if (featuredImageRef.current) {
       featuredImageRef.current.value = '';
     }
+    
+    toast.info('Featured image removed');
   };
 
-  // ========== THUMBNAIL IMAGES HANDLERS ==========
+  // ========== THUMBNAIL IMAGES HANDLERS WITH DRAG & DROP ==========
   
+  const moveThumbnail = (fromIndex, toIndex) => {
+    const updatedImages = [...allThumbnails];
+    const [movedImage] = updatedImages.splice(fromIndex, 1);
+    updatedImages.splice(toIndex, 0, movedImage);
+    setAllThumbnails(updatedImages);
+  };
+
+  const handleThumbnailDragStart = (index) => {
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDraggedIndex(index);
+    }
+  };
+
+  const handleThumbnailDragOver = (event, index) => {
+    event.preventDefault();
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleThumbnailDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleThumbnailDrop = (dropIndex) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDragOverIndex(null);
+      setDraggedIndex(null);
+      return;
+    }
+    moveThumbnail(draggedIndex, dropIndex);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleThumbnailDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   const handleThumbnailImagesChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    const validFiles = [];
-    const errorsList = [];
-
-    files.forEach(file => {
+    const batchId = Date.now();
+    const newImagesWithPreview = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
       const validation = validateImageFile(file);
-      if (validation.valid) {
-        validFiles.push(file);
-      } else {
-        errorsList.push(`${file.name}: ${validation.message}`);
+      if (!validation.valid) {
+        toast.error(`Image ${i + 1}: ${validation.message}`);
+        continue;
       }
-    });
-
-    if (errorsList.length > 0) {
-      toast.error(errorsList.join('\n'));
-    }
-
-    if (validFiles.length > 0) {
-      // Add all new images with uploading state
-      const newImagesWithPreview = validFiles.map(file => ({
+      
+      const previewUrl = URL.createObjectURL(file);
+      newImagesWithPreview.push({
+        id: `${batchId}_${i}_${Math.random().toString(36).substr(2, 9)}`,
         file,
-        preview: URL.createObjectURL(file),
+        preview: previewUrl,
         url: null,
         publicId: null,
         uploading: true,
-        id: Math.random().toString(36).substr(2, 9)
-      }));
-      
-      setThumbnailImages(prev => [...prev, ...newImagesWithPreview]);
+        isNew: true,
+        uploadAborted: false,
+        uploadBatchId: batchId
+      });
+    }
+    
+    if (newImagesWithPreview.length === 0) {
+      toast.error('No valid images to upload');
+      e.target.value = '';
+      return;
+    }
+    
+    setAllThumbnails(prev => [...prev, ...newImagesWithPreview]);
 
-      // Upload each image to Cloudinary
-      for (const img of newImagesWithPreview) {
-        try {
-          const { url, publicId } = await uploadToCloudinary(img.file, 'blogs/thumbnails');
-          setThumbnailImages(prev => prev.map(item => 
-            item.id === img.id ? { ...item, url, publicId, uploading: false } : item
-          ));
-        } catch (error) {
-          console.error('Upload error:', error);
-          setThumbnailImages(prev => prev.filter(item => item.id !== img.id));
-          toast.error(`Failed to upload ${img.file.name}`);
-        }
+    for (const img of newImagesWithPreview) {
+      try {
+        const { url, publicId } = await uploadToCloudinary(img.file, 'blogs/thumbnails');
+        setAllThumbnails(prev => prev.map(item => 
+          item.id === img.id && !item.uploadAborted 
+            ? { ...item, url, publicId, uploading: false } 
+            : item
+        ));
+        toast.success(`${img.file.name} uploaded successfully`);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setAllThumbnails(prev => prev.filter(item => item.id !== img.id));
+        toast.error(`Failed to upload ${img.file.name}`);
       }
     }
 
-    // Clear input
     e.target.value = '';
   };
 
-  const removeThumbnailImage = (imageId) => {
-    const imageToRemove = thumbnailImages.find(img => img.id === imageId);
+  const removeThumbnailImage = (imageId, isNew, publicId) => {
+    const imageToRemove = allThumbnails.find(img => img.id === imageId);
+    
+    setAllThumbnails(prev => prev.map(img => 
+      img.id === imageId ? { ...img, uploadAborted: true, uploading: false } : img
+    ));
+    
     if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
       URL.revokeObjectURL(imageToRemove.preview);
     }
-    setThumbnailImages(prev => prev.filter(img => img.id !== imageId));
+    
+    setAllThumbnails(prev => prev.filter(img => img.id !== imageId));
+    
+    toast.success('Image removed');
   };
 
   // ========== PARAGRAPH HANDLERS ==========
@@ -2010,7 +2241,6 @@ export default function ModeratorCreateBlog() {
 
     const previewUrl = URL.createObjectURL(file);
     
-    // Update paragraph with preview and uploading state
     const updatedParagraphs = [...formData.paragraphs];
     updatedParagraphs[index] = {
       ...updatedParagraphs[index],
@@ -2022,7 +2252,6 @@ export default function ModeratorCreateBlog() {
     };
     setFormData(prev => ({ ...prev, paragraphs: updatedParagraphs }));
 
-    // Upload to Cloudinary
     try {
       const { url, publicId } = await uploadToCloudinary(file, 'blogs/paragraphs');
       const finalParagraphs = [...formData.paragraphs];
@@ -2140,8 +2369,7 @@ export default function ModeratorCreateBlog() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if any uploads are still in progress
-    if (featuredImage.uploading || thumbnailImages.some(img => img.uploading)) {
+    if (featuredImage.uploading || allThumbnails.some(img => img.uploading)) {
       toast.error('Please wait for all uploads to complete');
       return;
     }
@@ -2162,7 +2390,6 @@ export default function ModeratorCreateBlog() {
         return;
       }
 
-      // Prepare paragraphs data with image URLs
       const processedParagraphs = formData.paragraphs
         .filter(p => p.header?.trim() && p.description?.trim())
         .map(p => ({
@@ -2171,7 +2398,6 @@ export default function ModeratorCreateBlog() {
           image: p.imageUrl || null
         }));
 
-      // Prepare payload with Cloudinary URLs and YouTube video
       const payload = {
         title: formData.title,
         author: formData.author,
@@ -2192,13 +2418,13 @@ export default function ModeratorCreateBlog() {
           videoId: youtubeVideo.videoId,
           thumbnail: youtubeVideo.thumbnail
         } : null,
-        thumbnailImages: thumbnailImages.map(img => ({
-          url: img.url,
-          publicId: img.publicId
-        }))
+        thumbnailImages: allThumbnails
+          .filter(img => img.url !== null && !img.uploading && !img.uploadAborted)
+          .map(img => ({
+            url: img.url,
+            publicId: img.publicId
+          }))
       };
-
-      console.log('Submitting blog payload:', payload);
 
       const response = await fetch('http://localhost:5000/api/blogs', {
         method: 'POST',
@@ -2212,6 +2438,7 @@ export default function ModeratorCreateBlog() {
       const data = await response.json();
 
       if (data.success) {
+        localStorage.removeItem('moderatorCreateBlogDraft');
         toast.success('Blog post created successfully!');
         router.push('/moderator/manage-blogs');
       } else {
@@ -2225,15 +2452,17 @@ export default function ModeratorCreateBlog() {
     }
   };
 
-  // Get category icon
-  const getCategoryIcon = (categoryValue) => {
-    const category = BLOG_CATEGORIES.find(c => c.value === categoryValue);
-    return category?.icon || '📌';
-  };
-
   return (
     <MantineProvider>
       <div className="min-h-screen bg-gray-50">
+        {/* Restore Draft Modal */}
+        <RestoreDraftModal 
+          isOpen={showRestoreModal}
+          onConfirm={handleRestoreDraft}
+          onCancel={handleDiscardDraft}
+          draftData={pendingDraft?.formData}
+        />
+        
         {/* Header */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="px-6 py-4">
@@ -2285,7 +2514,7 @@ export default function ModeratorCreateBlog() {
                   )}
                 </div>
 
-                {/* Author Name - Readonly */}
+                {/* Author Name - Readonly for moderator */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center gap-1">
@@ -2369,8 +2598,8 @@ export default function ModeratorCreateBlog() {
                     {formData.excerpt.length}/160 characters recommended
                   </p>
                 </div>
-                
-                {/* Mark as Featured and Tags */}
+
+                {/* Featured Checkbox and Tags */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
                   <div className="mb-4 pb-4 border-b border-gray-200">
                     <label className="flex items-center gap-2 text-sm text-gray-700">
@@ -2495,7 +2724,6 @@ export default function ModeratorCreateBlog() {
                           type="button"
                           onClick={removeFeaturedImage}
                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                          disabled={featuredImage.uploading}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -2578,7 +2806,7 @@ export default function ModeratorCreateBlog() {
                         <button
                           type="button"
                           onClick={removeYoutubeVideo}
-                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                          className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -2587,37 +2815,62 @@ export default function ModeratorCreateBlog() {
                   </div>
                 </div>
 
-                {/* Thumbnail Images (Optional) */}
+                {/* Thumbnail Images (Optional) with Drag & Drop */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <ImagePlus className="w-5 h-5 text-[#E39A65]" />
                       Thumbnail Images
                     </h2>
-                    <p className="text-xs text-gray-500 mt-1">Additional images for gallery (optional)</p>
+                    <p className="text-xs text-gray-500 mt-1">Additional images for gallery • Drag to reorder</p>
                   </div>
                   
                   <div className="p-5">
-                    {/* Thumbnail Gallery */}
-                    {thumbnailImages.length > 0 && (
+                    {allThumbnails.length > 0 && (
                       <div className="grid grid-cols-3 gap-3 mb-4">
-                        {thumbnailImages.map((image) => (
-                          <div key={image.id} className="relative rounded-lg overflow-hidden border border-gray-200 aspect-square">
+                        {allThumbnails.map((image, index) => (
+                          <div
+                            key={image.id}
+                            draggable={!image.uploading}
+                            onDragStart={() => handleThumbnailDragStart(index)}
+                            onDragOver={(e) => handleThumbnailDragOver(e, index)}
+                            onDragLeave={handleThumbnailDragLeave}
+                            onDrop={() => handleThumbnailDrop(index)}
+                            onDragEnd={handleThumbnailDragEnd}
+                            className={`relative rounded-lg overflow-hidden border border-gray-200 aspect-square transition-all duration-200 ${
+                              !image.uploading ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                            } ${
+                              draggedIndex === index ? 'opacity-50 scale-95' : ''
+                            } ${
+                              dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+                                ? 'ring-2 ring-[#E39A65] ring-offset-2' 
+                                : ''
+                            }`}
+                          >
+                            {/* Drag handle */}
+                            {!image.uploading && (
+                              <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+                                <GripVertical className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                            
                             <img 
                               src={image.preview} 
                               alt="Thumbnail" 
                               className="w-full h-full object-cover"
                             />
+                            
                             {image.uploading && (
                               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                 <Loader2 className="w-4 h-4 text-white animate-spin" />
                               </div>
                             )}
+                            
+                            {/* Remove button - Always enabled, even during upload */}
                             <button
                               type="button"
-                              onClick={() => removeThumbnailImage(image.id)}
-                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                              disabled={image.uploading}
+                              onClick={() => removeThumbnailImage(image.id, image.isNew, image.publicId)}
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -2626,7 +2879,6 @@ export default function ModeratorCreateBlog() {
                       </div>
                     )}
 
-                    {/* Upload Button */}
                     <div 
                       className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors cursor-pointer hover:border-[#E39A65] hover:bg-orange-50"
                       onClick={() => document.getElementById('thumbnailImages')?.click()}
@@ -2641,12 +2893,20 @@ export default function ModeratorCreateBlog() {
                       />
                       <Upload className="w-6 h-6 mx-auto mb-1 text-gray-400" />
                       <p className="text-xs text-gray-600">
-                        Click to upload thumbnail images
+                        Click to add thumbnail images
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        You can select multiple images
+                        You can select multiple images • Drag to reorder
                       </p>
                     </div>
+                    
+                    {allThumbnails.some(img => img.uploading) && (
+                      <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+                        <p className="text-xs text-blue-600">
+                          Uploading: {allThumbnails.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2681,31 +2941,26 @@ export default function ModeratorCreateBlog() {
                             <RichTextEditor.Underline />
                             <RichTextEditor.Strikethrough />
                           </RichTextEditor.ControlsGroup>
-
                           <RichTextEditor.ControlsGroup>
                             <RichTextEditor.H1 />
                             <RichTextEditor.H2 />
                             <RichTextEditor.H3 />
                             <RichTextEditor.H4 />
                           </RichTextEditor.ControlsGroup>
-
                           <RichTextEditor.ControlsGroup>
                             <RichTextEditor.BulletList />
                             <RichTextEditor.OrderedList />
                           </RichTextEditor.ControlsGroup>
-
                           <RichTextEditor.ControlsGroup>
                             <RichTextEditor.AlignLeft />
                             <RichTextEditor.AlignCenter />
                             <RichTextEditor.AlignRight />
                           </RichTextEditor.ControlsGroup>
-
                           <RichTextEditor.ControlsGroup>
                             <RichTextEditor.Link />
                             <RichTextEditor.Unlink />
                           </RichTextEditor.ControlsGroup>
                         </RichTextEditor.Toolbar>
-
                         <RichTextEditor.Content />
                       </RichTextEditor>
                     </div>

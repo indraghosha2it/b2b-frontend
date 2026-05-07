@@ -490,7 +490,7 @@ export default function ModeratorLayout({ children }) {
     }
     
     // All Products
-    if (href === '/moderator/all-roducts') {
+    if (href === '/moderator/all-products') {
       return currentPath === '/moderator/all-products' || 
              currentPath === '/moderator/editProduct' ||
              currentPath === '/moderator/viewProduct' ||

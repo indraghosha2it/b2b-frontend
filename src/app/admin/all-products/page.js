@@ -1633,13 +1633,20 @@ const handleChildSubcategoryChange = (value) => {
     setActiveImageIndex(prev => ({ ...prev, [productId]: 0 }));
   };
 
+  // const handleEdit = (productId) => {
+  //   router.push(`/admin/editProduct?id=${productId}`);
+  // };
   const handleEdit = (productId) => {
-    router.push(`/admin/editProduct?id=${productId}`);
-  };
+  window.open(`/admin/editProduct?id=${productId}`, '_blank');
+};
 
   const handleView = (productId) => {
-    router.push(`/admin/productDetails?id=${productId}`);
-  };
+  window.open(`/admin/productDetails?id=${productId}`, '_blank');
+};
+
+  // const handleView = (productId) => {
+  //   router.push(`/admin/productDetails?id=${productId}`);
+  // };
 
   const handleDeleteClick = (id, name) => {
     setDeleteModal({ show: true, id, name });

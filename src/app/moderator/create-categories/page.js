@@ -3091,7 +3091,7 @@ const fetchCategories = async () => {
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <div className="flex items-center gap-1">
                           <FolderTree className="w-3.5 h-3.5" />
-                          Categories
+                          sub-Categories
                         </div>
                       </th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

@@ -1,7 +1,6 @@
 
 
 
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -30,7 +29,8 @@
 //   Star,
 //   Search,
 //   Tag,
-//   FolderTree
+//   FolderTree,
+//   GripVertical
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -61,7 +61,7 @@
 //   { value: 'unisex', label: 'Unisex', icon: '👤' }
 // ];
 
-// // Available tags (matching your schema)
+// // Available tags
 // const AVAILABLE_TAGS = [
 //   'Top Ranking',
 //   'New Arrival',
@@ -109,18 +109,20 @@
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [categories, setCategories] = useState([]);
-//   const [subcategories, setSubcategories] = useState([]); // NEW: For storing subcategories of selected category
+//   const [subcategories, setSubcategories] = useState([]);
+//   const [childSubcategories, setChildSubcategories] = useState([]);
 //   const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
 //   const [showColorPicker, setShowColorPicker] = useState(false);
 //   const [currentColorIndex, setCurrentColorIndex] = useState(null);
 //   const [isMounted, setIsMounted] = useState(false);
 //   const [keywordInput, setKeywordInput] = useState('');
+//   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
-//   // New state for collapsible sections
+//   const [draggedIndex, setDraggedIndex] = useState(null);
+//   const [dragOverIndex, setDragOverIndex] = useState(null);
 //   const [showTags, setShowTags] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
   
-//   // Refs for click outside detection
 //   const colorPickerRef = useRef(null);
   
 //   // Form state with all fields
@@ -129,13 +131,14 @@
 //     description: '',
 //     instruction: '', 
 //     category: '',
-//     subcategory: '', // NEW: Subcategory field
+//     subcategory: '',
+//     childSubcategory: '',
 //     targetedCustomer: 'unisex',
 //     fabric: '',
 //     moq: 100,
-//     pricePerUnit: 0,
+//     pricePerUnit: '',
 //     quantityBasedPricing: [
-//       { range: '100-299', price: 0 }
+//       { range: '100-299', price: '' }  
 //     ],
 //     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
 //     colors: [
@@ -155,12 +158,12 @@
 
 //   // Image state - Store preview and upload status (6 images)
 //   const [productImages, setProductImages] = useState([
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false }
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+//     { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false }
 //   ]);
 
 //   // File input refs for images
@@ -266,10 +269,22 @@
 //     } else {
 //       setSubcategories([]);
 //       setSelectedCategoryDetails(null);
-//       // Reset subcategory when category changes
-//       setFormData(prev => ({ ...prev, subcategory: '' }));
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       setFormData(prev => ({ ...prev, subcategory: '', childSubcategory: '' }));
 //     }
 //   }, [formData.category]);
+
+//   // Fetch child subcategories when subcategory is selected
+//   useEffect(() => {
+//     if (formData.category && formData.subcategory) {
+//       fetchChildSubcategories(formData.category, formData.subcategory);
+//     } else {
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
+//       setFormData(prev => ({ ...prev, childSubcategory: '' }));
+//     }
+//   }, [formData.subcategory]);
 
 //   // Check user role
 //   useEffect(() => {
@@ -301,7 +316,6 @@
 //     }
 //   };
 
-//   // NEW: Fetch subcategories for selected category
 //   const fetchSubcategories = async (categoryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
@@ -318,6 +332,28 @@
 //     } catch (error) {
 //       console.error('Error fetching subcategories:', error);
 //       setSubcategories([]);
+//     }
+//   };
+
+//   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`, {
+//         headers: { 'Authorization': `Bearer ${token}` }
+//       });
+//       const data = await response.json();
+      
+//       if (data.success) {
+//         setChildSubcategories(data.data.children);
+//         setShowChildSubcategory(data.data.children.length > 0);
+//       } else {
+//         setChildSubcategories([]);
+//         setShowChildSubcategory(false);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching child subcategories:', error);
+//       setChildSubcategories([]);
+//       setShowChildSubcategory(false);
 //     }
 //   };
 
@@ -339,7 +375,6 @@
 //     }
 //   };
 
-//   // Validate image file
 //   const validateImageFile = (file) => {
 //     if (!allowedFileTypes.includes(file.type)) {
 //       const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -364,11 +399,17 @@
 //     const file = e.target.files[0];
 //     if (!file) return;
 
+//     // Clear existing image if any
+//     if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
+//       URL.revokeObjectURL(productImages[index].preview);
+//     }
+
 //     const validation = validateImageFile(file);
 //     if (!validation.valid) {
 //       const updatedImages = [...productImages];
 //       updatedImages[index] = { ...updatedImages[index], error: validation.message };
 //       setProductImages(updatedImages);
+//       toast.error(`Image ${index + 1}: ${validation.message}`);
 //       return;
 //     }
 
@@ -381,7 +422,8 @@
 //       error: '',
 //       uploading: true,
 //       url: null,
-//       publicId: null
+//       publicId: null,
+//       uploadAborted: false
 //     };
 //     setProductImages(updatedImages);
 
@@ -390,12 +432,19 @@
       
 //       setProductImages(prevImages => {
 //         const updated = [...prevImages];
-//         updated[index] = {
-//           ...updated[index],
-//           url: url,
-//           publicId: publicId,
-//           uploading: false
-//         };
+//         if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+//           updated[index] = {
+//             ...updated[index],
+//             url: url,
+//             publicId: publicId,
+//             uploading: false
+//           };
+//         } else if (updated[index] && updated[index].uploadAborted) {
+//           // Clean up if upload was aborted
+//           if (updated[index].preview && updated[index].preview.startsWith('blob:')) {
+//             URL.revokeObjectURL(updated[index].preview);
+//           }
+//         }
 //         return updated;
 //       });
       
@@ -404,11 +453,15 @@
 //       console.error('Upload error:', error);
 //       setProductImages(prevImages => {
 //         const updated = [...prevImages];
-//         updated[index] = {
-//           ...updated[index],
-//           error: 'Failed to upload image to Cloudinary',
-//           uploading: false
-//         };
+//         if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+//           updated[index] = {
+//             ...updated[index],
+//             error: 'Failed to upload image',
+//             uploading: false,
+//             preview: null,
+//             file: null
+//           };
+//         }
 //         return updated;
 //       });
 //       toast.error(`Failed to upload image ${index + 1}`);
@@ -425,9 +478,13 @@
     
 //     if (files.length > availableSlots) {
 //       toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+//       if (fileInputRefs.current['multiple']) {
+//         fileInputRefs.current['multiple'].value = '';
+//       }
 //       return;
 //     }
     
+//     // Find empty slots
 //     const emptySlots = [];
 //     for (let i = 0; i < productImages.length; i++) {
 //       if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
@@ -435,90 +492,191 @@
 //       }
 //     }
     
-//     const tempImages = [...productImages];
+//     if (files.length > emptySlots.length) {
+//       toast.error(`Only ${emptySlots.length} slots available. Please remove some images first.`);
+//       if (fileInputRefs.current['multiple']) {
+//         fileInputRefs.current['multiple'].value = '';
+//       }
+//       return;
+//     }
+    
+//     // Process each file individually - invalid files won't block valid ones
+//     const uploadPromises = [];
+//     const batchId = Date.now();
     
 //     for (let i = 0; i < files.length && i < emptySlots.length; i++) {
 //       const file = files[i];
 //       const slotIndex = emptySlots[i];
       
+//       // Validate file individually
 //       const validation = validateImageFile(file);
 //       if (!validation.valid) {
 //         toast.error(`Image ${i + 1}: ${validation.message}`);
-//         continue;
+//         continue; // Skip this file but continue with others
 //       }
       
 //       const previewUrl = URL.createObjectURL(file);
       
-//       tempImages[slotIndex] = {
-//         file: file,
-//         preview: previewUrl,
-//         error: '',
-//         uploading: true,
-//         url: null,
-//         publicId: null
-//       };
+//       // Set uploading state
+//       setProductImages(prevImages => {
+//         const updated = [...prevImages];
+//         updated[slotIndex] = {
+//           file: file,
+//           preview: previewUrl,
+//           error: '',
+//           uploading: true,
+//           url: null,
+//           publicId: null,
+//           uploadAborted: false
+//         };
+//         return updated;
+//       });
+      
+//       // Create upload promise for this file
+//       const uploadPromise = (async () => {
+//         try {
+//           const { url, publicId } = await uploadToCloudinary(file);
+          
+//           setProductImages(prevImages => {
+//             const updated = [...prevImages];
+//             if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+//               updated[slotIndex] = {
+//                 ...updated[slotIndex],
+//                 url: url,
+//                 publicId: publicId,
+//                 uploading: false
+//               };
+//             } else if (updated[slotIndex] && updated[slotIndex].uploadAborted) {
+//               // Clean up if upload was aborted
+//               if (updated[slotIndex].preview && updated[slotIndex].preview.startsWith('blob:')) {
+//                 URL.revokeObjectURL(updated[slotIndex].preview);
+//               }
+//             }
+//             return updated;
+//           });
+          
+//           return { success: true, slotIndex, fileIndex: i };
+//         } catch (error) {
+//           console.error('Upload error for file', i, error);
+//           setProductImages(prevImages => {
+//             const updated = [...prevImages];
+//             if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+//               updated[slotIndex] = {
+//                 ...updated[slotIndex],
+//                 error: 'Failed to upload image',
+//                 uploading: false,
+//                 preview: null,
+//                 file: null
+//               };
+//             }
+//             return updated;
+//           });
+//           return { success: false, slotIndex, fileIndex: i, error };
+//         }
+//       })();
+      
+//       uploadPromises.push(uploadPromise);
 //     }
     
-//     setProductImages([...tempImages]);
+//     // Wait for all uploads to complete
+//     const results = await Promise.all(uploadPromises);
+//     const successfulUploads = results.filter(r => r && r.success).length;
+//     const failedUploads = results.filter(r => r && !r.success).length;
     
-//     for (let i = 0; i < files.length && i < emptySlots.length; i++) {
-//       const file = files[i];
-//       const slotIndex = emptySlots[i];
-      
-//       const validation = validateImageFile(file);
-//       if (!validation.valid) {
-//         const updatedImages = [...productImages];
-//         updatedImages[slotIndex] = { file: null, preview: null, error: validation.message, url: null, publicId: null, uploading: false };
-//         setProductImages(updatedImages);
-//         continue;
-//       }
-      
-//       try {
-//         const { url, publicId } = await uploadToCloudinary(file);
-        
-//         setProductImages(prevImages => {
-//           const updatedImages = [...prevImages];
-//           updatedImages[slotIndex] = {
-//             ...updatedImages[slotIndex],
-//             url: url,
-//             publicId: publicId,
-//             uploading: false
-//           };
-//           return updatedImages;
-//         });
-        
-//         toast.success(`Image ${i + 1} uploaded successfully`);
-//       } catch (error) {
-//         console.error('Upload error:', error);
-//         setProductImages(prevImages => {
-//           const updatedImages = [...prevImages];
-//           updatedImages[slotIndex] = {
-//             ...updatedImages[slotIndex],
-//             error: 'Failed to upload image',
-//             uploading: false
-//           };
-//           return updatedImages;
-//         });
-//         toast.error(`Failed to upload image ${i + 1}`);
-//       }
+//     if (successfulUploads > 0) {
+//       toast.success(`${successfulUploads} image(s) uploaded successfully`);
+//     }
+//     if (failedUploads > 0) {
+//       toast.error(`${failedUploads} image(s) failed to upload`);
 //     }
     
+//     // Clear the file input
 //     if (fileInputRefs.current['multiple']) {
 //       fileInputRefs.current['multiple'].value = '';
 //     }
 //   };
 
 //   const removeImage = (index) => {
-//     if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
-//       URL.revokeObjectURL(productImages[index].preview);
+//     const imageToRemove = productImages[index];
+    
+//     // Mark as aborted to prevent success message if upload completes after removal
+//     setProductImages(prevImages => {
+//       const updated = [...prevImages];
+//       if (updated[index]) {
+//         updated[index].uploadAborted = true;
+//       }
+//       return updated;
+//     });
+    
+//     // Revoke object URL to prevent memory leaks
+//     if (imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+//       URL.revokeObjectURL(imageToRemove.preview);
 //     }
     
+//     // Reset the image slot
 //     const updatedImages = [...productImages];
-//     updatedImages[index] = { file: null, preview: null, error: '', url: null, publicId: null, uploading: false };
+//     updatedImages[index] = { 
+//       file: null, 
+//       preview: null, 
+//       error: '', 
+//       url: null, 
+//       publicId: null, 
+//       uploading: false,
+//       uploadAborted: false
+//     };
 //     setProductImages(updatedImages);
+    
+//     // Clear the file input value for this slot
 //     if (fileInputRefs.current[index]) {
 //       fileInputRefs.current[index].value = '';
 //     }
+    
+//     toast.success(`Image removed from slot ${index + 1}`);
+//   };
+
+//   const moveImage = (fromIndex, toIndex) => {
+//     const updatedImages = [...productImages];
+//     const [movedImage] = updatedImages.splice(fromIndex, 1);
+//     updatedImages.splice(toIndex, 0, movedImage);
+//     setProductImages(updatedImages);
+//   };
+
+//   const handleDragStart = (index) => {
+//     if (productImages[index].preview && !productImages[index].uploading) {
+//       setDraggedIndex(index);
+//     }
+//   };
+
+//   const handleDragOverWithFeedback = (event, index) => {
+//     event.preventDefault();
+//     if (productImages[index].preview && !productImages[index].uploading) {
+//       setDragOverIndex(index);
+//     }
+//   };
+
+//   const handleDragLeave = () => {
+//     setDragOverIndex(null);
+//   };
+
+//   const handleDropWithFeedback = (dropIndex) => {
+//     if (draggedIndex === null || draggedIndex === dropIndex) {
+//       setDragOverIndex(null);
+//       setDraggedIndex(null);
+//       return;
+//     }
+//     // Only allow dropping if both images are not uploading
+//     if (!productImages[draggedIndex]?.uploading && !productImages[dropIndex]?.uploading) {
+//       moveImage(draggedIndex, dropIndex);
+//     } else {
+//       toast.error('Cannot reorder images while uploading');
+//     }
+//     setDraggedIndex(null);
+//     setDragOverIndex(null);
+//   };
+
+//   const handleDragEnd = () => {
+//     setDraggedIndex(null);
+//     setDragOverIndex(null);
 //   };
 
 //   const handleChange = (e) => {
@@ -699,13 +857,15 @@
 //     const newErrors = {};
 
 //     formData.additionalInfo.forEach((info, index) => {
-//       if (!info.fieldName.trim()) {
-//         newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
-//         isValid = false;
-//       }
-//       if (!info.fieldValue.trim()) {
-//         newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
-//         isValid = false;
+//       if (info.fieldName.trim() || info.fieldValue.trim()) {
+//         if (!info.fieldName.trim()) {
+//           newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required when field value is provided';
+//           isValid = false;
+//         }
+//         if (!info.fieldValue.trim()) {
+//           newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required when field name is provided';
+//           isValid = false;
+//         }
 //       }
 //     });
 
@@ -736,11 +896,11 @@
 //       newErrors.moq = 'MOQ must be at least 1';
 //     }
 
-//     if (formData.pricePerUnit < 0) {
+//     if (formData.pricePerUnit !== '' && formData.pricePerUnit < 0) {
 //       newErrors.pricePerUnit = 'Price must be 0 or greater';
 //     }
 
-//     const hasImages = productImages.some(img => img.url !== null);
+//     const hasImages = productImages.some(img => img.url !== null && !img.uploadAborted);
 //     if (!hasImages) {
 //       newErrors.images = 'At least one product image is required';
 //     }
@@ -768,90 +928,198 @@
 //     return Object.keys(newErrors).length === 0 && isAdditionalInfoValid;
 //   };
 
+//   // const handleSubmit = async (e) => {
+//   //   e.preventDefault();
+
+//   //   const uploading = productImages.some(img => img.uploading === true);
+//   //   if (uploading) {
+//   //     toast.error('Please wait for all images to finish uploading');
+//   //     return;
+//   //   }
+
+//   //   const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
+//   //   if (hasEmptyPrice) {
+//   //     toast.error('Please fill in all price fields in Quantity Based Pricing');
+//   //     return;
+//   //   }
+
+//   //   if (formData.pricePerUnit === '') {
+//   //     toast.error('Please enter a price per unit');
+//   //     return;
+//   //   }
+
+//   //   if (!validateForm()) {
+//   //     toast.error('Please fix the errors in the form');
+//   //     return;
+//   //   }
+
+//   //   setIsSubmitting(true);
+
+//   //   try {
+//   //     const token = localStorage.getItem('token');
+      
+//   //     // Only include images that have a URL and are not aborted
+//   //     const imageUrls = productImages
+//   //       .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
+//   //       .map(img => img.url);
+      
+//   //     const processedPricing = formData.quantityBasedPricing.map(tier => ({
+//   //       ...tier,
+//   //       price: tier.price === '' ? 0 : parseFloat(tier.price)
+//   //     }));
+
+//   //     const processedAdditionalInfo = formData.additionalInfo.filter(
+//   //       info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
+//   //     );
+
+//   //     const payload = {
+//   //       productName: formData.productName,
+//   //       description: formData.description,
+//   //       instruction: formData.instruction || '',
+//   //       category: formData.category,
+//   //       subcategory: formData.subcategory || '',
+//   //       childSubcategory: formData.childSubcategory || '',
+//   //       targetedCustomer: formData.targetedCustomer,
+//   //       fabric: formData.fabric,
+//   //       moq: formData.moq,
+//   //       pricePerUnit: formData.pricePerUnit === '' ? 0 : parseFloat(formData.pricePerUnit),
+//   //       quantityBasedPricing: processedPricing,
+//   //       sizes: formData.sizes.filter(s => s.trim() !== ''),
+//   //       colors: formData.colors,
+//   //       additionalInfo: processedAdditionalInfo,
+//   //       images: imageUrls,
+//   //       isFeatured: formData.isFeatured,
+//   //       tags: formData.tags,
+//   //       metaSettings: formData.metaSettings
+//   //     };
+
+//   //     console.log('Submitting payload:', payload);
+
+//   //     const response = await fetch('http://localhost:5000/api/products', {
+//   //       method: 'POST',
+//   //       headers: {
+//   //         'Authorization': `Bearer ${token}`,
+//   //         'Content-Type': 'application/json'
+//   //       },
+//   //       body: JSON.stringify(payload)
+//   //     });
+
+//   //     const data = await response.json();
+
+//   //     if (data.success) {
+//   //       toast.success('Product created successfully!');
+//   //       router.push('/admin/all-products');
+//   //     } else {
+//   //       toast.error(data.error || 'Failed to create product');
+//   //     }
+//   //   } catch (error) {
+//   //     console.error('Error creating product:', error);
+//   //     toast.error('Network error. Please try again.');
+//   //   } finally {
+//   //     setIsSubmitting(false);
+//   //   }
+//   // };
+
+
 //   const handleSubmit = async (e) => {
-//     e.preventDefault();
+//   e.preventDefault();
 
-//     const uploading = productImages.some(img => img.uploading === true);
-//     if (uploading) {
-//       toast.error('Please wait for all images to finish uploading');
-//       return;
-//     }
+//   const uploading = productImages.some(img => img.uploading === true);
+//   if (uploading) {
+//     toast.error('Please wait for all images to finish uploading');
+//     return;
+//   }
 
-//     const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
-//     if (hasEmptyPrice) {
-//       toast.error('Please fill in all price fields in Quantity Based Pricing');
-//       return;
-//     }
+//   const hasEmptyPrice = formData.quantityBasedPricing.some(tier => tier.price === '');
+//   if (hasEmptyPrice) {
+//     toast.error('Please fill in all price fields in Quantity Based Pricing');
+//     return;
+//   }
 
-//     if (!validateForm()) {
-//       toast.error('Please fix the errors in the form');
-//       return;
-//     }
+//   if (formData.pricePerUnit === '') {
+//     toast.error('Please enter a price per unit');
+//     return;
+//   }
 
-//     setIsSubmitting(true);
+//   if (!validateForm()) {
+//     toast.error('Please fix the errors in the form');
+//     return;
+//   }
 
-//     try {
-//       const token = localStorage.getItem('token');
-      
-//       const imageUrls = productImages
-//         .filter(img => img.url !== null)
-//         .map(img => img.url);
-      
-//       const processedPricing = formData.quantityBasedPricing.map(tier => ({
-//         ...tier,
-//         price: tier.price === '' ? 0 : parseFloat(tier.price)
-//       }));
+//   setIsSubmitting(true);
 
-//       const processedAdditionalInfo = formData.additionalInfo.filter(
-//         info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
-//       );
+//   try {
+//     const token = localStorage.getItem('token');
+    
+//     const imageUrls = productImages
+//       .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
+//       .map(img => img.url);
+    
+//     const processedPricing = formData.quantityBasedPricing.map(tier => ({
+//       ...tier,
+//       price: tier.price === '' ? 0 : parseFloat(tier.price)
+//     }));
 
-//       // Create payload with subcategory included
-//       const payload = {
-//         productName: formData.productName,
-//         description: formData.description,
-//         instruction: formData.instruction || '',
-//         category: formData.category,
-//         subcategory: formData.subcategory || '', // NEW: Include subcategory (optional)
-//         targetedCustomer: formData.targetedCustomer,
-//         fabric: formData.fabric,
-//         moq: formData.moq,
-//         pricePerUnit: formData.pricePerUnit,
-//         quantityBasedPricing: processedPricing,
-//         sizes: formData.sizes.filter(s => s.trim() !== ''),
-//         colors: formData.colors,
-//         additionalInfo: processedAdditionalInfo,
-//         images: imageUrls,
-//         isFeatured: formData.isFeatured,
-//         tags: formData.tags,
-//         metaSettings: formData.metaSettings
-//       };
+//     const processedAdditionalInfo = formData.additionalInfo.filter(
+//       info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
+//     );
 
-//       const response = await fetch('http://localhost:5000/api/products', {
-//         method: 'POST',
-//         headers: {
-//           'Authorization': `Bearer ${token}`,
-//           'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(payload)
-//       });
+//     const payload = {
+//       productName: formData.productName,
+//       description: formData.description,
+//       instruction: formData.instruction || '',
+//       category: formData.category,
+//       subcategory: formData.subcategory || '',
+//       childSubcategory: formData.childSubcategory || '',
+//       targetedCustomer: formData.targetedCustomer,
+//       fabric: formData.fabric,
+//       moq: formData.moq,
+//       pricePerUnit: formData.pricePerUnit === '' ? 0 : parseFloat(formData.pricePerUnit),
+//       quantityBasedPricing: processedPricing,
+//       sizes: formData.sizes.filter(s => s.trim() !== ''),
+//       colors: formData.colors,
+//       additionalInfo: processedAdditionalInfo,
+//       images: imageUrls,
+//       isFeatured: formData.isFeatured,
+//       tags: formData.tags,
+//       metaSettings: formData.metaSettings
+//     };
 
-//       const data = await response.json();
+//     console.log('Submitting payload:', payload);
 
-//       if (data.success) {
-//         toast.success('Product created successfully!');
-//         router.push('/admin/all-products');
+//     const response = await fetch('http://localhost:5000/api/products', {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify(payload)
+//     });
+
+//     const data = await response.json();
+
+//     if (data.success) {
+//       toast.success('Product created successfully!');
+//       router.push('/admin/all-products');
+//     } else {
+//       // Check for duplicate key error
+//       if (data.error && data.error.includes('E11000 duplicate key error')) {
+//         // Extract slug from error message or use product name
+//         const productName = formData.productName;
+//         toast.error(`Product "${productName}" already exists. Please use a different product name.`);
+//       } else if (data.error) {
+//         toast.error(data.error);
 //       } else {
-//         toast.error(data.error || 'Failed to create product');
+//         toast.error('Failed to create product');
 //       }
-//     } catch (error) {
-//       console.error('Error creating product:', error);
-//       toast.error('Network error. Please try again.');
-//     } finally {
-//       setIsSubmitting(false);
 //     }
-//   };
-
+//   } catch (error) {
+//     console.error('Error creating product:', error);
+//     toast.error('Network error. Please try again.');
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
 //   const getSelectedCustomerIcon = () => {
 //     const customer = TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer);
 //     return customer ? customer.icon : '👤';
@@ -921,7 +1189,7 @@
 //                       )}
 //                     </div>
 
-//                     {/* Description with Mantine TipTap Rich Text Editor */}
+//                     {/* Description */}
 //                     <div>
 //                       <label className="block text-sm font-medium text-gray-700 mb-1">
 //                         Description
@@ -1016,8 +1284,8 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Category, Subcategory, Targeted Customer, and Fabric - 4 Column Layout */}
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+//                     {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
 //                       {/* Category */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1041,7 +1309,7 @@
 //                         )}
 //                       </div>
 
-//                       {/* Subcategory - NEW FIELD (Optional) */}
+//                       {/* Subcategory */}
 //                       <div>
 //                         <label className="block text-sm font-medium text-gray-700 mb-1">
 //                           <div className="flex items-center gap-1">
@@ -1056,7 +1324,7 @@
 //                           disabled={!formData.category || subcategories.length === 0}
 //                           className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition disabled:bg-gray-100 disabled:cursor-not-allowed border-gray-300"
 //                         >
-//                           <option value="">-- Select Subcategory (Optional) --</option>
+//                           <option value="">-- Select Subcategory --</option>
 //                           {subcategories.map(sub => (
 //                             <option key={sub._id} value={sub._id}>{sub.name}</option>
 //                           ))}
@@ -1067,6 +1335,29 @@
 //                           </p>
 //                         )}
 //                       </div>
+
+//                       {/* Child Subcategory */}
+//                       {showChildSubcategory && (
+//                         <div>
+//                           <label className="block text-sm font-medium text-gray-700 mb-1">
+//                             <div className="flex items-center gap-1">
+//                               <FolderTree className="w-4 h-4" />
+//                               Child Subcategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+//                             </div>
+//                           </label>
+//                           <select
+//                             name="childSubcategory"
+//                             value={formData.childSubcategory}
+//                             onChange={handleChange}
+//                             className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition border-gray-300"
+//                           >
+//                             <option value="">-- Select Child Subcategory --</option>
+//                             {childSubcategories.map(child => (
+//                               <option key={child._id} value={child._id}>{child.name}</option>
+//                             ))}
+//                           </select>
+//                         </div>
+//                       )}
 
 //                       {/* Targeted Customer */}
 //                       <div>
@@ -1135,6 +1426,11 @@
 //                                 <span className="font-medium">Subcategory:</span> {subcategories.find(s => s._id === formData.subcategory)?.name}
 //                               </p>
 //                             )}
+//                             {formData.childSubcategory && childSubcategories.find(c => c._id === formData.childSubcategory) && (
+//                               <p className="text-xs text-gray-600 mt-1">
+//                                 <span className="font-medium">Child Subcategory:</span> {childSubcategories.find(c => c._id === formData.childSubcategory)?.name}
+//                               </p>
+//                             )}
 //                           </div>
 //                         </div>
 //                       </div>
@@ -1188,51 +1484,82 @@
 //                       </p>
 //                     </div>
 
-//                     {/* Image Preview Grid */}
+//                     {/* Image Preview Grid with Drag and Drop - Increased size and optimized */}
 //                     <div className="grid grid-cols-2 gap-4">
 //                       {productImages.map((img, index) => (
-//                         <div key={index}>
+//                         <div
+//                           key={index}
+//                           draggable={img.preview !== null && !img.uploading}
+//                           onDragStart={() => handleDragStart(index)}
+//                           onDragOver={(e) => handleDragOverWithFeedback(e, index)}
+//                           onDragLeave={handleDragLeave}
+//                           onDrop={() => handleDropWithFeedback(index)}
+//                           onDragEnd={handleDragEnd}
+//                           className={`transition-all duration-200 ${
+//                             draggedIndex === index ? 'opacity-50 scale-95' : ''
+//                           } ${
+//                             dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+//                               ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
+//                               : ''
+//                           }`}
+//                         >
 //                           {img.preview ? (
-//                             <div className="relative rounded-lg overflow-hidden border border-gray-200 h-32">
+//                             <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-40 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
+//                               {/* Drag handle indicator */}
+//                               <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+//                                 <GripVertical className="w-3 h-3 text-white" />
+//                               </div>
+                              
 //                               <img 
 //                                 src={img.preview} 
 //                                 alt={`Product ${index + 1}`} 
-//                                 className="w-full h-full object-cover"
+//                                 className="w-full h-full object-contain bg-gray-100"
 //                                 onError={(e) => {
 //                                   console.error('Image failed to load:', img.preview);
 //                                   e.target.src = 'https://via.placeholder.com/150?text=Error';
 //                                 }}
 //                               />
                               
+//                               {/* Uploading Overlay */}
 //                               {img.uploading && (
-//                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
 //                                   <Loader2 className="w-6 h-6 text-white animate-spin" />
 //                                 </div>
 //                               )}
                               
+//                               {/* Remove Button - Always enabled, even during upload */}
 //                               <button
 //                                 type="button"
 //                                 onClick={() => removeImage(index)}
-//                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                                 disabled={img.uploading}
+//                                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
+//                                 title="Remove image"
 //                               >
 //                                 <X className="w-3 h-3" />
 //                               </button>
                               
-//                               <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded">
+//                               <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
 //                                 {index + 1}
 //                               </span>
 //                             </div>
 //                           ) : (
 //                             <div 
-//                               className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center ${
-//                                 img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'
+//                               className={`border-2 border-dashed rounded-lg p-4 text-center h-40 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+//                                 img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
 //                               }`}
+//                               onClick={() => fileInputRefs.current[index]?.click()}
 //                             >
-//                               <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+//                               <input 
+//                                 type="file" 
+//                                 ref={el => fileInputRefs.current[index] = el}
+//                                 className="hidden" 
+//                                 accept="image/jpeg,image/jpg,image/png,image/webp" 
+//                                 onChange={(e) => handleImageChange(e, index)} 
+//                               />
+//                               <ImageIcon className={`w-8 h-8 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
 //                               <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
 //                                 Slot {index + 1}
 //                               </p>
+//                               <p className="text-[10px] text-gray-400 mt-1">Click to upload</p>
 //                               {img.error && (
 //                                 <p className="text-xs text-red-600 mt-1">{img.error}</p>
 //                               )}
@@ -1246,24 +1573,19 @@
 //                     {productImages.some(img => img.uploading) && (
 //                       <div className="mt-4 p-2 bg-blue-50 rounded-lg">
 //                         <p className="text-xs text-blue-600">
-//                           Uploading: {productImages.filter(img => img.uploading).length} image(s) remaining...
+//                           Uploading: {productImages.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
 //                         </p>
 //                       </div>
 //                     )}
                     
 //                     {/* Image Count Info */}
 //                     <div className="mt-4 text-xs text-gray-500 text-center">
-//                       {productImages.filter(img => img.url !== null).length} of 6 images uploaded
+//                       {productImages.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} of 6 images uploaded
 //                     </div>
 //                   </div>
 //                 </div>
 //               </div>
 //             </div>
-
-//             {/* Rest of your form - Sizes, Colors, Additional Information, Featured & Tags, Meta Settings, Bulk Pricing, Submit Button */}
-//             {/* Keep all the remaining sections exactly as they are in your original code */}
-            
-//             {/* ... (Sizes, Colors, Additional Information, Featured & Tags, Meta Settings, Bulk Pricing sections remain unchanged) ... */}
 
 //             {/* Row 2: Sizes (Left) and Colors (Right) */}
 //             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -1506,7 +1828,7 @@
 //               </div>
 //             </div>
 
-//             {/* NEW ROW: Featured & Tags */}
+//             {/* Row: Featured & Tags */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1594,7 +1916,7 @@
 //               </div>
 //             </div>
 
-//             {/* NEW ROW: Meta Settings (SEO) */}
+//             {/* Row: Meta Settings (SEO) */}
 //             <div className="mb-6">
 //               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                 <div className="p-5 border-b border-gray-200">
@@ -1782,6 +2104,7 @@
 //                         onWheel={(e) => e.target.blur()}
 //                         min="0"
 //                         step="0.01"
+//                         placeholder="0.00"
 //                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
 //                           errors.pricePerUnit ? 'border-red-500' : 'border-gray-300'
 //                         }`}
@@ -1916,7 +2239,8 @@ import {
   Star,
   Search,
   Tag,
-  FolderTree
+  FolderTree,
+  GripVertical
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1990,6 +2314,60 @@ const uploadToCloudinary = async (file) => {
   }
 };
 
+// Restore Draft Modal Component
+const RestoreDraftModal = ({ isOpen, onConfirm, onCancel, draftData }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <div className="flex items-center gap-3 text-amber-600 mb-4">
+          <AlertCircle className="w-6 h-6" />
+          <h3 className="text-lg font-semibold">Unsaved Draft Found</h3>
+        </div>
+        
+        <p className="text-sm text-gray-600 mb-2">
+          You have unsaved draft data from your last session.
+        </p>
+        <p className="text-xs text-gray-500 mb-4">
+          Would you like to restore it? If you choose not to restore, the draft will be discarded.
+        </p>
+        
+        {/* Optional: Show preview of what will be restored */}
+        {draftData && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
+            <p className="font-medium text-gray-700 mb-1">Draft preview:</p>
+            {draftData.productName && (
+              <p className="text-gray-600">Product: {draftData.productName}</p>
+            )}
+            {draftData.fabric && (
+              <p className="text-gray-600">Fabric: {draftData.fabric}</p>
+            )}
+            <p className="text-gray-500 mt-1">
+              Last saved: {new Date().toLocaleString()}
+            </p>
+          </div>
+        )}
+        
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Discard Draft
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-medium text-white bg-[#E39A65] rounded-lg hover:bg-[#d48b54] transition-colors"
+          >
+            Restore Draft
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function CreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -2004,14 +2382,15 @@ export default function CreateProduct() {
   const [keywordInput, setKeywordInput] = useState('');
   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
-
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
-  // New state for collapsible sections
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
   
-  // Refs for click outside detection
+  // Modal state for draft restore
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState(null);
+  
   const colorPickerRef = useRef(null);
   
   // Form state with all fields
@@ -2025,9 +2404,9 @@ export default function CreateProduct() {
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
-    pricePerUnit: 0,
+    pricePerUnit: '',
     quantityBasedPricing: [
-      { range: '100-299', price: 0 }
+      { range: '100-299', price: '' }  
     ],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
@@ -2047,12 +2426,12 @@ export default function CreateProduct() {
 
   // Image state - Store preview and upload status (6 images)
   const [productImages, setProductImages] = useState([
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false }
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false }
   ]);
 
   // File input refs for images
@@ -2183,6 +2562,241 @@ export default function CreateProduct() {
     }
   }, [router]);
 
+  // Sync editor content to formData for auto-save
+  useEffect(() => {
+    if (!editor) return;
+    
+    const handleUpdate = () => {
+      const content = editor.getHTML();
+      setFormData(prev => {
+        if (prev.description !== content) {
+          return { ...prev, description: content };
+        }
+        return prev;
+      });
+    };
+    
+    editor.on('update', handleUpdate);
+    return () => {
+      editor.off('update', handleUpdate);
+    };
+  }, [editor]);
+
+  // Sync instruction editor content to formData for auto-save
+  useEffect(() => {
+    if (!instructionEditor) return;
+    
+    const handleUpdate = () => {
+      const content = instructionEditor.getHTML();
+      setFormData(prev => {
+        if (prev.instruction !== content) {
+          return { ...prev, instruction: content };
+        }
+        return prev;
+      });
+    };
+    
+    instructionEditor.on('update', handleUpdate);
+    return () => {
+      instructionEditor.off('update', handleUpdate);
+    };
+  }, [instructionEditor]);
+
+  // Auto-save to localStorage - Directly read from editors
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      // Get current content directly from editors
+      let currentDescription = formData.description;
+      let currentInstruction = formData.instruction;
+      
+      // Get fresh content from editors if they exist
+      if (editor && !editor.isDestroyed) {
+        const editorContent = editor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentDescription = editorContent;
+        }
+      }
+      if (instructionEditor && !instructionEditor.isDestroyed) {
+        const editorContent = instructionEditor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentInstruction = editorContent;
+        }
+      }
+      
+      // Only save if there's actual data
+      const hasDescription = currentDescription !== '' && currentDescription !== '<p></p>';
+      const hasInstruction = currentInstruction !== '' && currentInstruction !== '<p></p>';
+      const hasData = formData.productName !== '' || 
+                      hasDescription ||
+                      hasInstruction ||
+                      formData.fabric !== '' ||
+                      productImages.some(img => img.url !== null);
+      
+      if (hasData) {
+        const dataToSave = {
+          formData: {
+            ...formData,
+            description: currentDescription,
+            instruction: currentInstruction,
+            quantityBasedPricing: formData.quantityBasedPricing || [{ range: '100-299', price: '' }],
+            sizes: formData.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+            colors: formData.colors || [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+            tags: formData.tags || [],
+            additionalInfo: formData.additionalInfo || [],
+            metaSettings: formData.metaSettings || {}
+          },
+          productImages: productImages.map(img => ({
+            ...img,
+            file: null,
+            preview: img.url ? img.url : null,
+            uploading: false,
+            uploadAborted: false
+          })),
+          showTags,
+          showMeta,
+          keywordInput
+        };
+        localStorage.setItem('createProductDraft', JSON.stringify(dataToSave));
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimeout);
+  }, [formData, productImages, showTags, showMeta, keywordInput, editor, instructionEditor]);
+
+  // Load from localStorage on mount - with custom modal
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadDraft = () => {
+      const savedDraft = localStorage.getItem('createProductDraft');
+      if (savedDraft && isMounted) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          
+          // Check if there's meaningful data
+          const hasDescription = parsed.formData?.description && 
+                                 parsed.formData.description !== '' && 
+                                 parsed.formData.description !== '<p></p>';
+          const hasData = parsed.formData && (
+            parsed.formData.productName !== '' || 
+            hasDescription ||
+            parsed.formData.fabric !== ''
+          );
+          
+          if (hasData) {
+            // Store the draft data and show modal instead of confirm
+            setPendingDraft(parsed);
+            setShowRestoreModal(true);
+          }
+        } catch (error) {
+          console.error('Error loading draft:', error);
+        }
+      }
+    };
+    
+    // Delay loading to ensure component is mounted
+    const timer = setTimeout(loadDraft, 1000);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  // Restore editor content after editors are initialized
+  useEffect(() => {
+    if (editor && !editor.isDestroyed && formData.description) {
+      const currentContent = editor.getHTML();
+      if (currentContent !== formData.description && formData.description !== '<p></p>') {
+        editor.commands.setContent(formData.description);
+      }
+    }
+  }, [editor, formData.description]);
+
+  useEffect(() => {
+    if (instructionEditor && !instructionEditor.isDestroyed && formData.instruction) {
+      const currentContent = instructionEditor.getHTML();
+      if (currentContent !== formData.instruction && formData.instruction !== '<p></p>') {
+        instructionEditor.commands.setContent(formData.instruction);
+      }
+    }
+  }, [instructionEditor, formData.instruction]);
+
+  // Force sync tags and featured status when formData changes
+  useEffect(() => {
+    if (formData.isFeatured && formData.tags.length === 0) {
+      setShowTags(true);
+    }
+  }, [formData.isFeatured, formData.tags]);
+
+  // Handle restore draft confirmation
+  const handleRestoreDraft = () => {
+    if (pendingDraft) {
+      try {
+        // Restore form data - ensure arrays are properly restored
+        const restoredFormData = {
+          ...pendingDraft.formData,
+          quantityBasedPricing: pendingDraft.formData.quantityBasedPricing && pendingDraft.formData.quantityBasedPricing.length > 0 
+            ? pendingDraft.formData.quantityBasedPricing 
+            : [{ range: '100-299', price: '' }],
+          sizes: pendingDraft.formData.sizes && pendingDraft.formData.sizes.length > 0 
+            ? pendingDraft.formData.sizes 
+            : ['S', 'M', 'L', 'XL', 'XXL'],
+          colors: pendingDraft.formData.colors && pendingDraft.formData.colors.length > 0 
+            ? pendingDraft.formData.colors 
+            : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+          tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
+          additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
+          metaSettings: pendingDraft.formData.metaSettings || {
+            metaTitle: '',
+            metaDescription: '',
+            metaKeywords: []
+          }
+        };
+        
+        setFormData(restoredFormData);
+        setShowTags(pendingDraft.showTags || false);
+        setShowMeta(pendingDraft.showMeta || false);
+        setKeywordInput(pendingDraft.keywordInput || '');
+        
+        // Restore images
+        if (pendingDraft.productImages && pendingDraft.productImages.length > 0) {
+          const restoredImages = productImages.map((img, idx) => {
+            const savedImg = pendingDraft.productImages[idx];
+            if (savedImg && savedImg.url) {
+              return {
+                ...img,
+                url: savedImg.url,
+                publicId: savedImg.publicId,
+                preview: savedImg.url,
+                uploading: false,
+                uploadAborted: false
+              };
+            }
+            return img;
+          });
+          setProductImages(restoredImages);
+        }
+        
+        toast.info('Draft data restored', { duration: 3000 });
+      } catch (error) {
+        console.error('Error restoring draft:', error);
+        toast.error('Failed to restore draft');
+      }
+    }
+    
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+  };
+
+  // Handle discard draft
+  const handleDiscardDraft = () => {
+    localStorage.removeItem('createProductDraft');
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+    toast.info('Draft discarded');
+  };
+
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
@@ -2288,11 +2902,17 @@ export default function CreateProduct() {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Clear existing image if any
+    if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
+      URL.revokeObjectURL(productImages[index].preview);
+    }
+
     const validation = validateImageFile(file);
     if (!validation.valid) {
       const updatedImages = [...productImages];
       updatedImages[index] = { ...updatedImages[index], error: validation.message };
       setProductImages(updatedImages);
+      toast.error(`Image ${index + 1}: ${validation.message}`);
       return;
     }
 
@@ -2305,7 +2925,8 @@ export default function CreateProduct() {
       error: '',
       uploading: true,
       url: null,
-      publicId: null
+      publicId: null,
+      uploadAborted: false
     };
     setProductImages(updatedImages);
 
@@ -2314,12 +2935,19 @@ export default function CreateProduct() {
       
       setProductImages(prevImages => {
         const updated = [...prevImages];
-        updated[index] = {
-          ...updated[index],
-          url: url,
-          publicId: publicId,
-          uploading: false
-        };
+        if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+          updated[index] = {
+            ...updated[index],
+            url: url,
+            publicId: publicId,
+            uploading: false
+          };
+        } else if (updated[index] && updated[index].uploadAborted) {
+          // Clean up if upload was aborted
+          if (updated[index].preview && updated[index].preview.startsWith('blob:')) {
+            URL.revokeObjectURL(updated[index].preview);
+          }
+        }
         return updated;
       });
       
@@ -2328,11 +2956,15 @@ export default function CreateProduct() {
       console.error('Upload error:', error);
       setProductImages(prevImages => {
         const updated = [...prevImages];
-        updated[index] = {
-          ...updated[index],
-          error: 'Failed to upload image to Cloudinary',
-          uploading: false
-        };
+        if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+          updated[index] = {
+            ...updated[index],
+            error: 'Failed to upload image',
+            uploading: false,
+            preview: null,
+            file: null
+          };
+        }
         return updated;
       });
       toast.error(`Failed to upload image ${index + 1}`);
@@ -2349,9 +2981,13 @@ export default function CreateProduct() {
     
     if (files.length > availableSlots) {
       toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+      if (fileInputRefs.current['multiple']) {
+        fileInputRefs.current['multiple'].value = '';
+      }
       return;
     }
     
+    // Find empty slots
     const emptySlots = [];
     for (let i = 0; i < productImages.length; i++) {
       if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
@@ -2359,143 +2995,193 @@ export default function CreateProduct() {
       }
     }
     
-    const tempImages = [...productImages];
+    if (files.length > emptySlots.length) {
+      toast.error(`Only ${emptySlots.length} slots available. Please remove some images first.`);
+      if (fileInputRefs.current['multiple']) {
+        fileInputRefs.current['multiple'].value = '';
+      }
+      return;
+    }
+    
+    // Process each file individually - invalid files won't block valid ones
+    const uploadPromises = [];
+    const batchId = Date.now();
     
     for (let i = 0; i < files.length && i < emptySlots.length; i++) {
       const file = files[i];
       const slotIndex = emptySlots[i];
       
+      // Validate file individually
       const validation = validateImageFile(file);
       if (!validation.valid) {
         toast.error(`Image ${i + 1}: ${validation.message}`);
-        continue;
+        continue; // Skip this file but continue with others
       }
       
       const previewUrl = URL.createObjectURL(file);
       
-      tempImages[slotIndex] = {
-        file: file,
-        preview: previewUrl,
-        error: '',
-        uploading: true,
-        url: null,
-        publicId: null
-      };
+      // Set uploading state
+      setProductImages(prevImages => {
+        const updated = [...prevImages];
+        updated[slotIndex] = {
+          file: file,
+          preview: previewUrl,
+          error: '',
+          uploading: true,
+          url: null,
+          publicId: null,
+          uploadAborted: false
+        };
+        return updated;
+      });
+      
+      // Create upload promise for this file
+      const uploadPromise = (async () => {
+        try {
+          const { url, publicId } = await uploadToCloudinary(file);
+          
+          setProductImages(prevImages => {
+            const updated = [...prevImages];
+            if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+              updated[slotIndex] = {
+                ...updated[slotIndex],
+                url: url,
+                publicId: publicId,
+                uploading: false
+              };
+            } else if (updated[slotIndex] && updated[slotIndex].uploadAborted) {
+              // Clean up if upload was aborted
+              if (updated[slotIndex].preview && updated[slotIndex].preview.startsWith('blob:')) {
+                URL.revokeObjectURL(updated[slotIndex].preview);
+              }
+            }
+            return updated;
+          });
+          
+          return { success: true, slotIndex, fileIndex: i };
+        } catch (error) {
+          console.error('Upload error for file', i, error);
+          setProductImages(prevImages => {
+            const updated = [...prevImages];
+            if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+              updated[slotIndex] = {
+                ...updated[slotIndex],
+                error: 'Failed to upload image',
+                uploading: false,
+                preview: null,
+                file: null
+              };
+            }
+            return updated;
+          });
+          return { success: false, slotIndex, fileIndex: i, error };
+        }
+      })();
+      
+      uploadPromises.push(uploadPromise);
     }
     
-    setProductImages([...tempImages]);
+    // Wait for all uploads to complete
+    const results = await Promise.all(uploadPromises);
+    const successfulUploads = results.filter(r => r && r.success).length;
+    const failedUploads = results.filter(r => r && !r.success).length;
     
-    for (let i = 0; i < files.length && i < emptySlots.length; i++) {
-      const file = files[i];
-      const slotIndex = emptySlots[i];
-      
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        const updatedImages = [...productImages];
-        updatedImages[slotIndex] = { file: null, preview: null, error: validation.message, url: null, publicId: null, uploading: false };
-        setProductImages(updatedImages);
-        continue;
-      }
-      
-      try {
-        const { url, publicId } = await uploadToCloudinary(file);
-        
-        setProductImages(prevImages => {
-          const updatedImages = [...prevImages];
-          updatedImages[slotIndex] = {
-            ...updatedImages[slotIndex],
-            url: url,
-            publicId: publicId,
-            uploading: false
-          };
-          return updatedImages;
-        });
-        
-        toast.success(`Image ${i + 1} uploaded successfully`);
-      } catch (error) {
-        console.error('Upload error:', error);
-        setProductImages(prevImages => {
-          const updatedImages = [...prevImages];
-          updatedImages[slotIndex] = {
-            ...updatedImages[slotIndex],
-            error: 'Failed to upload image',
-            uploading: false
-          };
-          return updatedImages;
-        });
-        toast.error(`Failed to upload image ${i + 1}`);
-      }
+    if (successfulUploads > 0) {
+      toast.success(`${successfulUploads} image(s) uploaded successfully`);
+    }
+    if (failedUploads > 0) {
+      toast.error(`${failedUploads} image(s) failed to upload`);
     }
     
+    // Clear the file input
     if (fileInputRefs.current['multiple']) {
       fileInputRefs.current['multiple'].value = '';
     }
   };
 
   const removeImage = (index) => {
-    if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
-      URL.revokeObjectURL(productImages[index].preview);
+    const imageToRemove = productImages[index];
+    
+    // Mark as aborted to prevent success message if upload completes after removal
+    setProductImages(prevImages => {
+      const updated = [...prevImages];
+      if (updated[index]) {
+        updated[index].uploadAborted = true;
+      }
+      return updated;
+    });
+    
+    // Revoke object URL to prevent memory leaks
+    if (imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToRemove.preview);
     }
     
+    // Reset the image slot
     const updatedImages = [...productImages];
-    updatedImages[index] = { file: null, preview: null, error: '', url: null, publicId: null, uploading: false };
+    updatedImages[index] = { 
+      file: null, 
+      preview: null, 
+      error: '', 
+      url: null, 
+      publicId: null, 
+      uploading: false,
+      uploadAborted: false
+    };
     setProductImages(updatedImages);
+    
+    // Clear the file input value for this slot
     if (fileInputRefs.current[index]) {
       fileInputRefs.current[index].value = '';
     }
+    
+    toast.success(`Image removed from slot ${index + 1}`);
   };
 
+  const moveImage = (fromIndex, toIndex) => {
+    const updatedImages = [...productImages];
+    const [movedImage] = updatedImages.splice(fromIndex, 1);
+    updatedImages.splice(toIndex, 0, movedImage);
+    setProductImages(updatedImages);
+  };
 
-  // Move image function for reordering
-const moveImage = (fromIndex, toIndex) => {
-  const updatedImages = [...productImages];
-  const [movedImage] = updatedImages.splice(fromIndex, 1);
-  updatedImages.splice(toIndex, 0, movedImage);
-  setProductImages(updatedImages);
-};
+  const handleDragStart = (index) => {
+    if (productImages[index].preview && !productImages[index].uploading) {
+      setDraggedIndex(index);
+    }
+  };
 
-const handleDragStart = (index) => {
-  setDraggedIndex(index);
-};
+  const handleDragOverWithFeedback = (event, index) => {
+    event.preventDefault();
+    if (productImages[index].preview && !productImages[index].uploading) {
+      setDragOverIndex(index);
+    }
+  };
 
-const handleDragOver = (event) => {
-  event.preventDefault(); // Required to allow drop
-};
-
-const handleDrop = (dropIndex) => {
-  if (draggedIndex === null || draggedIndex === dropIndex) {
-    setDraggedIndex(null);
-    return;
-  }
-  moveImage(draggedIndex, dropIndex);
-  setDraggedIndex(null);
-};
-
-const handleDragEnd = () => {
-  setDraggedIndex(null);
-};
-
-const handleDragOverWithFeedback = (event, index) => {
-  event.preventDefault();
-  if (productImages[index].preview) {
-    setDragOverIndex(index);
-  }
-};
-
-const handleDragLeave = () => {
-  setDragOverIndex(null);
-};
-
-const handleDropWithFeedback = (dropIndex) => {
-  if (draggedIndex === null || draggedIndex === dropIndex) {
+  const handleDragLeave = () => {
     setDragOverIndex(null);
+  };
+
+  const handleDropWithFeedback = (dropIndex) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDragOverIndex(null);
+      setDraggedIndex(null);
+      return;
+    }
+    // Only allow dropping if both images are not uploading
+    if (!productImages[draggedIndex]?.uploading && !productImages[dropIndex]?.uploading) {
+      moveImage(draggedIndex, dropIndex);
+    } else {
+      toast.error('Cannot reorder images while uploading');
+    }
     setDraggedIndex(null);
-    return;
-  }
-  moveImage(draggedIndex, dropIndex);
-  setDraggedIndex(null);
-  setDragOverIndex(null);
-};
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -2674,13 +3360,15 @@ const handleDropWithFeedback = (dropIndex) => {
     const newErrors = {};
 
     formData.additionalInfo.forEach((info, index) => {
-      if (!info.fieldName.trim()) {
-        newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
-        isValid = false;
-      }
-      if (!info.fieldValue.trim()) {
-        newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
-        isValid = false;
+      if (info.fieldName.trim() || info.fieldValue.trim()) {
+        if (!info.fieldName.trim()) {
+          newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required when field value is provided';
+          isValid = false;
+        }
+        if (!info.fieldValue.trim()) {
+          newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required when field name is provided';
+          isValid = false;
+        }
       }
     });
 
@@ -2711,11 +3399,11 @@ const handleDropWithFeedback = (dropIndex) => {
       newErrors.moq = 'MOQ must be at least 1';
     }
 
-    if (formData.pricePerUnit < 0) {
+    if (formData.pricePerUnit !== '' && formData.pricePerUnit < 0) {
       newErrors.pricePerUnit = 'Price must be 0 or greater';
     }
 
-    const hasImages = productImages.some(img => img.url !== null);
+    const hasImages = productImages.some(img => img.url !== null && !img.uploadAborted);
     if (!hasImages) {
       newErrors.images = 'At least one product image is required';
     }
@@ -2758,6 +3446,11 @@ const handleDropWithFeedback = (dropIndex) => {
       return;
     }
 
+    if (formData.pricePerUnit === '') {
+      toast.error('Please enter a price per unit');
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
@@ -2769,7 +3462,7 @@ const handleDropWithFeedback = (dropIndex) => {
       const token = localStorage.getItem('token');
       
       const imageUrls = productImages
-        .filter(img => img.url !== null)
+        .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
         .map(img => img.url);
       
       const processedPricing = formData.quantityBasedPricing.map(tier => ({
@@ -2791,7 +3484,7 @@ const handleDropWithFeedback = (dropIndex) => {
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
-        pricePerUnit: formData.pricePerUnit,
+        pricePerUnit: formData.pricePerUnit === '' ? 0 : parseFloat(formData.pricePerUnit),
         quantityBasedPricing: processedPricing,
         sizes: formData.sizes.filter(s => s.trim() !== ''),
         colors: formData.colors,
@@ -2816,10 +3509,19 @@ const handleDropWithFeedback = (dropIndex) => {
       const data = await response.json();
 
       if (data.success) {
+        localStorage.removeItem('createProductDraft'); 
         toast.success('Product created successfully!');
         router.push('/admin/all-products');
       } else {
-        toast.error(data.error || 'Failed to create product');
+        // Check for duplicate key error
+        if (data.error && data.error.includes('E11000 duplicate key error')) {
+          const productName = formData.productName;
+          toast.error(`Product "${productName}" already exists. Please use a different product name.`);
+        } else if (data.error) {
+          toast.error(data.error);
+        } else {
+          toast.error('Failed to create product');
+        }
       }
     } catch (error) {
       console.error('Error creating product:', error);
@@ -2837,6 +3539,14 @@ const handleDropWithFeedback = (dropIndex) => {
   return (
     <MantineProvider>
       <div className="min-h-screen bg-gray-50">
+        {/* Restore Draft Modal */}
+        <RestoreDraftModal 
+          isOpen={showRestoreModal}
+          onConfirm={handleRestoreDraft}
+          onCancel={handleDiscardDraft}
+          draftData={pendingDraft?.formData}
+        />
+        
         {/* Header */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="px-6 py-4">
@@ -2993,7 +3703,7 @@ const handleDropWithFeedback = (dropIndex) => {
                       </p>
                     </div>
 
-                    {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric - 5 Column Layout */}
+                    {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
                       {/* Category */}
                       <div>
@@ -3045,7 +3755,7 @@ const handleDropWithFeedback = (dropIndex) => {
                         )}
                       </div>
 
-                      {/* Child Subcategory - Only shows when a subcategory with children is selected */}
+                      {/* Child Subcategory */}
                       {showChildSubcategory && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -3121,7 +3831,7 @@ const handleDropWithFeedback = (dropIndex) => {
                       </div>
                     </div>
 
-                    {/* Category Info Display - Shows all selected levels */}
+                    {/* Category Info Display */}
                     {selectedCategoryDetails && (
                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <div className="flex items-center gap-2">
@@ -3193,51 +3903,82 @@ const handleDropWithFeedback = (dropIndex) => {
                       </p>
                     </div>
 
-                    {/* Image Preview Grid */}
-                    {/* <div className="grid grid-cols-2 gap-4">
+                    {/* Image Preview Grid with Drag and Drop - Increased size and optimized */}
+                    <div className="grid grid-cols-2 gap-4">
                       {productImages.map((img, index) => (
-                        <div key={index}>
+                        <div
+                          key={index}
+                          draggable={img.preview !== null && !img.uploading}
+                          onDragStart={() => handleDragStart(index)}
+                          onDragOver={(e) => handleDragOverWithFeedback(e, index)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={() => handleDropWithFeedback(index)}
+                          onDragEnd={handleDragEnd}
+                          className={`transition-all duration-200 ${
+                            draggedIndex === index ? 'opacity-50 scale-95' : ''
+                          } ${
+                            dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+                              ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
+                              : ''
+                          }`}
+                        >
                           {img.preview ? (
-                            <div className="relative rounded-lg overflow-hidden border border-gray-200 h-32">
+                            <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-40 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
+                              {/* Drag handle indicator */}
+                              <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+                                <GripVertical className="w-3 h-3 text-white" />
+                              </div>
+                              
                               <img 
                                 src={img.preview} 
                                 alt={`Product ${index + 1}`} 
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain bg-gray-100"
                                 onError={(e) => {
                                   console.error('Image failed to load:', img.preview);
                                   e.target.src = 'https://via.placeholder.com/150?text=Error';
                                 }}
                               />
                               
+                              {/* Uploading Overlay */}
                               {img.uploading && (
-                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
                                   <Loader2 className="w-6 h-6 text-white animate-spin" />
                                 </div>
                               )}
                               
+                              {/* Remove Button - Always enabled, even during upload */}
                               <button
                                 type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                disabled={img.uploading}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
+                                title="Remove image"
                               >
                                 <X className="w-3 h-3" />
                               </button>
                               
-                              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded">
+                              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
                                 {index + 1}
                               </span>
                             </div>
                           ) : (
                             <div 
-                              className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center ${
-                                img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'
+                              className={`border-2 border-dashed rounded-lg p-4 text-center h-40 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                                img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
                               }`}
+                              onClick={() => fileInputRefs.current[index]?.click()}
                             >
-                              <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+                              <input 
+                                type="file" 
+                                ref={el => fileInputRefs.current[index] = el}
+                                className="hidden" 
+                                accept="image/jpeg,image/jpg,image/png,image/webp" 
+                                onChange={(e) => handleImageChange(e, index)} 
+                              />
+                              <ImageIcon className={`w-8 h-8 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
                               <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
                                 Slot {index + 1}
                               </p>
+                              <p className="text-[10px] text-gray-400 mt-1">Click to upload</p>
                               {img.error && (
                                 <p className="text-xs text-red-600 mt-1">{img.error}</p>
                               )}
@@ -3245,94 +3986,20 @@ const handleDropWithFeedback = (dropIndex) => {
                           )}
                         </div>
                       ))}
-                    </div> */}
-
-                    {/* Image Preview Grid with Drag and Drop */}
-<div className="grid grid-cols-2 gap-4">
-  {productImages.map((img, index) => (
-   <div
-  key={index}
-  draggable={img.preview !== null}
-  onDragStart={() => img.preview && handleDragStart(index)}
-  onDragOver={(e) => img.preview && handleDragOverWithFeedback(e, index)}
-  onDragLeave={handleDragLeave}
-  onDrop={() => img.preview && handleDropWithFeedback(index)}
-  onDragEnd={handleDragEnd}
-  className={`transition-all duration-200 ${
-    draggedIndex === index ? 'opacity-50 scale-95' : ''
-  } ${
-    dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' : ''
-  }`}
->
-      {img.preview ? (
-        <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing">
-          {/* Drag handle indicator */}
-          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5">
-            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-            </svg>
-          </div>
-          
-          <img 
-            src={img.preview} 
-            alt={`Product ${index + 1}`} 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              console.error('Image failed to load:', img.preview);
-              e.target.src = 'https://via.placeholder.com/150?text=Error';
-            }}
-          />
-          
-          {img.uploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 text-white animate-spin" />
-            </div>
-          )}
-          
-          <button
-            type="button"
-            onClick={() => removeImage(index)}
-            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            disabled={img.uploading}
-          >
-            <X className="w-3 h-3" />
-          </button>
-          
-          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded">
-            {index + 1}
-          </span>
-        </div>
-      ) : (
-        <div 
-          className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center ${
-            img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'
-          }`}
-        >
-          <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
-          <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
-            Slot {index + 1}
-          </p>
-          {img.error && (
-            <p className="text-xs text-red-600 mt-1">{img.error}</p>
-          )}
-        </div>
-      )}
-    </div>
-  ))}
-</div>
+                    </div>
                     
                     {/* Upload Progress Summary */}
                     {productImages.some(img => img.uploading) && (
                       <div className="mt-4 p-2 bg-blue-50 rounded-lg">
                         <p className="text-xs text-blue-600">
-                          Uploading: {productImages.filter(img => img.uploading).length} image(s) remaining...
+                          Uploading: {productImages.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
                         </p>
                       </div>
                     )}
                     
                     {/* Image Count Info */}
                     <div className="mt-4 text-xs text-gray-500 text-center">
-                      {productImages.filter(img => img.url !== null).length} of 6 images uploaded
+                      {productImages.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} of 6 images uploaded
                     </div>
                   </div>
                 </div>
@@ -3580,7 +4247,7 @@ const handleDropWithFeedback = (dropIndex) => {
               </div>
             </div>
 
-            {/* NEW ROW: Featured & Tags */}
+            {/* Row: Featured & Tags */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3668,7 +4335,7 @@ const handleDropWithFeedback = (dropIndex) => {
               </div>
             </div>
 
-            {/* NEW ROW: Meta Settings (SEO) */}
+            {/* Row: Meta Settings (SEO) */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3856,6 +4523,7 @@ const handleDropWithFeedback = (dropIndex) => {
                         onWheel={(e) => e.target.blur()}
                         min="0"
                         step="0.01"
+                        placeholder="0.00"
                         className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
                           errors.pricePerUnit ? 'border-red-500' : 'border-gray-300'
                         }`}

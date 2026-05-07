@@ -1,6 +1,5 @@
 
 
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -29,7 +28,8 @@
 //   Star,
 //   Search,
 //   Tag,
-//   FolderTree
+//   FolderTree,
+//   GripVertical
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -120,6 +120,9 @@
 //   const [showTags, setShowTags] = useState(false);
 //   const [showMeta, setShowMeta] = useState(false);
   
+
+//   const [draggedIndex, setDraggedIndex] = useState(null);
+// const [dragOverIndex, setDragOverIndex] = useState(null);
 //   const colorPickerRef = useRef(null);
   
 //   const [formData, setFormData] = useState({
@@ -529,6 +532,51 @@
 //     fileInputRefs.current[index].value = '';
 //   }
 // };
+
+// // ADD THESE FUNCTIONS ↓
+// const moveImage = (fromIndex, toIndex) => {
+//   const updatedImages = [...productImages];
+//   const [movedImage] = updatedImages.splice(fromIndex, 1);
+//   updatedImages.splice(toIndex, 0, movedImage);
+//   setProductImages(updatedImages);
+// };
+
+// const handleDragStart = (index) => {
+//   setDraggedIndex(index);
+// };
+
+// const handleDragOver = (event) => {
+//   event.preventDefault();
+// };
+
+// const handleDragOverWithFeedback = (event, index) => {
+//   event.preventDefault();
+//   if (productImages[index].preview) {
+//     setDragOverIndex(index);
+//   }
+// };
+
+// const handleDragLeave = () => {
+//   setDragOverIndex(null);
+// };
+
+// const handleDrop = (dropIndex) => {
+//   if (draggedIndex === null || draggedIndex === dropIndex) {
+//     setDragOverIndex(null);
+//     setDraggedIndex(null);
+//     return;
+//   }
+//   moveImage(draggedIndex, dropIndex);
+//   setDraggedIndex(null);
+//   setDragOverIndex(null);
+// };
+
+// const handleDragEnd = () => {
+//   setDraggedIndex(null);
+//   setDragOverIndex(null);
+// };
+
+
 
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
@@ -1240,7 +1288,7 @@
 //       </div>
 
 //       {/* Image Preview Grid */}
-//       <div className="grid grid-cols-2 gap-4">
+//       {/* <div className="grid grid-cols-2 gap-4">
 //         {productImages.map((img, index) => (
 //           <div key={index}>
 //             {img.preview ? (
@@ -1296,8 +1344,88 @@
 //             )}
 //           </div>
 //         ))}
-//       </div>
-      
+//       </div> */}
+//       {/* Image Preview Grid with Drag and Drop */}
+// <div className="grid grid-cols-2 gap-4">
+//   {productImages.map((img, index) => (
+//     <div
+//       key={index}
+//       draggable={img.preview !== null}
+//       onDragStart={() => img.preview && handleDragStart(index)}
+//       onDragOver={(e) => img.preview && handleDragOverWithFeedback(e, index)}
+//       onDragLeave={handleDragLeave}
+//       onDrop={() => img.preview && handleDrop(index)}
+//       onDragEnd={handleDragEnd}
+//       className={`transition-all duration-200 ${
+//         draggedIndex === index ? 'opacity-50 scale-95' : ''
+//       } ${
+//         dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+//           ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
+//           : ''
+//       }`}
+//     >
+//       {img.preview ? (
+//         <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing">
+//           {/* Drag handle indicator */}
+//           <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+//             <GripVertical className="w-3 h-3 text-white" />
+//           </div>
+          
+//           <img 
+//             src={img.preview} 
+//             alt={`Product ${index + 1}`} 
+//             className="w-full h-full object-cover"
+//             onError={(e) => {
+//               console.error('Image failed to load');
+//               e.target.src = 'https://via.placeholder.com/150?text=Error';
+//             }}
+//           />
+          
+//           {img.uploading && (
+//             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+//               <Loader2 className="w-6 h-6 text-white animate-spin" />
+//             </div>
+//           )}
+          
+//           <button
+//             type="button"
+//             onClick={() => removeImage(index)}
+//             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+//             disabled={img.uploading}
+//           >
+//             <X className="w-3 h-3" />
+//           </button>
+          
+//           <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
+//             {index + 1}
+//           </span>
+//         </div>
+//       ) : (
+//         <div 
+//           className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center cursor-pointer ${
+//             img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
+//           }`}
+//           onClick={() => fileInputRefs.current[index]?.click()}
+//         >
+//           <input 
+//             type="file" 
+//             ref={el => fileInputRefs.current[index] = el}
+//             className="hidden" 
+//             accept="image/jpeg,image/jpg,image/png,image/webp" 
+//             onChange={(e) => handleImageChange(e, index)} 
+//           />
+//           <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+//           <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
+//             Slot {index + 1}
+//           </p>
+//           {img.error && (
+//             <p className="text-xs text-red-600 mt-1">{img.error}</p>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   ))}
+// </div>
 //       {/* Upload Progress Summary */}
 //       {productImages.some(img => img.uploading) && (
 //         <div className="mt-4 p-2 bg-blue-50 rounded-lg">
@@ -1796,13 +1924,6 @@
 //   );
 // }
 
-
-
-
-
-
-
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1906,6 +2027,59 @@ const uploadToCloudinary = async (file) => {
   }
 };
 
+// Restore Draft Modal Component
+const RestoreDraftModal = ({ isOpen, onConfirm, onCancel, draftData }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+        <div className="flex items-center gap-3 text-amber-600 mb-4">
+          <AlertCircle className="w-6 h-6" />
+          <h3 className="text-lg font-semibold">Unsaved Draft Found</h3>
+        </div>
+        
+        <p className="text-sm text-gray-600 mb-2">
+          You have unsaved draft data from your last session.
+        </p>
+        <p className="text-xs text-gray-500 mb-4">
+          Would you like to restore it? If you choose not to restore, the draft will be discarded.
+        </p>
+        
+        {draftData && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
+            <p className="font-medium text-gray-700 mb-1">Draft preview:</p>
+            {draftData.productName && (
+              <p className="text-gray-600">Product: {draftData.productName}</p>
+            )}
+            {draftData.fabric && (
+              <p className="text-gray-600">Fabric: {draftData.fabric}</p>
+            )}
+            <p className="text-gray-500 mt-1">
+              Last saved: {new Date().toLocaleString()}
+            </p>
+          </div>
+        )}
+        
+        <div className="flex items-center justify-end gap-3 mt-4">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Discard Draft
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-medium text-white bg-[#E39A65] rounded-lg hover:bg-[#d48b54] transition-colors"
+          >
+            Restore Draft
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ModeratorCreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -1920,27 +2094,31 @@ export default function ModeratorCreateProduct() {
   const [keywordInput, setKeywordInput] = useState('');
   const [showChildSubcategory, setShowChildSubcategory] = useState(false);
   
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const [showTags, setShowTags] = useState(false);
   const [showMeta, setShowMeta] = useState(false);
   
-
-  const [draggedIndex, setDraggedIndex] = useState(null);
-const [dragOverIndex, setDragOverIndex] = useState(null);
+  // Modal state for draft restore
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [pendingDraft, setPendingDraft] = useState(null);
+  
   const colorPickerRef = useRef(null);
   
+  // Form state with all fields
   const [formData, setFormData] = useState({
     productName: '',
     description: '',
     instruction: '', 
     category: '',
     subcategory: '',
-    childSubcategory: '', // NEW: Child subcategory field
+    childSubcategory: '',
     targetedCustomer: 'unisex',
     fabric: '',
     moq: 100,
-    pricePerUnit: 0,
+    pricePerUnit: '',
     quantityBasedPricing: [
-      { range: '100-299', price: 0 }
+      { range: '100-299', price: '' }  
     ],
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
@@ -1958,31 +2136,33 @@ const [dragOverIndex, setDragOverIndex] = useState(null);
     }
   });
 
-// Image state with upload status - 6 slots
-const [productImages, setProductImages] = useState([
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false },
-  { file: null, preview: null, error: '', url: null, publicId: null, uploading: false }
-]);
+  // Image state - Store preview and upload status (6 images)
+  const [productImages, setProductImages] = useState([
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false },
+    { file: null, preview: null, error: '', url: null, publicId: null, uploading: false, uploadAborted: false }
+  ]);
 
+  // File input refs for images
   const fileInputRefs = useRef([]);
+
+  // Errors state
   const [errors, setErrors] = useState({});
 
+  // Allowed file types
   const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
-  const maxFileSize = 5 * 1024 * 1024;
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
 
+  // Set mounted state
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    console.log('Product Images State:', productImages);
-  }, [productImages]);
-
+  // Click outside handler for color picker
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
@@ -1997,16 +2177,25 @@ const [productImages, setProductImages] = useState([
     };
   }, []);
 
-  // TipTap editors
+  // Initialize TipTap editor for description
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        bulletList: { keepMarks: true, keepAttributes: false },
-        orderedList: { keepMarks: true, keepAttributes: false },
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
       }),
       Link.configure({
         openOnClick: false,
-        HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
+        HTMLAttributes: {
+          rel: 'noopener noreferrer',
+          target: '_blank',
+        },
       }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
@@ -2021,12 +2210,21 @@ const [productImages, setProductImages] = useState([
   const instructionEditor = useEditor({
     extensions: [
       StarterKit.configure({
-        bulletList: { keepMarks: true, keepAttributes: false },
-        orderedList: { keepMarks: true, keepAttributes: false },
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+        },
       }),
       Link.configure({
         openOnClick: false,
-        HTMLAttributes: { rel: 'noopener noreferrer', target: '_blank' },
+        HTMLAttributes: {
+          rel: 'noopener noreferrer',
+          target: '_blank',
+        },
       }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
@@ -2043,7 +2241,7 @@ const [productImages, setProductImages] = useState([
     fetchCategories();
   }, []);
 
-  // Fetch subcategories when category changes
+  // Fetch subcategories when category is selected
   useEffect(() => {
     if (formData.category) {
       fetchSubcategories(formData.category);
@@ -2057,7 +2255,7 @@ const [productImages, setProductImages] = useState([
     }
   }, [formData.category]);
 
-  // Fetch child subcategories when subcategory changes
+  // Fetch child subcategories when subcategory is selected
   useEffect(() => {
     if (formData.category && formData.subcategory) {
       fetchChildSubcategories(formData.category, formData.subcategory);
@@ -2068,6 +2266,7 @@ const [productImages, setProductImages] = useState([
     }
   }, [formData.subcategory]);
 
+  // Check user role
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user.role !== 'moderator' && user.role !== 'admin') {
@@ -2075,12 +2274,241 @@ const [productImages, setProductImages] = useState([
     }
   }, [router]);
 
+  // Sync editor content to formData for auto-save
+  useEffect(() => {
+    if (!editor) return;
+    
+    const handleUpdate = () => {
+      const content = editor.getHTML();
+      setFormData(prev => {
+        if (prev.description !== content) {
+          return { ...prev, description: content };
+        }
+        return prev;
+      });
+    };
+    
+    editor.on('update', handleUpdate);
+    return () => {
+      editor.off('update', handleUpdate);
+    };
+  }, [editor]);
+
+  // Sync instruction editor content to formData for auto-save
+  useEffect(() => {
+    if (!instructionEditor) return;
+    
+    const handleUpdate = () => {
+      const content = instructionEditor.getHTML();
+      setFormData(prev => {
+        if (prev.instruction !== content) {
+          return { ...prev, instruction: content };
+        }
+        return prev;
+      });
+    };
+    
+    instructionEditor.on('update', handleUpdate);
+    return () => {
+      instructionEditor.off('update', handleUpdate);
+    };
+  }, [instructionEditor]);
+
+  // Auto-save to localStorage - Directly read from editors
+  useEffect(() => {
+    const saveTimeout = setTimeout(() => {
+      let currentDescription = formData.description;
+      let currentInstruction = formData.instruction;
+      
+      if (editor && !editor.isDestroyed) {
+        const editorContent = editor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentDescription = editorContent;
+        }
+      }
+      if (instructionEditor && !instructionEditor.isDestroyed) {
+        const editorContent = instructionEditor.getHTML();
+        if (editorContent && editorContent !== '<p></p>') {
+          currentInstruction = editorContent;
+        }
+      }
+      
+      const hasDescription = currentDescription !== '' && currentDescription !== '<p></p>';
+      const hasInstruction = currentInstruction !== '' && currentInstruction !== '<p></p>';
+      const hasData = formData.productName !== '' || 
+                      hasDescription ||
+                      hasInstruction ||
+                      formData.fabric !== '' ||
+                      productImages.some(img => img.url !== null);
+      
+      if (hasData) {
+        const dataToSave = {
+          formData: {
+            ...formData,
+            description: currentDescription,
+            instruction: currentInstruction,
+            quantityBasedPricing: formData.quantityBasedPricing || [{ range: '100-299', price: '' }],
+            sizes: formData.sizes || ['S', 'M', 'L', 'XL', 'XXL'],
+            colors: formData.colors || [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+            tags: formData.tags || [],
+            additionalInfo: formData.additionalInfo || [],
+            metaSettings: formData.metaSettings || {}
+          },
+          productImages: productImages.map(img => ({
+            ...img,
+            file: null,
+            preview: img.url ? img.url : null,
+            uploading: false,
+            uploadAborted: false
+          })),
+          showTags,
+          showMeta,
+          keywordInput
+        };
+        localStorage.setItem('moderatorCreateProductDraft', JSON.stringify(dataToSave));
+      }
+    }, 1000);
+
+    return () => clearTimeout(saveTimeout);
+  }, [formData, productImages, showTags, showMeta, keywordInput, editor, instructionEditor]);
+
+  // Load from localStorage on mount - with custom modal
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadDraft = () => {
+      const savedDraft = localStorage.getItem('moderatorCreateProductDraft');
+      if (savedDraft && isMounted) {
+        try {
+          const parsed = JSON.parse(savedDraft);
+          
+          const hasDescription = parsed.formData?.description && 
+                                 parsed.formData.description !== '' && 
+                                 parsed.formData.description !== '<p></p>';
+          const hasData = parsed.formData && (
+            parsed.formData.productName !== '' || 
+            hasDescription ||
+            parsed.formData.fabric !== ''
+          );
+          
+          if (hasData) {
+            setPendingDraft(parsed);
+            setShowRestoreModal(true);
+          }
+        } catch (error) {
+          console.error('Error loading draft:', error);
+        }
+      }
+    };
+    
+    const timer = setTimeout(loadDraft, 1000);
+    
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
+
+  // Restore editor content after editors are initialized
+  useEffect(() => {
+    if (editor && !editor.isDestroyed && formData.description) {
+      const currentContent = editor.getHTML();
+      if (currentContent !== formData.description && formData.description !== '<p></p>') {
+        editor.commands.setContent(formData.description);
+      }
+    }
+  }, [editor, formData.description]);
+
+  useEffect(() => {
+    if (instructionEditor && !instructionEditor.isDestroyed && formData.instruction) {
+      const currentContent = instructionEditor.getHTML();
+      if (currentContent !== formData.instruction && formData.instruction !== '<p></p>') {
+        instructionEditor.commands.setContent(formData.instruction);
+      }
+    }
+  }, [instructionEditor, formData.instruction]);
+
+  // Force sync tags and featured status when formData changes
+  useEffect(() => {
+    if (formData.isFeatured && formData.tags.length === 0) {
+      setShowTags(true);
+    }
+  }, [formData.isFeatured, formData.tags]);
+
+  // Handle restore draft confirmation
+  const handleRestoreDraft = () => {
+    if (pendingDraft) {
+      try {
+        const restoredFormData = {
+          ...pendingDraft.formData,
+          quantityBasedPricing: pendingDraft.formData.quantityBasedPricing && pendingDraft.formData.quantityBasedPricing.length > 0 
+            ? pendingDraft.formData.quantityBasedPricing 
+            : [{ range: '100-299', price: '' }],
+          sizes: pendingDraft.formData.sizes && pendingDraft.formData.sizes.length > 0 
+            ? pendingDraft.formData.sizes 
+            : ['S', 'M', 'L', 'XL', 'XXL'],
+          colors: pendingDraft.formData.colors && pendingDraft.formData.colors.length > 0 
+            ? pendingDraft.formData.colors 
+            : [{ code: '#FF0000' }, { code: '#0000FF' }, { code: '#000000' }],
+          tags: Array.isArray(pendingDraft.formData.tags) ? pendingDraft.formData.tags : [],
+          additionalInfo: Array.isArray(pendingDraft.formData.additionalInfo) ? pendingDraft.formData.additionalInfo : [],
+          metaSettings: pendingDraft.formData.metaSettings || {
+            metaTitle: '',
+            metaDescription: '',
+            metaKeywords: []
+          }
+        };
+        
+        setFormData(restoredFormData);
+        setShowTags(pendingDraft.showTags || false);
+        setShowMeta(pendingDraft.showMeta || false);
+        setKeywordInput(pendingDraft.keywordInput || '');
+        
+        if (pendingDraft.productImages && pendingDraft.productImages.length > 0) {
+          const restoredImages = productImages.map((img, idx) => {
+            const savedImg = pendingDraft.productImages[idx];
+            if (savedImg && savedImg.url) {
+              return {
+                ...img,
+                url: savedImg.url,
+                publicId: savedImg.publicId,
+                preview: savedImg.url,
+                uploading: false,
+                uploadAborted: false
+              };
+            }
+            return img;
+          });
+          setProductImages(restoredImages);
+        }
+        
+        toast.info('Draft data restored', { duration: 3000 });
+      } catch (error) {
+        console.error('Error restoring draft:', error);
+        toast.error('Failed to restore draft');
+      }
+    }
+    
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+  };
+
+  // Handle discard draft
+  const handleDiscardDraft = () => {
+    localStorage.removeItem('moderatorCreateProductDraft');
+    setShowRestoreModal(false);
+    setPendingDraft(null);
+    toast.info('Draft discarded');
+  };
+
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/categories', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       const data = await response.json();
@@ -2114,7 +2542,6 @@ const [productImages, setProductImages] = useState([
     }
   };
 
-  // NEW: Fetch child subcategories for a subcategory
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
       const token = localStorage.getItem('token');
@@ -2141,7 +2568,9 @@ const [productImages, setProductImages] = useState([
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       
       const data = await response.json();
@@ -2173,213 +2602,274 @@ const [productImages, setProductImages] = useState([
     return { valid: true };
   };
 
-const handleImageChange = async (e, index) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleImageChange = async (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const validation = validateImageFile(file);
-  if (!validation.valid) {
-    const updatedImages = [...productImages];
-    updatedImages[index] = { ...updatedImages[index], error: validation.message };
-    setProductImages(updatedImages);
-    return;
-  }
-
-  const previewUrl = URL.createObjectURL(file);
-  
-  const updatedImages = [...productImages];
-  updatedImages[index] = {
-    file: file,
-    preview: previewUrl,
-    error: '',
-    uploading: true,
-    url: null,
-    publicId: null
-  };
-  setProductImages(updatedImages);
-  console.log('Preview set for index:', index);
-
-  try {
-    const { url, publicId } = await uploadToCloudinary(file);
-    console.log('Upload successful for index:', index, 'URL:', url);
-    
-    setProductImages(prevImages => {
-      const updated = [...prevImages];
-      updated[index] = {
-        ...updated[index],
-        url: url,
-        publicId: publicId,
-        uploading: false
-      };
-      return updated;
-    });
-    
-    toast.success(`Image ${index + 1} uploaded successfully`);
-  } catch (error) {
-    console.error('Upload error:', error);
-    setProductImages(prevImages => {
-      const updated = [...prevImages];
-      updated[index] = {
-        ...updated[index],
-        error: 'Failed to upload image to Cloudinary',
-        uploading: false
-      };
-      return updated;
-    });
-    toast.error(`Failed to upload image ${index + 1}`);
-  }
-};
-
-const handleMultipleImageSelect = async (e) => {
-  const files = Array.from(e.target.files);
-  
-  if (files.length === 0) return;
-  
-  const currentImagesCount = productImages.filter(img => img.url !== null || img.uploading).length;
-  const availableSlots = 6 - currentImagesCount;
-  
-  if (files.length > availableSlots) {
-    toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
-    return;
-  }
-  
-  const emptySlots = [];
-  for (let i = 0; i < productImages.length; i++) {
-    if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
-      emptySlots.push(i);
+    if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
+      URL.revokeObjectURL(productImages[index].preview);
     }
-  }
-  
-  const tempImages = [...productImages];
-  
-  for (let i = 0; i < files.length && i < emptySlots.length; i++) {
-    const file = files[i];
-    const slotIndex = emptySlots[i];
-    
+
     const validation = validateImageFile(file);
     if (!validation.valid) {
-      toast.error(`Image ${i + 1}: ${validation.message}`);
-      continue;
+      const updatedImages = [...productImages];
+      updatedImages[index] = { ...updatedImages[index], error: validation.message };
+      setProductImages(updatedImages);
+      toast.error(`Image ${index + 1}: ${validation.message}`);
+      return;
     }
-    
+
     const previewUrl = URL.createObjectURL(file);
     
-    tempImages[slotIndex] = {
+    const updatedImages = [...productImages];
+    updatedImages[index] = {
       file: file,
       preview: previewUrl,
       error: '',
       uploading: true,
       url: null,
-      publicId: null
+      publicId: null,
+      uploadAborted: false
     };
-  }
-  
-  setProductImages([...tempImages]);
-  
-  for (let i = 0; i < files.length && i < emptySlots.length; i++) {
-    const file = files[i];
-    const slotIndex = emptySlots[i];
-    
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      const updatedImages = [...productImages];
-      updatedImages[slotIndex] = { file: null, preview: null, error: validation.message, url: null, publicId: null, uploading: false };
-      setProductImages(updatedImages);
-      continue;
-    }
-    
+    setProductImages(updatedImages);
+
     try {
       const { url, publicId } = await uploadToCloudinary(file);
       
       setProductImages(prevImages => {
-        const updatedImages = [...prevImages];
-        updatedImages[slotIndex] = {
-          ...updatedImages[slotIndex],
-          url: url,
-          publicId: publicId,
-          uploading: false
-        };
-        return updatedImages;
+        const updated = [...prevImages];
+        if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+          updated[index] = {
+            ...updated[index],
+            url: url,
+            publicId: publicId,
+            uploading: false
+          };
+        } else if (updated[index] && updated[index].uploadAborted) {
+          if (updated[index].preview && updated[index].preview.startsWith('blob:')) {
+            URL.revokeObjectURL(updated[index].preview);
+          }
+        }
+        return updated;
       });
       
-      toast.success(`Image ${i + 1} uploaded successfully`);
+      toast.success(`Image ${index + 1} uploaded successfully`);
     } catch (error) {
       console.error('Upload error:', error);
       setProductImages(prevImages => {
-        const updatedImages = [...prevImages];
-        updatedImages[slotIndex] = {
-          ...updatedImages[slotIndex],
-          error: 'Failed to upload image',
-          uploading: false
-        };
-        return updatedImages;
+        const updated = [...prevImages];
+        if (updated[index] && updated[index].uploading === true && !updated[index].uploadAborted) {
+          updated[index] = {
+            ...updated[index],
+            error: 'Failed to upload image',
+            uploading: false,
+            preview: null,
+            file: null
+          };
+        }
+        return updated;
       });
-      toast.error(`Failed to upload image ${i + 1}`);
+      toast.error(`Failed to upload image ${index + 1}`);
     }
-  }
-  
-  if (fileInputRefs.current['multiple']) {
-    fileInputRefs.current['multiple'].value = '';
-  }
-};
+  };
 
-const removeImage = (index) => {
-  if (productImages[index].preview && productImages[index].preview.startsWith('blob:')) {
-    URL.revokeObjectURL(productImages[index].preview);
-  }
-  
-  const updatedImages = [...productImages];
-  updatedImages[index] = { file: null, preview: null, error: '', url: null, publicId: null, uploading: false };
-  setProductImages(updatedImages);
-  if (fileInputRefs.current[index]) {
-    fileInputRefs.current[index].value = '';
-  }
-};
+  const handleMultipleImageSelect = async (e) => {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+    
+    const currentImagesCount = productImages.filter(img => img.url !== null || img.uploading).length;
+    const availableSlots = 6 - currentImagesCount;
+    
+    if (files.length > availableSlots) {
+      toast.error(`You can only upload ${availableSlots} more image(s). Maximum 6 images total.`);
+      if (fileInputRefs.current['multiple']) {
+        fileInputRefs.current['multiple'].value = '';
+      }
+      return;
+    }
+    
+    const emptySlots = [];
+    for (let i = 0; i < productImages.length; i++) {
+      if (!productImages[i].url && !productImages[i].uploading && !productImages[i].preview) {
+        emptySlots.push(i);
+      }
+    }
+    
+    if (files.length > emptySlots.length) {
+      toast.error(`Only ${emptySlots.length} slots available. Please remove some images first.`);
+      if (fileInputRefs.current['multiple']) {
+        fileInputRefs.current['multiple'].value = '';
+      }
+      return;
+    }
+    
+    const uploadPromises = [];
+    const batchId = Date.now();
+    
+    for (let i = 0; i < files.length && i < emptySlots.length; i++) {
+      const file = files[i];
+      const slotIndex = emptySlots[i];
+      
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        toast.error(`Image ${i + 1}: ${validation.message}`);
+        continue;
+      }
+      
+      const previewUrl = URL.createObjectURL(file);
+      
+      setProductImages(prevImages => {
+        const updated = [...prevImages];
+        updated[slotIndex] = {
+          file: file,
+          preview: previewUrl,
+          error: '',
+          uploading: true,
+          url: null,
+          publicId: null,
+          uploadAborted: false
+        };
+        return updated;
+      });
+      
+      const uploadPromise = (async () => {
+        try {
+          const { url, publicId } = await uploadToCloudinary(file);
+          
+          setProductImages(prevImages => {
+            const updated = [...prevImages];
+            if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+              updated[slotIndex] = {
+                ...updated[slotIndex],
+                url: url,
+                publicId: publicId,
+                uploading: false
+              };
+            } else if (updated[slotIndex] && updated[slotIndex].uploadAborted) {
+              if (updated[slotIndex].preview && updated[slotIndex].preview.startsWith('blob:')) {
+                URL.revokeObjectURL(updated[slotIndex].preview);
+              }
+            }
+            return updated;
+          });
+          
+          return { success: true, slotIndex, fileIndex: i };
+        } catch (error) {
+          console.error('Upload error for file', i, error);
+          setProductImages(prevImages => {
+            const updated = [...prevImages];
+            if (updated[slotIndex] && updated[slotIndex].uploading === true && !updated[slotIndex].uploadAborted) {
+              updated[slotIndex] = {
+                ...updated[slotIndex],
+                error: 'Failed to upload image',
+                uploading: false,
+                preview: null,
+                file: null
+              };
+            }
+            return updated;
+          });
+          return { success: false, slotIndex, fileIndex: i, error };
+        }
+      })();
+      
+      uploadPromises.push(uploadPromise);
+    }
+    
+    const results = await Promise.all(uploadPromises);
+    const successfulUploads = results.filter(r => r && r.success).length;
+    const failedUploads = results.filter(r => r && !r.success).length;
+    
+    if (successfulUploads > 0) {
+      toast.success(`${successfulUploads} image(s) uploaded successfully`);
+    }
+    if (failedUploads > 0) {
+      toast.error(`${failedUploads} image(s) failed to upload`);
+    }
+    
+    if (fileInputRefs.current['multiple']) {
+      fileInputRefs.current['multiple'].value = '';
+    }
+  };
 
-// ADD THESE FUNCTIONS ↓
-const moveImage = (fromIndex, toIndex) => {
-  const updatedImages = [...productImages];
-  const [movedImage] = updatedImages.splice(fromIndex, 1);
-  updatedImages.splice(toIndex, 0, movedImage);
-  setProductImages(updatedImages);
-};
+  const removeImage = (index) => {
+    const imageToRemove = productImages[index];
+    
+    setProductImages(prevImages => {
+      const updated = [...prevImages];
+      if (updated[index]) {
+        updated[index].uploadAborted = true;
+      }
+      return updated;
+    });
+    
+    if (imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+    
+    const updatedImages = [...productImages];
+    updatedImages[index] = { 
+      file: null, 
+      preview: null, 
+      error: '', 
+      url: null, 
+      publicId: null, 
+      uploading: false,
+      uploadAborted: false
+    };
+    setProductImages(updatedImages);
+    
+    if (fileInputRefs.current[index]) {
+      fileInputRefs.current[index].value = '';
+    }
+    
+    toast.success(`Image removed from slot ${index + 1}`);
+  };
 
-const handleDragStart = (index) => {
-  setDraggedIndex(index);
-};
+  const moveImage = (fromIndex, toIndex) => {
+    const updatedImages = [...productImages];
+    const [movedImage] = updatedImages.splice(fromIndex, 1);
+    updatedImages.splice(toIndex, 0, movedImage);
+    setProductImages(updatedImages);
+  };
 
-const handleDragOver = (event) => {
-  event.preventDefault();
-};
+  const handleDragStart = (index) => {
+    if (productImages[index].preview && !productImages[index].uploading) {
+      setDraggedIndex(index);
+    }
+  };
 
-const handleDragOverWithFeedback = (event, index) => {
-  event.preventDefault();
-  if (productImages[index].preview) {
-    setDragOverIndex(index);
-  }
-};
+  const handleDragOverWithFeedback = (event, index) => {
+    event.preventDefault();
+    if (productImages[index].preview && !productImages[index].uploading) {
+      setDragOverIndex(index);
+    }
+  };
 
-const handleDragLeave = () => {
-  setDragOverIndex(null);
-};
-
-const handleDrop = (dropIndex) => {
-  if (draggedIndex === null || draggedIndex === dropIndex) {
+  const handleDragLeave = () => {
     setDragOverIndex(null);
+  };
+
+  const handleDropWithFeedback = (dropIndex) => {
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDragOverIndex(null);
+      setDraggedIndex(null);
+      return;
+    }
+    if (!productImages[draggedIndex]?.uploading && !productImages[dropIndex]?.uploading) {
+      moveImage(draggedIndex, dropIndex);
+    } else {
+      toast.error('Cannot reorder images while uploading');
+    }
     setDraggedIndex(null);
-    return;
-  }
-  moveImage(draggedIndex, dropIndex);
-  setDraggedIndex(null);
-  setDragOverIndex(null);
-};
+    setDragOverIndex(null);
+  };
 
-const handleDragEnd = () => {
-  setDraggedIndex(null);
-  setDragOverIndex(null);
-};
-
-
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -2559,13 +3049,15 @@ const handleDragEnd = () => {
     const newErrors = {};
 
     formData.additionalInfo.forEach((info, index) => {
-      if (!info.fieldName.trim()) {
-        newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required';
-        isValid = false;
-      }
-      if (!info.fieldValue.trim()) {
-        newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required';
-        isValid = false;
+      if (info.fieldName.trim() || info.fieldValue.trim()) {
+        if (!info.fieldName.trim()) {
+          newErrors[`additionalInfo_${index}_fieldName`] = 'Field name is required when field value is provided';
+          isValid = false;
+        }
+        if (!info.fieldValue.trim()) {
+          newErrors[`additionalInfo_${index}_fieldValue`] = 'Field value is required when field name is provided';
+          isValid = false;
+        }
       }
     });
 
@@ -2596,11 +3088,11 @@ const handleDragEnd = () => {
       newErrors.moq = 'MOQ must be at least 1';
     }
 
-    if (formData.pricePerUnit < 0) {
+    if (formData.pricePerUnit !== '' && formData.pricePerUnit < 0) {
       newErrors.pricePerUnit = 'Price must be 0 or greater';
     }
 
-    const hasImages = productImages.some(img => img.url !== null);
+    const hasImages = productImages.some(img => img.url !== null && !img.uploadAborted);
     if (!hasImages) {
       newErrors.images = 'At least one product image is required';
     }
@@ -2643,6 +3135,11 @@ const handleDragEnd = () => {
       return;
     }
 
+    if (formData.pricePerUnit === '') {
+      toast.error('Please enter a price per unit');
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form');
       return;
@@ -2654,7 +3151,7 @@ const handleDragEnd = () => {
       const token = localStorage.getItem('token');
       
       const imageUrls = productImages
-        .filter(img => img.url !== null)
+        .filter(img => img.url !== null && !img.uploadAborted && !img.uploading)
         .map(img => img.url);
       
       const processedPricing = formData.quantityBasedPricing.map(tier => ({
@@ -2672,11 +3169,11 @@ const handleDragEnd = () => {
         instruction: formData.instruction || '',
         category: formData.category,
         subcategory: formData.subcategory || '',
-        childSubcategory: formData.childSubcategory || '', // NEW: Include child subcategory
+        childSubcategory: formData.childSubcategory || '',
         targetedCustomer: formData.targetedCustomer,
         fabric: formData.fabric,
         moq: formData.moq,
-        pricePerUnit: formData.pricePerUnit,
+        pricePerUnit: formData.pricePerUnit === '' ? 0 : parseFloat(formData.pricePerUnit),
         quantityBasedPricing: processedPricing,
         sizes: formData.sizes.filter(s => s.trim() !== ''),
         colors: formData.colors,
@@ -2686,11 +3183,8 @@ const handleDragEnd = () => {
         tags: formData.tags,
         metaSettings: formData.metaSettings
       };
-      
-      console.log('Submitting images:', imageUrls);
-      console.log('Images count:', imageUrls.length);
-      console.log('Subcategory:', formData.subcategory);
-      console.log('Child Subcategory:', formData.childSubcategory);
+
+      console.log('Submitting payload:', payload);
 
       const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
@@ -2704,10 +3198,18 @@ const handleDragEnd = () => {
       const data = await response.json();
 
       if (data.success) {
+        localStorage.removeItem('moderatorCreateProductDraft');
         toast.success('Product created successfully!');
         router.push('/moderator/all-products');
       } else {
-        toast.error(data.error || 'Failed to create product');
+        if (data.error && data.error.includes('E11000 duplicate key error')) {
+          const productName = formData.productName;
+          toast.error(`Product "${productName}" already exists. Please use a different product name.`);
+        } else if (data.error) {
+          toast.error(data.error);
+        } else {
+          toast.error('Failed to create product');
+        }
       }
     } catch (error) {
       console.error('Error creating product:', error);
@@ -2725,6 +3227,14 @@ const handleDragEnd = () => {
   return (
     <MantineProvider>
       <div className="min-h-screen bg-gray-50">
+        {/* Restore Draft Modal */}
+        <RestoreDraftModal 
+          isOpen={showRestoreModal}
+          onConfirm={handleRestoreDraft}
+          onCancel={handleDiscardDraft}
+          draftData={pendingDraft?.formData}
+        />
+        
         {/* Header */}
         <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="px-6 py-4">
@@ -2750,9 +3260,9 @@ const handleDragEnd = () => {
         {/* Main Content */}
         <div className="p-6">
           <form onSubmit={handleSubmit}>
-            {/* Row 1: Basic Details and Product Images */}
+            {/* Row 1: Basic Details (Left) and Product Images (Right) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              {/* Basic Details Card */}
+              {/* Basic Details Card - Left (2/3 width) - Same as Admin version */}
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
@@ -2763,7 +3273,6 @@ const handleDragEnd = () => {
                   </div>
                   
                   <div className="p-5 space-y-4">
-                    {/* Product Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Product Name <span className="text-red-500">*</span>
@@ -2786,7 +3295,6 @@ const handleDragEnd = () => {
                       )}
                     </div>
 
-                    {/* Description */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
@@ -2827,7 +3335,6 @@ const handleDragEnd = () => {
                       )}
                     </div>
 
-                    {/* Instruction Field */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Instructions / Care Instructions
@@ -2871,9 +3378,8 @@ const handleDragEnd = () => {
                       </p>
                     </div>
 
-                    {/* Category, Subcategory, Child Subcategory, Targeted Customer, Fabric */}
+                    {/* Category Fields */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
-                      {/* Category */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Category <span className="text-red-500">*</span>
@@ -2896,7 +3402,6 @@ const handleDragEnd = () => {
                         )}
                       </div>
 
-                      {/* Subcategory Field */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <div className="flex items-center gap-1">
@@ -2919,14 +3424,8 @@ const handleDragEnd = () => {
                             <option key={sub._id} value={sub._id}>{sub.name}</option>
                           ))}
                         </select>
-                        {subcategories.length === 0 && formData.category && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            No subcategories available for this category
-                          </p>
-                        )}
                       </div>
 
-                      {/* Child Subcategory Field - Only shows when a subcategory with children is selected */}
                       {showChildSubcategory && (
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2949,7 +3448,6 @@ const handleDragEnd = () => {
                         </div>
                       )}
 
-                      {/* Targeted Customer */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           <div className="flex items-center gap-1">
@@ -2981,7 +3479,6 @@ const handleDragEnd = () => {
                         )}
                       </div>
 
-                      {/* Fabric */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Fabric (Material) <span className="text-red-500">*</span>
@@ -3002,7 +3499,6 @@ const handleDragEnd = () => {
                       </div>
                     </div>
 
-                    {/* Category Info Display - Shows all selected levels */}
                     {selectedCategoryDetails && (
                       <div className="mt-2 p-3 bg-orange-50 rounded-lg border border-orange-200">
                         <div className="flex items-center gap-2">
@@ -3025,230 +3521,154 @@ const handleDragEnd = () => {
                         </div>
                       </div>
                     )}
-
-                    {formData.targetedCustomer && (
-                      <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">{getSelectedCustomerIcon()}</span>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {TARGETED_CUSTOMERS.find(c => c.value === formData.targetedCustomer)?.label} Collection
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              This product will be shown in the {formData.targetedCustomer} section
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
 
-            {/* Product Images Card */}
-<div className="lg:col-span-1">
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-    <div className="p-5 border-b border-gray-200">
-      <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-        <ImageIcon className="w-5 h-5 text-[#E39A65]" />
-        Product Images <span className="text-red-500">*</span>
-      </h2>
-      <p className="text-xs text-gray-500 mt-1">Upload up to 6 images (JPG, PNG, WebP, max 5MB each)</p>
-    </div>
-    
-    <div className="p-5">
-      {errors.images && (
-        <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
-          <AlertCircle className="w-3 h-3" />
-          {errors.images}
-        </p>
-      )}
-      
-      {/* Multiple Image Upload Button */}
-      <div className="mb-4">
-        <input
-          type="file"
-          id="multiple-images"
-          className="hidden"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          multiple
-          onChange={handleMultipleImageSelect}
-          ref={el => {
-            if (el) fileInputRefs.current['multiple'] = el;
-          }}
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRefs.current['multiple']?.click()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
-        >
-          <Upload className="w-5 h-5" />
-          <span>Select Multiple Images (Up to 6)</span>
-        </button>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          You can select multiple images at once. Images will be uploaded automatically.
-        </p>
-      </div>
-
-      {/* Image Preview Grid */}
-      {/* <div className="grid grid-cols-2 gap-4">
-        {productImages.map((img, index) => (
-          <div key={index}>
-            {img.preview ? (
-              <div className="relative rounded-lg overflow-hidden border border-gray-200 h-32">
-                <img 
-                  src={img.preview} 
-                  alt={`Product ${index + 1}`} 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.error('Image failed to load');
-                    e.target.src = 'https://via.placeholder.com/150?text=Error';
-                  }}
-                />
-                {img.uploading && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+              {/* Product Images Card - Right (1/3 width) */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                  <div className="p-5 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <ImageIcon className="w-5 h-5 text-[#E39A65]" />
+                      Product Images <span className="text-red-500">*</span>
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-1">Upload up to 6 images (JPG, PNG, WebP, max 5MB each)</p>
                   </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                  disabled={img.uploading}
-                >
-                  <X className="w-3 h-3" />
-                </button>
-                <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded">
-                  {index + 1}
-                </span>
+                  
+                  <div className="p-5">
+                    {errors.images && (
+                      <p className="text-xs text-red-600 mb-4 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.images}
+                      </p>
+                    )}
+                    
+                    <div className="mb-4">
+                      <input
+                        type="file"
+                        id="multiple-images"
+                        className="hidden"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        multiple
+                        onChange={handleMultipleImageSelect}
+                        ref={el => {
+                          if (el) fileInputRefs.current['multiple'] = el;
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRefs.current['multiple']?.click()}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-50 text-blue-700 font-medium rounded-lg border-2 border-dashed border-blue-300 hover:bg-blue-100 hover:border-blue-400 transition-colors"
+                      >
+                        <Upload className="w-5 h-5" />
+                        <span>Select Multiple Images (Up to 6)</span>
+                      </button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        You can select multiple images at once. Images will be uploaded automatically.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {productImages.map((img, index) => (
+                        <div
+                          key={index}
+                          draggable={img.preview !== null && !img.uploading}
+                          onDragStart={() => handleDragStart(index)}
+                          onDragOver={(e) => handleDragOverWithFeedback(e, index)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={() => handleDropWithFeedback(index)}
+                          onDragEnd={handleDragEnd}
+                          className={`transition-all duration-200 ${
+                            draggedIndex === index ? 'opacity-50 scale-95' : ''
+                          } ${
+                            dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
+                              ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
+                              : ''
+                          }`}
+                        >
+                          {img.preview ? (
+                            <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-40 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing bg-gray-100">
+                              <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+                                <GripVertical className="w-3 h-3 text-white" />
+                              </div>
+                              
+                              <img 
+                                src={img.preview} 
+                                alt={`Product ${index + 1}`} 
+                                className="w-full h-full object-contain bg-gray-100"
+                                onError={(e) => {
+                                  console.error('Image failed to load:', img.preview);
+                                  e.target.src = 'https://via.placeholder.com/150?text=Error';
+                                }}
+                              />
+                              
+                              {img.uploading && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+                                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                </div>
+                              )}
+                              
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
+                                title="Remove image"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                              
+                              <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
+                                {index + 1}
+                              </span>
+                            </div>
+                          ) : (
+                            <div 
+                              className={`border-2 border-dashed rounded-lg p-4 text-center h-40 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                                img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
+                              }`}
+                              onClick={() => fileInputRefs.current[index]?.click()}
+                            >
+                              <input 
+                                type="file" 
+                                ref={el => fileInputRefs.current[index] = el}
+                                className="hidden" 
+                                accept="image/jpeg,image/jpg,image/png,image/webp" 
+                                onChange={(e) => handleImageChange(e, index)} 
+                              />
+                              <ImageIcon className={`w-8 h-8 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
+                              <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
+                                Slot {index + 1}
+                              </p>
+                              <p className="text-[10px] text-gray-400 mt-1">Click to upload</p>
+                              {img.error && (
+                                <p className="text-xs text-red-600 mt-1">{img.error}</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {productImages.some(img => img.uploading) && (
+                      <div className="mt-4 p-2 bg-blue-50 rounded-lg">
+                        <p className="text-xs text-blue-600">
+                          Uploading: {productImages.filter(img => img.uploading && !img.uploadAborted).length} image(s) remaining...
+                        </p>
+                      </div>
+                    )}
+                    
+                    <div className="mt-4 text-xs text-gray-500 text-center">
+                      {productImages.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} of 6 images uploaded
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div 
-                className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center ${
-                  img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50'
-                }`}
-                onClick={() => fileInputRefs.current[index]?.click()}
-              >
-                <input 
-                  type="file" 
-                  ref={el => fileInputRefs.current[index] = el}
-                  className="hidden" 
-                  accept="image/jpeg,image/jpg,image/png,image/webp" 
-                  onChange={(e) => handleImageChange(e, index)} 
-                />
-                <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
-                <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
-                  Slot {index + 1}
-                </p>
-                {img.error && (
-                  <p className="text-xs text-red-600 mt-1">{img.error}</p>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div> */}
-      {/* Image Preview Grid with Drag and Drop */}
-<div className="grid grid-cols-2 gap-4">
-  {productImages.map((img, index) => (
-    <div
-      key={index}
-      draggable={img.preview !== null}
-      onDragStart={() => img.preview && handleDragStart(index)}
-      onDragOver={(e) => img.preview && handleDragOverWithFeedback(e, index)}
-      onDragLeave={handleDragLeave}
-      onDrop={() => img.preview && handleDrop(index)}
-      onDragEnd={handleDragEnd}
-      className={`transition-all duration-200 ${
-        draggedIndex === index ? 'opacity-50 scale-95' : ''
-      } ${
-        dragOverIndex === index && draggedIndex !== index && draggedIndex !== null 
-          ? 'ring-2 ring-[#E39A65] ring-offset-2 rounded-lg' 
-          : ''
-      }`}
-    >
-      {img.preview ? (
-        <div className="relative rounded-lg overflow-hidden border-2 border-gray-200 h-32 hover:border-[#E39A65] transition-colors cursor-grab active:cursor-grabbing">
-          {/* Drag handle indicator */}
-          <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
-            <GripVertical className="w-3 h-3 text-white" />
-          </div>
-          
-          <img 
-            src={img.preview} 
-            alt={`Product ${index + 1}`} 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              console.error('Image failed to load');
-              e.target.src = 'https://via.placeholder.com/150?text=Error';
-            }}
-          />
-          
-          {img.uploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 text-white animate-spin" />
-            </div>
-          )}
-          
-          <button
-            type="button"
-            onClick={() => removeImage(index)}
-            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-            disabled={img.uploading}
-          >
-            <X className="w-3 h-3" />
-          </button>
-          
-          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black bg-opacity-60 text-white text-xs rounded z-10">
-            {index + 1}
-          </span>
-        </div>
-      ) : (
-        <div 
-          className={`border-2 border-dashed rounded-lg p-4 text-center h-32 flex flex-col items-center justify-center cursor-pointer ${
-            img.error ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-gray-50 hover:border-[#E39A65] hover:bg-orange-50'
-          }`}
-          onClick={() => fileInputRefs.current[index]?.click()}
-        >
-          <input 
-            type="file" 
-            ref={el => fileInputRefs.current[index] = el}
-            className="hidden" 
-            accept="image/jpeg,image/jpg,image/png,image/webp" 
-            onChange={(e) => handleImageChange(e, index)} 
-          />
-          <ImageIcon className={`w-6 h-6 mx-auto mb-2 ${img.error ? 'text-red-400' : 'text-gray-400'}`} />
-          <p className={`text-xs ${img.error ? 'text-red-600' : 'text-gray-600'}`}>
-            Slot {index + 1}
-          </p>
-          {img.error && (
-            <p className="text-xs text-red-600 mt-1">{img.error}</p>
-          )}
-        </div>
-      )}
-    </div>
-  ))}
-</div>
-      {/* Upload Progress Summary */}
-      {productImages.some(img => img.uploading) && (
-        <div className="mt-4 p-2 bg-blue-50 rounded-lg">
-          <p className="text-xs text-blue-600">
-            Uploading: {productImages.filter(img => img.uploading).length} image(s) remaining...
-          </p>
-        </div>
-      )}
-      
-      {/* Image Count Info */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
-        {productImages.filter(img => img.url !== null).length} of 6 images uploaded
-      </div>
-    </div>
-  </div>
-</div>
             </div>
 
-            {/* Sizes and Colors */}
+            {/* Row 2: Sizes and Colors */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Sizes Card */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -3256,6 +3676,7 @@ const handleDragEnd = () => {
                     Sizes <span className="text-red-500">*</span>
                   </h2>
                 </div>
+                
                 <div className="p-5">
                   {errors.sizes && (
                     <p className="text-xs text-red-600 mb-3 flex items-center gap-1">
@@ -3263,6 +3684,7 @@ const handleDragEnd = () => {
                       {errors.sizes}
                     </p>
                   )}
+                  
                   <div className="space-y-2">
                     {formData.sizes.map((size, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -3284,6 +3706,7 @@ const handleDragEnd = () => {
                         )}
                       </div>
                     ))}
+                    
                     <button
                       type="button"
                       onClick={addSize}
@@ -3296,6 +3719,7 @@ const handleDragEnd = () => {
                 </div>
               </div>
 
+              {/* Colors Card */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -3303,6 +3727,7 @@ const handleDragEnd = () => {
                     Colors <span className="text-red-500">*</span>
                   </h2>
                 </div>
+                
                 <div className="p-5">
                   {errors.colors && (
                     <p className="text-xs text-red-600 mb-3 flex items-center gap-1">
@@ -3310,6 +3735,7 @@ const handleDragEnd = () => {
                       {errors.colors}
                     </p>
                   )}
+                  
                   <div className="space-y-3">
                     {formData.colors.map((color, index) => (
                       <div key={index} className="relative">
@@ -3327,18 +3753,24 @@ const handleDragEnd = () => {
                             </div>
                             <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
                           </div>
+                          
                           {formData.colors.length > 1 && (
                             <button
                               type="button"
                               onClick={() => removeColor(index)}
                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                              title="Remove Color"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
                           )}
                         </div>
+
                         {showColorPicker && currentColorIndex === index && (
-                          <div ref={colorPickerRef} className="absolute right-0 mt-2 z-50">
+                          <div 
+                            ref={colorPickerRef}
+                            className="absolute right-0 mt-2 z-50"
+                          >
                             <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-3">
                               <SketchPicker
                                 color={color.code}
@@ -3350,6 +3782,7 @@ const handleDragEnd = () => {
                         )}
                       </div>
                     ))}
+                    
                     <button
                       type="button"
                       onClick={addColor}
@@ -3363,7 +3796,7 @@ const handleDragEnd = () => {
               </div>
             </div>
 
-            {/* Additional Information */}
+            {/* Row 3: Additional Information */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3375,6 +3808,7 @@ const handleDragEnd = () => {
                     Add custom fields for extra product details
                   </p>
                 </div>
+                
                 <div className="p-5">
                   <div className="space-y-4">
                     {formData.additionalInfo.map((info, index) => (
@@ -3382,27 +3816,31 @@ const handleDragEnd = () => {
                         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Type className="w-3 h-3 inline mr-1" />
-                              Field Name
+                              <div className="flex items-center gap-1">
+                                <Type className="w-3 h-3" />
+                                Field Name
+                              </div>
                             </label>
                             <input
                               type="text"
                               value={info.fieldName}
                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldName', e.target.value)}
-                              placeholder="e.g., Material Care"
+                              placeholder="e.g., Material Care, Country, Warranty"
                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                              <Hash className="w-3 h-3 inline mr-1" />
-                              Field Value
+                              <div className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                Field Value
+                              </div>
                             </label>
                             <input
                               type="text"
                               value={info.fieldValue}
                               onChange={(e) => handleAdditionalInfoChange(index, 'fieldValue', e.target.value)}
-                              placeholder="e.g., Machine Wash"
+                              placeholder="e.g., Machine Wash, Bangladesh, 2 Years"
                               className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
@@ -3416,20 +3854,47 @@ const handleDragEnd = () => {
                         </button>
                       </div>
                     ))}
+                    
                     <button
                       type="button"
                       onClick={addAdditionalInfo}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-[#E39A65] border-2 border-dashed border-[#E39A65]/30 rounded-lg hover:bg-orange-50 hover:border-[#E39A65] transition-colors"
                     >
                       <PlusCircle className="w-4 h-4" />
                       Add Additional Information
                     </button>
+
+                    {formData.additionalInfo.length === 0 && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p className="text-xs font-medium text-blue-800 mb-2">Suggested fields:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {['Care Instructions', 'Country of Origin', 'Warranty', 'Material Composition', 'Season', 'Occasion'].map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  additionalInfo: [
+                                    ...prev.additionalInfo,
+                                    { fieldName: suggestion, fieldValue: '' }
+                                  ]
+                                }));
+                              }}
+                              className="px-2 py-1 text-xs bg-white text-blue-700 rounded-full border border-blue-300 hover:bg-blue-100 transition-colors"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Product Promotion */}
+            {/* Row: Featured & Tags */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3437,7 +3902,11 @@ const handleDragEnd = () => {
                     <Star className="w-5 h-5 text-[#E39A65]" />
                     Product Promotion
                   </h2>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Mark as featured and add tags to highlight your product
+                  </p>
                 </div>
+                
                 <div className="p-5">
                   <div className="mb-4">
                     <label className="flex items-center gap-3 cursor-pointer">
@@ -3448,7 +3917,7 @@ const handleDragEnd = () => {
                           setFormData({ ...formData, isFeatured: e.target.checked });
                           setShowTags(e.target.checked);
                         }}
-                        className="w-5 h-5 text-[#E39A65] border-gray-300 rounded"
+                        className="w-5 h-5 text-[#E39A65] border-gray-300 rounded focus:ring-[#E39A65]"
                       />
                       <div>
                         <span className="text-sm font-medium text-gray-700">Mark as Featured Product</span>
@@ -3468,6 +3937,7 @@ const handleDragEnd = () => {
                       </div>
                       <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showTags ? 'rotate-180' : ''}`} />
                     </div>
+
                     {showTags && (
                       <div className="mt-3">
                         <p className="text-xs text-gray-500 mb-2">Select one tag (optional)</p>
@@ -3479,16 +3949,20 @@ const handleDragEnd = () => {
                                 name="productTag"
                                 checked={formData.tags.includes(tag)}
                                 onChange={() => handleTagToggle(tag)}
-                                className="w-4 h-4 text-[#E39A65] border-gray-300"
+                                className="w-4 h-4 text-[#E39A65] border-gray-300 focus:ring-[#E39A65]"
                               />
                               <span className="text-sm text-gray-600">{tag}</span>
                             </label>
                           ))}
                         </div>
+                        
                         {formData.tags.length > 0 && (
                           <div className="mt-4 flex flex-wrap gap-2">
                             {formData.tags.map(tag => (
-                              <span key={tag} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                              <span
+                                key={tag}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800"
+                              >
                                 {tag}
                                 <button
                                   type="button"
@@ -3508,7 +3982,7 @@ const handleDragEnd = () => {
               </div>
             </div>
 
-            {/* Meta Settings */}
+            {/* Row: Meta Settings (SEO) */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3522,12 +3996,18 @@ const handleDragEnd = () => {
                     </h2>
                     <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showMeta ? 'rotate-180' : ''}`} />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Optimize your product for search engines
+                  </p>
                 </div>
+                
                 {showMeta && (
                   <div className="p-5">
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Title
+                        </label>
                         <input
                           type="text"
                           value={formData.metaSettings.metaTitle}
@@ -3543,7 +4023,9 @@ const handleDragEnd = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Description
+                        </label>
                         <textarea
                           value={formData.metaSettings.metaDescription}
                           onChange={(e) => handleMetaChange('metaDescription', e.target.value)}
@@ -3559,19 +4041,30 @@ const handleDragEnd = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Meta Keywords
+                        </label>
+                        
                         {formData.metaSettings.metaKeywords?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                             {formData.metaSettings.metaKeywords.map((keyword, index) => (
-                              <span key={index} className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                              >
                                 {keyword}
-                                <button type="button" onClick={() => removeKeyword(index)} className="ml-1.5 text-blue-600 hover:text-blue-800">
+                                <button
+                                  type="button"
+                                  onClick={() => removeKeyword(index)}
+                                  className="ml-1.5 text-blue-600 hover:text-blue-800"
+                                >
                                   <X className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
                           </div>
                         )}
+                        
                         <div className="relative">
                           <input
                             type="text"
@@ -3599,7 +4092,7 @@ const handleDragEnd = () => {
               </div>
             </div>
 
-            {/* Bulk Pricing */}
+            {/* Row 4: Bulk Pricing */}
             <div className="mb-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="p-5 border-b border-gray-200">
@@ -3608,6 +4101,7 @@ const handleDragEnd = () => {
                     Bulk Pricing
                   </h2>
                 </div>
+                
                 <div className="p-5 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -3625,6 +4119,7 @@ const handleDragEnd = () => {
                       />
                       {errors.moq && <p className="text-xs text-red-600 mt-1">{errors.moq}</p>}
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Price Per Unit ($) <span className="text-red-500">*</span>
@@ -3637,6 +4132,7 @@ const handleDragEnd = () => {
                         onWheel={(e) => e.target.blur()}
                         min="0"
                         step="0.01"
+                        placeholder="0.00"
                         className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                       />
                       {errors.pricePerUnit && <p className="text-xs text-red-600 mt-1">{errors.pricePerUnit}</p>}
@@ -3645,7 +4141,9 @@ const handleDragEnd = () => {
 
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <label className="block text-sm font-medium text-gray-700">Quantity Based Pricing:</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Quantity Based Pricing:
+                      </label>
                       <button
                         type="button"
                         onClick={addPricingRow}
@@ -3655,11 +4153,14 @@ const handleDragEnd = () => {
                         Add Tier
                       </button>
                     </div>
+                    
                     <div className="space-y-4">
                       {formData.quantityBasedPricing.map((tier, index) => (
                         <div key={index} className="flex items-start gap-3">
                           <div className="w-1/2">
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Quantity Range</label>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              Quantity Range
+                            </label>
                             <input
                               type="text"
                               value={tier.range}
@@ -3668,8 +4169,11 @@ const handleDragEnd = () => {
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
+                          
                           <div className="w-1/2">
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Price ($)</label>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                              Price ($)
+                            </label>
                             <input
                               type="number"
                               value={tier.price}
@@ -3681,12 +4185,14 @@ const handleDragEnd = () => {
                               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition"
                             />
                           </div>
+                          
                           {formData.quantityBasedPricing.length > 1 && (
                             <div className="flex items-end h-[62px]">
                               <button
                                 type="button"
                                 onClick={() => removePricingRow(index)}
                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Remove Tier"
                               >
                                 <MinusCircle className="w-5 h-5" />
                               </button>

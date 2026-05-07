@@ -1509,12 +1509,16 @@ const fetchChildSubcategories = async (categoryId, subcategoryId) => {
   };
 
   const handleEdit = (productId) => {
-    router.push(`/moderator/editProduct?id=${productId}`);
+      window.open(`/moderator/editProduct?id=${productId}`, '_blank');
   };
 
-  const handleView = (productId) => {
-    router.push(`/moderator/productDetails?id=${productId}`);
+    const handleView = (productId) => {
+      window.open(`/moderator/productDetails?id=${productId}`, '_blank');
   };
+
+  // const handleView = (productId) => {
+  //   router.push(`/moderator/productDetails?id=${productId}`);
+  // };
 
   const getActiveFilterCount = () => {
     let count = 0;

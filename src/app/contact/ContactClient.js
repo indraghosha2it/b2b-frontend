@@ -138,21 +138,21 @@ useEffect(() => {
     },
     {
       name: 'Customer Support',
-      email: 'support@asianclothify.com',
+      email: 'info@asianclothify.com',
       phone: '01305-785686',
      
       icon: <FaHeadset />
     },
     {
       name: 'Export & Shipping',
-      email: 'export@asianclothify.com',
+      email: 'sales@asianclothify.com',
       phone: '01305-785687',
    
       icon: <FaTruck />
     },
     {
       name: 'Quality Control',
-      email: 'quality@asianclothify.com',
+      email: 'info@asianclothify.com',
       phone: '01305-785688',
    
       icon: <FaShieldAlt />

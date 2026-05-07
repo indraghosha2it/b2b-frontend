@@ -1,6 +1,4 @@
 
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -23,7 +21,8 @@
 //   Type,
 //   Globe,
 //   ImagePlus,
-//   Video
+//   Video,
+//   Youtube
 // } from 'lucide-react';
 // import NextLink from 'next/link';
 // import { toast } from 'sonner';
@@ -50,7 +49,7 @@
 //   { value: 'others', label: 'Others', icon: '📌' }
 // ];
 
-// // Cloudinary upload function
+// // Cloudinary upload function for images
 // const uploadToCloudinary = async (file, folder = 'blogs') => {
 //   const formData = new FormData();
 //   formData.append('file', file);
@@ -81,36 +80,38 @@
 //   }
 // };
 
-// // Cloudinary video upload function
-// const uploadVideoToCloudinary = async (file) => {
-//   const formData = new FormData();
-//   formData.append('file', file);
-//   formData.append('upload_preset', 'b2b-products');
-//   formData.append('folder', 'blogs/videos');
-//   formData.append('resource_type', 'video');
+// // YouTube helper functions
+// const getYouTubeVideoId = (url) => {
+//   if (!url) return null;
   
-//   try {
-//     const response = await fetch(
-//       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
-//       {
-//         method: 'POST',
-//         body: formData,
-//       }
-//     );
-    
-//     const data = await response.json();
-//     if (data.secure_url) {
-//       return {
-//         url: data.secure_url,
-//         publicId: data.public_id,
-//       };
-//     } else {
-//       throw new Error('Upload failed');
+//   const patterns = [
+//     /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/\s]+)/,
+//     /youtube\.com\/embed\/([^/?]+)/,
+//     /youtube\.com\/v\/([^/?]+)/,
+//     /youtube\.com\/shorts\/([^/?]+)/
+//   ];
+  
+//   for (const pattern of patterns) {
+//     const match = url.match(pattern);
+//     if (match && match[1]) {
+//       return match[1];
 //     }
-//   } catch (error) {
-//     console.error('Cloudinary video upload error:', error);
-//     throw error;
 //   }
+//   return null;
+// };
+
+// const getYouTubeThumbnail = (videoId) => {
+//   if (!videoId) return null;
+//   return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+// };
+
+// const validateYoutubeUrl = (url) => {
+//   if (!url) return { valid: true, error: null };
+//   const videoId = getYouTubeVideoId(url);
+//   return { 
+//     valid: !!videoId, 
+//     error: videoId ? null : 'Please enter a valid YouTube URL'
+//   };
 // };
 
 // // ========== PARAGRAPH SECTION COMPONENT ==========
@@ -219,53 +220,8 @@
 //           )}
 //         </div>
 
-//         {/* Section Image (Optional) */}
-//         <div>
-//           <label className="block text-sm font-medium text-gray-600 mb-1.5">
-//             Section Image (Optional)
-//           </label>
-//           {paragraph.imagePreview ? (
-//             <div className="relative rounded-lg overflow-hidden border border-gray-200">
-//               <img 
-//                 src={paragraph.imagePreview} 
-//                 alt={`Section ${index + 1}`} 
-//                 className="w-full h-32 object-cover"
-//               />
-//               {paragraph.imageUploading && (
-//                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-//                   <Loader2 className="w-6 h-6 text-white animate-spin" />
-//                 </div>
-//               )}
-//               <button
-//                 type="button"
-//                 onClick={() => onUpdate(index, 'imageFile', null)}
-//                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                 disabled={paragraph.imageUploading}
-//               >
-//                 <X className="w-3 h-3" />
-//               </button>
-//             </div>
-//           ) : (
-//             <div className="flex items-center gap-2">
-//               <input
-//                 type="file"
-//                 ref={imageInputRef}
-//                 className="hidden"
-//                 accept="image/jpeg,image/jpg,image/png,image/webp"
-//                 onChange={handleImageUpload}
-//               />
-//               <button
-//                 type="button"
-//                 onClick={() => imageInputRef.current?.click()}
-//                 className="flex items-center gap-2 px-3 py-2 text-sm text-[#E39A65] border border-dashed border-[#E39A65] rounded-lg hover:bg-orange-50 transition-colors"
-//                 disabled={paragraph.imageUploading}
-//               >
-//                 <ImagePlus className="w-4 h-4" />
-//                 {paragraph.imageUploading ? 'Uploading...' : 'Add Image'}
-//               </button>
-//             </div>
-//           )}
-//         </div>
+    
+    
 //       </div>
 //     </div>
 //   );
@@ -283,7 +239,6 @@
   
 //   // Refs for file inputs
 //   const featuredImageRef = useRef(null);
-//   const videoInputRef = useRef(null);
 
 //   // Form state
 //   const [formData, setFormData] = useState({
@@ -313,16 +268,13 @@
 //     existingPublicId: null
 //   });
 
-//   // Video state with Cloudinary URL
-//   const [videoFile, setVideoFile] = useState({
-//     file: null,
-//     preview: null,
-//     url: null,
-//     publicId: null,
-//     uploading: false,
+//   // YouTube video state
+//   const [youtubeVideo, setYoutubeVideo] = useState({
+//     url: '',
+//     videoId: null,
+//     thumbnail: null,
 //     error: '',
-//     existingUrl: null,
-//     existingPublicId: null
+//     existingVideo: null
 //   });
 
 //   // Thumbnail images state
@@ -338,9 +290,7 @@
 
 //   // Allowed file types
 //   const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-//   const allowedVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo'];
 //   const maxImageSize = 5 * 1024 * 1024; // 5MB
-//   const maxVideoSize = 50 * 1024 * 1024; // 50MB
 
 //   // Set mounted state
 //   useEffect(() => {
@@ -426,17 +376,14 @@
 //             });
 //           }
 
-//           // Set video if exists
-//           if (blog.videoUrl) {
-//             setVideoFile({
-//               file: null,
-//               preview: blog.videoUrl,
-//               url: blog.videoUrl,
-//               publicId: blog.videoPublicId,
-//               uploading: false,
+//           // Set YouTube video if exists
+//           if (blog.youtubeVideo && blog.youtubeVideo.videoId) {
+//             setYoutubeVideo({
+//               url: blog.youtubeVideo.url,
+//               videoId: blog.youtubeVideo.videoId,
+//               thumbnail: blog.youtubeVideo.thumbnail,
 //               error: '',
-//               existingUrl: blog.videoUrl,
-//               existingPublicId: blog.videoPublicId
+//               existingVideo: blog.youtubeVideo
 //             });
 //           }
 
@@ -517,45 +464,39 @@
 //     return { valid: true };
 //   };
 
-//   // Validate video file
-//   const validateVideoFile = (file) => {
-//     const fileExtension = file.name.split('.').pop().toLowerCase();
-//     const allowedExtensions = ['mp4', 'webm', 'mov', 'avi', 'mpeg', 'mkv'];
+//   // YouTube URL handler
+//   const handleYoutubeUrlChange = (e) => {
+//     const url = e.target.value;
+//     const validation = validateYoutubeUrl(url);
     
-//     if (!allowedExtensions.includes(fileExtension)) {
-//       return {
-//         valid: false,
-//         message: `Invalid format: .${fileExtension}. Allowed: ${allowedExtensions.join(', ')}`
-//       };
+//     if (validation.valid && url) {
+//       const videoId = getYouTubeVideoId(url);
+//       setYoutubeVideo({
+//         url,
+//         videoId,
+//         thumbnail: getYouTubeThumbnail(videoId),
+//         error: '',
+//         existingVideo: null
+//       });
+//     } else {
+//       setYoutubeVideo({
+//         url,
+//         videoId: null,
+//         thumbnail: null,
+//         error: validation.error || '',
+//         existingVideo: null
+//       });
 //     }
+//   };
 
-//     if (file.type) {
-//       const allowedMimeTypes = [
-//         'video/mp4', 
-//         'video/webm', 
-//         'video/quicktime', 
-//         'video/x-msvideo', 
-//         'video/mpeg',
-//         'video/x-matroska'
-//       ];
-      
-//       if (!allowedMimeTypes.includes(file.type)) {
-//         return {
-//           valid: false,
-//           message: `Invalid video type: ${file.type}. Allowed: MP4, WebM, MOV, AVI, MPEG`
-//         };
-//       }
-//     }
-
-//     if (file.size > maxVideoSize) {
-//       const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-//       return {
-//         valid: false,
-//         message: `Video too large: ${fileSizeMB}MB. Max: 50MB`
-//       };
-//     }
-
-//     return { valid: true };
+//   const removeYoutubeVideo = () => {
+//     setYoutubeVideo({
+//       url: '',
+//       videoId: null,
+//       thumbnail: null,
+//       error: '',
+//       existingVideo: null
+//     });
 //   };
 
 //   // ========== FEATURED IMAGE HANDLERS ==========
@@ -613,65 +554,6 @@
 //     setFeaturedImage({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '', existingUrl: null, existingPublicId: null });
 //     if (featuredImageRef.current) {
 //       featuredImageRef.current.value = '';
-//     }
-//   };
-
-//   // ========== VIDEO HANDLERS ==========
-
-//   const handleVideoChange = async (e) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
-
-//     const validation = validateVideoFile(file);
-//     if (!validation.valid) {
-//       setVideoFile(prev => ({ ...prev, error: validation.message }));
-//       toast.error(validation.message);
-//       return;
-//     }
-
-//     const videoUrl = URL.createObjectURL(file);
-//     setVideoFile({
-//       file,
-//       preview: videoUrl,
-//       url: null,
-//       publicId: null,
-//       uploading: true,
-//       error: '',
-//       existingUrl: null,
-//       existingPublicId: null
-//     });
-
-//     try {
-//       const { url, publicId } = await uploadVideoToCloudinary(file);
-//       setVideoFile({
-//         file,
-//         preview: videoUrl,
-//         url,
-//         publicId,
-//         uploading: false,
-//         error: '',
-//         existingUrl: null,
-//         existingPublicId: null
-//       });
-//       toast.success('Video uploaded successfully');
-//     } catch (error) {
-//       console.error('Upload error:', error);
-//       setVideoFile(prev => ({
-//         ...prev,
-//         uploading: false,
-//         error: 'Failed to upload video'
-//       }));
-//       toast.error('Failed to upload video');
-//     }
-//   };
-
-//   const removeVideo = () => {
-//     if (videoFile.preview && videoFile.preview.startsWith('blob:')) {
-//       URL.revokeObjectURL(videoFile.preview);
-//     }
-//     setVideoFile({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '', existingUrl: null, existingPublicId: null });
-//     if (videoInputRef.current) {
-//       videoInputRef.current.value = '';
 //     }
 //   };
 
@@ -891,7 +773,7 @@
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 
-//     if (featuredImage.uploading || videoFile.uploading || newThumbnailImages.some(img => img.uploading)) {
+//     if (featuredImage.uploading || newThumbnailImages.some(img => img.uploading)) {
 //       toast.error('Please wait for all uploads to complete');
 //       return;
 //     }
@@ -925,9 +807,12 @@
 //       const featuredImageUrl = featuredImage.url || featuredImage.existingUrl;
 //       const featuredImagePublicId = featuredImage.publicId || featuredImage.existingPublicId;
 
-//       // Get video URL (new or existing)
-//       const videoUrl = videoFile.url || videoFile.existingUrl;
-//       const videoPublicId = videoFile.publicId || videoFile.existingPublicId;
+//       // Process YouTube video (new or existing)
+//       const youtubeVideoData = youtubeVideo.videoId ? {
+//         url: youtubeVideo.url,
+//         videoId: youtubeVideo.videoId,
+//         thumbnail: youtubeVideo.thumbnail
+//       } : null;
 
 //       // Process thumbnail images
 //       const existingThumbnailsToKeep = existingThumbnails.map(thumb => ({
@@ -959,8 +844,7 @@
 //         metaKeywords: formData.metaKeywords || '',
 //         featuredImageUrl,
 //         featuredImagePublicId,
-//         videoUrl: videoUrl || null,
-//         videoPublicId: videoPublicId || null,
+//         youtubeVideo: youtubeVideoData,
 //         thumbnailImages: allThumbnails,
 //         imagesToDelete: thumbnailsToDelete
 //       };
@@ -1215,7 +1099,7 @@
 //                 </div>
 //               </div>
 
-//               {/* Right Column - Images */}
+//               {/* Right Column - Images & Video */}
 //               <div className="space-y-6">
 //                 {/* Featured Image (Required) */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -1286,63 +1170,111 @@
 //                   </div>
 //                 </div>
 
-//                 {/* Video Upload (Optional) */}
+//                 {/* YouTube Video (Optional) */}
 //                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
 //                   <div className="p-5 border-b border-gray-200">
 //                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-//                       <Video className="w-5 h-5 text-[#E39A65]" />
-//                       Video (Optional)
+//                       <Youtube className="w-5 h-5 text-red-600" />
+//                       YouTube Video (Optional)
 //                     </h2>
-//                     <p className="text-xs text-gray-500 mt-1">Upload a video to accompany your blog post (MP4, WebM, MOV - max 50MB)</p>
+//                     <p className="text-xs text-gray-500 mt-1">Add or update YouTube video for your blog post</p>
 //                   </div>
                   
 //                   <div className="p-5">
-//                     {!videoFile.preview ? (
-//                       <div 
-//                         className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-colors cursor-pointer hover:border-[#E39A65] hover:bg-orange-50"
-//                         onClick={() => videoInputRef.current?.click()}
-//                       >
-//                         <input 
-//                           type="file" 
-//                           ref={videoInputRef}
-//                           className="hidden" 
-//                           accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/mpeg,.mp4,.webm,.mov,.avi,.mpeg" 
-//                           onChange={handleVideoChange} 
-//                         />
-//                         <Video className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-//                         <p className="text-sm font-medium text-gray-600">
-//                           Click to upload video
-//                         </p>
-//                         <p className="text-xs text-gray-500 mt-1">
-//                           MP4, WebM, MOV up to 50MB
-//                         </p>
-//                       </div>
-//                     ) : (
-//                       <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-900">
-//                         <video 
-//                           src={videoFile.preview} 
-//                           controls
-//                           className="w-full h-auto max-h-64"
-//                         >
-//                           Your browser does not support the video tag.
-//                         </video>
-//                         {videoFile.uploading && (
-//                           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-//                             <Loader2 className="w-6 h-6 text-white animate-spin" />
+//                     {/* Show existing video if present */}
+//                     {youtubeVideo.existingVideo && !youtubeVideo.videoId && (
+//                       <div className="mb-4">
+//                         <p className="text-xs font-medium text-gray-600 mb-2">Current video:</p>
+//                         <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-900">
+//                           <div className="relative pb-[56.25%] h-0">
+//                             <iframe
+//                               src={`https://www.youtube.com/embed/${youtubeVideo.existingVideo.videoId}`}
+//                               title="YouTube video player"
+//                               frameBorder="0"
+//                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+//                               allowFullScreen
+//                               className="absolute top-0 left-0 w-full h-full"
+//                             ></iframe>
 //                           </div>
-//                         )}
+//                           <button
+//                             type="button"
+//                             onClick={removeYoutubeVideo}
+//                             className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+//                           >
+//                             <X className="w-4 h-4" />
+//                           </button>
+//                         </div>
+//                       </div>
+//                     )}
+
+//                     {/* YouTube URL Input */}
+//                     {!youtubeVideo.videoId && (
+//                       <div className="space-y-3">
+//                         <div>
+//                           <label className="block text-sm font-medium text-gray-700 mb-1">
+//                             YouTube URL
+//                           </label>
+//                           <input
+//                             type="text"
+//                             value={youtubeVideo.url}
+//                             onChange={handleYoutubeUrlChange}
+//                             placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
+//                             className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-[#E39A65] focus:border-transparent outline-none transition ${
+//                               youtubeVideo.error ? 'border-red-500' : 'border-gray-300'
+//                             }`}
+//                           />
+//                           {youtubeVideo.error && (
+//                             <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+//                               <AlertCircle className="w-3 h-3" />
+//                               {youtubeVideo.error}
+//                             </p>
+//                           )}
+//                           {!youtubeVideo.error && youtubeVideo.url && (
+//                             <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+//                               ✓ Valid YouTube URL
+//                             </p>
+//                           )}
+//                         </div>
+                        
+//                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+//                           <Youtube className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+//                           <p className="text-sm font-medium text-gray-600">
+//                             Enter a YouTube URL above to add or replace video
+//                           </p>
+//                           <p className="text-xs text-gray-500 mt-1">
+//                             Supports YouTube links, shorts, and embed URLs
+//                           </p>
+//                           <div className="mt-3 text-xs text-gray-400">
+//                             <p>Examples:</p>
+//                             <p>• https://www.youtube.com/watch?v=...</p>
+//                             <p>• https://youtu.be/...</p>
+//                             <p>• https://www.youtube.com/shorts/...</p>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     )}
+
+//                     {/* Show new video preview */}
+//                     {youtubeVideo.videoId && (
+//                       <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-900">
+//                         <div className="relative pb-[56.25%] h-0">
+//                           <iframe
+//                             src={`https://www.youtube.com/embed/${youtubeVideo.videoId}`}
+//                             title="YouTube video player"
+//                             frameBorder="0"
+//                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+//                             allowFullScreen
+//                             className="absolute top-0 left-0 w-full h-full"
+//                           ></iframe>
+//                         </div>
 //                         <button
 //                           type="button"
-//                           onClick={removeVideo}
-//                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-//                           disabled={videoFile.uploading}
+//                           onClick={removeYoutubeVideo}
+//                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
 //                         >
 //                           <X className="w-4 h-4" />
 //                         </button>
 //                       </div>
-//                     )}
-//                     {videoFile.error && (
-//                       <p className="text-xs text-red-600 mt-2">{videoFile.error}</p>
 //                     )}
 //                   </div>
 //                 </div>
@@ -1629,7 +1561,6 @@
 //   );
 // }
 
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -1653,7 +1584,8 @@ import {
   Globe,
   ImagePlus,
   Video,
-  Youtube
+  Youtube,
+  GripVertical
 } from 'lucide-react';
 import NextLink from 'next/link';
 import { toast } from 'sonner';
@@ -1775,6 +1707,13 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
     onImageUpload(index, file);
   };
 
+  // Sync editor content when paragraph.description changes
+  useEffect(() => {
+    if (editor && paragraph.description !== editor.getHTML()) {
+      editor.commands.setContent(paragraph.description);
+    }
+  }, [paragraph.description, editor]);
+
   return (
     <div className="p-5 bg-gray-50 rounded-lg border border-gray-200">
       <div className="flex items-center justify-between mb-4">
@@ -1850,9 +1789,6 @@ const ParagraphSection = ({ index, paragraph, onUpdate, onRemove, onImageUpload,
             <p className="text-xs text-red-600 mt-1">{errors[`paragraph_${index}_description`]}</p>
           )}
         </div>
-
-    
-    
       </div>
     </div>
   );
@@ -1867,6 +1803,10 @@ export default function AdminEditBlog() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  
+  // Drag and drop state for thumbnails
+  const [draggedThumbnailIndex, setDraggedThumbnailIndex] = useState(null);
+  const [dragOverThumbnailIndex, setDragOverThumbnailIndex] = useState(null);
   
   // Refs for file inputs
   const featuredImageRef = useRef(null);
@@ -1887,7 +1827,7 @@ export default function AdminEditBlog() {
     metaKeywords: ''
   });
 
-  // Featured image state with Cloudinary URL
+  // Featured image state with abort support
   const [featuredImage, setFeaturedImage] = useState({
     file: null,
     preview: null,
@@ -1896,7 +1836,9 @@ export default function AdminEditBlog() {
     uploading: false,
     error: '',
     existingUrl: null,
-    existingPublicId: null
+    existingPublicId: null,
+    uploadAborted: false,
+    uploadId: null
   });
 
   // YouTube video state
@@ -1908,9 +1850,8 @@ export default function AdminEditBlog() {
     existingVideo: null
   });
 
-  // Thumbnail images state
-  const [newThumbnailImages, setNewThumbnailImages] = useState([]);
-  const [existingThumbnails, setExistingThumbnails] = useState([]);
+  // Unified thumbnail images state with drag & drop support
+  const [allThumbnails, setAllThumbnails] = useState([]);
   const [thumbnailsToDelete, setThumbnailsToDelete] = useState([]);
 
   // Errors state
@@ -1920,7 +1861,6 @@ export default function AdminEditBlog() {
   const [tagInput, setTagInput] = useState('');
 
   // Allowed file types
-  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const maxImageSize = 5 * 1024 * 1024; // 5MB
 
   // Set mounted state
@@ -2003,7 +1943,9 @@ export default function AdminEditBlog() {
               uploading: false,
               error: '',
               existingUrl: blog.featuredImage,
-              existingPublicId: blog.featuredImagePublicId
+              existingPublicId: blog.featuredImagePublicId,
+              uploadAborted: false,
+              uploadId: null
             });
           }
 
@@ -2018,9 +1960,18 @@ export default function AdminEditBlog() {
             });
           }
 
-          // Set thumbnail images
+          // Set thumbnail images into unified list
           if (blog.thumbnailImages && blog.thumbnailImages.length > 0) {
-            setExistingThumbnails(blog.thumbnailImages);
+            const existingWithType = blog.thumbnailImages.map((thumb, idx) => ({
+              id: `existing_${idx}_${thumb.publicId}`,
+              url: thumb.url,
+              publicId: thumb.publicId,
+              preview: thumb.url,
+              uploading: false,
+              isNew: false,
+              uploadAborted: false
+            }));
+            setAllThumbnails(existingWithType);
           }
         } else {
           toast.error(data.error || 'Failed to fetch blog');
@@ -2143,6 +2094,8 @@ export default function AdminEditBlog() {
     }
 
     const previewUrl = URL.createObjectURL(file);
+    const uploadId = Date.now();
+    
     setFeaturedImage({
       file,
       preview: previewUrl,
@@ -2151,108 +2104,203 @@ export default function AdminEditBlog() {
       uploading: true,
       error: '',
       existingUrl: null,
-      existingPublicId: null
+      existingPublicId: null,
+      uploadAborted: false,
+      uploadId: uploadId
     });
 
     try {
       const { url, publicId } = await uploadToCloudinary(file, 'blogs/featured');
-      setFeaturedImage({
-        file,
-        preview: previewUrl,
-        url,
-        publicId,
-        uploading: false,
-        error: '',
-        existingUrl: null,
-        existingPublicId: null
+      
+      setFeaturedImage(prev => {
+        if (prev.uploadAborted || prev.uploadId !== uploadId) {
+          if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          return prev;
+        }
+        toast.success('Featured image uploaded successfully');
+        return {
+          ...prev,
+          url,
+          publicId,
+          uploading: false,
+          error: ''
+        };
       });
-      toast.success('Featured image uploaded successfully');
     } catch (error) {
       console.error('Upload error:', error);
-      setFeaturedImage(prev => ({
-        ...prev,
-        uploading: false,
-        error: 'Failed to upload image'
-      }));
-      toast.error('Failed to upload featured image');
+      setFeaturedImage(prev => {
+        if (prev.uploadAborted || prev.uploadId !== uploadId) {
+          if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl);
+          }
+          return prev;
+        }
+        toast.error('Failed to upload featured image');
+        return {
+          ...prev,
+          uploading: false,
+          error: 'Failed to upload image'
+        };
+      });
     }
   };
 
   const removeFeaturedImage = () => {
-    if (featuredImage.preview && featuredImage.preview.startsWith('blob:')) {
-      URL.revokeObjectURL(featuredImage.preview);
+    const currentPreview = featuredImage.preview;
+    
+    setFeaturedImage(prev => ({ 
+      ...prev, 
+      uploadAborted: true, 
+      uploading: false
+    }));
+    
+    if (currentPreview && currentPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(currentPreview);
     }
-    setFeaturedImage({ file: null, preview: null, url: null, publicId: null, uploading: false, error: '', existingUrl: null, existingPublicId: null });
+    
+    setFeaturedImage({ 
+      file: null, 
+      preview: null, 
+      url: null, 
+      publicId: null, 
+      uploading: false, 
+      error: '', 
+      existingUrl: null, 
+      existingPublicId: null,
+      uploadAborted: false,
+      uploadId: null
+    });
+    
     if (featuredImageRef.current) {
       featuredImageRef.current.value = '';
     }
+    
+    toast.info('Featured image removed');
   };
 
-  // ========== THUMBNAIL IMAGES HANDLERS ==========
+  // ========== THUMBNAIL IMAGES HANDLERS WITH DRAG & DROP ==========
   
+  const moveThumbnail = (fromIndex, toIndex) => {
+    const updatedImages = [...allThumbnails];
+    const [movedImage] = updatedImages.splice(fromIndex, 1);
+    updatedImages.splice(toIndex, 0, movedImage);
+    setAllThumbnails(updatedImages);
+  };
+
+  const handleThumbnailDragStart = (index) => {
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDraggedThumbnailIndex(index);
+    }
+  };
+
+  const handleThumbnailDragOver = (event, index) => {
+    event.preventDefault();
+    if (allThumbnails[index] && !allThumbnails[index].uploading) {
+      setDragOverThumbnailIndex(index);
+    }
+  };
+
+  const handleThumbnailDragLeave = () => {
+    setDragOverThumbnailIndex(null);
+  };
+
+  const handleThumbnailDrop = (dropIndex) => {
+    if (draggedThumbnailIndex === null || draggedThumbnailIndex === dropIndex) {
+      setDragOverThumbnailIndex(null);
+      setDraggedThumbnailIndex(null);
+      return;
+    }
+    moveThumbnail(draggedThumbnailIndex, dropIndex);
+    setDraggedThumbnailIndex(null);
+    setDragOverThumbnailIndex(null);
+  };
+
+  const handleThumbnailDragEnd = () => {
+    setDraggedThumbnailIndex(null);
+    setDragOverThumbnailIndex(null);
+  };
+
   const handleThumbnailImagesChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    const validFiles = [];
-    const errorsList = [];
-
-    files.forEach(file => {
+    const batchId = Date.now();
+    const newImagesWithPreview = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
       const validation = validateImageFile(file);
-      if (validation.valid) {
-        validFiles.push(file);
-      } else {
-        errorsList.push(`${file.name}: ${validation.message}`);
+      if (!validation.valid) {
+        toast.error(`Image ${i + 1}: ${validation.message}`);
+        continue;
       }
-    });
-
-    if (errorsList.length > 0) {
-      toast.error(errorsList.join('\n'));
-    }
-
-    if (validFiles.length > 0) {
-      const newImagesWithPreview = validFiles.map(file => ({
+      
+      const previewUrl = URL.createObjectURL(file);
+      newImagesWithPreview.push({
+        id: `${batchId}_${i}_${Math.random().toString(36).substr(2, 9)}`,
         file,
-        preview: URL.createObjectURL(file),
+        preview: previewUrl,
         url: null,
         publicId: null,
         uploading: true,
-        id: Math.random().toString(36).substr(2, 9)
-      }));
-      
-      setNewThumbnailImages(prev => [...prev, ...newImagesWithPreview]);
+        isNew: true,
+        uploadAborted: false,
+        uploadBatchId: batchId
+      });
+    }
+    
+    if (newImagesWithPreview.length === 0) {
+      toast.error('No valid images to upload');
+      e.target.value = '';
+      return;
+    }
+    
+    setAllThumbnails(prev => [...prev, ...newImagesWithPreview]);
 
-      for (const img of newImagesWithPreview) {
-        try {
-          const { url, publicId } = await uploadToCloudinary(img.file, 'blogs/thumbnails');
-          setNewThumbnailImages(prev => prev.map(item => 
-            item.id === img.id ? { ...item, url, publicId, uploading: false } : item
-          ));
-        } catch (error) {
-          console.error('Upload error:', error);
-          setNewThumbnailImages(prev => prev.filter(item => item.id !== img.id));
-          toast.error(`Failed to upload ${img.file.name}`);
-        }
+    for (const img of newImagesWithPreview) {
+      try {
+        const { url, publicId } = await uploadToCloudinary(img.file, 'blogs/thumbnails');
+        setAllThumbnails(prev => prev.map(item => 
+          item.id === img.id && !item.uploadAborted 
+            ? { ...item, url, publicId, uploading: false } 
+            : item
+        ));
+        toast.success(`${img.file.name} uploaded successfully`);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setAllThumbnails(prev => prev.filter(item => item.id !== img.id));
+        toast.error(`Failed to upload ${img.file.name}`);
       }
     }
 
     e.target.value = '';
   };
 
-  const removeNewThumbnail = (imageId) => {
-    const imageToRemove = newThumbnailImages.find(img => img.id === imageId);
+  const removeThumbnail = (imageId, isNew, publicId) => {
+    const imageToRemove = allThumbnails.find(img => img.id === imageId);
+    
+    // If it's an existing image (not new), mark for deletion
+    if (!isNew && publicId) {
+      setThumbnailsToDelete(prev => [...prev, publicId]);
+    }
+    
+    // Mark as aborted to prevent success message if upload completes after removal
+    setAllThumbnails(prev => prev.map(img => 
+      img.id === imageId ? { ...img, uploadAborted: true, uploading: false } : img
+    ));
+    
+    // Revoke object URL if it exists (to prevent memory leaks)
     if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
       URL.revokeObjectURL(imageToRemove.preview);
     }
-    setNewThumbnailImages(prev => prev.filter(img => img.id !== imageId));
-  };
-
-  const removeExistingThumbnail = (index, publicId) => {
-    if (publicId) {
-      setThumbnailsToDelete(prev => [...prev, publicId]);
-    }
-    setExistingThumbnails(prev => prev.filter((_, i) => i !== index));
-    toast.info('Thumbnail marked for deletion');
+    
+    // Remove the image from state immediately
+    setAllThumbnails(prev => prev.filter(img => img.id !== imageId));
+    
+    toast.success('Image removed');
   };
 
   // ========== PARAGRAPH HANDLERS ==========
@@ -2404,7 +2452,7 @@ export default function AdminEditBlog() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (featuredImage.uploading || newThumbnailImages.some(img => img.uploading)) {
+    if (featuredImage.uploading || allThumbnails.some(img => img.uploading)) {
       toast.error('Please wait for all uploads to complete');
       return;
     }
@@ -2446,19 +2494,12 @@ export default function AdminEditBlog() {
       } : null;
 
       // Process thumbnail images
-      const existingThumbnailsToKeep = existingThumbnails.map(thumb => ({
-        url: thumb.url,
-        publicId: thumb.publicId
-      }));
-
-      const newThumbnailUrls = newThumbnailImages
-        .filter(img => img.url)
+      const thumbnailsToKeep = allThumbnails
+        .filter(img => img.url !== null && !img.uploading && !img.uploadAborted && !thumbnailsToDelete.includes(img.publicId))
         .map(img => ({
           url: img.url,
           publicId: img.publicId
         }));
-
-      const allThumbnails = [...existingThumbnailsToKeep, ...newThumbnailUrls];
 
       const payload = {
         title: formData.title,
@@ -2476,11 +2517,9 @@ export default function AdminEditBlog() {
         featuredImageUrl,
         featuredImagePublicId,
         youtubeVideo: youtubeVideoData,
-        thumbnailImages: allThumbnails,
+        thumbnailImages: thumbnailsToKeep,
         imagesToDelete: thumbnailsToDelete
       };
-
-      console.log('Submitting payload:', payload);
 
       const response = await fetch(`http://localhost:5000/api/blogs/admin/${blogId}`, {
         method: 'PUT',
@@ -2505,12 +2544,6 @@ export default function AdminEditBlog() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  // Get category icon
-  const getCategoryIcon = (categoryValue) => {
-    const category = BLOG_CATEGORIES.find(c => c.value === categoryValue);
-    return category?.icon || '📌';
   };
 
   if (isLoading) {
@@ -2578,7 +2611,7 @@ export default function AdminEditBlog() {
                   )}
                 </div>
 
-                {/* Author Name - Readonly for admin edit too */}
+                {/* Author Name - Readonly */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center gap-1">
@@ -2766,7 +2799,6 @@ export default function AdminEditBlog() {
                           type="button"
                           onClick={removeFeaturedImage}
                           className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                          disabled={featuredImage.uploading}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -2910,64 +2942,73 @@ export default function AdminEditBlog() {
                   </div>
                 </div>
 
-                {/* Thumbnail Images (Optional) */}
+                {/* Thumbnail Images (Optional) - With Drag & Drop */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200">
                   <div className="p-5 border-b border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <ImagePlus className="w-5 h-5 text-[#E39A65]" />
                       Thumbnail Images
                     </h2>
-                    <p className="text-xs text-gray-500 mt-1">Additional images for gallery (optional)</p>
+                    <p className="text-xs text-gray-500 mt-1">Additional images for gallery • Drag to reorder</p>
                   </div>
                   
                   <div className="p-5">
-                    {/* Existing Thumbnails */}
-                    {existingThumbnails.length > 0 && (
+                    {allThumbnails.length > 0 && (
                       <div className="mb-4">
-                        <p className="text-xs font-medium text-gray-600 mb-2">Current thumbnails:</p>
+                        <p className="text-xs font-medium text-gray-600 mb-2">
+                          Thumbnails ({allThumbnails.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length}):
+                        </p>
                         <div className="grid grid-cols-3 gap-3">
-                          {existingThumbnails.map((thumb, index) => (
-                            <div key={index} className="relative rounded-lg overflow-hidden border border-gray-200 aspect-square">
-                              <img 
-                                src={thumb.url} 
-                                alt="Thumbnail" 
-                                className="w-full h-full object-cover"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => removeExistingThumbnail(index, thumb.publicId)}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* New Thumbnails */}
-                    {newThumbnailImages.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-xs font-medium text-gray-600 mb-2">New thumbnails to add:</p>
-                        <div className="grid grid-cols-3 gap-3">
-                          {newThumbnailImages.map((image) => (
-                            <div key={image.id} className="relative rounded-lg overflow-hidden border border-gray-200 aspect-square">
+                          {allThumbnails.map((image, index) => (
+                            <div
+                              key={image.id}
+                              draggable={!image.uploading}
+                              onDragStart={() => handleThumbnailDragStart(index)}
+                              onDragOver={(e) => handleThumbnailDragOver(e, index)}
+                              onDragLeave={handleThumbnailDragLeave}
+                              onDrop={() => handleThumbnailDrop(index)}
+                              onDragEnd={handleThumbnailDragEnd}
+                              className={`relative rounded-lg overflow-hidden border border-gray-200 aspect-square transition-all duration-200 ${
+                                !image.uploading ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                              } ${
+                                draggedThumbnailIndex === index ? 'opacity-50 scale-95' : ''
+                              } ${
+                                dragOverThumbnailIndex === index && draggedThumbnailIndex !== index && draggedThumbnailIndex !== null 
+                                  ? 'ring-2 ring-[#E39A65] ring-offset-2' 
+                                  : ''
+                              }`}
+                            >
+                              {/* Drag handle */}
+                              {!image.uploading && (
+                                <div className="absolute top-1 left-1 bg-black/50 rounded px-1.5 py-0.5 z-10">
+                                  <GripVertical className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                              
                               <img 
                                 src={image.preview} 
                                 alt="Thumbnail" 
                                 className="w-full h-full object-cover"
                               />
+                              
                               {image.uploading && (
                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                                 </div>
                               )}
+                              
+                              {/* Badge for existing vs new */}
+                              {!image.isNew && !image.uploading && image.url && (
+                                <div className="absolute bottom-1 left-1 bg-green-500/80 text-white text-[8px] px-1.5 py-0.5 rounded z-10">
+                                  Saved
+                                </div>
+                              )}
+                              
+                              {/* Remove button - Always enabled */}
                               <button
                                 type="button"
-                                onClick={() => removeNewThumbnail(image.id)}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                                disabled={image.uploading}
+                                onClick={() => removeThumbnail(image.id, image.isNew, image.publicId)}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-20"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -2995,9 +3036,16 @@ export default function AdminEditBlog() {
                         Click to add more thumbnail images
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        You can select multiple images
+                        You can select multiple images • Drag to reorder
                       </p>
                     </div>
+
+                    {allThumbnails.length > 0 && (
+                      <p className="text-xs text-gray-500 mt-3 text-center">
+                        {allThumbnails.filter(img => img.url !== null && !img.uploading && !img.uploadAborted).length} images
+                        {thumbnailsToDelete.length > 0 && ` (${thumbnailsToDelete.length} marked for deletion)`}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
