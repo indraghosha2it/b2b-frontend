@@ -2435,6 +2435,11 @@ const removeFeaturedImage = () => {
           }))
       };
 
+<<<<<<< HEAD
+=======
+      console.log('Submitting blog payload:', payload);
+
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/blogs', {
         method: 'POST',
         headers: {

@@ -2521,6 +2521,11 @@ export default function ModeratorEditBlog() {
         imagesToDelete: thumbnailsToDelete
       };
 
+<<<<<<< HEAD
+=======
+      console.log('Submitting payload:', payload);
+
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/blogs/admin/${blogId}`, {
         method: 'PUT',
         headers: {

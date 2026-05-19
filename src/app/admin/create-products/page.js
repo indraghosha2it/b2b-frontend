@@ -1064,6 +1064,7 @@
 //       info => info.fieldName.trim() !== '' && info.fieldValue.trim() !== ''
 //     );
 
+<<<<<<< HEAD
 //     const payload = {
 //       productName: formData.productName,
 //       description: formData.description,
@@ -1084,6 +1085,16 @@
 //       tags: formData.tags,
 //       metaSettings: formData.metaSettings
 //     };
+=======
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
+//         method: 'POST',
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(payload)
+//       });
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
 
 //     console.log('Submitting payload:', payload);
 

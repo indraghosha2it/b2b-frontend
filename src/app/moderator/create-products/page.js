@@ -2506,9 +2506,13 @@ export default function ModeratorCreateProduct() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories', {
+<<<<<<< HEAD
         headers: {
           'Authorization': `Bearer ${token}`
         }
+=======
+        headers: { 'Authorization': `Bearer ${token}` }
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
       });
       
       const data = await response.json();
@@ -2568,9 +2572,13 @@ export default function ModeratorCreateProduct() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}`, {
+<<<<<<< HEAD
         headers: {
           'Authorization': `Bearer ${token}`
         }
+=======
+        headers: { 'Authorization': `Bearer ${token}` }
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
       });
       
       const data = await response.json();
@@ -3184,8 +3192,11 @@ export default function ModeratorCreateProduct() {
         metaSettings: formData.metaSettings
       };
 
+<<<<<<< HEAD
       console.log('Submitting payload:', payload);
 
+=======
+>>>>>>> 4ec6bb2d2262c53c7320d53e966bf7be2d6f9ee1
       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/products', {
         method: 'POST',
         headers: {
