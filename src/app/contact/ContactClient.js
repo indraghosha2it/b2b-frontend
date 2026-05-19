@@ -225,7 +225,7 @@ const handleSubmit = async (e) => {
   setFormStatus({ submitted: true, success: false, message: 'Sending...' });
 
   try {
-    const response = await fetch('http://localhost:5000/api/contact', {
+    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/contact', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

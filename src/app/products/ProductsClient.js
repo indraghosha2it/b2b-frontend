@@ -1236,7 +1236,7 @@
 
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await fetch('http://localhost:5000/api/categories');
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
 //       const data = await response.json();
 //       if (data.success) {
 //         setCategories(data.data);
@@ -1251,7 +1251,7 @@
 //   // Add this function after fetchCategories
 // const fetchSubcategories = async (categoryId) => {
 //   try {
-//     const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
+//     const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`);
 //     const data = await response.json();
 //     if (data.success && Array.isArray(data.data.subcategories)) {
 //       setSubcategories(data.data.subcategories);
@@ -1332,7 +1332,7 @@
 //       }
 //       queryParams.append('sort', sortParam);
 
-//       const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -3104,7 +3104,7 @@ export default function ProductsClient() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/categories');
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data);
@@ -3118,7 +3118,7 @@ export default function ProductsClient() {
 
   const fetchSubcategories = async (categoryId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories`);
       const data = await response.json();
       if (data.success && Array.isArray(data.data.subcategories)) {
         setSubcategories(data.data.subcategories);
@@ -3136,7 +3136,7 @@ export default function ProductsClient() {
 
   const fetchChildSubcategories = async (categoryId, subcategoryId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/categories/${categoryId}/subcategories/${subcategoryId}/children`);
       const data = await response.json();
       if (data.success && Array.isArray(data.data.children)) {
         setChildSubcategories(data.data.children);
@@ -3233,7 +3233,7 @@ export default function ProductsClient() {
       }
       queryParams.append('sort', sortParam);
 
-      const response = await fetch(`http://localhost:5000/api/products?${queryParams.toString()}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?${queryParams.toString()}`);
       const data = await response.json();
       
       if (data.success) {

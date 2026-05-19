@@ -13,7 +13,7 @@ export default function SEO({
 }) {
   const siteTitle = "Asian Clothify";
   const fullTitle = title ? `${title} || ${siteTitle}` : siteTitle;
-  const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://asianclothify.com';
   const fullUrl = url ? `${siteUrl}${url}` : siteUrl;
   const ogImage = image || '/og-image.jpg';
 

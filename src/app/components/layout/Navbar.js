@@ -86,7 +86,7 @@ export default function Navbar() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ export default function Navbar() {
 
     setSearchLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
       if (data.success) {
@@ -205,7 +205,7 @@ export default function Navbar() {
   useEffect(() => {
     const testConnection = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/health');
+        const response = await fetch('https://b2b-backend-rosy.vercel.app/api/health');
         const data = await response.json();
         console.log('✅ Backend connection test:', data);
       } catch (error) {
@@ -972,7 +972,7 @@ const isActive = (path) => {
 //       const controller = new AbortController();
 //       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-//       const response = await fetch('http://localhost:5000/api/inquiry-cart', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiry-cart', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
 //           'Content-Type': 'application/json'
@@ -1020,7 +1020,7 @@ const isActive = (path) => {
 
 //     setSearchLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -1092,7 +1092,7 @@ const isActive = (path) => {
 //   useEffect(() => {
 //     const testConnection = async () => {
 //       try {
-//         const response = await fetch('http://localhost:5000/api/health');
+//         const response = await fetch('https://b2b-backend-rosy.vercel.app/api/health');
 //         const data = await response.json();
 //         console.log('✅ Backend connection test:', data);
 //       } catch (error) {

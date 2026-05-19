@@ -454,7 +454,7 @@
 //   const searchProducts = async () => {
 //     setSearching(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
 //       const data = await response.json();
 //       if (data.success) {
 //         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -706,7 +706,7 @@
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -777,7 +777,7 @@
 
 //   const fetchProductDetails = async (productId) => {
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
 //       const data = await response.json();
 //       if (data.success) {
 //         setProductDetails(prev => ({
@@ -1159,7 +1159,7 @@
 
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch('http://localhost:5000/api/upload/company-logo', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/upload/company-logo', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1188,7 +1188,7 @@
 //   const resetToDefaultLogo = () => {
 //     if (isPaid) return;
 //     if (invoiceData.company.logoPublicId) {
-//       fetch(`http://localhost:5000/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
+//       fetch(`https://b2b-backend-rosy.vercel.app/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1394,7 +1394,7 @@
 //         updatedAt: new Date().toISOString()
 //       };
 
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2943,7 +2943,7 @@ const SearchProductModal = ({ isOpen, onClose, onSelectProduct, existingProductI
   const searchProducts = async () => {
     setSearching(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products?search=${encodeURIComponent(searchTerm)}&limit=20`);
       const data = await response.json();
       if (data.success) {
         const filtered = data.data.filter(p => !existingProductIds.includes(p._id));
@@ -3195,7 +3195,7 @@ export default function UpdateInvoicePage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -3266,7 +3266,7 @@ export default function UpdateInvoicePage() {
 
   const fetchProductDetails = async (productId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/products/${productId}`);
       const data = await response.json();
       if (data.success) {
         setProductDetails(prev => ({
@@ -3648,7 +3648,7 @@ export default function UpdateInvoicePage() {
 
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/upload/company-logo', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/upload/company-logo', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -3677,7 +3677,7 @@ export default function UpdateInvoicePage() {
   const resetToDefaultLogo = () => {
     if (isPaid) return;
     if (invoiceData.company.logoPublicId) {
-      fetch(`http://localhost:5000/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
+      fetch(`https://b2b-backend-rosy.vercel.app/api/upload/delete-logo?publicId=${invoiceData.company.logoPublicId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -3883,7 +3883,7 @@ export default function UpdateInvoicePage() {
         updatedAt: new Date().toISOString()
       };
 
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

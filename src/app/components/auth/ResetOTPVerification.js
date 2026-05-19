@@ -89,7 +89,7 @@ const handleSubmit = async (e) => {
   try {
     console.log('📤 Sending password reset OTP verification for:', email);
     
-    const response = await fetch('http://localhost:5000/api/auth/verify-reset-otp', {
+    const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/verify-reset-otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ const handleSubmit = async (e) => {
     const loadingToast = toast.loading('Sending new OTP...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

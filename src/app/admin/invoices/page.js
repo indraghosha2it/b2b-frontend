@@ -404,7 +404,7 @@
 //       }
 
 //       // Build query params - SERVER SIDE PAGINATION like inquiries page
-//       let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+//       let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
       
 //       // Add status filter if not "All" and not showing expired only
 //       if (activeFilter !== 'All' && !showExpiredOnly) {
@@ -570,7 +570,7 @@
 //     setDeletingInvoice(invoiceToDelete._id);
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -608,7 +608,7 @@
 //         updateData.dueAmount = 0;
 //       }
 
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -1529,7 +1529,7 @@ const fetchInvoices = async () => {
     }
 
     // Build query params for paginated invoices
-    let url = `http://localhost:5000/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
+    let url = `https://b2b-backend-rosy.vercel.app/api/invoices?page=${currentPage}&limit=${itemsPerPage}`;
     
     // Add status filter if not "All" and not showing expired only
     // IMPORTANT: When showExpiredOnly is true, we DON'T send any paymentStatus filter
@@ -1714,7 +1714,7 @@ const fetchInvoices = async () => {
     setDeletingInvoice(invoiceToDelete._id);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceToDelete._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1752,7 +1752,7 @@ const fetchInvoices = async () => {
         updateData.dueAmount = 0;
       }
 
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

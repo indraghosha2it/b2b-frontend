@@ -843,7 +843,7 @@
 //       }
 
 //       // Fetch user's inquiries
-//       const inquiriesResponse = await fetch('http://localhost:5000/api/inquiries/my-inquiries', {
+//       const inquiriesResponse = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiries/my-inquiries', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -852,7 +852,7 @@
 //       const inquiriesData = await inquiriesResponse.json();
       
 //       // Fetch user's invoices
-//       const invoicesResponse = await fetch('http://localhost:5000/api/invoices/my-invoices', {
+//       const invoicesResponse = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/my-invoices', {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -945,7 +945,7 @@
 //   const handleCancelInquiry = async (inquiryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/inquiries/${inquiryId}/cancel`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiryId}/cancel`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -967,7 +967,7 @@
 //   const handleAcceptQuote = async (inquiryId) => {
 //     try {
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/inquiries/${inquiryId}/accept`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiryId}/accept`, {
 //         method: 'PUT',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -1003,7 +1003,7 @@
 //       toast.loading('Generating PDF...', { id: 'pdf' });
       
 //       const token = localStorage.getItem('token');
-//       const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}/pdf`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -2146,7 +2146,7 @@ export default function CustomerDashboardPage() {
       }
 
       // Fetch user's inquiries
-      const inquiriesResponse = await fetch('http://localhost:5000/api/inquiries/my-inquiries', {
+      const inquiriesResponse = await fetch('https://b2b-backend-rosy.vercel.app/api/inquiries/my-inquiries', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2155,7 +2155,7 @@ export default function CustomerDashboardPage() {
       const inquiriesData = await inquiriesResponse.json();
       
       // Fetch user's invoices
-      const invoicesResponse = await fetch('http://localhost:5000/api/invoices/my-invoices', {
+      const invoicesResponse = await fetch('https://b2b-backend-rosy.vercel.app/api/invoices/my-invoices', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -2248,7 +2248,7 @@ export default function CustomerDashboardPage() {
   const handleCancelInquiry = async (inquiryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/inquiries/${inquiryId}/cancel`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiryId}/cancel`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2270,7 +2270,7 @@ export default function CustomerDashboardPage() {
   const handleAcceptQuote = async (inquiryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/inquiries/${inquiryId}/accept`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/inquiries/${inquiryId}/accept`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2306,7 +2306,7 @@ export default function CustomerDashboardPage() {
       toast.loading('Generating PDF...', { id: 'pdf' });
       
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/invoices/${invoiceId}/pdf`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/invoices/${invoiceId}/pdf`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

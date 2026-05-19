@@ -46,7 +46,7 @@
 //   const performSearch = async () => {
 //     setLoading(true);
 //     try {
-//       const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
 //       const data = await response.json();
       
 //       if (data.success) {
@@ -574,7 +574,7 @@ function SearchContent() {
   const performSearch = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
       if (data.success) {

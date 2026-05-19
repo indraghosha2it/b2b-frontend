@@ -762,7 +762,7 @@
 
 //       console.log('Submitting blog payload:', payload);
 
-//       const response = await fetch('http://localhost:5000/api/blogs', {
+//       const response = await fetch('https://b2b-backend-rosy.vercel.app/api/blogs', {
 //         method: 'POST',
 //         headers: {
 //           'Authorization': `Bearer ${token}`,
@@ -2426,7 +2426,7 @@ export default function ModeratorCreateBlog() {
           }))
       };
 
-      const response = await fetch('http://localhost:5000/api/blogs', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/blogs', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

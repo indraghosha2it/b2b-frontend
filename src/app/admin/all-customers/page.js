@@ -87,7 +87,7 @@
 //         businessType: selectedBusinessType !== 'all' ? selectedBusinessType : ''
 //       });
 
-//       const response = await fetch(`http://localhost:5000/api/admin/customers?${params}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers?${params}`, {
 //         headers: {
 //           'Authorization': `Bearer ${token}`
 //         }
@@ -126,7 +126,7 @@
 //     try {
 //       const token = localStorage.getItem('token');
       
-//       const response = await fetch(`http://localhost:5000/api/admin/customers/${deleteModal.customerId}`, {
+//       const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers/${deleteModal.customerId}`, {
 //         method: 'DELETE',
 //         headers: {
 //           'Authorization': `Bearer ${token}`
@@ -201,7 +201,7 @@
 //   //   try {
 //   //     const token = localStorage.getItem('token');
       
-//   //     const response = await fetch('http://localhost:5000/api/auth/register', {
+//   //     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/register', {
 //   //       method: 'POST',
 //   //       headers: {
 //   //         'Content-Type': 'application/json',
@@ -306,7 +306,7 @@
 //     const token = localStorage.getItem('token');
     
 //     // CHANGE THIS ENDPOINT to admin-specific endpoint
-//     const response = await fetch('http://localhost:5000/api/auth/admin/create-customer', {
+//     const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/admin/create-customer', {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -1251,7 +1251,7 @@ export default function AllCustomers() {
         businessType: selectedBusinessType !== 'all' ? selectedBusinessType : ''
       });
 
-      const response = await fetch(`http://localhost:5000/api/admin/customers?${params}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1289,7 +1289,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/admin/customers/${deleteModal.customerId}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers/${deleteModal.customerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -1365,7 +1365,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/admin/customers/${editModal.customer._id}`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers/${editModal.customer._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1443,7 +1443,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/admin/customers/${passwordModal.customerId}/reset-password`, {
+      const response = await fetch(`https://b2b-backend-rosy.vercel.app/api/admin/customers/${passwordModal.customerId}/reset-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1525,7 +1525,7 @@ export default function AllCustomers() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/auth/admin/create-customer', {
+      const response = await fetch('https://b2b-backend-rosy.vercel.app/api/auth/admin/create-customer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

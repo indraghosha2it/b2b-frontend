@@ -91,13 +91,13 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://asianclothify.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: "Asian Clothify - Wholesale Clothing Platform",
-  description: "Premium wholesale clothing from Bangladesh. Bulk orders, custom manufacturing, and ready-to-ship collections for global businesses.",    url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+  description: "Premium wholesale clothing from Bangladesh. Bulk orders, custom manufacturing, and ready-to-ship collections for global businesses.",    url: process.env.NEXT_PUBLIC_BASE_URL || 'https://asianclothify.com',
     siteName: "Asian Clothify",
     images: [
       {
